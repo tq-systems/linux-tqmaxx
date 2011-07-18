@@ -102,7 +102,7 @@ struct ipu_fmt *ipu_find_fmt_rgb(unsigned int pixelformat)
 }
 EXPORT_SYMBOL_GPL(ipu_find_fmt_rgb);
 
-static struct ipu_fmt *ipu_find_fmt(unsigned long pixelformat)
+struct ipu_fmt *ipu_find_fmt(unsigned long pixelformat)
 {
 	struct ipu_fmt *fmt;
 

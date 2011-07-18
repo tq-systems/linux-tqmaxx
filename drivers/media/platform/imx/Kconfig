@@ -1,2 +1,11 @@
 config VIDEO_IMX_IPU_COMMON
 	tristate
+
+config VIDEO_IMX_IPU_SCALER
+	tristate "i.MX5/6 IPUv3 based image scaler driver"
+	depends on VIDEO_DEV && IMX_IPUV3_CORE
+	select VIDEOBUF2_DMA_CONTIG
+	select VIDEO_IMX_IPU_COMMON
+	select V4L2_MEM2MEM_DEV
+	---help---
+	  This is a v4l2 scaler video driver for the IPUv3 on i.MX5/6.
