@@ -15,6 +15,7 @@
 #include <linux/errno.h>
 #include <linux/spinlock.h>
 #include <linux/bitrev.h>
+#include <linux/interrupt.h>
 #include <linux/io.h>
 #include <linux/err.h>
 #include "ipu-prv.h"
@@ -96,6 +97,15 @@ struct ic_task_bitfields {
 	u32 ic_cmb_galpha_bit;
 };
 
+struct ic_task_channels {
+	u8 in;
+	u8 out;
+	u8 rot_in;
+	u8 rot_out;
+	u8 in_prev;
+	u8 in_next;
+};
+
 static const struct ic_task_regoffs ic_task_reg[IC_NUM_TASKS] = {
 	[IC_TASK_ENCODER] = {
 		.rsc = IC_PRP_ENC_RSC,
@@ -138,12 +148,53 @@ static const struct ic_task_bitfields ic_task_bit[IC_NUM_TASKS] = {
 	},
 };
 
+static const struct ic_task_channels ic_task_ch[IC_NUM_TASKS] = {
+	[IC_TASK_ENCODER] = {
+		.in = IPUV3_CHANNEL_MEM_IC_PRP_VF,
+		.out = IPUV3_CHANNEL_IC_PRP_ENC_MEM,
+		.rot_in = IPUV3_CHANNEL_MEM_ROT_ENC,
+		.rot_out = IPUV3_CHANNEL_ROT_ENC_MEM,
+	},
+	[IC_TASK_VIEWFINDER] = {
+		.in = IPUV3_CHANNEL_MEM_VDI_CUR,
+		.out = IPUV3_CHANNEL_IC_PRP_VF_MEM,
+		.rot_in = IPUV3_CHANNEL_MEM_ROT_VF,
+		.rot_out = IPUV3_CHANNEL_ROT_VF_MEM,
+		.in_prev = IPUV3_CHANNEL_MEM_VDI_PREV,
+		.in_next = IPUV3_CHANNEL_MEM_VDI_NEXT,
+	},
+	[IC_TASK_POST_PROCESSOR] = {
+		.in = IPUV3_CHANNEL_MEM_IC_PP,
+		.out = IPUV3_CHANNEL_IC_PP_MEM,
+		.rot_in = IPUV3_CHANNEL_MEM_ROT_PP,
+		.rot_out = IPUV3_CHANNEL_ROT_PP_MEM,
+	},
+};
+
+struct image_convert_ctx {
+	void (*complete)(void *ctx, int err);
+	void *complete_context;
+
+	struct list_head list;
+	struct ipu_image in;
+	struct ipu_image in_n;
+	struct ipu_image in_p;
+	struct ipu_image out;
+
+	void *freep;
+
+	bool rotate:1;
+
+	u32 rsc;
+};
+
 struct ipu_ic_priv;
 
 struct ipu_ic {
 	enum ipu_ic_task task;
 	const struct ic_task_regoffs *reg;
 	const struct ic_task_bitfields *bit;
+	const struct ic_task_channels *ch;
 
 	enum ipu_color_space in_cs, g_in_cs;
 	enum ipu_color_space out_cs;
@@ -152,6 +203,19 @@ struct ipu_ic {
 	bool in_use;
 
 	struct ipu_ic_priv *priv;
+
+	struct ipuv3_channel *input_channel_p;
+	struct ipuv3_channel *input_channel;
+	struct ipuv3_channel *input_channel_n;
+	struct ipuv3_channel *output_channel;
+	struct ipuv3_channel *rotation_input_channel;
+	struct ipuv3_channel *rotation_output_channel;
+
+	struct list_head image_list;
+
+	struct workqueue_struct *workqueue;
+	struct work_struct work;
+	struct completion complete;
 };
 
 struct ipu_ic_priv {
@@ -168,7 +232,8 @@ static inline u32 ipu_ic_read(struct ipu_ic *ic, unsigned offset)
 	return readl(ic->priv->base + offset);
 }
 
-static inline void ipu_ic_write(struct ipu_ic *ic, u32 value, unsigned offset)
+static inline void ipu_ic_write(struct ipu_ic *ic, u32 value,
+				unsigned offset)
 {
 	writel(value, ic->priv->base + offset);
 }
@@ -446,32 +511,35 @@ int ipu_ic_task_init(struct ipu_ic *ic,
 		     int in_width, int in_height,
 		     int out_width, int out_height,
 		     enum ipu_color_space in_cs,
-		     enum ipu_color_space out_cs)
+		     enum ipu_color_space out_cs,
+		     u32 rsc)
 {
 	struct ipu_ic_priv *priv = ic->priv;
-	u32 reg, downsize_coeff, resize_coeff;
+	u32 downsize_coeff, resize_coeff;
 	unsigned long flags;
 	int ret = 0;
 
-	/* Setup vertical resizing */
-	ret = calc_resize_coeffs(ic, in_height, out_height,
-				 &resize_coeff, &downsize_coeff);
-	if (ret)
-		return ret;
+	if (!rsc) {
+		/* Setup vertical resizing */
+		ret = calc_resize_coeffs(ic, in_height, out_height,
+					 &resize_coeff, &downsize_coeff);
+		if (ret)
+			return ret;
 
-	reg = (downsize_coeff << 30) | (resize_coeff << 16);
+		rsc = (downsize_coeff << 30) | (resize_coeff << 16);
 
-	/* Setup horizontal resizing */
-	ret = calc_resize_coeffs(ic, in_width, out_width,
-				 &resize_coeff, &downsize_coeff);
-	if (ret)
-		return ret;
+		/* Setup horizontal resizing */
+		ret = calc_resize_coeffs(ic, in_width, out_width,
+					 &resize_coeff, &downsize_coeff);
+		if (ret)
+			return ret;
 
-	reg |= (downsize_coeff << 14) | resize_coeff;
+		rsc |= (downsize_coeff << 14) | resize_coeff;
+	}
 
 	spin_lock_irqsave(&priv->lock, flags);
 
-	ipu_ic_write(ic, reg, ic->reg->rsc);
+	ipu_ic_write(ic, rsc, ic->reg->rsc);
 
 	/* Setup color space conversion */
 	ic->in_cs = in_cs;
@@ -629,6 +697,676 @@ unlock:
 }
 EXPORT_SYMBOL_GPL(ipu_ic_task_idma_init);
 
+static struct image_convert_ctx *ipu_image_convert_next(struct ipu_ic *ic)
+{
+	struct ipu_ic_priv *priv = ic->priv;
+	struct ipuv3_channel *ch_in = ic->input_channel;
+	struct ipuv3_channel *ch_out = ic->output_channel;
+	struct image_convert_ctx *ctx;
+	struct ipu_image *in_p, *in, *in_n;
+	struct ipu_image *out;
+	int ret;
+	unsigned long flags;
+	unsigned int inburst, outburst;
+	unsigned int in_height;
+
+	spin_lock_irqsave(&priv->lock, flags);
+
+	if (list_empty(&ic->image_list)) {
+		spin_unlock_irqrestore(&priv->lock, flags);
+		return NULL;
+	}
+
+	ctx = list_first_entry(&ic->image_list, struct image_convert_ctx, list);
+
+	list_del(&ctx->list);
+
+	spin_unlock_irqrestore(&priv->lock, flags);
+
+	in_p = &ctx->in_p;
+	in = &ctx->in;
+	in_n = &ctx->in_n;
+	out = &ctx->out;
+
+	ipu_cpmem_zero(ch_in);
+	ipu_cpmem_zero(ch_out);
+
+	inburst = in->rect.width & 0xf ? 8 : 16;
+	outburst = out->rect.width & 0xf ? 8 : 16;
+
+	ipu_ic_enable(ic);
+
+	ipu_ic_task_idma_init(ic, ic->input_channel, in->rect.width,
+			      in->rect.height, inburst, IPU_ROTATE_NONE);
+	ipu_ic_task_idma_init(ic, ic->output_channel, out->rect.width,
+			      out->rect.height, outburst, IPU_ROTATE_NONE);
+
+	ipu_cpmem_set_image(ch_in, &ctx->in);
+	ipu_cpmem_set_image(ch_out, &ctx->out);
+
+	ipu_cpmem_set_burstsize(ch_in, inburst);
+	ipu_cpmem_set_burstsize(ch_out, outburst);
+
+	in_height = in->rect.height;
+
+	dev_dbg(priv->ipu->dev, "%s: %dx%d(%dx%d@%d,%d) -> %dx%d(%dx%d@%d,%d)\n",
+		__func__, in->pix.width, in->pix.height,
+		in->rect.width, in->rect.height, in->rect.left, in->rect.top,
+		out->pix.width, out->pix.height,
+		out->rect.width, out->rect.height,
+		out->rect.left, out->rect.top);
+
+	dev_dbg(priv->ipu->dev,
+		"%s: hscale: >>%d, *8192/%d vscale: >>%d, *8192/%d\n",
+		__func__, (ctx->rsc >> 14) & 0x3, (ctx->rsc & 0x3fff),
+		ctx->rsc >> 30, (ctx->rsc >> 16) & 0x3fff);
+
+	ret = ipu_ic_task_init(ic, in->rect.width, in_height,
+			out->rect.width, out->rect.height,
+			ipu_pixelformat_to_colorspace(in->pix.pixelformat),
+			ipu_pixelformat_to_colorspace(out->pix.pixelformat),
+			ctx->rsc);
+	if (ret) {
+		ipu_ic_disable(ic);
+		return ERR_PTR(ret);
+	}
+
+	ipu_idmac_enable_channel(ic->input_channel);
+	ipu_idmac_enable_channel(ic->output_channel);
+
+	ipu_ic_task_enable(ic);
+
+	ipu_idmac_select_buffer(ic->input_channel, 0);
+	ipu_idmac_select_buffer(ic->output_channel, 0);
+
+	return ctx;
+}
+
+static void ipu_image_convert_work(struct work_struct *work)
+{
+	struct ipu_ic *ic = container_of(work, struct ipu_ic, work);
+	struct image_convert_ctx *ctx;
+	int ret;
+
+	while (1) {
+		int task_error = 0;
+
+		ctx = ipu_image_convert_next(ic);
+		if (!ctx)
+			return;
+
+		if (IS_ERR(ctx)) {
+			task_error = PTR_ERR(ctx);
+		} else {
+			ret = wait_for_completion_interruptible_timeout(
+						&ic->complete, 100 * HZ);
+			if (!ret)
+				task_error = -ETIMEDOUT;
+		}
+
+		ipu_ic_task_disable(ic);
+		ipu_ic_disable(ic);
+
+		if (ctx->complete)
+			ctx->complete(ctx->complete_context, task_error);
+		kfree(ctx->freep);
+	}
+}
+
+static irqreturn_t ipu_image_convert_handler(int irq, void *context)
+{
+	struct ipu_ic *ic = context;
+
+	complete(&ic->complete);
+
+	return IRQ_HANDLED;
+}
+
+
+/*
+ * IDMAC base addresses are 8-byte aligned
+ */
+static int ipu_image_halign(u32 pixfmt)
+{
+	switch (pixfmt) {
+	/* 2 RGB32 pixels correspond to 8 bytes */
+	case V4L2_PIX_FMT_RGB32:
+	case V4L2_PIX_FMT_BGR32:
+		return 2;
+	/* 4 RGB565 or YUYV pixels correspond to 8 bytes */
+	case V4L2_PIX_FMT_RGB565:
+	case V4L2_PIX_FMT_UYVY:
+	case V4L2_PIX_FMT_YUYV:
+		return 4;
+	/*
+	 * 8 RGB24 pixels correspond to 24 bytes,
+	 * 8 NV12 pixels correspond to 8 bytes, both in luma and chroma
+	 */
+	case V4L2_PIX_FMT_RGB24:
+	case V4L2_PIX_FMT_BGR24:
+	case V4L2_PIX_FMT_NV12:
+		return 8;
+	/* 16 YUV420 pixels correspond to 16 bytes in luma, 8 bytes in chroma */
+	case V4L2_PIX_FMT_YUV420:
+	case V4L2_PIX_FMT_YVU420:
+	case V4L2_PIX_FMT_YUV422P:
+		return 16;
+	default:
+		return -EINVAL;
+	}
+}
+
+/*
+ * Vertically chroma-subsampled formats are limited to even heights and vertical
+ * positions
+ */
+static int ipu_image_valign(u32 pixfmt)
+{
+	switch (pixfmt) {
+	case V4L2_PIX_FMT_RGB24:
+	case V4L2_PIX_FMT_BGR24:
+	case V4L2_PIX_FMT_RGB32:
+	case V4L2_PIX_FMT_BGR32:
+	case V4L2_PIX_FMT_RGB565:
+	case V4L2_PIX_FMT_UYVY:
+	case V4L2_PIX_FMT_YUYV:
+	case V4L2_PIX_FMT_YUV422P:
+		return 1;
+	case V4L2_PIX_FMT_NV12:
+	case V4L2_PIX_FMT_YUV420:
+	case V4L2_PIX_FMT_YVU420:
+		return 2;
+	default:
+		return -EINVAL;
+	}
+}
+
+#define round_closest(x, y) round_down((x) + (y)/2, (y))
+
+struct image_convert_ctx *ipu_image_convert_prepare(struct ipu_soc *ipu,
+		struct ipu_image *in, struct ipu_image *out,
+		enum ipu_image_scale_ctrl ctrl, int *num_tiles)
+{
+	struct image_convert_ctx *ctx, *c;
+	int htiles, vtiles;
+	int in_valign, in_halign, in_burst, out_valign, out_halign, out_burst;
+	int left, top;
+	int x, y;
+	int h_resize_opt, v_resize_opt;
+	u32 v_downsize_coeff = 0, h_downsize_coeff = 0;
+	u32 v_resize_coeff, h_resize_coeff;
+
+	/* validate input */
+	if (in->rect.width < 16 || out->rect.width < 16 ||
+	    (in->rect.width / 4) > out->rect.width ||
+	    (in->rect.height / 4) > out->rect.height)
+		return ERR_PTR(-EINVAL);
+
+	/* tile setup */
+	htiles = DIV_ROUND_UP(out->rect.width, 1024);
+	vtiles = DIV_ROUND_UP(out->rect.height, 1024);
+
+	in_valign = ipu_image_valign(in->pix.pixelformat);
+	in_halign = ipu_image_halign(in->pix.pixelformat);
+	out_valign = ipu_image_valign(out->pix.pixelformat);
+	out_halign = ipu_image_halign(out->pix.pixelformat);
+
+	/* IC bursts are limited to either 8 or 16 pixels */
+	in_burst = 8;
+	out_burst = 8;
+
+	if (in_valign < 0 || in_halign < 0 ||
+	    out_valign < 0 || out_halign < 0) {
+		dev_err(ipu->dev, "unsupported in/out format\n");
+		return ERR_PTR(-EINVAL);
+	}
+
+	/* compute static decimator coefficients */
+	while ((in->rect.width >> h_downsize_coeff) > out->rect.width)
+		h_downsize_coeff++;
+	while ((in->rect.height >> v_downsize_coeff) > out->rect.height)
+		v_downsize_coeff++;
+
+	/* move and crop the output image according to IDMAC limitations */
+	switch (ctrl) {
+	case IPU_IMAGE_SCALE_ROUND_DOWN:
+		left = round_up(in->rect.left, in_halign);
+		top = round_up(in->rect.top, in_valign);
+		in->rect.width = in->rect.width - (left - in->rect.left);
+		in->rect.height = in->rect.height - (top - in->rect.top);
+		in->rect.left = left;
+		in->rect.top = top;
+		left = round_up(out->rect.left, out_halign);
+		top = round_up(out->rect.top, out_valign);
+		out->rect.width = round_down(out->rect.width - (left -
+					     out->rect.left), out_burst);
+		out->rect.height = round_down(out->rect.height - (top -
+					      out->rect.top), out_valign);
+		break;
+	case IPU_IMAGE_SCALE_ROUND_UP:
+		left = round_down(in->rect.left, in_halign);
+		top = round_down(in->rect.top, in_valign);
+		in->rect.width = in->rect.width + in->rect.left - left;
+		in->rect.height = in->rect.height + in->rect.top - top;
+		in->rect.left = left;
+		in->rect.top = top;
+		left = round_down(out->rect.left, out_halign);
+		top = round_down(out->rect.top, out_valign);
+		out->rect.width = round_up(out->rect.width + out->rect.left -
+					   left, out_burst);
+		out->rect.height = round_up(out->rect.height + out->rect.top -
+					    top, out_valign);
+		break;
+	case IPU_IMAGE_SCALE_PIXELPERFECT:
+		left = round_down(in->rect.left, in_halign);
+		top = round_down(in->rect.top, in_valign);
+		in->rect.width = in->rect.width + in->rect.left - left;
+		in->rect.height = in->rect.height + in->rect.top - top;
+		in->rect.left = left;
+		in->rect.top = top;
+		left = round_down(out->rect.left + out_halign / 2, out_halign);
+		top = round_down(out->rect.top + out_valign / 2, out_valign);
+		/*
+		 * don't round width and height to burst size / pixel format
+		 * limitations yet, we do it after determining the scaling
+		 * coefficients
+		 */
+		out->rect.width = out->rect.width + out->rect.left - left;
+		out->rect.height = out->rect.height + out->rect.top - top;
+		break;
+	default:
+		return ERR_PTR(-EINVAL);
+	}
+	out->rect.left = left;
+	out->rect.top = top;
+
+	/* Round input width and height according to decimation */
+	in->rect.width = round_down(in->rect.width, 1 << h_downsize_coeff);
+	in->rect.height = round_down(in->rect.height, 1 << v_downsize_coeff);
+
+	dev_dbg(ipu->dev,
+		"%s: in: %dx%d(%dx%d@%d,%d) -> out: %dx%d(%dx%d@%d,%d)\n",
+		__func__, in->pix.width, in->pix.height, in->rect.width,
+		in->rect.height, in->rect.left, in->rect.top, out->pix.width,
+		out->pix.height, out->rect.width, out->rect.height,
+		out->rect.left, out->rect.top);
+
+	/*
+	 * Compute the bilinear resizing coefficients that can/could be used if
+	 * scaling using a single tile. The bottom right pixel should sample the
+	 * input as close as possible to but not beyond the bottom right input
+	 * pixel out of the decimator:
+	 *
+	 * (out->rect.width - 1) * h_resize / 8192.0 <= (in->rect.width >>
+	 *						 h_downsize_coeff) - 1
+	 * (out->rect.height - 1) * v_resize / 8192.0 <= (in->rect.height >>
+	 *						  v_downsize_coeff) - 1
+	 */
+	h_resize_opt = 8192 * ((in->rect.width >> h_downsize_coeff) - 1) /
+		       (out->rect.width - 1);
+	v_resize_opt = 8192 * ((in->rect.height >> v_downsize_coeff) - 1) /
+		       (out->rect.height - 1);
+
+	dev_dbg(ipu->dev,
+		"%s: hscale: >>%d, *8192/%d vscale: >>%d, *8192/%d, %dx%d tiles\n",
+		__func__, h_downsize_coeff, h_resize_opt, v_downsize_coeff,
+		v_resize_opt, htiles, vtiles);
+
+	ctx = kcalloc(htiles * vtiles, sizeof(*ctx), GFP_KERNEL);
+	if (!ctx)
+		return ERR_PTR(-ENOMEM);
+
+	c = ctx;
+
+	for (x = htiles - 1; x >= 0; x--) {
+		int in_right, out_right;
+
+		/*
+		 * Since we render tiles right to left, the right edge
+		 * is already known. Depending on tile position and
+		 * scaling mode, we may overshoot it.
+		 */
+		if (x == htiles - 1) {
+			out_right = out->rect.left + out->rect.width;
+			in_right = in->rect.left + in->rect.width;
+		} else {
+			struct image_convert_ctx *c_right = c - vtiles;
+
+			out_right = c_right->out.rect.left;
+			in_right = c_right->in.rect.left;
+		}
+
+		/* Now determine the left edge of this tile column */
+		if (x == 0) {
+			/* For the leftmost column this is trivial */
+			c->out.rect.left = out->rect.left;
+			c->in.rect.left = in->rect.left;
+		} else {
+			int best_left, best_in_left;
+			int min_left, max_left;
+			int min_diff = INT_MAX;
+
+			/*
+			 * Find the best possible left edge. It must be adjusted
+			 * according to IDMAC limitations, and should be
+			 * chosen so that
+			 * (in->rect.left + (c->out.rect.left - out->rect.left)
+			 *  * h_resize_opt / (8192 >> h_downsize_coeff))
+			 * is as close as possible to a valid left edge in the
+			 * input.
+			 */
+			min_left = max(0,
+				       round_up(out_right - 1024, out_halign));
+			max_left = min(round_down(out_right, out_halign),
+				       x * 1024);
+			best_left = min_left;
+			best_in_left = (best_left - out->rect.left) *
+				       h_resize_opt;
+			for (left = min_left; left < max_left;
+			     left += out_halign) {
+				int diff, in_left;
+
+				/*
+				 * In ROUND_UP and ROUND_DOWN modes, for the
+				 * rightmost column, only consider left edges
+				 * that are a multiple of the burst size away
+				 * from the right edge.
+				 */
+				if ((ctrl != IPU_IMAGE_SCALE_PIXELPERFECT) &&
+				    (x == htiles - 1) &&
+				    ((out_right - left) % out_burst))
+					continue;
+				in_left = in->rect.left +
+					  (((left - out->rect.left) *
+					    h_resize_opt) << h_downsize_coeff);
+				diff = abs(in_left -
+					   round_closest(in_left,
+							 8192 * in_halign));
+
+				if (diff < min_diff) {
+					min_diff = diff;
+					best_left = left;
+					best_in_left = in_left;
+				}
+			}
+
+			c->out.rect.left = best_left;
+			c->in.rect.left = DIV_ROUND_CLOSEST(best_in_left, 8192);
+
+			dev_dbg(ipu->dev,
+				"%s: tile(%d,y):\tleft: %d -> %d (instead of %d.%04d -> %d)",
+				__func__, x, c->in.rect.left,
+				c->out.rect.left, best_in_left / 8192,
+				(best_in_left % 8192) * 10000 / 8192,
+				out->rect.left +
+				DIV_ROUND_CLOSEST((c->in.rect.left -
+						   in->rect.left) *
+						  (8192 >> h_downsize_coeff),
+						  h_resize_opt));
+		}
+
+		/* Determine tile width from left and right edges */
+		c->out.rect.width = out_right - c->out.rect.left;
+		c->in.rect.width = in_right - c->in.rect.left;
+
+		/* Now we can determine the actual per-tile scaling factor */
+		if (x == htiles - 1) {
+			/*
+			 * Round down for the right column, since we
+			 * don't want to read beyond the right edge.
+			 */
+			h_resize_coeff = 8192 * ((c->in.rect.width >>
+						 h_downsize_coeff) - 1) /
+					 (c->out.rect.width - 1);
+		} else {
+			/*
+			 * Round to closest for seams between tiles for
+			 * minimal distortion.
+			 */
+			h_resize_coeff = DIV_ROUND_CLOSEST(8192 *
+							   (c->in.rect.width >>
+							    h_downsize_coeff),
+							   c->out.rect.width);
+		}
+
+		/*
+		 * With the scaling factor known, round up output width
+		 * to burst size. In ROUND_UP and ROUND_DOWN scaling mode
+		 * this is a no-op for the right column.
+		 */
+		c->out.rect.width = round_up(c->out.rect.width, out_burst);
+
+		/*
+		 * Calculate input width from the last accessed input pixel
+		 * given output width and scaling coefficients. Round to
+		 * burst size.
+		 */
+		c->in.rect.width = (DIV_ROUND_UP((c->out.rect.width - 1) *
+						 h_resize_coeff, 8192) + 1)
+				   << h_downsize_coeff;
+		c->in.rect.width = round_up(c->in.rect.width, in_burst);
+
+		for (y = vtiles - 1; y >= 0; y--) {
+			int in_bottom, out_bottom;
+
+			memcpy(&c->in.pix, &in->pix,
+			      sizeof(struct v4l2_pix_format));
+
+			if (y == vtiles - 1) {
+				out_bottom = out->rect.top + out->rect.height;
+				in_bottom = in->rect.top + in->rect.height;
+			} else {
+				struct image_convert_ctx *c_below = c - 1;
+
+				out_bottom = c_below->out.rect.top;
+				in_bottom = c_below->in.rect.top;
+
+				/*
+				 * Copy horizontal parameters from the tile
+				 * below
+				 */
+				c->out.rect.left = c_below->out.rect.left;
+				c->out.rect.width = c_below->out.rect.width;
+				c->in.rect.left = c_below->in.rect.left;
+				c->in.rect.width = c_below->in.rect.width;
+			}
+
+			if (y == 0) {
+				c->out.rect.top = out->rect.top;
+				c->in.rect.top = in->rect.top;
+			} else {
+				int best_top, best_in_top;
+				int min_top, max_top;
+				int min_diff = INT_MAX;
+
+				/*
+				 * Find the best possible top edge. It must be
+				 * adjusted according to IDMAC limitations, and
+				 * should be chosen so that
+				 * (in->rect.top + (c->out.rect.top -
+				 *  out->rect.top) * v_resize_opt /
+				 * (8192 >> v_downsize_coeff))
+				 * is as close as possible to a valid top edge
+				 * in the input.
+				 */
+				min_top = max(0,
+					      round_up(out_bottom - 1024,
+						       out_valign));
+				max_top = min(round_down(out_bottom,
+							 out_halign), y * 1024);
+				best_top = min_top;
+				best_in_top = (best_top - out->rect.top) *
+					       v_resize_opt;
+				for (top = min_top; top < max_top;
+				     top += out_valign) {
+					int diff, in_top;
+
+					in_top = in->rect.top +
+						 (((top - out->rect.top) *
+						   v_resize_opt) <<
+						  v_downsize_coeff);
+					diff = abs(in_top -
+						   round_closest(in_top, 8192 *
+								 in_valign));
+
+					if (diff < min_diff) {
+						min_diff = diff;
+						best_top = top;
+						best_in_top = in_top;
+					}
+				}
+
+				c->out.rect.top = best_top;
+				c->in.rect.top = DIV_ROUND_CLOSEST(best_in_top,
+								   8192);
+
+				dev_dbg(ipu->dev,
+					"%s: tile(%d,%d):\ttop: %d -> %d (instead of %d.%04d -> %d)",
+					__func__, x, y, c->in.rect.top,
+					c->out.rect.top, best_in_top / 8192,
+					(best_in_top % 8192) * 10000 / 8192,
+					out->rect.top +
+					DIV_ROUND_CLOSEST((c->in.rect.top -
+							   in->rect.top) * (8192
+							  >> v_downsize_coeff),
+							  v_resize_opt));
+			}
+
+			/* Determine tile height from top and bottom edges */
+			c->out.rect.height = out_bottom - c->out.rect.top;
+			c->in.rect.height = in_bottom - c->in.rect.top;
+
+			/*
+			 * Now we can determine the actual vertical per-tile
+			 * scaling factor
+			 */
+			if (y == vtiles - 1) {
+				/*
+				 * Round down for the bottom row, since we
+				 * don't want to read beyond the lower border.
+				 */
+				v_resize_coeff = 8192 * ((c->in.rect.height >>
+							 v_downsize_coeff) - 1)
+						 / (c->out.rect.height - 1);
+			} else {
+				/*
+				 * Round to closest for seams between tiles for
+				 * minimal distortion.
+				 */
+				v_resize_coeff = DIV_ROUND_CLOSEST(8192 *
+							(c->in.rect.height >>
+							 v_downsize_coeff),
+							c->out.rect.height);
+			}
+
+			/*
+			 * With the scaling factor known, round up output height
+			 * to IDMAC limitations
+			 */
+			c->out.rect.height = round_up(c->out.rect.height,
+						      out_valign);
+
+			/*
+			 * Calculate input height from the last accessed input
+			 * line given output height and scaling coefficients.
+			 */
+			c->in.rect.height = (DIV_ROUND_UP(
+						(c->out.rect.height - 1) *
+						v_resize_coeff, 8192) + 1)
+					    << v_downsize_coeff;
+
+			/* align height according to IDMAC restrictions */
+			c->in.rect.height = round_up(c->in.rect.height,
+				in_valign);
+
+			memcpy(&c->out.pix, &out->pix,
+			       sizeof(struct v4l2_pix_format));
+
+			dev_dbg(ipu->dev,
+				"%s: tile(%d,%d): %dx%d(%dx%d@%d,%d) -> %dx%d(%dx%d@%d,%d), resize: %dx%d\n",
+				__func__, x, y,
+				c->in.pix.width, c->in.pix.height,
+				c->in.rect.width, c->in.rect.height,
+				c->in.rect.left, c->in.rect.top,
+				c->out.pix.width, c->out.pix.height,
+				c->out.rect.width, c->out.rect.height,
+				c->out.rect.left, c->out.rect.top,
+				h_resize_coeff, v_resize_coeff);
+
+			c->rsc = (v_downsize_coeff << 30) |
+				 (v_resize_coeff << 16) |
+				 (h_downsize_coeff << 14) |
+				 h_resize_coeff;
+
+			c++;
+		}
+	}
+
+	*num_tiles = htiles * vtiles;
+
+	return ctx;
+}
+EXPORT_SYMBOL_GPL(ipu_image_convert_prepare);
+
+int ipu_image_convert_run(struct ipu_soc *ipu, struct ipu_image *in,
+			  struct ipu_image *out, struct image_convert_ctx *ctx,
+			  int num_tiles, void (*complete)(void *ctx, int err),
+			  void *complete_context, bool free_ctx)
+{
+	struct ipu_ic_priv *priv = ipu->ic_priv;
+	struct ipu_ic *ic = &priv->task[IC_TASK_POST_PROCESSOR];
+	unsigned long flags;
+	int i;
+
+	for (i = 0; i < num_tiles; i++) {
+		ctx[i].in.phys0 = in->phys0;
+		ctx[i].out.phys0 = out->phys0;
+	}
+	ctx[num_tiles - 1].complete = complete;
+	ctx[num_tiles - 1].complete_context = complete_context;
+	if (free_ctx)
+		ctx[num_tiles - 1].freep = ctx;
+
+	spin_lock_irqsave(&priv->lock, flags);
+
+	for (i = 0; i < num_tiles; i++)
+		list_add_tail(&ctx[i].list, &ic->image_list);
+
+	queue_work(ic->workqueue, &ic->work);
+
+	spin_unlock_irqrestore(&priv->lock, flags);
+
+	return 0;
+}
+EXPORT_SYMBOL_GPL(ipu_image_convert_run);
+
+static int ipu_image_convert_init(struct device *dev, struct ipu_soc *ipu,
+		struct ipu_ic_priv *priv)
+{
+	int ret;
+	struct ipu_ic *ic = ipu_ic_get(ipu, IC_TASK_POST_PROCESSOR);
+	int irq = ipu_idmac_channel_irq(ipu, ic->output_channel,
+					IPU_IRQ_EOF);
+
+	ic->workqueue = create_singlethread_workqueue(dev_name(ipu->dev));
+	if (!ic->workqueue)
+		return -ENOMEM;
+
+	INIT_WORK(&ic->work, ipu_image_convert_work);
+	init_completion(&ic->complete);
+
+	ret = devm_request_threaded_irq(dev, irq, NULL,
+				ipu_image_convert_handler,
+				IRQF_ONESHOT, "IC PP", ic);
+	if (ret)
+		goto err;
+
+	return 0;
+err:
+	destroy_workqueue(ic->workqueue);
+	return ret;
+}
+
 int ipu_ic_enable(struct ipu_ic *ic)
 {
 	struct ipu_ic_priv *priv = ic->priv;
@@ -736,11 +1474,29 @@ int ipu_ic_init(struct ipu_soc *ipu, struct device *dev,
 	priv->ipu = ipu;
 
 	for (i = 0; i < IC_NUM_TASKS; i++) {
+		INIT_LIST_HEAD(&priv->task[i].image_list);
 		priv->task[i].task = i;
 		priv->task[i].priv = priv;
 		priv->task[i].reg = &ic_task_reg[i];
 		priv->task[i].bit = &ic_task_bit[i];
+
+		priv->task[i].input_channel = ipu_idmac_get(ipu,
+							ic_task_ch[i].in);
+		priv->task[i].output_channel = ipu_idmac_get(ipu,
+							ic_task_ch[i].out);
+		priv->task[i].rotation_input_channel = ipu_idmac_get(ipu,
+							ic_task_ch[i].rot_in);
+		priv->task[i].rotation_output_channel = ipu_idmac_get(ipu,
+							ic_task_ch[i].rot_out);
+		if (ic_task_ch[i].in_prev) {
+			priv->task[i].input_channel_p = ipu_idmac_get(ipu,
+							ic_task_ch[i].in_prev);
+			priv->task[i].input_channel_n = ipu_idmac_get(ipu,
+							ic_task_ch[i].in_next);
+		}
 	}
+
+	ipu_image_convert_init(dev, ipu, priv);
 
 	return 0;
 }
