@@ -269,6 +269,28 @@ static void panel_simple_shutdown(struct device *dev)
 	panel_simple_disable(&panel->base);
 }
 
+static const struct drm_display_mode auo_g156xw01_mode = {
+	.clock = 76000,
+	.hdisplay = 1366,
+	.hsync_start = 1366 + 10,
+	.hsync_end = 1366 + 10 + 200,
+	.htotal = 1366 + 10 + 200 + 10,
+	.vdisplay = 768,
+	.vsync_start = 768 + 10,
+	.vsync_end = 768 + 10 + 38,
+	.vtotal = 768 + 10 + 38 + 100,
+	.flags = DRM_MODE_FLAG_NVSYNC | DRM_MODE_FLAG_NHSYNC,
+};
+
+static const struct panel_desc auo_g156xw01 = {
+	.modes = &auo_g156xw01_mode,
+	.num_modes = 1,
+	.size = {
+		.width = 344,
+		.height = 194,
+	},
+};
+
 static const struct drm_display_mode auo_b101aw03_mode = {
 	.clock = 51450,
 	.hdisplay = 1024,
@@ -449,6 +471,9 @@ static const struct panel_desc samsung_ltn101nt05 = {
 
 static const struct of_device_id platform_of_match[] = {
 	{
+		.compatible = "auo,g156xw01",
+		.data = &auo_g156xw01,
+	}, {
 		.compatible = "auo,b101aw03",
 		.data = &auo_b101aw03,
 	}, {
