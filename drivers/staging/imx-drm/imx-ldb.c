@@ -24,6 +24,7 @@
 #include <drm/drmP.h>
 #include <drm/drm_fb_helper.h>
 #include <drm/drm_crtc_helper.h>
+#include <drm/drm_panel.h>
 #include <linux/mfd/syscon.h>
 #include <linux/mfd/syscon/imx6q-iomuxc-gpr.h>
 #include <linux/of_address.h>
@@ -65,6 +66,7 @@ struct imx_ldb_channel {
 	void *edid;
 	int edid_len;
 	struct drm_display_mode mode;
+	struct drm_panel *panel;
 	int mode_valid;
 };
 
@@ -95,6 +97,13 @@ static int imx_ldb_connector_get_modes(struct drm_connector *connector)
 {
 	struct imx_ldb_channel *imx_ldb_ch = con_to_imx_ldb_ch(connector);
 	int num_modes = 0;
+
+	if (imx_ldb_ch->panel && imx_ldb_ch->panel->funcs &&
+	    imx_ldb_ch->panel->funcs->get_modes) {
+		num_modes = imx_ldb_ch->panel->funcs->get_modes(imx_ldb_ch->panel);
+		if (num_modes > 0)
+			return num_modes;
+	}
 
 	if (imx_ldb_ch->edid) {
 		drm_mode_connector_update_edid_property(connector,
@@ -127,6 +136,13 @@ static struct drm_encoder *imx_ldb_connector_best_encoder(
 
 static void imx_ldb_encoder_dpms(struct drm_encoder *encoder, int mode)
 {
+	struct imx_ldb_channel *imx_ldb_ch = enc_to_imx_ldb_ch(encoder);
+
+	if (mode != DRM_MODE_DPMS_ON)
+		drm_panel_disable(imx_ldb_ch->panel);
+	else
+		drm_panel_enable(imx_ldb_ch->panel);
+
 }
 
 static bool imx_ldb_encoder_mode_fixup(struct drm_encoder *encoder,
@@ -368,6 +384,13 @@ static int imx_ldb_register(struct drm_device *drm,
 			return ret;
 	}
 
+	/* set the connector's dpms to OFF so that
+	 * drm_helper_connector_dpms() won't return
+	 * immediately since the current state is ON
+	 * at this point.
+	 */
+	imx_ldb_ch->connector.dpms = DRM_MODE_DPMS_OFF;
+
 	drm_encoder_helper_add(&imx_ldb_ch->encoder,
 			&imx_ldb_encoder_helper_funcs);
 	drm_encoder_init(drm, &imx_ldb_ch->encoder, &imx_ldb_encoder_funcs,
@@ -377,6 +400,9 @@ static int imx_ldb_register(struct drm_device *drm,
 			&imx_ldb_connector_helper_funcs);
 	drm_connector_init(drm, &imx_ldb_ch->connector,
 			   &imx_ldb_connector_funcs, DRM_MODE_CONNECTOR_LVDS);
+
+	if (imx_ldb_ch->panel)
+		drm_panel_attach(imx_ldb_ch->panel, &imx_ldb_ch->connector);
 
 	drm_mode_connector_attach_encoder(&imx_ldb_ch->connector,
 			&imx_ldb_ch->encoder);
@@ -492,6 +518,7 @@ static int imx_ldb_bind(struct device *dev, struct device *master, void *data)
 
 	for_each_child_of_node(np, child) {
 		struct imx_ldb_channel *channel;
+		struct device_node *panel_node;
 
 		ret = of_property_read_u32(child, "reg", &i);
 		if (ret || i < 0 || i > 1)
@@ -519,6 +546,9 @@ static int imx_ldb_bind(struct device *dev, struct device *master, void *data)
 			if (!ret)
 				channel->mode_valid = 1;
 		}
+		panel_node = of_parse_phandle(child, "fsl,panel", 0);
+		if (panel_node)
+			channel->panel = of_drm_find_panel(panel_node);
 
 		ret = of_property_read_u32(child, "fsl,data-width", &datawidth);
 		if (ret)
