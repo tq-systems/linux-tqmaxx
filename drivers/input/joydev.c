@@ -38,6 +38,9 @@ MODULE_LICENSE("GPL");
 #define JOYDEV_MINORS		16
 #define JOYDEV_BUFFER_SIZE	64
 
+/* for blacklisting */
+#define VID_EETI		0x0EEF
+
 struct joydev {
 	int open;
 	struct input_handle handle;
@@ -756,6 +759,11 @@ static bool joydev_match(struct input_handler *handler, struct input_dev *dev)
 
 	/* Avoid tablets, digitisers and similar devices */
 	if (test_bit(EV_KEY, dev->evbit) && test_bit(BTN_DIGI, dev->keybit))
+		return false;
+
+	/* avoid EETI virtual devices */
+	if (unlikely((BUS_VIRTUAL == dev->id.bustype) &&
+		    (VID_EETI == dev->id.vendor)))
 		return false;
 
 	return true;
