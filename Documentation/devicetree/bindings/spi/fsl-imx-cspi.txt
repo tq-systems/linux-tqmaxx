@@ -8,6 +8,10 @@ Required properties:
 - fsl,spi-num-chipselects : Contains the number of the chipselect
 - cs-gpios : Specifies the gpio pins to be used for chipselects.
 
+Optional properties:
+- fsl,rt : indicates the controller should run the message pump with realtime
+	   priority to minimise the transfer latency on the bus (boolean)
+
 Example:
 
 ecspi@70010000 {
