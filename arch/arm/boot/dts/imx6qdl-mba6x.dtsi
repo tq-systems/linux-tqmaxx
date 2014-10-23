@@ -66,7 +66,7 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_disp0_ipu1>;
 		interface-pix-fmt = "bgr666";
-		status = "okay";
+		status = "disabled";
 
 		port@0 {
 			display0_in: endpoint {
@@ -237,7 +237,7 @@
 };
 
 &hdmi {
-	status = "okay";
+	status = "disabled";
 	ddc-i2c-bus = <&i2c2>;
 };
 
@@ -597,13 +597,13 @@
 };
 
 &ldb {
-	status = "okay";
+	status = "disabled";
 
 	lvds-channel@0 {
 		fsl,data-mapping = "spwg";
 		fsl,data-width = <24>;
 		native-mode = <&chimei_g104_x1>;
-		status = "okay";
+		status = "disabled";
 
 		display-timings {
 			chimei_g104_x1: chimei-g104-x1 {
