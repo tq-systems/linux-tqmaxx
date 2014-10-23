@@ -73,9 +73,9 @@ static int ksz9031rn_phy_fixup(struct phy_device *dev)
 	 * min rx data delay, max rx/tx clock delay,
 	 * min rx/tx control delay
 	 */
-	mmd_write_reg(dev, 2, 4, 0);
-	mmd_write_reg(dev, 2, 5, 0);
-	mmd_write_reg(dev, 2, 8, 0x003ff);
+	mmd_write_reg(dev, 2, MICREL_KSZ9031_EXT_RGMII_CTRL_SIG_SKEW, 0);
+	mmd_write_reg(dev, 2, MICREL_KSZ9031_EXT_RGMII_RX_DATA_SKEW, 0);
+	mmd_write_reg(dev, 2, MICREL_KSZ9031_EXT_RGMII_CLOCK_SKEW, 0x003ff);
 
 	return 0;
 }
