@@ -26,6 +26,7 @@
 #include <linux/signal.h>
 #include <linux/types.h>
 #include <linux/interrupt.h>
+#include <linux/regulator/consumer.h>
 
 #include "pcie-designware.h"
 
@@ -38,6 +39,7 @@ struct imx6_pcie {
 	struct clk		*pcie;
 	struct pcie_port	pp;
 	struct regmap		*iomuxc_gpr;
+	struct regulator	*reg_vcc;
 	void __iomem		*mem_base;
 };
 
@@ -550,6 +552,20 @@ static int __init imx6_pcie_probe(struct platform_device *pdev)
 			return ret;
 		}
 	}
+
+	/* Fetch regulator */
+	imx6_pcie->reg_vcc = devm_regulator_get(&pdev->dev, "vcc");
+	if (!IS_ERR(imx6_pcie->reg_vcc)) {
+		ret = regulator_enable(imx6_pcie->reg_vcc);
+		if (ret) {
+			dev_err(&pdev->dev,
+				"Failed to enable vcc regulator: %d\n", ret);
+			return ret;
+		}
+	} else {
+		imx6_pcie->reg_vcc = NULL;
+	}
+
 
 	/* Fetch clocks */
 	imx6_pcie->pcie_phy = devm_clk_get(&pdev->dev, "pcie_phy");

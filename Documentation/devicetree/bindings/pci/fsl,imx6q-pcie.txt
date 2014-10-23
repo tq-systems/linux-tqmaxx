@@ -13,6 +13,9 @@ Required properties:
 - clock-names: Must include the following additional entries:
 	- "pcie_phy"
 
+Optional properties:
+- vcc-supply: phandle to regulator fro the pcie supply
+
 Example:
 
 	pcie@0x01000000 {
