@@ -319,6 +319,7 @@ struct mmc_host {
 #ifdef CONFIG_MMC_DEBUG
 	unsigned int		removed:1;	/* host is being removed */
 #endif
+	unsigned int		dsr_req:1;	/* DSR is requested for Host */
 
 	int			rescan_disable;	/* disable card detection */
 	int			rescan_entered;	/* used with nonremovable devices */
@@ -364,6 +365,8 @@ struct mmc_host {
 	unsigned int		actual_clock;	/* Actual HC clock rate */
 
 	unsigned int		slotno;	/* used for sdio acpi binding */
+
+	u16			dsr;	/* optional driver stage (dsr) value */
 
 	unsigned long		private[0] ____cacheline_aligned;
 };

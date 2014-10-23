@@ -40,6 +40,13 @@ Optional properties:
 - mmc-hs200-1_2v: eMMC HS200 mode(1.2V I/O) is supported
 - mmc-hs400-1_8v: eMMC HS400 mode(1.8V I/O) is supported
 - mmc-hs400-1_2v: eMMC HS400 mode(1.2V I/O) is supported
+- dsr: Content of the optional driver stage register (DSR) as described
+  in JEDEC Standard No. 84-A44, 12.4: Programmable card output driver, SDIO
+  simplified specification 2.00 4.10.5: DSR Register and SD Card Physical Layer
+  Specification 2.00 5.5 DSR Register. For SD and MMC cards this is an optional
+  feature. SDIO cards do not have this feature.
+  SD Card Physical Layer Specification 2.00 Table 6-1 defines the DSR register
+  layout.
 
 *NOTE* on CD and WP polarity. To use common for all SD/MMC host controllers line
 polarity properties, we have to fix the meaning of the "normal" and "inverted"
