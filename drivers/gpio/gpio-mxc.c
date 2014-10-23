@@ -175,6 +175,31 @@ static int gpio_set_irq_type(struct irq_data *d, u32 type)
 	u32 gpio = port->bgc.gc.base + gpio_idx;
 	int edge;
 	void __iomem *reg = port->base;
+	int ret = 0;
+
+	if (!gpiochip_is_requested(&port->bgc.gc, gpio_idx)) {
+		char label[32];
+
+		snprintf(label, 32, "gpio%u-irq", gpio);
+		ret = gpio_request_one(gpio, GPIOF_DIR_IN, label);
+	} else {
+		val = readl(port->base + GPIO_GDIR);
+		if (val & BIT(gpio_idx))
+			ret = -EINVAL;
+	}
+
+	if (ret) {
+		dev_err(port->bgc.gc.dev, "unable to set gpio_idx %u as IN\n",
+			gpio_idx);
+		return ret;
+	}
+
+	ret = gpio_lock_as_irq(&port->bgc.gc, gpio_idx);
+	if (ret) {
+		dev_err(port->bgc.gc.dev, "unable to lock gpio_idx %u for IRQ\n",
+			gpio_idx);
+		return ret;
+	}
 
 	port->both_edges &= ~(1 << gpio_idx);
 	switch (type) {
@@ -229,6 +254,15 @@ static int gpio_set_irq_type(struct irq_data *d, u32 type)
 	writel(1 << gpio_idx, port->base + GPIO_ISR);
 
 	return 0;
+}
+
+static void gpio_irq_shutdown(struct irq_data *d)
+{
+	struct irq_chip_generic *gc = irq_data_get_irq_chip_data(d);
+	struct mxc_gpio_port *port = gc->private;
+	u32 gpio_idx = d->hwirq;
+
+	gpio_unlock_as_irq(&port->bgc.gc, gpio_idx);
 }
 
 static void mxc_flip_edge(struct mxc_gpio_port *port, u32 gpio)
@@ -353,6 +387,7 @@ static void __init mxc_gpio_init_gc(struct mxc_gpio_port *port, int irq_base)
 	ct->chip.irq_mask = irq_gc_mask_clr_bit;
 	ct->chip.irq_unmask = irq_gc_mask_set_bit;
 	ct->chip.irq_set_type = gpio_set_irq_type;
+	ct->chip.irq_shutdown = gpio_irq_shutdown;
 	ct->chip.irq_set_wake = gpio_set_wake_irq;
 	ct->regs.ack = GPIO_ISR;
 	ct->regs.mask = GPIO_IMR;
