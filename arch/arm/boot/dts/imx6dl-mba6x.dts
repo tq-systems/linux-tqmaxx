@@ -1,0 +1,34 @@
+/*
+ * Copyright 2013 Sascha Hauer, Pengutronix
+ *
+ * The code contained herein is licensed under the GNU General Public
+ * License. You may obtain a copy of the GNU General Public License
+ * Version 2 or later at the following locations:
+ *
+ * http://www.opensource.org/licenses/gpl-license.html
+ * http://www.gnu.org/copyleft/gpl.html
+ */
+/dts-v1/;
+
+#include "dt-bindings/gpio/gpio.h"
+#include "imx6dl-tqma6s.dtsi"
+#include "imx6qdl-mba6x.dtsi"
+
+/ {
+	model = "TQ TQMa6S on MBa6x";
+	compatible = "tq,mba6x", "tq,tqma6s", "fsl,imx6dl";
+
+	chosen {
+		linux,stdout-path = &uart2;
+		stdout-path = &uart2;
+	};
+
+	memory {
+		reg = <0x10000000 0x20000000>;
+	};
+};
+
+&disp0 {
+	crtcs = <&ipu1 0>;
+};
+

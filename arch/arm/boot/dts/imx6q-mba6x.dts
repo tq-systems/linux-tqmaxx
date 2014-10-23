@@ -1,0 +1,59 @@
+/*
+ * Copyright 2013 Sascha Hauer, Pengutronix
+ *
+ * The code contained herein is licensed under the GNU General Public
+ * License. You may obtain a copy of the GNU General Public License
+ * Version 2 or later at the following locations:
+ *
+ * http://www.opensource.org/licenses/gpl-license.html
+ * http://www.gnu.org/copyleft/gpl.html
+ */
+/dts-v1/;
+
+#include "dt-bindings/gpio/gpio.h"
+#include "imx6q-tqma6q.dtsi"
+#include "imx6qdl-mba6x.dtsi"
+
+/ {
+	model = "TQ TQMa6Q on MBa6x";
+	compatible = "tq,mba6x", "tq,tqma6q", "fsl,imx6q";
+
+	chosen {
+		linux,stdout-path = &uart2;
+		stdout-path = &uart2;
+	};
+
+	memory {
+		reg = <0x10000000 0x40000000>;
+	};
+};
+
+&disp0 {
+	crtcs = <&ipu1 0 &ipu2 0>;
+};
+
+&ecspi5 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_ecspi5_mba6x>;
+	fsl,spi-num-chipselects = <1>;
+	cs-gpios = <&gpio1 17 0>;
+	status = "okay";
+};
+
+&iomuxc {
+	ecspi5 {
+		pinctrl_ecspi5_mba6x: ecspi5grp-mba6x {
+			fsl,pins = <
+				/* HYS, SPEED = MED, 100k up, DSE = 011, SRE_FAST */
+				MX6QDL_PAD_SD1_DAT0__ECSPI5_MISO 0x1b099
+				MX6QDL_PAD_SD1_CMD__ECSPI5_MOSI 0xb099
+				MX6QDL_PAD_SD1_CLK__ECSPI5_SCLK 0xb099
+				MX6QDL_PAD_SD1_DAT1__GPIO1_IO17 0xb099 /* eCSPI5 SS0 */
+			>;
+		};
+	};
+};
+
+&sata {
+	status = "okay";
+};
