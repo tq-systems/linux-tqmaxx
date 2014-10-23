@@ -80,6 +80,40 @@ static int ksz9031rn_phy_fixup(struct phy_device *dev)
 	return 0;
 }
 
+static int ksz9031rn_tqma6s_mba6x_phy_fixup(struct phy_device *dev)
+{
+	/*
+	 * values adopted to run length
+	 * +0.96ns RXC +0.96ns TXC
+	 * 0.00 ns RXD0 .. 3, RX_DV
+	 * -0.42 TXD2 TX_EN -0.30ns TXD3 TXD0, -0.12ns TXD1
+	 */
+	mmd_write_reg(dev, 2, MICREL_KSZ9031_EXT_RGMII_CTRL_SIG_SKEW, 0x0070);
+	mmd_write_reg(dev, 2, MICREL_KSZ9031_EXT_RGMII_RX_DATA_SKEW, 0x7777);
+	mmd_write_reg(dev, 2, MICREL_KSZ9031_EXT_RGMII_TX_DATA_SKEW, 0x2052);
+	mmd_write_reg(dev, 2, MICREL_KSZ9031_EXT_RGMII_CLOCK_SKEW, 0x03ff);
+
+	return 0;
+}
+
+static int ksz9031rn_tqma6q_mba6x_phy_fixup(struct phy_device *dev)
+{
+	/*
+	 * values adopted to run length
+	 * +0.96ns RXC +0.96ns TXC
+	 * 0.00 ns RXD0 .. 3, RX_DV
+	 * -0.42 TXD2, -0.30ns TXD3 TX_EN, -0.24ns TXD1, -0.06ns TXD0
+	 * i.MX6Q timing violation of up to 0.5 ns vs. RGMII requirement
+	 * seems not need any extra care
+	 */
+	mmd_write_reg(dev, 2, MICREL_KSZ9031_EXT_RGMII_CTRL_SIG_SKEW, 0x0072);
+	mmd_write_reg(dev, 2, MICREL_KSZ9031_EXT_RGMII_RX_DATA_SKEW, 0x7777);
+	mmd_write_reg(dev, 2, MICREL_KSZ9031_EXT_RGMII_TX_DATA_SKEW, 0x2036);
+	mmd_write_reg(dev, 2, MICREL_KSZ9031_EXT_RGMII_CLOCK_SKEW, 0x03ff);
+
+	return 0;
+}
+
 /*
  * fixup for PLX PEX8909 bridge to configure GPIO1-7 as output High
  * as they are used for slots1-7 PERST#
@@ -228,6 +262,60 @@ put_node:
 	of_node_put(np);
 }
 
+static void __init imx6q_mba6x_enet_init(void)
+{
+	struct device_node *np;
+	void __iomem *base;
+
+	np = of_find_compatible_node(NULL, NULL, "fsl,imx6q-iomuxc");
+	if (!np) {
+		pr_warn("failed to find iomuxc node\n");
+		return;
+	}
+
+	base = of_iomap(np, 0);
+	if (!base) {
+		pr_warn("failed to map iomuxc\n");
+		goto put_node;
+	}
+
+#define MX6Q_GRP_DDR_TYPE_RGMII		0x00790
+#define MX6Q_GRP_RGMII_TERM		0x007ac
+
+#define MX6DL_GRP_DDR_TYPE_RGMII	0x00768
+#define MX6DL_GRP_RGMII_TERM		0x00788
+
+/* disable on die termination for RGMII */
+#define MX6_GRP_RGMII_TERM_DISABLE	0x00000000
+/* optimised drive strength for 1.0 .. 1.3 V signal on RGMII */
+#define MX6_GRP_DDR_TYPE_RGMII_1P2V	0x00080000
+/* optimised drive strength for 1.3 .. 2.5 V signal on RGMII */
+#define MX6_GRP_DDR_TYPE_RGMII_1P5V	0x000C0000
+
+	if (of_machine_is_compatible("tq,tqma6s")) {
+		writel_relaxed(MX6_GRP_DDR_TYPE_RGMII_1P5V,
+				base + MX6DL_GRP_DDR_TYPE_RGMII);
+		writel_relaxed(MX6_GRP_RGMII_TERM_DISABLE,
+				base + MX6DL_GRP_RGMII_TERM);
+		if (IS_BUILTIN(CONFIG_PHYLIB))
+			phy_register_fixup_for_uid(PHY_ID_KSZ9031,
+						   MICREL_PHY_ID_MASK,
+					ksz9031rn_tqma6s_mba6x_phy_fixup);
+	} else if (of_machine_is_compatible("tq,tqma6q")) {
+		writel_relaxed(MX6_GRP_DDR_TYPE_RGMII_1P5V,
+				base + MX6Q_GRP_DDR_TYPE_RGMII);
+		writel_relaxed(MX6_GRP_RGMII_TERM_DISABLE,
+				base + MX6Q_GRP_RGMII_TERM);
+		if (IS_BUILTIN(CONFIG_PHYLIB))
+			phy_register_fixup_for_uid(PHY_ID_KSZ9031,
+						   MICREL_PHY_ID_MASK,
+					ksz9031rn_tqma6q_mba6x_phy_fixup);
+	}
+
+put_node:
+	of_node_put(np);
+}
+
 static void __init imx6q_axi_init(void)
 {
 	struct regmap *gpr;
@@ -274,7 +362,10 @@ static void __init imx6q_init_machine(void)
 	if (parent == NULL)
 		pr_warn("failed to initialize soc device\n");
 
-	imx6q_enet_phy_init();
+	if (of_machine_is_compatible("tq,mba6x"))
+		imx6q_mba6x_enet_init();
+	else
+		imx6q_enet_phy_init();
 
 	of_platform_populate(NULL, of_default_bus_match_table, NULL, parent);
 
