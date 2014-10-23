@@ -384,6 +384,24 @@ static int ksz9031_config_init(struct phy_device *phydev)
 				MII_KSZ9031RN_TX_DATA_PAD_SKEW, 4,
 				tx_data_skews, 4);
 	}
+
+	{
+		int rc;
+		u16 val;
+		/* force master mode -> errata #2
+		 * attention: Master <-> Master will not work
+		 */
+		rc = phy_read(phydev, MII_CTRL1000);
+		if (rc >= 0) {
+			val = (u16)rc;
+			/* enable master mode, config & prefer master */
+			val |= (CTL1000_ENABLE_MASTER | CTL1000_AS_MASTER);
+			rc = phy_write(phydev, MII_CTRL1000, val);
+			pr_info("%s force master (%s)\n", __func__,
+				rc ? "NIO" : "IO");
+		}
+	}
+
 	return 0;
 }
 
@@ -570,8 +588,8 @@ static struct phy_driver ksphy_driver[] = {
 	.phy_id		= PHY_ID_KSZ9031,
 	.phy_id_mask	= 0x00fffff0,
 	.name		= "Micrel KSZ9031 Gigabit PHY",
-	.features	= (PHY_GBIT_FEATURES | SUPPORTED_Pause
-				| SUPPORTED_Asym_Pause),
+	/* disable asym pause -> errata #1 */
+	.features	= (PHY_GBIT_FEATURES | SUPPORTED_Pause),
 	.flags		= PHY_HAS_MAGICANEG | PHY_HAS_INTERRUPT,
 	.config_init	= ksz9031_config_init,
 	.config_aneg	= genphy_config_aneg,
