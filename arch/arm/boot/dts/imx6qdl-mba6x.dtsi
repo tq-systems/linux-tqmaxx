@@ -74,6 +74,12 @@
 		status = "disabled";
 	};
 
+	backlight_rev0100: backlight@2 {
+		compatible = "gpio-backlight";
+		gpios = <&gpio4 20 GPIO_ACTIVE_HIGH>; /* LCD.CONTRAST */
+		status = "disabled";
+	};
+
 	disp0: display@0 {
 		compatible = "fsl,imx-parallel-display";
 		#address-cells = <1>;
@@ -141,19 +147,6 @@
 			gpios = <&gpio6 31 0>;
 			linux,default-trigger = "heartbeat";
 		};
-#if 0
-		lcd-backlight-enable {
-			label = "backlight";
-			gpios = <&gpio4 5 0>; /* LCD.BLT_EN */
-			linux,default-trigger = "default-off";
-		};
-
-		lcd-contrast {
-			label = "contrast";
-			gpios = <&gpio4 20 0>; /* LCD.CONTRAST */
-			linux,default-trigger = "default-off";
-		};
-#endif
 	};
 
 	regulators {
@@ -195,6 +188,19 @@
 			regulator-max-microvolt = <3300000>;
 			gpio = <&gpio2 0 0>; /* PCIE.PWR_EN */
 			enable-active-high;
+		};
+
+		reg_backlight_rev0100: regulator@4 {
+			compatible = "regulator-fixed";
+			reg = <4>;
+			regulator-name = "vcc-backlight_rev0100";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			gpios = <&gpio4 5 0>; /* LCD.BLT_EN */
+			enable-active-high;
+			enable-boot-on;
+			enable-always-on;
+			status = "disabled";
 		};
 	};
 
