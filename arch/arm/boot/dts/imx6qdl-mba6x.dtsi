@@ -186,6 +186,16 @@
 			regulator-min-microvolt = <3300000>;
 			regulator-max-microvolt = <3300000>;
 		};
+
+		reg_pcie: regulator@3 {
+			compatible = "regulator-fixed";
+			reg = <3>;
+			regulator-name = "vcc-pcie";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			gpio = <&gpio2 0 0>; /* PCIE.PWR_EN */
+			enable-active-high;
+		};
 	};
 
 	sound {
@@ -497,8 +507,8 @@
 				MX6QDL_PAD_SD4_DAT3__GPIO2_IO11 0x001b0f0 /* #PCIE.WAKE */
 				MX6QDL_PAD_NANDF_CLE__GPIO6_IO07 0x001b0f0 /* #PCIE.RST */
 				MX6QDL_PAD_NANDF_CS0__GPIO6_IO11 0x001b0f0 /* #PCIE.DIS */
-				/* HYS = 1, DSE = 110, PUE+PKE, SPEED = HIGH (11)*/
-				MX6QDL_PAD_NANDF_D0__GPIO2_IO00 0x00130f0 /* PCIE.PWR_EN */
+				/* HYS = 1, DSE = 110, PUE+PKE + 100k up, SPEED = HIGH (11)*/
+				MX6QDL_PAD_NANDF_D0__GPIO2_IO00 0x0000b0f0 /* PCIE.PWR_EN */
 			>;
 		};
 	};
@@ -693,13 +703,11 @@
 };
 
 &pcie {
-	status = "disabled";
+	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pcie_mba6x>;
 	reset-gpio = <&gpio6 7 0>;
-	power-on-gpio = <&gpio2 0 0>;
-	wake-up-gpio = <&gpio2 11 0>;
-	disable-gpio = <&gpio6 11 0>;
+	vcc-supply = <&reg_pcie>;
 };
 
 &pwm1 {
