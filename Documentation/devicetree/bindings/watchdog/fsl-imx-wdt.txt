@@ -5,6 +5,9 @@ Required properties:
 - reg : Should contain WDT registers location and length
 - interrupts : Should contain WDT interrupt
 
+Optional properties:
+- fsl,use-wre: set if watchdog reset out (WDOG_B) signal shall be asserted
+
 Examples:
 
 wdt@73f98000 {

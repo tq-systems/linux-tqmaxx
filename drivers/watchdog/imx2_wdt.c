@@ -28,6 +28,7 @@
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/moduleparam.h>
+#include <linux/of.h>
 #include <linux/platform_device.h>
 #include <linux/regmap.h>
 #include <linux/timer.h>
@@ -58,6 +59,7 @@ struct imx2_wdt_device {
 	struct regmap *regmap;
 	struct timer_list timer;	/* Pings the watchdog when closed */
 	struct watchdog_device wdog;
+	unsigned int use_wre:1;		/* enable WRE feature */
 };
 
 static bool nowayout = WATCHDOG_NOWAYOUT;
@@ -88,7 +90,10 @@ static inline void imx2_wdt_setup(struct watchdog_device *wdog)
 	/* Strip the old watchdog Time-Out value */
 	val &= ~IMX2_WDT_WCR_WT;
 	/* Generate reset if WDOG times out */
-	val &= ~IMX2_WDT_WCR_WRE;
+	if (wdev->use_wre)
+		val |= IMX2_WDT_WCR_WRE;
+	else
+		val &= ~IMX2_WDT_WCR_WRE;
 	/* Keep Watchdog Disabled */
 	val &= ~IMX2_WDT_WCR_WDE;
 	/* Set the watchdog's Time-Out value */
@@ -219,6 +224,9 @@ static int __init imx2_wdt_probe(struct platform_device *pdev)
 		return PTR_ERR(wdev->clk);
 	}
 
+	if (of_property_read_bool(pdev->dev.of_node, "fsl,use-wre"))
+		wdev->use_wre = 1;
+
 	wdog			= &wdev->wdog;
 	wdog->info		= &imx2_wdt_info;
 	wdog->ops		= &imx2_wdt_ops;
@@ -226,7 +234,7 @@ static int __init imx2_wdt_probe(struct platform_device *pdev)
 	wdog->max_timeout	= IMX2_WDT_MAX_TIME;
 
 	clk_prepare_enable(wdev->clk);
-
+ 
 	regmap_read(wdev->regmap, IMX2_WDT_WRSR, &val);
 	wdog->bootstatus = val & IMX2_WDT_WRSR_TOUT ? WDIOF_CARDRESET : 0;
 
