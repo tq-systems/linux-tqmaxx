@@ -256,8 +256,8 @@
 &ecspi1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_ecspi1_mba6x>;
-	fsl,spi-num-chipselects = <3>;
-	cs-gpios = <&gpio3 19 0>, <&gpio3 24 0>, <&gpio3 25 0>;
+	fsl,spi-num-chipselects = <2>;
+	cs-gpios = <&gpio3 19 0>, <&gpio3 24 0>;
 };
 
 &fec {
@@ -292,10 +292,12 @@
 	disp0_tsc: edt-ft5x06@38 {
 		compatible = "edt-ft5x06";
 		reg = <0x38>;
-		interrupt-parent = <&gpio3>;
-		interrupts = <25 0x2>;
 		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_ft5x06_int>;
+		pinctrl-0 = <&pinctrl_ft5x06>;
+		interrupt-parent = <&gpio3>;
+		interrupts = <25 0x0>;
+		wake-gpios = <&gpio7 11 GPIO_ACTIVE_HIGH>; /* LCD.PWR_EN -> TSC /WAKE */
+		reset-gpios = <&gpio1 7 GPIO_ACTIVE_LOW>; /* LCD.RESET -> TSC /RST */
 	};
 };
 
@@ -417,7 +419,8 @@
 				MX6QDL_PAD_EIM_D16__ECSPI1_SCLK 0xb099
 				MX6QDL_PAD_EIM_D19__GPIO3_IO19 0xb099 /* eCSPI1 SS1 */
 				MX6QDL_PAD_EIM_D24__GPIO3_IO24 0xb099 /* eCSPI1 SS2 */
-				MX6QDL_PAD_EIM_D25__GPIO3_IO25 0xb099 /* eCSPI1 SS3 */
+				/* TODO: eCSPI1 SS3 -> used as Touch IRQ */
+				/* MX6QDL_PAD_EIM_D25__GPIO3_IO25 0xb099 */
 			>;
 		};
 	};
@@ -438,8 +441,6 @@
 				MX6QDL_PAD_ENET_CRS_DV__GPIO1_IO25 0x80000000 /* FEC phy reset */
 				MX6QDL_PAD_NANDF_RB0__GPIO6_IO10 0x80000000 /* PMIC irq */
 				MX6QDL_PAD_EIM_D22__GPIO3_IO22 0x80000000 /* OTG_PWR */
-				MX6QDL_PAD_GPIO_16__GPIO7_IO11 0x80000000 /* LCD.PWR_EN */
-				MX6QDL_PAD_GPIO_7__GPIO1_IO07 0x80000000 /* LCD.RESET */
 				MX6QDL_PAD_GPIO_19__GPIO4_IO05 0x80000000 /* LCD.BLT_EN */
 				/* LCD.CONTRAST -> Rev 0100 only, not used on Rev.0200*/
 				MX6QDL_PAD_DI0_PIN4__GPIO4_IO20 0x80000000
@@ -547,9 +548,14 @@
 	};
 
 	tsc {
-		pinctrl_ft5x06_int: ft5x06-int {
+		pinctrl_ft5x06: ft5x06grp {
 			fsl,pins = <
-				MX6QDL_PAD_EIM_D25__GPIO3_IO25 0x80000000 /* TSC Interrupt line */
+				/* LCD.RESET -> TSC /RST */
+				MX6QDL_PAD_GPIO_7__GPIO1_IO07  0x00001090
+				/* LCD.PWR_EN -> TSC /WAKE */
+				MX6QDL_PAD_GPIO_16__GPIO7_IO11 0x00001090
+				/* TSC Interrupt line: HYS, PKE, SPEED MED, DSE 240 OHM */
+				MX6QDL_PAD_EIM_D25__GPIO3_IO25 0x00013088
 			>;
 		};
 	};
