@@ -48,7 +48,7 @@
 		gpios = <&gpio1 21 GPIO_ACTIVE_HIGH>;
 	};
 
-	backlight: backlight@0 {
+	backlight_ldb: backlight@0 {
 		compatible = "pwm-backlight";
 		pwms = <&pwm1 0 62500>;
 
@@ -57,6 +57,21 @@
 
 		power-supply = <&vcc3v3>;
 		enable-gpios = <&gpio4 5 GPIO_ACTIVE_HIGH>;
+
+		status = "disabled";
+	};
+
+	backlight_pd: backlight@1 {
+		compatible = "pwm-backlight";
+		pwms = <&pwm1 0 5000000>;
+
+		brightness-levels = <255 128 64 32 16 8 4 1 0>;
+		default-brightness-level = <6>;
+
+		power-supply = <&vcc3v3>;
+		enable-gpios = <&gpio4 5 GPIO_ACTIVE_HIGH>;
+
+		status = "disabled";
 	};
 
 	disp0: display@0 {

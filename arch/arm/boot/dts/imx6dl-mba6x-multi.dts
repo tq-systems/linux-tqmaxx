@@ -11,6 +11,10 @@
 
 #include "imx6dl-mba6x.dts"
 
+&backlight_ldb {
+	status = "okay";
+};
+
 &hdmi {
 	status = "okay";
 };
