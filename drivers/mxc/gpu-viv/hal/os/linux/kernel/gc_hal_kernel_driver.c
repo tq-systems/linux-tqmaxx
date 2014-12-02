@@ -19,7 +19,6 @@
 *
 *****************************************************************************/
 
-
 #include <linux/device.h>
 #include <linux/of.h>
 #include <linux/slab.h>
