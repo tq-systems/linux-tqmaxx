@@ -1,0 +1,12 @@
+# drivers/mxc/Kconfig
+
+menu "MXC support drivers"
+
+if SOC_IMX6Q
+
+source "drivers/mxc/gpu-viv/Kconfig"
+
+endif
+
+endmenu
+
