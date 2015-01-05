@@ -192,6 +192,7 @@ dtb-$(CONFIG_ARCH_MXC) += \
 	imx6dl-mba6x.dtb \
 	imx6dl-mba6x-hdmi.dtb \
 	imx6dl-mba6x-lvds.dtb \
+	imx6dl-mba6x-lvdsdual.dtb \
 	imx6dl-mba6x-multi.dtb \
 	imx6dl-mba6x-pd.dtb \
 	imx6dl-nitrogen6x.dtb \
@@ -215,6 +216,7 @@ dtb-$(CONFIG_ARCH_MXC) += \
 	imx6q-mba6x.dtb \
 	imx6q-mba6x-hdmi.dtb \
 	imx6q-mba6x-lvds.dtb \
+	imx6q-mba6x-lvdsdual.dtb \
 	imx6q-mba6x-multi.dtb \
 	imx6q-mba6x-pd.dtb \
 	imx6q-phytec-pbab01.dtb \
