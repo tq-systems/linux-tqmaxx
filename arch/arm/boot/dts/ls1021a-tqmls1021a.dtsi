@@ -31,6 +31,13 @@
 
 &i2c0 {
 	status = "okay";
+	eeprom0: 24c64@50 {
+		compatible = "atmel,24c64";
+		reg = <0x50>;
+		pagesize = <32>;
+		status = "okay";
+	};
+
 	rtc: pcf85063@51 {
 		compatible = "nxp,pcf85063";
 		reg = <0x51>;
