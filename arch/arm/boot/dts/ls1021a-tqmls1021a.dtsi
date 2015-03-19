@@ -19,6 +19,21 @@
 			clock-frequency = <24576000>;
 		};
 	};
+
+	regulators {
+		compatible = "simple-bus";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		reg_3p3v_som: regulator@0 {
+			compatible = "regulator-fixed";
+			reg = <0>;
+			regulator-name = "3P3V_SOM";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			regulator-always-on;
+		};
+	};
 };
 
 &duart0 {
@@ -31,6 +46,13 @@
 
 &i2c0 {
 	status = "okay";
+	sensor0: sa56004@4c {
+		compatible = "nxp,sa56004";
+		reg = <0x4c>;
+		vcc-supply = <&reg_3p3v_som>;
+		status = "okay";
+	};
+
 	eeprom0: 24c64@50 {
 		compatible = "atmel,24c64";
 		reg = <0x50>;
