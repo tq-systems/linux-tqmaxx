@@ -79,6 +79,42 @@
 		status = "okay";
 	};
 
+	stmpe811@41 {
+		compatible = "st,stmpe811";
+		reg = <0x41>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+/*
+		interrupts = <GIC_SPI 167 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-controller;
+*/
+		status = "okay";
+
+		stmpe_gpio {
+			compatible = "stmpe,gpio";
+			gpio-controller;
+			#gpio-cells = <2>;
+			gpio,norequest-mask = <0xF0>;
+		};
+
+		stmpe_touchscreen {
+			compatible = "stmpe,ts";
+/*
+ * TODO:
+ * this has to be configured per panel
+ */
+			ts,sample-time = <4>;
+			ts,mod-12b = <1>;
+			ts,ref-sel = <0>;
+			ts,adc-freq = <1>;
+			ts,ave-ctrl = <1>;
+			ts,touch-det-delay = <3>;
+			ts,settling = <4>;
+			ts,fraction-z = <7>;
+			ts,i-drive = <1>;
+		};
+	};
+
 	pca9530: pca9530@60 {
 		compatible = "nxp,pca9530";
 		reg = <0x60>;
