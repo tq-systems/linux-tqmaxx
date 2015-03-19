@@ -72,6 +72,13 @@
 		status = "okay";
 	};
 
+	pca9554_1: pca954@21 {
+		compatible = "nxp,pca9554";
+		reg = <0x21>;
+/*		interrupts = <GIC_SPI 169 IRQ_TYPE_LEVEL_HIGH>; */
+		status = "okay";
+	};
+
 	pca9530: pca9530@60 {
 		compatible = "nxp,pca9530";
 		reg = <0x60>;
