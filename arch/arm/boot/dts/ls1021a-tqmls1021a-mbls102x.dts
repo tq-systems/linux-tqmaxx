@@ -65,6 +65,11 @@
 
 &i2c0 {
 	status = "okay";
+	pca9530: pca9530@60 {
+		compatible = "nxp,pca9530";
+		reg = <0x60>;
+		status = "okay";
+	};
 };
 
 &i2c1 {
