@@ -46,11 +46,27 @@
 
 &i2c0 {
 	status = "okay";
+	pmic0: mc34vr500@08 {
+		reg = <0x08>;
+		status = "disabled";
+	};
+
 	sensor0: sa56004@4c {
 		compatible = "nxp,sa56004";
 		reg = <0x4c>;
 		vcc-supply = <&reg_3p3v_som>;
 		status = "okay";
+	};
+
+	pmc0: pmc@11 {
+		reg = <0x11>;
+		interrupts = <GIC_SPI 165 IRQ_TYPE_LEVEL_HIGH>;
+		status = "disabled";
+	};
+
+	supervisor0: adm1069@4f {
+		reg = <0x4f>;
+		status = "disabled";
 	};
 
 	eeprom0: 24c64@50 {
