@@ -95,6 +95,13 @@
 	status = "okay";
 };
 
+&mdio0 {
+	tbi1: tbi-phy@1f {
+		reg = <0x1f>;
+		device_type = "tbi-phy";
+	};
+};
+
 &uqe {
 	tdma: ucc@2000 {
 		compatible = "fsl,ucc-tdm";
