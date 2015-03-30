@@ -135,15 +135,23 @@
 };
 
 &qspi {
-	num-cs = <2>;
+	fsl,qspi-has-second-chip;
 	status = "okay";
 
-	qflash0: n25q128a13@0 {
-		compatible = "micron,n25q128a13";
+	qflash0: mt25ql512@0 {
+		compatible = "micron,n25q512ax3";
 		#address-cells = <1>;
 		#size-cells = <1>;
 		spi-max-frequency = <20000000>;
 		reg = <0>;
+	};
+
+	qflash1: mt25ql512@1 {
+		compatible = "micron,n25q512ax3";
+		#address-cells = <1>;
+		#size-cells = <1>;
+		spi-max-frequency = <20000000>;
+		reg = <1>;
 	};
 };
 
