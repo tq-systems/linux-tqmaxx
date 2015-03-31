@@ -206,6 +206,9 @@
 #define SEQID_EN4B		10
 #define SEQID_BRWR		11
 #define SEQID_RDFSR		12
+/* Micron Quad Mode enter */
+#define SEQID_RDEVCR		13
+#define SEQID_WREVCR		14
 
 #define QUADSPI_MIN_IOMAP SZ_4M
 
@@ -482,6 +485,17 @@ static void fsl_qspi_init_lut(struct fsl_qspi *q)
 	writel(LUT0(CMD, PAD1, SPINOR_OP_RDFSR) | LUT1(FSL_READ, PAD1, 0x1),
 			base + QUADSPI_LUT(lut_base));
 
+	/* Micron Quad Mode enter */
+	/* Read enhanced volatilite config reg */
+	lut_base = SEQID_RDEVCR * 4;
+	writel(LUT0(CMD, PAD1, SPINOR_OP_RD_EVCR) | LUT1(FSL_READ, PAD1, 0x1),
+			base + QUADSPI_LUT(lut_base));
+
+	/* Write enhanced volatilite config reg */
+	lut_base = SEQID_WREVCR * 4;
+	writel(LUT0(CMD, PAD1, SPINOR_OP_WD_EVCR) | LUT1(FSL_WRITE, PAD1, 0x2),
+			base + QUADSPI_LUT(lut_base));
+
 	fsl_qspi_lock_lut(q);
 }
 
@@ -515,6 +529,11 @@ static int fsl_qspi_get_seqid(struct fsl_qspi *q, u8 cmd)
 		return SEQID_BRWR;
 	case SPINOR_OP_RDFSR:
 		return SEQID_RDFSR;
+	case SPINOR_OP_RD_EVCR:
+		return SEQID_RDEVCR;
+	case SPINOR_OP_WD_EVCR:
+		return SEQID_WREVCR;
+
 	default:
 		if (cmd == q->nor[0].erase_opcode)
 			return SEQID_SE;
