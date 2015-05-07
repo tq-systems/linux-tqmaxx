@@ -168,11 +168,15 @@
 		reg = <0x05>;
 		ti,rx-internal-delay = <DP83867_RGMIIDCTL_1_75_NS>;
 		ti,tx-internal-delay = <DP83867_RGMIIDCTL_1_75_NS>;
+		led-cfg1 = <0x6b90>;
+		led-cfg2 = <0x0000>;
 	};
 	rgmii_phy0d: ethernet-phy@0d {
 		reg = <0x0d>;
 		ti,rx-internal-delay = <DP83867_RGMIIDCTL_1_75_NS>;
 		ti,tx-internal-delay = <DP83867_RGMIIDCTL_1_75_NS>;
+		led-cfg1 = <0x6b90>;
+		led-cfg2 = <0x0000>;
 	};
 	sgmii_phy13: ethernet-phy@13 {
 		reg = <0x13>;
