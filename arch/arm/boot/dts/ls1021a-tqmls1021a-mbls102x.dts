@@ -72,6 +72,7 @@
 &enet0 {
 	phy-handle = <&rgmii_phy0d>;
 	phy-connection-type = "rgmii-id";
+	mac-address = "00:00:00:00:00:00";
 	status = "okay";
 };
 
@@ -79,12 +80,14 @@
 	tbi-handle = <&tbi1>;
 	phy-handle = <&sgmii_phy13>;
 	phy-connection-type = "sgmii";
+	mac-address = "00:00:00:00:00:00";
 	status = "okay";
 };
 
 &enet2 {
 	phy-handle = <&rgmii_phy05>;
 	phy-connection-type = "rgmii-id";
+	mac-address = "00:00:00:00:00:00";
 	status = "okay";
 };
 
