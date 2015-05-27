@@ -1070,6 +1070,9 @@ static const struct of_device_id platform_of_match[] = {
 		.compatible = "innolux,at043tn24",
 		.data = &innolux_at043tn24,
 	}, {
+		.compatible = "innolux,g101ice-l01",
+		.data = &innolux_g121i1_l01,
+	}, {
 		.compatible ="innolux,g121i1-l01",
 		.data = &innolux_g121i1_l01
 	}, {
