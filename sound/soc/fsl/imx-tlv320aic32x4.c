@@ -152,7 +152,6 @@ MODULE_DEVICE_TABLE(of, imx_tlv320aic_dt_ids);
 static struct platform_driver imx_tlv320aic_driver = {
 	.driver = {
 		.name = "imx-tlv320aic32x4",
-		.owner = THIS_MODULE,
 		.of_match_table = imx_tlv320aic_dt_ids,
 	},
 	.probe = imx_tlv320aic_probe,
