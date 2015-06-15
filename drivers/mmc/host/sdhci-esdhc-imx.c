@@ -1052,6 +1052,10 @@ static int sdhci_esdhc_imx_probe(struct platform_device *pdev)
 	err = mmc_of_parse(host->mmc);
 	if (err)
 		goto disable_clk;
+	if (boarddata->dsr_req) {
+		host->mmc->dsr_req = 1;
+		host->mmc->dsr = boarddata->dsr;
+	}
 
 	err = sdhci_add_host(host);
 	if (err)
