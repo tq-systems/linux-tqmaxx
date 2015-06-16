@@ -815,6 +815,22 @@ static const struct drm_display_mode innolux_g121i1_l01_mode = {
 	.vrefresh = 60,
 };
 
+static const struct panel_desc innolux_g101i1_l01 = {
+	.modes = &innolux_g121i1_l01_mode,
+	.num_modes = 1,
+	.bpc = 6,
+	.size = {
+		.width = 261,
+		.height = 163,
+	},
+	.delay = {
+		.prepare = 5,
+		.enable = 200,
+		.disable = 200,
+		.unprepare = 5,
+	},
+};
+
 static const struct panel_desc innolux_g121i1_l01 = {
 	.modes = &innolux_g121i1_l01_mode,
 	.num_modes = 1,
@@ -1071,7 +1087,7 @@ static const struct of_device_id platform_of_match[] = {
 		.data = &innolux_at043tn24,
 	}, {
 		.compatible = "innolux,g101ice-l01",
-		.data = &innolux_g121i1_l01,
+		.data = &innolux_g101i1_l01,
 	}, {
 		.compatible ="innolux,g121i1-l01",
 		.data = &innolux_g121i1_l01
