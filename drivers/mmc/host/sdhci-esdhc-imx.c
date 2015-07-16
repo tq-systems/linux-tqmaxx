@@ -878,7 +878,9 @@ sdhci_esdhc_imx_probe_dt(struct platform_device *pdev,
 	if (of_get_property(np, "fsl,cd-controller", NULL))
 		boarddata->cd_type = ESDHC_CD_CONTROLLER;
 
-	if (of_get_property(np, "fsl,wp-controller", NULL))
+	if (of_property_read_bool(np, "disable-wp"))
+		boarddata->wp_type = ESDHC_WP_NONE;
+	else if (of_get_property(np, "fsl,wp-controller", NULL))
 		boarddata->wp_type = ESDHC_WP_CONTROLLER;
 
 	boarddata->cd_gpio = of_get_named_gpio(np, "cd-gpios", 0);
