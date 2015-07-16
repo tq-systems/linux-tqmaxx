@@ -9,7 +9,7 @@
  * http://www.gnu.org/copyleft/gpl.html
  */
 
-&fec {
+&ethphy {
 	rxdv-skew-ps = <180>;
 	txen-skew-ps = <120>;
 	rxd3-skew-ps = <180>;
