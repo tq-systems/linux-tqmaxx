@@ -133,6 +133,50 @@ static int lan87xx_read_status(struct phy_device *phydev)
 	return err;
 }
 
+/* control / status indications reg */
+#define LAN8820_PHY_CSIR		0x1b
+#define LAN8820_PHY_CSIR_TXDELAY	0x0200
+#define LAN8820_PHY_CSIR_RXDELAY	0x0100
+
+static int lan8820_config_init(struct phy_device *phydev)
+{
+	int temp;
+	int err;
+
+	if ((phydev->interface == PHY_INTERFACE_MODE_RGMII) ||
+	    (phydev->interface == PHY_INTERFACE_MODE_RGMII_ID) ||
+	    (phydev->interface == PHY_INTERFACE_MODE_RGMII_RXID) ||
+	    (phydev->interface == PHY_INTERFACE_MODE_RGMII_TXID)) {
+		temp = phy_read(phydev, LAN8820_PHY_CSIR);
+		if (temp < 0)
+			return temp;
+
+		switch (phydev->interface) {
+		case PHY_INTERFACE_MODE_RGMII_ID:
+			temp |= (LAN8820_PHY_CSIR_TXDELAY |
+				 LAN8820_PHY_CSIR_RXDELAY);
+			break;
+		case PHY_INTERFACE_MODE_RGMII_RXID:
+			temp &= ~LAN8820_PHY_CSIR_TXDELAY;
+			temp |= LAN8820_PHY_CSIR_RXDELAY;
+			break;
+		case PHY_INTERFACE_MODE_RGMII_TXID:
+			temp &= ~LAN8820_PHY_CSIR_RXDELAY;
+			temp |= LAN8820_PHY_CSIR_TXDELAY;
+			break;
+		default:
+			temp &= ~(LAN8820_PHY_CSIR_RXDELAY |
+				  LAN8820_PHY_CSIR_RXDELAY);
+		};
+
+		err = phy_write(phydev, LAN8820_PHY_CSIR, temp);
+		if (err < 0)
+			return err;
+	}
+
+	return smsc_phy_ack_interrupt(phydev);
+}
+
 static struct phy_driver smsc_phy_driver[] = {
 {
 	.phy_id		= 0x0007c0a0, /* OUI=0x00800f, Model#=0x0a */
@@ -248,6 +292,28 @@ static struct phy_driver smsc_phy_driver[] = {
 	.resume		= genphy_resume,
 
 	.driver		= { .owner = THIS_MODULE, }
+}, {
+	.phy_id		= 0x0007c0e0,
+	.phy_id_mask	= 0xfffffff0,
+	.name		= "SMSC LAN8820",
+
+	.features	= (PHY_GBIT_FEATURES | SUPPORTED_Pause |
+			   SUPPORTED_Asym_Pause),
+	.flags		= PHY_HAS_INTERRUPT | PHY_HAS_MAGICANEG,
+
+	/* basic functions */
+	.config_aneg	= genphy_config_aneg,
+	.config_init	= lan8820_config_init,
+	.read_status	= genphy_read_status,
+
+	/* IRQ related */
+	.ack_interrupt	= smsc_phy_ack_interrupt,
+	.config_intr	= smsc_phy_config_intr,
+
+	.suspend	= genphy_suspend,
+	.resume		= genphy_resume,
+
+	.driver		= { .owner = THIS_MODULE, }
 } };
 
 module_phy_driver(smsc_phy_driver);
@@ -261,6 +327,7 @@ static struct mdio_device_id __maybe_unused smsc_tbl[] = {
 	{ 0x0007c0b0, 0xfffffff0 },
 	{ 0x0007c0c0, 0xfffffff0 },
 	{ 0x0007c0d0, 0xfffffff0 },
+	{ 0x0007c0e0, 0xfffffff0 },
 	{ 0x0007c0f0, 0xfffffff0 },
 	{ }
 };
