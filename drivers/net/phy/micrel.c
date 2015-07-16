@@ -427,6 +427,8 @@ static int ksz9031_of_load_skew_values(struct phy_device *phydev,
 
 static int ksz9031_config_init(struct phy_device *phydev)
 {
+	int rc;
+	u16 val;
 	struct device *dev = &phydev->dev;
 	struct device_node *of_node = dev->of_node;
 	char *clk_skews[2] = {"rxc-skew-ps", "txc-skew-ps"};
@@ -459,7 +461,24 @@ static int ksz9031_config_init(struct phy_device *phydev)
 		ksz9031_of_load_skew_values(phydev, of_node,
 				MII_KSZ9031RN_TX_DATA_PAD_SKEW, 4,
 				tx_data_skews, 4);
+
+		/* force master mode -> errata #2
+		 * attention: Master <-> Master will not work
+		 */
+		 if (of_property_read_bool(of_node, "force-master")) {
+			rc = phy_read(phydev, MII_CTRL1000);
+			if (rc >= 0) {
+				val = (u16)rc;
+				/* enable master mode, config &
+				 * prefer master
+				 */
+				val |= (CTL1000_ENABLE_MASTER |
+					CTL1000_AS_MASTER);
+				phy_write(phydev, MII_CTRL1000, val);
+			}
+		}
 	}
+
 	return 0;
 }
 
