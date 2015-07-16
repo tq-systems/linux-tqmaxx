@@ -1,0 +1,82 @@
+/*
+ * Copyright 2013 Sascha Hauer, Pengutronix
+ *
+ * The code contained herein is licensed under the GNU General Public
+ * License. You may obtain a copy of the GNU General Public License
+ * Version 2 or later at the following locations:
+ *
+ * http://www.opensource.org/licenses/gpl-license.html
+ * http://www.gnu.org/copyleft/gpl.html
+ */
+
+&fec {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_enet>;
+	phy-mode = "rgmii";
+	status = "okay";
+};
+
+&i2c1 {
+	status = "okay";
+	clock-frequency = <100000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_i2c1>;
+};
+
+&i2c3 {
+	sensor1: lm75@49 {
+		compatible = "lm75";
+		reg = <0x49>;
+	};
+
+	eeprom1: m24c64@57 {
+		compatible = "st,24c64", "at24";
+		reg = <0x57>;
+		pagesize = <32>;
+	};
+
+	rtc1: ds1339@68 {
+		compatible = "ds1339";
+		reg = <0x68>;
+	};
+};
+
+&iomuxc {
+	enet {
+		pinctrl_enet: enetgrp {
+			fsl,pins = <
+				 /* FEC phy reset */
+				MX6QDL_PAD_ENET_CRS_DV__GPIO1_IO25   0x1b099
+				/* DSE = 100, 100k up, SPEED = MED */
+				MX6QDL_PAD_ENET_MDIO__ENET_MDIO       0xb0a0
+				MX6QDL_PAD_ENET_MDC__ENET_MDC         0xb0a0
+				/* DSE = 111, pull 100k up */
+				MX6QDL_PAD_RGMII_TXC__RGMII_TXC       0xb038
+				MX6QDL_PAD_RGMII_TD0__RGMII_TD0       0xb038
+				MX6QDL_PAD_RGMII_TD1__RGMII_TD1       0xb038
+				MX6QDL_PAD_RGMII_TD2__RGMII_TD2       0xb038
+				MX6QDL_PAD_RGMII_TD3__RGMII_TD3       0xb038
+				MX6QDL_PAD_RGMII_TX_CTL__RGMII_TX_CTL 0xb038
+				/* DSE = 111, pull external */
+				MX6QDL_PAD_RGMII_RXC__RGMII_RXC       0x0038
+				MX6QDL_PAD_RGMII_RD0__RGMII_RD0       0x0038
+				MX6QDL_PAD_RGMII_RD1__RGMII_RD1       0x0038
+				MX6QDL_PAD_RGMII_RD2__RGMII_RD2       0x0038
+				MX6QDL_PAD_RGMII_RD3__RGMII_RD3       0x0038
+				MX6QDL_PAD_RGMII_RX_CTL__RGMII_RX_CTL 0x0038
+				/* HYS = 1, DSE = 111, 100k up, SPEED = HIGH */
+				MX6QDL_PAD_ENET_REF_CLK__ENET_TX_CLK  0x1b0f0
+			>;
+		};
+	};
+
+	i2c1 {
+		pinctrl_i2c1: i2c1grp {
+			fsl,pins = <
+				MX6QDL_PAD_CSI0_DAT8__I2C1_SDA 0x4001b8b1
+				MX6QDL_PAD_CSI0_DAT9__I2C1_SCL 0x4001b8b1
+			>;
+		};
+	};
+
+};
