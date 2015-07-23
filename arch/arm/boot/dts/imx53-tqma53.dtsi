@@ -46,12 +46,6 @@
 	status = "disabled";
 };
 
-&uart3 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_uart3>;
-	status = "disabled";
-};
-
 &ecspi1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_ecspi1>;
@@ -83,7 +77,6 @@
 				 MX53_PAD_PATA_DATA5__GPIO2_5    0x80000000 /* LCD_POWER */
 				 MX53_PAD_PATA_DATA14__GPIO2_14  0x80000000 /* CSI_RST */
 				 MX53_PAD_PATA_DATA15__GPIO2_15  0x80000000 /* CSI_PWDN */
-				 MX53_PAD_GPIO_3__GPIO1_3        0x80000000
 				 MX53_PAD_PATA_DA_0__GPIO7_6	 0x80000000 /* #PHY_RESET */
 			>;
 		};
@@ -207,13 +200,6 @@
 			fsl,pins = <
 				MX53_PAD_PATA_BUFFER_EN__UART2_RXD_MUX	0x1e4
 				MX53_PAD_PATA_DMARQ__UART2_TXD_MUX	0x1e4
-			>;
-		};
-
-		pinctrl_uart3: uart3grp {
-			fsl,pins = <
-				MX53_PAD_PATA_CS_0__UART3_TXD_MUX	0x1e4
-				MX53_PAD_PATA_CS_1__UART3_RXD_MUX	0x1e4
 			>;
 		};
 	};
