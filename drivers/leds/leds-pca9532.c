@@ -21,6 +21,10 @@
 #include <linux/workqueue.h>
 #include <linux/leds-pca9532.h>
 #include <linux/gpio.h>
+#if defined(CONFIG_OF)
+#include <linux/of.h>
+#include <linux/of_device.h>
+#endif
 
 /* m =  num_leds*/
 #define PCA9532_REG_INPUT(i)	((i) >> 3)
@@ -49,10 +53,6 @@ struct pca9532_data {
 	u8 pwm[2];
 	u8 psc[2];
 };
-
-static int pca9532_probe(struct i2c_client *client,
-	const struct i2c_device_id *id);
-static int pca9532_remove(struct i2c_client *client);
 
 enum {
 	pca9530,
@@ -84,15 +84,6 @@ static const struct pca9532_chip_info pca9532_chip_info_tbl[] = {
 	[pca9533] = {
 		.num_leds = 4,
 	},
-};
-
-static struct i2c_driver pca9532_driver = {
-	.driver = {
-		.name = "leds-pca953x",
-	},
-	.probe = pca9532_probe,
-	.remove = pca9532_remove,
-	.id_table = pca9532_id,
 };
 
 /* We have two pwm/blinkers, but 16 possible leds to drive. Additionally,
@@ -436,6 +427,66 @@ exit:
 	return err;
 }
 
+#if defined(CONFIG_OF)
+static const struct of_device_id of_pca9532_leds_match[] = {
+	{
+		.compatible = "nxp,pca9530",
+		.data = &pca9532_chip_info_tbl[pca9530],
+	}, {
+		.compatible = "nxp,pca9531",
+		.data = &pca9532_chip_info_tbl[pca9531],
+	}, {
+		.compatible = "nxp,pca9532",
+		.data = &pca9532_chip_info_tbl[pca9532],
+	}, {
+		.compatible = "nxp,pca9533",
+		.data = &pca9532_chip_info_tbl[pca9533],
+	},
+};
+MODULE_DEVICE_TABLE(of, of_pca9532_leds_match);
+
+
+static int pca9532_probe_dt(struct i2c_client *client)
+{
+	struct device_node *np = client->dev.of_node, *child;
+	struct device *dev = &client->dev;
+	const struct of_device_id *match;
+	const struct pca9532_chip_info *pca9532_info;
+	int err, count, reg;
+	struct pca9532_data *data;
+
+	match = of_match_device(of_pca9532_leds_match, dev);
+	if (!match)
+		return -ENODEV;
+
+	pca9532_info = match->data;
+	if (!np)
+		return -ENODEV;
+
+	count = of_get_child_count(np);
+	if (!count || count > pca9532_info->num_leds)
+		return -EINVAL;
+
+	data = devm_kzalloc(&client->dev, sizeof(*data), GFP_KERNEL);
+	if (!data)
+		return -ENOMEM;
+
+	for_each_child_of_node(np, child) {
+		err = of_property_read_u32(child, "reg", &reg);
+		if (err)
+			return err;
+		if (reg < 0 || reg >= pca9532_info->num_leds)
+			return -EINVAL;
+		data->leds[reg].type = PCA9532_TYPE_LED;
+		data->leds[reg].state = PCA9532_OFF;
+		data->leds[reg].name = 
+			of_get_property(child, "label", NULL) ? : child->name;
+	}
+	client->dev.platform_data = data;
+	return 0;
+}
+#endif
+
 static int pca9532_probe(struct i2c_client *client,
 	const struct i2c_device_id *id)
 {
@@ -443,6 +494,14 @@ static int pca9532_probe(struct i2c_client *client,
 	struct pca9532_platform_data *pca9532_pdata =
 			dev_get_platdata(&client->dev);
 
+#if defined(CONFIG_OF)
+	if (!pca9532_pdata) {
+		if (pca9532_probe_dt(client))
+			return -EIO;
+		else
+			pca9532_pdata = dev_get_platdata(&client->dev);
+	}
+#endif
 	if (!pca9532_pdata)
 		return -EIO;
 
@@ -475,6 +534,18 @@ static int pca9532_remove(struct i2c_client *client)
 
 	return 0;
 }
+
+static struct i2c_driver pca9532_driver = {
+	.driver = {
+		.name = "leds-pca953x",
+#if defined(CONFIG_OF)
+		.of_match_table = of_match_ptr(of_pca9532_leds_match),
+#endif
+	},
+	.probe = pca9532_probe,
+	.remove = pca9532_remove,
+	.id_table = pca9532_id,
+};
 
 module_i2c_driver(pca9532_driver);
 
