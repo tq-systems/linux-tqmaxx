@@ -1214,7 +1214,6 @@ static int fsl_qspi_probe(struct platform_device *pdev)
 	/* iterate the subnodes. */
 	for_each_available_child_of_node(dev->of_node, np) {
 		enum read_mode mode = SPI_NOR_QUAD;
-		char modalias[40];
 		u32 dummy = 0;
 
 		/* skip the holes */
@@ -1240,10 +1239,6 @@ static int fsl_qspi_probe(struct platform_device *pdev)
 		nor->prepare = fsl_qspi_prep;
 		nor->unprepare = fsl_qspi_unprep;
 
-		ret = of_modalias_node(np, modalias, sizeof(modalias));
-		if (ret < 0)
-			goto mutex_failed;
-
 		ret = of_property_read_u32(np, "spi-max-frequency",
 				&q->clk_rate);
 		if (ret < 0)
@@ -1258,7 +1253,7 @@ static int fsl_qspi_probe(struct platform_device *pdev)
 		/* set the chip address for READID */
 		fsl_qspi_set_base_addr(q, nor);
 
-		ret = spi_nor_scan(nor, modalias, mode);
+		ret = spi_nor_scan(nor, NULL, mode);
 		if (ret)
 			goto mutex_failed;
 
