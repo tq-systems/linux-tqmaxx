@@ -136,6 +136,7 @@ struct sgtl5000_priv {
 	int revision;
 	u8 micbias_resistor;
 	u8 micbias_voltage;
+	bool mono_r;
 	struct regulator_init_data *ldo_init_data;
 	struct regulator_consumer_supply *ldo_consumer;
 	char *ldo_consumer_name;
@@ -725,14 +726,23 @@ static int sgtl5000_pcm_hw_params(struct snd_pcm_substream *substream,
 		return -EFAULT;
 	}
 
-	if (substream->stream == SNDRV_PCM_STREAM_PLAYBACK)
-		stereo = SGTL5000_DAC_STEREO;
-	else
-		stereo = SGTL5000_ADC_STEREO;
+	if (sgtl5000->mono_r &&
+	    substream->stream == SNDRV_PCM_STREAM_PLAYBACK) {
+		snd_soc_update_bits(codec, SGTL5000_CHIP_ANA_POWER,
+				    SGTL5000_DAC_STEREO, SGTL5000_DAC_STEREO);
+		snd_soc_update_bits(codec, SGTL5000_CHIP_ANA_TEST2,
+				    SGTL5000_MONO_DAC,
+				    channels == 1 ? SGTL5000_MONO_DAC : 0);
+	} else {
+		if (substream->stream == SNDRV_PCM_STREAM_PLAYBACK)
+			stereo = SGTL5000_DAC_STEREO;
+		else
+			stereo = SGTL5000_ADC_STEREO;
 
-	/* set mono to save power */
-	snd_soc_update_bits(codec, SGTL5000_CHIP_ANA_POWER, stereo,
-			channels == 1 ? 0 : stereo);
+		/* set mono to save power */
+		snd_soc_update_bits(codec, SGTL5000_CHIP_ANA_POWER, stereo,
+				channels == 1 ? 0 : stereo);
+	}
 
 	/* set codec clock base on lrclk */
 	ret = sgtl5000_set_clock(codec, params_rate(params));
@@ -1539,6 +1549,9 @@ static int sgtl5000_i2c_probe(struct i2c_client *client,
 		} else {
 			sgtl5000->micbias_voltage = 0;
 		}
+		sgtl5000->mono_r = of_property_read_bool(np,
+							 "mono-right");
+		dev_err(&client->dev, "MONO: %s\n", sgtl5000->mono_r ? "right" : "left");
 	}
 
 	i2c_set_clientdata(client, sgtl5000);
