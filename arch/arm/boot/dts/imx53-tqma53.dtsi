@@ -76,23 +76,6 @@
 			>;
 		};
 
-		pinctrl_fec: fecgrp {
-			fsl,pins = <
-				MX53_PAD_FEC_MDC__FEC_MDC		0x004
-				MX53_PAD_FEC_MDIO__FEC_MDIO		0x1fc
-				MX53_PAD_FEC_REF_CLK__FEC_TX_CLK	0x182
-				MX53_PAD_FEC_RX_ER__FEC_RX_ER		0x1c0
-				MX53_PAD_FEC_CRS_DV__FEC_RX_DV		0x180
-				MX53_PAD_FEC_RXD1__FEC_RDATA_1		0x180
-				MX53_PAD_FEC_RXD0__FEC_RDATA_0		0x180
-				MX53_PAD_FEC_TX_EN__FEC_TX_EN		0x002
-				MX53_PAD_FEC_TXD1__FEC_TDATA_1		0x002
-				MX53_PAD_FEC_TXD0__FEC_TDATA_0		0x002
-				MX53_PAD_PATA_DA_0__GPIO7_6	 	0x102 /* #PHY_RESET */
-				MX53_PAD_PATA_DATA7__GPIO2_7	 	0x100 /* #PHY_INT */
-			>;
-		};
-
 		pinctrl_i2c2: i2c2grp {
 			fsl,pins = <
 				MX53_PAD_KEY_ROW3__I2C2_SDA		0xc0000000
@@ -185,11 +168,4 @@
 		pagesize = <32>;
 		reg = <0x50>;
 	};
-};
-
-&fec {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_fec>;
-	phy-mode = "rmii";
-	status = "disabled";
 };
