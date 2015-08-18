@@ -47,20 +47,6 @@
 
 &iomuxc {
 	imx53-tqma53 {
-		pinctrl_can1: can1grp {
-			fsl,pins = <
-				MX53_PAD_KEY_COL2__CAN1_TXCAN		0x80000000
-				MX53_PAD_KEY_ROW2__CAN1_RXCAN		0x80000000
-			>;
-		};
-
-		pinctrl_can2: can2grp {
-			fsl,pins = <
-				MX53_PAD_KEY_COL4__CAN2_TXCAN		0x80000000
-				MX53_PAD_KEY_ROW4__CAN2_RXCAN		0x80000000
-			>;
-		};
-
 		pinctrl_esdhc3: esdhc3grp {
 			fsl,pins = <
 				MX53_PAD_PATA_DATA8__ESDHC3_DAT0	0x1d2
@@ -122,18 +108,6 @@
 &uart2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart2>;
-	status = "disabled";
-};
-
-&can1 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_can1>;
-	status = "disabled";
-};
-
-&can2 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_can2>;
 	status = "disabled";
 };
 
