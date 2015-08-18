@@ -95,11 +95,7 @@ static const char *supply_names[SGTL5000_SUPPLY_NUM] = {
 #define LDO_CONSUMER_NAME	"VDDD_LDO"
 #define LDO_VOLTAGE		1200000
 
-static struct regulator_consumer_supply ldo_consumer[] = {
-	REGULATOR_SUPPLY(LDO_CONSUMER_NAME, NULL),
-};
-
-static struct regulator_init_data ldo_init_data = {
+static const struct regulator_init_data ldo_init_data_tpl = {
 	.constraints = {
 		.min_uV                 = 1200000,
 		.max_uV                 = 1200000,
@@ -107,7 +103,6 @@ static struct regulator_init_data ldo_init_data = {
 		.valid_ops_mask         = REGULATOR_CHANGE_STATUS,
 	},
 	.num_consumer_supplies = 1,
-	.consumer_supplies = &ldo_consumer[0],
 };
 
 /*
@@ -141,6 +136,9 @@ struct sgtl5000_priv {
 	int revision;
 	u8 micbias_resistor;
 	u8 micbias_voltage;
+	struct regulator_init_data *ldo_init_data;
+	struct regulator_consumer_supply *ldo_consumer;
+	char *ldo_consumer_name;
 };
 
 /*
@@ -1223,15 +1221,39 @@ static int sgtl5000_replace_vddd_with_ldo(struct snd_soc_codec *codec)
 	struct sgtl5000_priv *sgtl5000 = snd_soc_codec_get_drvdata(codec);
 	int ret;
 
+	sgtl5000->ldo_init_data = devm_kzalloc(codec->dev,
+					       sizeof(struct regulator_init_data),
+					       GFP_KERNEL);
+	sgtl5000->ldo_consumer = devm_kzalloc(codec->dev,
+					      sizeof(struct regulator_consumer_supply),
+					      GFP_KERNEL);
+	sgtl5000->ldo_consumer_name = devm_kzalloc(codec->dev, 32,
+						   GFP_KERNEL);
+	if (!sgtl5000->ldo_init_data || !sgtl5000->ldo_consumer ||
+	    !sgtl5000->ldo_consumer_name)
+		return -ENOMEM;
+
+	snprintf(sgtl5000->ldo_consumer_name, 32, "%s-%s",
+		 LDO_CONSUMER_NAME, dev_name(codec->dev));
+	*sgtl5000->ldo_init_data = ldo_init_data_tpl;
+	sgtl5000->ldo_consumer->supply = sgtl5000->ldo_consumer_name;
+	sgtl5000->ldo_init_data->consumer_supplies = sgtl5000->ldo_consumer;
+
 	/* set internal ldo to 1.2v */
-	ret = ldo_regulator_register(codec, &ldo_init_data, LDO_VOLTAGE);
+	ret = ldo_regulator_register(codec, sgtl5000->ldo_init_data, LDO_VOLTAGE);
 	if (ret) {
 		dev_err(codec->dev,
 			"Failed to register vddd internal supplies: %d\n", ret);
 		return ret;
 	}
 
-	sgtl5000->supplies[VDDD].supply = LDO_CONSUMER_NAME;
+	sgtl5000->supplies[VDDD].supply = devm_kstrdup(codec->dev,
+						       sgtl5000->ldo_consumer_name,
+						       GFP_KERNEL);
+	if (!sgtl5000->supplies[VDDD].supply) {
+		ldo_regulator_remove(codec);
+		return -ENOMEM;
+	}
 
 	dev_info(codec->dev, "Using internal LDO instead of VDDD\n");
 	return 0;
