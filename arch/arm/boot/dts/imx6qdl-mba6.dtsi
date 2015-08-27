@@ -127,7 +127,7 @@
 	cs-gpios = <&gpio3 19 0>, <&gpio3 24 0>;
 
 	spidev1_1: spidev1-1@1 {
-		compatible = "spidev";
+		compatible = "tq,testdev";
 		spi-max-frequency = <1000000>;
 		reg = <1>;
 		status = "okay";
