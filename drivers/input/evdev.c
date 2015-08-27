@@ -15,6 +15,9 @@
 #define EVDEV_MIN_BUFFER_SIZE	64U
 #define EVDEV_BUF_PACKETS	8
 
+/* for blacklisting */
+#define VID_EETI		0x0EEF
+
 #include <linux/poll.h>
 #include <linux/sched.h>
 #include <linux/slab.h>
@@ -1220,6 +1223,14 @@ static void evdev_disconnect(struct input_handle *handle)
 	put_device(&evdev->dev);
 }
 
+static bool evdev_match(struct input_handler *handler, struct input_dev *dev)
+{
+	if (unlikely((BUS_USB == dev->id.bustype) &&
+		    (VID_EETI == dev->id.vendor)))
+		return false;
+	return true;
+}
+
 static const struct input_device_id evdev_ids[] = {
 	{ .driver_info = 1 },	/* Matches all devices */
 	{ },			/* Terminating zero entry */
@@ -1232,6 +1243,7 @@ static struct input_handler evdev_handler = {
 	.events		= evdev_events,
 	.connect	= evdev_connect,
 	.disconnect	= evdev_disconnect,
+	.match		= evdev_match,
 	.legacy_minors	= true,
 	.minor		= EVDEV_MINOR_BASE,
 	.name		= "evdev",
