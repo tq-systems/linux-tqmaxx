@@ -15,12 +15,13 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 
-		reg_3p3v: fixed@0 {
-				compatible = "regulator-fixed";
-				regulator-name = "supply-3p3v";
-				regulator-min-microvolt = <3300000>;
-				regulator-max-microvolt = <3300000>;
-				regulator-always-on;
+		reg_3p3v: regulator@0 {
+			compatible = "regulator-fixed";
+			regulator-name = "supply-3p3v";
+			reg = <0>;
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			regulator-always-on;
 		};
 	};
 };
