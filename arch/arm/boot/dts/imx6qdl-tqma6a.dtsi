@@ -10,10 +10,10 @@
  */
 
 &i2c1 {
-	status = "okay";
-	clock-frequency = <100000>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_i2c1_tqma6>;
+	clock-frequency = <100000>;
+	status = "okay";
 
 	pmic: pf0100@08 {
 		compatible = "fsl,pfuze100";
