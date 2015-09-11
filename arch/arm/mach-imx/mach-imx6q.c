@@ -266,18 +266,10 @@ static void __init imx6q_mba6x_enet_init(void)
 {
 	struct device_node *np;
 	void __iomem *base;
-
-	np = of_find_compatible_node(NULL, NULL, "fsl,imx6q-iomuxc");
-	if (!np) {
-		pr_warn("failed to find iomuxc node\n");
-		return;
-	}
-
-	base = of_iomap(np, 0);
-	if (!base) {
-		pr_warn("failed to map iomuxc\n");
-		goto put_node;
-	}
+	u32 ddr_type_rgmii;
+	u32 rgmii_term;
+	int (*mba6x_phy_fixup)(struct phy_device *);
+	const char *compatible;
 
 #define MX6Q_GRP_DDR_TYPE_RGMII		0x00790
 #define MX6Q_GRP_RGMII_TERM		0x007ac
@@ -292,25 +284,42 @@ static void __init imx6q_mba6x_enet_init(void)
 /* optimised drive strength for 1.3 .. 2.5 V signal on RGMII */
 #define MX6_GRP_DDR_TYPE_RGMII_1P5V	0x000C0000
 
-	if (of_machine_is_compatible("tq,tqma6s")) {
-		writel_relaxed(MX6_GRP_DDR_TYPE_RGMII_1P5V,
-				base + MX6DL_GRP_DDR_TYPE_RGMII);
-		writel_relaxed(MX6_GRP_RGMII_TERM_DISABLE,
-				base + MX6DL_GRP_RGMII_TERM);
-		if (IS_BUILTIN(CONFIG_PHYLIB))
-			phy_register_fixup_for_uid(PHY_ID_KSZ9031,
-						   MICREL_PHY_ID_MASK,
-					ksz9031rn_tqma6s_mba6x_phy_fixup);
-	} else if (of_machine_is_compatible("tq,tqma6q")) {
-		writel_relaxed(MX6_GRP_DDR_TYPE_RGMII_1P5V,
-				base + MX6Q_GRP_DDR_TYPE_RGMII);
-		writel_relaxed(MX6_GRP_RGMII_TERM_DISABLE,
-				base + MX6Q_GRP_RGMII_TERM);
-		if (IS_BUILTIN(CONFIG_PHYLIB))
-			phy_register_fixup_for_uid(PHY_ID_KSZ9031,
-						   MICREL_PHY_ID_MASK,
-					ksz9031rn_tqma6q_mba6x_phy_fixup);
+	if (cpu_is_imx6dl()) {
+		pr_warn("MBa6 - DL\n");
+
+		compatible = "fsl,imx6dl-iomuxc";
+		mba6x_phy_fixup = ksz9031rn_tqma6s_mba6x_phy_fixup;
+		ddr_type_rgmii = MX6DL_GRP_DDR_TYPE_RGMII;
+		rgmii_term = MX6DL_GRP_RGMII_TERM;
+	} else if (cpu_is_imx6q()) {
+		pr_warn("MBa6 - Q\n");
+
+		compatible = "fsl,imx6q-iomuxc";
+		mba6x_phy_fixup = ksz9031rn_tqma6q_mba6x_phy_fixup;
+		ddr_type_rgmii = MX6Q_GRP_DDR_TYPE_RGMII;
+		rgmii_term = MX6Q_GRP_RGMII_TERM;
+	} else {
+		pr_warn("unknown CPU for MBa6\n");
+		return;
 	}
+
+	np = of_find_compatible_node(NULL, NULL, compatible);
+	if (!np) {
+		pr_warn("failed to find iomuxc node\n");
+		return;
+	}
+
+	base = of_iomap(np, 0);
+	if (!base) {
+		pr_warn("failed to map iomuxc\n");
+		goto put_node;
+	}
+
+	writel_relaxed(MX6_GRP_DDR_TYPE_RGMII_1P5V, base + ddr_type_rgmii);
+	writel_relaxed(MX6_GRP_RGMII_TERM_DISABLE, base + rgmii_term);
+	if (IS_BUILTIN(CONFIG_PHYLIB))
+		phy_register_fixup_for_uid(PHY_ID_KSZ9031, MICREL_PHY_ID_MASK,
+					   mba6x_phy_fixup);
 
 put_node:
 	of_node_put(np);
@@ -362,7 +371,10 @@ static void __init imx6q_init_machine(void)
 	if (parent == NULL)
 		pr_warn("failed to initialize soc device\n");
 
-	if (of_machine_is_compatible("tq,mba6x"))
+	pr_warn("check MBa6\n");
+	if (of_machine_is_compatible("tq,mba6x") || 
+	    of_machine_is_compatible("tq,mba6a") ||
+	    of_machine_is_compatible("tq,mba6b"))
 		imx6q_mba6x_enet_init();
 	else
 		imx6q_enet_phy_init();
