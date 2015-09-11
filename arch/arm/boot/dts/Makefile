@@ -189,6 +189,16 @@ dtb-$(CONFIG_ARCH_MXC) += \
 	imx6dl-gw53xx.dtb \
 	imx6dl-gw54xx.dtb \
 	imx6dl-hummingboard.dtb \
+	imx6dl-mba6a.dtb \
+	imx6dl-mba6a-hdmi.dtb \
+	imx6dl-mba6a-lvds.dtb \
+	imx6dl-mba6a-multi.dtb \
+	imx6dl-mba6a-pd.dtb \
+	imx6dl-mba6b.dtb \
+	imx6dl-mba6b-hdmi.dtb \
+	imx6dl-mba6b-lvds.dtb \
+	imx6dl-mba6b-multi.dtb \
+	imx6dl-mba6b-pd.dtb \
 	imx6dl-mba6x.dtb \
 	imx6dl-mba6x-hdmi.dtb \
 	imx6dl-mba6x-lvds.dtb \
@@ -213,6 +223,16 @@ dtb-$(CONFIG_ARCH_MXC) += \
 	imx6q-gw53xx.dtb \
 	imx6q-gw5400-a.dtb \
 	imx6q-gw54xx.dtb \
+	imx6q-mba6a.dtb \
+	imx6q-mba6a-hdmi.dtb \
+	imx6q-mba6a-lvds.dtb \
+	imx6q-mba6a-multi.dtb \
+	imx6q-mba6a-pd.dtb \
+	imx6q-mba6b.dtb \
+	imx6q-mba6b-hdmi.dtb \
+	imx6q-mba6b-lvds.dtb \
+	imx6q-mba6b-multi.dtb \
+	imx6q-mba6b-pd.dtb \
 	imx6q-mba6x.dtb \
 	imx6q-mba6x-hdmi.dtb \
 	imx6q-mba6x-lvds.dtb \
