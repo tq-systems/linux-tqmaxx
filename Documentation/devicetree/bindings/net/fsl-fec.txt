@@ -12,6 +12,10 @@ Optional properties:
   only if property "phy-reset-gpios" is available.  Missing the property
   will have the duration be 1 millisecond.  Numbers greater than 1000 are
   invalid and 1 millisecond will be used instead.
+- phy-reset-delay : Reset delay in milliseconds.  Should present
+  only if property "phy-reset-gpios" is available and Phy needs a delay after
+  releasing reset. Missing the property will have the duration be 0 millisecond.
+  Numbers greater than 1000 are invalid and 10 millisecond will be used instead.
 - phy-supply : regulator that powers the Ethernet PHY.
 - phy-handle : phandle to the PHY device connected to this device.
 - fixed-link : Assume a fixed link. See fixed-link.txt in the same directory.
