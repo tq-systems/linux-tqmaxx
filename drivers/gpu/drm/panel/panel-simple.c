@@ -538,6 +538,29 @@ static const struct panel_desc auo_b133htn01 = {
 	},
 };
 
+static const struct drm_display_mode auo_m240htn01_mode = {
+	.clock = 71200,
+	.hdisplay = 1920,
+	.hsync_start = 1920 + 40,
+	.hsync_end = 1920 + 40 + 80,
+	.htotal = 1920 + 40 + 80 + 60,
+	.vdisplay = 1080,
+	.vsync_start = 1080 + 25,
+	.vsync_end = 1080 + 25 + 15,
+	.vtotal = 1080 + 25 + 15 + 10,
+	.vrefresh = 60,
+};
+
+static const struct panel_desc auo_m240htn01 = {
+	.modes = &auo_m240htn01_mode,
+	.num_modes = 1,
+	.bpc = 6,
+	.size = {
+		.width = 531,
+		.height = 299,
+	},
+};
+
 static const struct drm_display_mode avic_tm070ddh03_mode = {
 	.clock = 51200,
 	.hdisplay = 1024,
@@ -792,6 +815,22 @@ static const struct drm_display_mode innolux_g121i1_l01_mode = {
 	.vrefresh = 60,
 };
 
+static const struct panel_desc innolux_g101i1_l01 = {
+	.modes = &innolux_g121i1_l01_mode,
+	.num_modes = 1,
+	.bpc = 6,
+	.size = {
+		.width = 261,
+		.height = 163,
+	},
+	.delay = {
+		.prepare = 5,
+		.enable = 200,
+		.disable = 200,
+		.unprepare = 5,
+	},
+};
+
 static const struct panel_desc innolux_g121i1_l01 = {
 	.modes = &innolux_g121i1_l01_mode,
 	.num_modes = 1,
@@ -1011,6 +1050,9 @@ static const struct of_device_id platform_of_match[] = {
 		.compatible = "auo,b133xtn01",
 		.data = &auo_b133xtn01,
 	}, {
+		.compatible = "auo,m240htn01",
+		.data = &auo_m240htn01,
+	}, {
 		.compatible = "avic,tm070ddh03",
 		.data = &avic_tm070ddh03,
 	}, {
@@ -1043,6 +1085,9 @@ static const struct of_device_id platform_of_match[] = {
 	}, {
 		.compatible = "innolux,at043tn24",
 		.data = &innolux_at043tn24,
+	}, {
+		.compatible = "innolux,g101ice-l01",
+		.data = &innolux_g101i1_l01,
 	}, {
 		.compatible ="innolux,g121i1-l01",
 		.data = &innolux_g121i1_l01
