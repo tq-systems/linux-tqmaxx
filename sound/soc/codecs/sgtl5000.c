@@ -95,11 +95,7 @@ static const char *supply_names[SGTL5000_SUPPLY_NUM] = {
 #define LDO_CONSUMER_NAME	"VDDD_LDO"
 #define LDO_VOLTAGE		1200000
 
-static struct regulator_consumer_supply ldo_consumer[] = {
-	REGULATOR_SUPPLY(LDO_CONSUMER_NAME, NULL),
-};
-
-static struct regulator_init_data ldo_init_data = {
+static const struct regulator_init_data ldo_init_data_tpl = {
 	.constraints = {
 		.min_uV                 = 1200000,
 		.max_uV                 = 1200000,
@@ -107,7 +103,6 @@ static struct regulator_init_data ldo_init_data = {
 		.valid_ops_mask         = REGULATOR_CHANGE_STATUS,
 	},
 	.num_consumer_supplies = 1,
-	.consumer_supplies = &ldo_consumer[0],
 };
 
 /*
@@ -141,6 +136,10 @@ struct sgtl5000_priv {
 	int revision;
 	u8 micbias_resistor;
 	u8 micbias_voltage;
+	bool mono_r;
+	struct regulator_init_data *ldo_init_data;
+	struct regulator_consumer_supply *ldo_consumer;
+	char *ldo_consumer_name;
 };
 
 /*
@@ -727,14 +726,23 @@ static int sgtl5000_pcm_hw_params(struct snd_pcm_substream *substream,
 		return -EFAULT;
 	}
 
-	if (substream->stream == SNDRV_PCM_STREAM_PLAYBACK)
-		stereo = SGTL5000_DAC_STEREO;
-	else
-		stereo = SGTL5000_ADC_STEREO;
+	if (sgtl5000->mono_r &&
+	    substream->stream == SNDRV_PCM_STREAM_PLAYBACK) {
+		snd_soc_update_bits(codec, SGTL5000_CHIP_ANA_POWER,
+				    SGTL5000_DAC_STEREO, SGTL5000_DAC_STEREO);
+		snd_soc_update_bits(codec, SGTL5000_CHIP_ANA_TEST2,
+				    SGTL5000_MONO_DAC,
+				    channels == 1 ? SGTL5000_MONO_DAC : 0);
+	} else {
+		if (substream->stream == SNDRV_PCM_STREAM_PLAYBACK)
+			stereo = SGTL5000_DAC_STEREO;
+		else
+			stereo = SGTL5000_ADC_STEREO;
 
-	/* set mono to save power */
-	snd_soc_update_bits(codec, SGTL5000_CHIP_ANA_POWER, stereo,
-			channels == 1 ? 0 : stereo);
+		/* set mono to save power */
+		snd_soc_update_bits(codec, SGTL5000_CHIP_ANA_POWER, stereo,
+				channels == 1 ? 0 : stereo);
+	}
 
 	/* set codec clock base on lrclk */
 	ret = sgtl5000_set_clock(codec, params_rate(params));
@@ -1223,15 +1231,39 @@ static int sgtl5000_replace_vddd_with_ldo(struct snd_soc_codec *codec)
 	struct sgtl5000_priv *sgtl5000 = snd_soc_codec_get_drvdata(codec);
 	int ret;
 
+	sgtl5000->ldo_init_data = devm_kzalloc(codec->dev,
+					       sizeof(struct regulator_init_data),
+					       GFP_KERNEL);
+	sgtl5000->ldo_consumer = devm_kzalloc(codec->dev,
+					      sizeof(struct regulator_consumer_supply),
+					      GFP_KERNEL);
+	sgtl5000->ldo_consumer_name = devm_kzalloc(codec->dev, 32,
+						   GFP_KERNEL);
+	if (!sgtl5000->ldo_init_data || !sgtl5000->ldo_consumer ||
+	    !sgtl5000->ldo_consumer_name)
+		return -ENOMEM;
+
+	snprintf(sgtl5000->ldo_consumer_name, 32, "%s-%s",
+		 LDO_CONSUMER_NAME, dev_name(codec->dev));
+	*sgtl5000->ldo_init_data = ldo_init_data_tpl;
+	sgtl5000->ldo_consumer->supply = sgtl5000->ldo_consumer_name;
+	sgtl5000->ldo_init_data->consumer_supplies = sgtl5000->ldo_consumer;
+
 	/* set internal ldo to 1.2v */
-	ret = ldo_regulator_register(codec, &ldo_init_data, LDO_VOLTAGE);
+	ret = ldo_regulator_register(codec, sgtl5000->ldo_init_data, LDO_VOLTAGE);
 	if (ret) {
 		dev_err(codec->dev,
 			"Failed to register vddd internal supplies: %d\n", ret);
 		return ret;
 	}
 
-	sgtl5000->supplies[VDDD].supply = LDO_CONSUMER_NAME;
+	sgtl5000->supplies[VDDD].supply = devm_kstrdup(codec->dev,
+						       sgtl5000->ldo_consumer_name,
+						       GFP_KERNEL);
+	if (!sgtl5000->supplies[VDDD].supply) {
+		ldo_regulator_remove(codec);
+		return -ENOMEM;
+	}
 
 	dev_info(codec->dev, "Using internal LDO instead of VDDD\n");
 	return 0;
@@ -1517,6 +1549,9 @@ static int sgtl5000_i2c_probe(struct i2c_client *client,
 		} else {
 			sgtl5000->micbias_voltage = 0;
 		}
+		sgtl5000->mono_r = of_property_read_bool(np,
+							 "mono-right");
+		dev_err(&client->dev, "MONO: %s\n", sgtl5000->mono_r ? "right" : "left");
 	}
 
 	i2c_set_clientdata(client, sgtl5000);
