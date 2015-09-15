@@ -35,6 +35,8 @@ enum cd_types {
  * @wp_type:	type of write_protect method (see wp_types enum above)
  * @cd_type:	type of card_detect method (see cd_types enum above)
  * @support_vsel:  indicate it supports 1.8v switching
+ * @dsr_req:	indicate DSR is requested
+ * @dsr:	requested driver stage setting
  */
 
 struct esdhc_platform_data {
@@ -46,5 +48,7 @@ struct esdhc_platform_data {
 	unsigned int f_max;
 	bool support_vsel;
 	unsigned int delay_line;
+	bool dsr_req;
+	u16 dsr;
 };
 #endif /* __ASM_ARCH_IMX_ESDHC_H */

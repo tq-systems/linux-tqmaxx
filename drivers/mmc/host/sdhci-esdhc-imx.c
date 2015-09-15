@@ -4,7 +4,7 @@
  * derived from the OF-version.
  *
  * Copyright (c) 2010 Pengutronix e.K.
- *   Author: Wolfram Sang <w.sang@pengutronix.de>
+ *   Author: Wolfram Sang <kernel@pengutronix.de>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -161,7 +161,7 @@ struct pltfm_imx_data {
 	u32 is_ddr;
 };
 
-static struct platform_device_id imx_esdhc_devtype[] = {
+static const struct platform_device_id imx_esdhc_devtype[] = {
 	{
 		.name = "sdhci-esdhc-imx25",
 		.driver_data = (kernel_ulong_t) &esdhc_imx25_data,
@@ -878,7 +878,9 @@ sdhci_esdhc_imx_probe_dt(struct platform_device *pdev,
 	if (of_get_property(np, "fsl,cd-controller", NULL))
 		boarddata->cd_type = ESDHC_CD_CONTROLLER;
 
-	if (of_get_property(np, "fsl,wp-controller", NULL))
+	if (of_property_read_bool(np, "disable-wp"))
+		boarddata->wp_type = ESDHC_WP_NONE;
+	else if (of_get_property(np, "fsl,wp-controller", NULL))
 		boarddata->wp_type = ESDHC_WP_CONTROLLER;
 
 	boarddata->cd_gpio = of_get_named_gpio(np, "cd-gpios", 0);
@@ -1052,6 +1054,10 @@ static int sdhci_esdhc_imx_probe(struct platform_device *pdev)
 	err = mmc_of_parse(host->mmc);
 	if (err)
 		goto disable_clk;
+	if (boarddata->dsr_req) {
+		host->mmc->dsr_req = 1;
+		host->mmc->dsr = boarddata->dsr;
+	}
 
 	err = sdhci_add_host(host);
 	if (err)
@@ -1151,5 +1157,5 @@ static struct platform_driver sdhci_esdhc_imx_driver = {
 module_platform_driver(sdhci_esdhc_imx_driver);
 
 MODULE_DESCRIPTION("SDHCI driver for Freescale i.MX eSDHC");
-MODULE_AUTHOR("Wolfram Sang <w.sang@pengutronix.de>");
+MODULE_AUTHOR("Wolfram Sang <kernel@pengutronix.de>");
 MODULE_LICENSE("GPL v2");

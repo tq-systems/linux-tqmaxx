@@ -400,6 +400,9 @@ int mmc_of_parse(struct mmc_host *host)
 	else if (ret != -ENOENT)
 		return ret;
 
+	if (of_property_read_bool(np, "disable-wp"))
+		host->caps2 |= MMC_CAP2_NO_WRITE_PROTECT;
+
 	/* See the comment on CD inversion above */
 	if (ro_cap_invert ^ ro_gpio_invert)
 		host->caps2 |= MMC_CAP2_RO_ACTIVE_HIGH;
@@ -465,16 +468,21 @@ struct mmc_host *mmc_alloc_host(int extra, struct device *dev)
 {
 	int err;
 	struct mmc_host *host;
+	int alias_id;
 
 	host = kzalloc(sizeof(struct mmc_host) + extra, GFP_KERNEL);
 	if (!host)
 		return NULL;
 
+	alias_id = of_alias_get_id(dev->of_node, "mmc");
+	if (alias_id < 0)
+		alias_id = 0;
+
 	/* scanning will be enabled when we're ready */
 	host->rescan_disable = 1;
 	idr_preload(GFP_KERNEL);
 	spin_lock(&mmc_host_lock);
-	err = idr_alloc(&mmc_host_idr, host, 0, 0, GFP_NOWAIT);
+	err = idr_alloc(&mmc_host_idr, host, alias_id, 0, GFP_NOWAIT);
 	if (err >= 0)
 		host->index = err;
 	spin_unlock(&mmc_host_lock);
