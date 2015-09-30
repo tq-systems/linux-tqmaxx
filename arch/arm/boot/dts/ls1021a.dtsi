@@ -63,7 +63,15 @@
 		serial3 = &lpuart3;
 		serial4 = &lpuart4;
 		serial5 = &lpuart5;
+		ethernet0 = &enet0;
+		ethernet1 = &enet1;
+		ethernet2 = &enet2;
 		sysclk = &sysclk;
+		gpio0 = &gpio1;
+		gpio1 = &gpio2;
+		gpio2 = &gpio3;
+		gpio3 = &gpio4;
+		crypto = &crypto;
 	};
 
 	cpus {
