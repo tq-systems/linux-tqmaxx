@@ -262,7 +262,7 @@
 	flash0: n25q512ax3@0 {
 		#address-cells = <1>;
 		#size-cells = <1>;
-		compatible = "micron,n25q512ax3";
+		compatible = "jedec,spi-nor";
 		spi-max-frequency = <29000000>;
 		reg = <0>;
 	};
