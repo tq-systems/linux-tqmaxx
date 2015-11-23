@@ -51,7 +51,7 @@
 	status = "okay";
 
 	display: display@0 {
-		bits-per-pixel = <24>;
+		bits-per-pixel = <32>;
 
 		display-timings {
 			native-mode = <&et0700>;
@@ -127,6 +127,7 @@
 
 &i2c0 {
 	status = "okay";
+
 	pca9554_0: pca954@20 {
 		compatible = "nxp,pca9554";
 		reg = <0x20>;
@@ -189,6 +190,12 @@
 
 	pca9530: pca9530@60 {
 		compatible = "nxp,pca9530";
+		gpio-controller;
+		#gpio-cells = <2>;
+		nxp,pwm = <0x80 0x80>;
+		nxp,psc = <0 0>;
+		nxp,typecodes = <0x5>;
+		nxp,statecodes = <0xb>;
 		reg = <0x60>;
 		status = "okay";
 	};
