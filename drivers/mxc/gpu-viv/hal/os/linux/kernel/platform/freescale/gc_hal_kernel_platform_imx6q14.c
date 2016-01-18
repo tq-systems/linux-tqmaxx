@@ -37,7 +37,7 @@
 #include <mach/busfreq.h>
 #else
 #if 0
-#include <linux/busfreq-imx6.h>
+#include <linux/busfreq-imx.h>
 #endif
 #include <linux/reset.h>
 #endif
