@@ -36,7 +36,9 @@
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3, 10, 0)
 #include <mach/busfreq.h>
 #else
+#if 0
 #include <linux/busfreq-imx6.h>
+#endif
 #include <linux/reset.h>
 #endif
 #endif
@@ -764,21 +766,28 @@ _SetClock(
 }
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3,5,0)
-#ifdef CONFIG_PM
+#ifdef CONFIG_PM_RUNTIME
 static int gpu_runtime_suspend(struct device *dev)
 {
+#if 0
     release_bus_freq(BUS_FREQ_HIGH);
+#endif
     return 0;
 }
 
 static int gpu_runtime_resume(struct device *dev)
 {
+#if 0
     request_bus_freq(BUS_FREQ_HIGH);
+#endif
     return 0;
 }
+#endif
 
+#ifdef CONFIG_PM
 static struct dev_pm_ops gpu_pm_ops;
 #endif
+
 #endif
 
 gceSTATUS
