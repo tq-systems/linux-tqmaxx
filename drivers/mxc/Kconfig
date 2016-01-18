@@ -5,7 +5,9 @@ if ARCH_MXC
 menu "MXC support drivers"
 
 config MXC_IPU
-	bool "Image Processing Unit Driver"
+	bool
+	default n
+#	bool "Image Processing Unit Driver"
 	select MXC_IPU_V3
 	help
 	  If you plan to use the Image Processing unit, say
