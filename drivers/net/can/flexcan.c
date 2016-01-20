@@ -190,6 +190,7 @@
 #define FLEXCAN_QUIRK_BROKEN_ERR_STATE	BIT(1) /* [TR]WRN_INT not connected */
 #define FLEXCAN_QUIRK_DISABLE_RXFG	BIT(2) /* Disable RX FIFO Global mask */
 #define FLEXCAN_QUIRK_DISABLE_MECR	BIT(3) /* Disble Memory error detection */
+#define FLEXCAN_QUIRK_ONLY_LEGACY_RX_SUPPORT	BIT(4) /* No RX FIFO mode support */
 
 /* Structure of the message buffer */
 struct flexcan_mb {
@@ -275,6 +276,22 @@ static struct flexcan_devtype_data fsl_imx6q_devtype_data = {
 static struct flexcan_devtype_data fsl_vf610_devtype_data = {
 	.quirks = FLEXCAN_QUIRK_DISABLE_RXFG | FLEXCAN_QUIRK_DISABLE_MECR,
 };
+
+/* LS1021A-Rev1 has a broken RX-FIFO support. So only legacy RX message-buffers
+ * work here.
+ */
+static struct flexcan_devtype_data fsl_ls1021a_devtype_data = {
+	.quirks = FLEXCAN_QUIRK_DISABLE_RXFG | FLEXCAN_QUIRK_DISABLE_MECR |
+		  FLEXCAN_QUIRK_ONLY_LEGACY_RX_SUPPORT,
+};
+
+/* LS1021A-Rev2 has functional RX-FIFO mode, so no need to fall back to
+ * the legacy mode.
+ */
+static struct flexcan_devtype_data fsl_ls1021a_r2_devtype_data = {
+	.quirks = FLEXCAN_QUIRK_DISABLE_RXFG | FLEXCAN_QUIRK_DISABLE_MECR,
+};
+
 
 static const struct can_bittiming_const flexcan_bittiming_const = {
 	.name = DRV_NAME,
@@ -1135,6 +1152,10 @@ static void unregister_flexcandev(struct net_device *dev)
 static const struct of_device_id flexcan_of_match[] = {
 	{ .compatible = "fsl,imx6q-flexcan", .data = &fsl_imx6q_devtype_data, },
 	{ .compatible = "fsl,imx28-flexcan", .data = &fsl_imx28_devtype_data, },
+	{ .compatible = "fsl,ls1021a-flexcan",
+	  .data = &fsl_ls1021a_devtype_data, },
+	{ .compatible = "fsl,ls1021ar2-flexcan",
+	  .data = &fsl_ls1021a_r2_devtype_data, },
 	{ .compatible = "fsl,p1010-flexcan", .data = &fsl_p1010_devtype_data, },
 	{ .compatible = "fsl,vf610-flexcan", .data = &fsl_vf610_devtype_data, },
 	{ /* sentinel */ },
