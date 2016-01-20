@@ -84,8 +84,9 @@
 };
 
 &mdio0 {
-	tbi1: tbi-phy@1f {
-		reg = <0x1f>;
+	tbi1: tbi-phy@8 {
+		compatible = "fsl,gianfar-tbi";
+		reg = <0x8>;
 		device_type = "tbi-phy";
 	};
 };
