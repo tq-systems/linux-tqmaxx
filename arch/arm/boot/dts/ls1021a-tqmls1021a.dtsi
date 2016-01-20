@@ -36,6 +36,13 @@
 	};
 };
 
+&esdhc {
+	compatible = "fsl,esdhc", "fsl,ls1021a-esdhc";
+	/* e-MMC over 8 data lines */
+	bus-width = <8>;
+	status = "okay";
+};
+
 &i2c0 {
 	status = "okay";
 
