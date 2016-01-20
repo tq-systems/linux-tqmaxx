@@ -36,16 +36,9 @@
 	};
 };
 
-&duart0 {
-	status = "okay";
-};
-
-&duart1 {
-	status = "okay";
-};
-
 &i2c0 {
 	status = "okay";
+
 	pmic0: mc34vr500@08 {
 		reg = <0x08>;
 		status = "disabled";
@@ -83,55 +76,11 @@
 	};
 };
 
-&i2c1 {
-	status = "okay";
-};
-
-&i2c2 {
-	status = "okay";
-};
-
-&lpuart0 {
-	status = "okay";
-};
-
 &mdio0 {
 	tbi1: tbi-phy@1f {
 		reg = <0x1f>;
 		device_type = "tbi-phy";
 	};
-};
-
-&uqe {
-	tdma: ucc@2000 {
-		compatible = "fsl,ucc-tdm";
-		rx-clock-name = "clk8";
-		tx-clock-name = "clk9";
-		fsl,rx-sync-clock = "rsync_pin";
-		fsl,tx-sync-clock = "tsync_pin";
-		fsl,tx-timeslot = <0xfffffffe>;
-		fsl,rx-timeslot = <0xfffffffe>;
-		fsl,tdm-framer-type = "e1";
-		fsl,tdm-mode = "normal";
-		fsl,tdm-id = <0>;
-		fsl,siram-entry-id = <0>;
-	};
-
-	serial: ucc@2200 {
-		device_type = "serial";
-		compatible = "ucc_uart";
-		port-number = <1>;
-		rx-clock-name = "brg2";
-		tx-clock-name = "brg2";
-	};
-};
-
-&pwm6 {
-	status = "okay";
-};
-
-&pwm7 {
-	status = "okay";
 };
 
 &qspi {
@@ -153,8 +102,4 @@
 		spi-max-frequency = <20000000>;
 		reg = <1>;
 	};
-};
-
-&sai1 {
-	status = "okay";
 };

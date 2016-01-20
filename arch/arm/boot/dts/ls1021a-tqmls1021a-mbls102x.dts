@@ -36,6 +36,16 @@
 	};
 };
 
+&can0 {
+	status = "okay";
+	xceiver-supply = <&reg_3p3v>;
+};
+
+&can1 {
+	status = "okay";
+	xceiver-supply = <&reg_3p3v>;
+};
+
 &dcu0 {
 	display = <&display>;
 	status = "okay";
@@ -44,7 +54,8 @@
 		bits-per-pixel = <24>;
 
 		display-timings {
-			native-mode = <&timing0>;
+			native-mode = <&et0700>;
+
 			timing0: nl4827hc19 {
 				clock-frequency = <10870000>;
 				hactive = <480>;
@@ -58,22 +69,39 @@
 				hsync-active = <1>;
 				vsync-active = <1>;
 			};
+
+			/* ET0700G0DH6 + ETM0700G0DH6 */
+			et0700: 800x480p62 {
+				clock-frequency = <33260000>;
+				hactive = <800>;
+				vactive = <480>;
+				hback-porch = <216>;
+				hfront-porch = <40>;
+				vback-porch = <33>;
+				vfront-porch = <10>;
+				hsync-len = <128>;
+				vsync-len = <2>;
+				hsync-active = <0>;
+				vsync-active = <0>;
+				de-active = <1>;
+				pixelclk-active = <0>;
+			};
 		};
 	};
 };
 
-&duart0 {
+&uart0 {
 	status = "okay";
 };
 
-&duart1 {
+&uart1 {
 	status = "okay";
 };
 
 &enet0 {
 	phy-handle = <&rgmii_phy0d>;
 	phy-connection-type = "rgmii-id";
-	mac-address = "00:00:00:00:00:00";
+	mac-address = [ 00 00 00 00 00 00 ];
 	status = "okay";
 };
 
@@ -81,14 +109,14 @@
 	tbi-handle = <&tbi1>;
 	phy-handle = <&sgmii_phy13>;
 	phy-connection-type = "sgmii";
-	mac-address = "00:00:00:00:00:00";
+	mac-address = [ 00 00 00 00 00 00 ];
 	status = "okay";
 };
 
 &enet2 {
 	phy-handle = <&rgmii_phy05>;
 	phy-connection-type = "rgmii-id";
-	mac-address = "00:00:00:00:00:00";
+	mac-address = [ 00 00 00 00 00 00 ];
 	status = "okay";
 };
 
@@ -97,14 +125,24 @@
 	pca9554_0: pca954@20 {
 		compatible = "nxp,pca9554";
 		reg = <0x20>;
-/*		interrupts = <GIC_SPI 168 IRQ_TYPE_LEVEL_HIGH>; */
+		interrupt-parent = <&gpio1>;
+		interrupts = <24 IRQ_TYPE_EDGE_FALLING>;
+
+		interrupt-controller;
+		#interrupt-cells = <2>;
+
 		status = "okay";
 	};
 
 	pca9554_1: pca954@21 {
 		compatible = "nxp,pca9554";
 		reg = <0x21>;
-/*		interrupts = <GIC_SPI 169 IRQ_TYPE_LEVEL_HIGH>; */
+		interrupt-parent = <&gpio1>;
+		interrupts = <25 IRQ_TYPE_EDGE_FALLING>;
+
+		interrupt-controller;
+		#interrupt-cells = <2>;
+
 		status = "okay";
 	};
 
@@ -113,10 +151,10 @@
 		reg = <0x41>;
 		#address-cells = <1>;
 		#size-cells = <0>;
-/*
-		interrupts = <GIC_SPI 167 IRQ_TYPE_LEVEL_HIGH>;
-		interrupt-controller;
-*/
+
+		interrupt-parent = <&gpio1>;
+		interrupts = <23 IRQ_TYPE_EDGE_FALLING>;
+
 		status = "okay";
 
 		stmpe_gpio {
@@ -155,16 +193,14 @@
 	status = "okay";
 };
 
-&i2c2 {
-	status = "okay";
-};
-
 &lpuart0 {
 	status = "okay";
 };
 
 &mdio0 {
 	rgmii_phy05: ethernet-phy@05 {
+		compatible = "ethernet-phy-id2000.a230",
+			"ethernet-phy-ieee802.3-c22";
 		reg = <0x05>;
 		ti,rx-internal-delay = <DP83867_RGMIIDCTL_1_75_NS>;
 		ti,tx-internal-delay = <DP83867_RGMIIDCTL_1_75_NS>;
@@ -172,6 +208,8 @@
 		led-cfg2 = <0x0000>;
 	};
 	rgmii_phy0d: ethernet-phy@0d {
+		compatible = "ethernet-phy-id2000.a230",
+			"ethernet-phy-ieee802.3-c22";
 		reg = <0x0d>;
 		ti,rx-internal-delay = <DP83867_RGMIIDCTL_1_75_NS>;
 		ti,tx-internal-delay = <DP83867_RGMIIDCTL_1_75_NS>;
@@ -179,6 +217,8 @@
 		led-cfg2 = <0x0000>;
 	};
 	sgmii_phy13: ethernet-phy@13 {
+		compatible = "ethernet-phy-id2000.a230",
+			"ethernet-phy-ieee802.3-c22";
 		reg = <0x13>;
 	};
 };
