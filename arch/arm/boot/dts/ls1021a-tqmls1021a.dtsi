@@ -92,6 +92,7 @@
 };
 
 &qspi {
+	compatible = "fsl,ls1021a-qspi";
 	fsl,qspi-has-second-chip;
 	status = "okay";
 
