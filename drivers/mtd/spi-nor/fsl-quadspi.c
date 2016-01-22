@@ -204,11 +204,12 @@
 #define SEQID_WRSR		8
 #define SEQID_RDCR		9
 #define SEQID_EN4B		10
-#define SEQID_BRWR		11
+#define SEQID_RDVCR		11
 #define SEQID_RDFSR		12
 /* Micron Quad Mode enter */
 #define SEQID_RDEVCR		13
 #define SEQID_WREVCR		14
+#define SEQID_WRVCR		15
 
 #define QUADSPI_MIN_IOMAP SZ_4M
 
@@ -475,9 +476,10 @@ static void fsl_qspi_init_lut(struct fsl_qspi *q)
 	qspi_writel(q, LUT0(CMD, PAD1, SPINOR_OP_EN4B),
 			base + QUADSPI_LUT(lut_base));
 
-	/* Enter 4 Byte Mode (Spansion) */
-	lut_base = SEQID_BRWR * 4;
-	qspi_writel(q, LUT0(CMD, PAD1, SPINOR_OP_BRWR),
+	/* Read Volatile Configuration Register */
+	lut_base = SEQID_RDVCR * 4;
+	qspi_writel(q, LUT0(CMD, PAD1, SPINOR_OP_RD_VCR) |
+			LUT1(FSL_READ, PAD1, 0x1),
 			base + QUADSPI_LUT(lut_base));
 
 	/* Read Flag Status */
@@ -494,6 +496,12 @@ static void fsl_qspi_init_lut(struct fsl_qspi *q)
 	/* Write enhanced volatilite config reg */
 	lut_base = SEQID_WREVCR * 4;
 	writel(LUT0(CMD, PAD1, SPINOR_OP_WD_EVCR) | LUT1(FSL_WRITE, PAD1, 0x2),
+			base + QUADSPI_LUT(lut_base));
+
+	/* Write volatile configuration register */
+	lut_base = SEQID_WRVCR * 4;
+	qspi_writel(q, LUT0(CMD, PAD1, SPINOR_OP_WR_VCR) |
+			LUT1(FSL_WRITE, PAD1, 0x2),
 			base + QUADSPI_LUT(lut_base));
 
 	fsl_qspi_lock_lut(q);
@@ -525,14 +533,16 @@ static int fsl_qspi_get_seqid(struct fsl_qspi *q, u8 cmd)
 		return SEQID_RDCR;
 	case SPINOR_OP_EN4B:
 		return SEQID_EN4B;
-	case SPINOR_OP_BRWR:
-		return SEQID_BRWR;
+	case SPINOR_OP_RD_VCR:
+		return SEQID_RDVCR;
 	case SPINOR_OP_RDFSR:
 		return SEQID_RDFSR;
 	case SPINOR_OP_RD_EVCR:
 		return SEQID_RDEVCR;
 	case SPINOR_OP_WD_EVCR:
 		return SEQID_WREVCR;
+	case SPINOR_OP_WR_VCR:
+		return SEQID_WRVCR;
 
 	default:
 		if (cmd == q->nor[0].erase_opcode)
