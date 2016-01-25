@@ -8,6 +8,7 @@
  */
 
 /dts-v1/;
+#include <dt-bindings/net/ti-dp83867.h>
 #include "ls1021a-tqmls1021a.dtsi"
 
 / {
@@ -165,9 +166,13 @@
 &mdio0 {
 	rgmii_phy05: ethernet-phy@05 {
 		reg = <0x05>;
+		ti,rx-internal-delay = <DP83867_RGMIIDCTL_1_75_NS>;
+		ti,tx-internal-delay = <DP83867_RGMIIDCTL_1_75_NS>;
 	};
 	rgmii_phy0d: ethernet-phy@0d {
 		reg = <0x0d>;
+		ti,rx-internal-delay = <DP83867_RGMIIDCTL_1_75_NS>;
+		ti,tx-internal-delay = <DP83867_RGMIIDCTL_1_75_NS>;
 	};
 	sgmii_phy13: ethernet-phy@13 {
 		reg = <0x13>;
