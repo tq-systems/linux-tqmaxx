@@ -1,0 +1,272 @@
+/*
+ * Copyright 2013-2014 Freescale Semiconductor, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ */
+
+/dts-v1/;
+#include <dt-bindings/net/ti-dp83867.h>
+#include "ls1021a-tqmls1021a.dtsi"
+
+/ {
+	model = "TQMLS1021A SOM on MBLS102x";
+
+	aliases {
+		enet0_rgmii_phy = &rgmii_phy0d;
+		enet1_sgmii_phy = &sgmii_phy13;
+		enet2_rgmii_phy = &rgmii_phy05;
+	};
+
+	regulators {
+		compatible = "simple-bus";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		reg_3p3v: regulator@0 {
+			compatible = "regulator-fixed";
+			reg = <0>;
+			regulator-name = "3P3V";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			regulator-always-on;
+		};
+	};
+};
+
+&can0 {
+	status = "okay";
+	xceiver-supply = <&reg_3p3v>;
+};
+
+&can1 {
+	status = "okay";
+	xceiver-supply = <&reg_3p3v>;
+};
+
+&dcu0 {
+	display = <&display>;
+	status = "okay";
+
+	display: display@0 {
+		bits-per-pixel = <32>;
+
+		display-timings {
+			native-mode = <&et0700>;
+
+			timing0: nl4827hc19 {
+				clock-frequency = <10870000>;
+				hactive = <480>;
+				vactive = <272>;
+				hback-porch = <2>;
+				hfront-porch = <2>;
+				vback-porch = <2>;
+				vfront-porch = <2>;
+				hsync-len = <41>;
+				vsync-len = <4>;
+				hsync-active = <1>;
+				vsync-active = <1>;
+			};
+
+			/* ET0700G0DH6 + ETM0700G0DH6 */
+			et0700: 800x480p62 {
+				clock-frequency = <33260000>;
+				hactive = <800>;
+				vactive = <480>;
+				hback-porch = <216>;
+				hfront-porch = <40>;
+				vback-porch = <33>;
+				vfront-porch = <10>;
+				hsync-len = <128>;
+				vsync-len = <2>;
+				hsync-active = <0>;
+				vsync-active = <0>;
+				de-active = <1>;
+				pixelclk-active = <0>;
+			};
+		};
+	};
+};
+
+&esdhc {
+	/* SD card over 4 data lines (overwrites module)*/
+	bus-width = <4>;
+};
+
+&uart0 {
+	status = "okay";
+};
+
+&uart1 {
+	status = "okay";
+};
+
+&enet0 {
+	phy-handle = <&rgmii_phy0d>;
+	phy-connection-type = "rgmii-id";
+	mac-address = [ 00 00 00 00 00 00 ];
+	status = "okay";
+};
+
+&enet1 {
+	tbi-handle = <&tbi1>;
+	phy-handle = <&sgmii_phy13>;
+	phy-connection-type = "sgmii";
+	mac-address = [ 00 00 00 00 00 00 ];
+	status = "okay";
+};
+
+&enet2 {
+	phy-handle = <&rgmii_phy05>;
+	phy-connection-type = "rgmii-id";
+	mac-address = [ 00 00 00 00 00 00 ];
+	status = "okay";
+};
+
+&i2c0 {
+	status = "okay";
+
+	pca9554_0: pca954@20 {
+		compatible = "nxp,pca9554";
+		reg = <0x20>;
+		interrupt-parent = <&gpio1>;
+		interrupts = <24 IRQ_TYPE_EDGE_FALLING>;
+
+		interrupt-controller;
+		#interrupt-cells = <2>;
+
+		status = "okay";
+	};
+
+	pca9554_1: pca954@21 {
+		compatible = "nxp,pca9554";
+		reg = <0x21>;
+		interrupt-parent = <&gpio1>;
+		interrupts = <25 IRQ_TYPE_EDGE_FALLING>;
+
+		interrupt-controller;
+		#interrupt-cells = <2>;
+
+		status = "okay";
+	};
+
+	stmpe811@41 {
+		compatible = "st,stmpe811";
+		reg = <0x41>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		interrupt-parent = <&gpio1>;
+		interrupts = <23 IRQ_TYPE_EDGE_FALLING>;
+
+		status = "okay";
+
+		stmpe_gpio {
+			compatible = "stmpe,gpio";
+			gpio-controller;
+			#gpio-cells = <2>;
+			gpio,norequest-mask = <0xF0>;
+		};
+
+		stmpe_touchscreen {
+			compatible = "stmpe,ts";
+/*
+ * TODO:
+ * this has to be configured per panel
+ */
+			ts,sample-time = <4>;
+			ts,mod-12b = <1>;
+			ts,ref-sel = <0>;
+			ts,adc-freq = <1>;
+			ts,ave-ctrl = <1>;
+			ts,touch-det-delay = <3>;
+			ts,settling = <4>;
+			ts,fraction-z = <7>;
+			ts,i-drive = <1>;
+		};
+	};
+
+	pca9530: pca9530@60 {
+		compatible = "nxp,pca9530";
+		gpio-controller;
+		#gpio-cells = <2>;
+		nxp,pwm = <0x80 0x80>;
+		nxp,psc = <0 0>;
+		nxp,typecodes = <0x5>;
+		nxp,statecodes = <0xb>;
+		reg = <0x60>;
+		status = "okay";
+	};
+};
+
+&i2c1 {
+	status = "okay";
+};
+
+&lpuart0 {
+	status = "okay";
+};
+
+&mdio0 {
+	rgmii_phy05: ethernet-phy@05 {
+		compatible = "ethernet-phy-id2000.a230",
+			"ethernet-phy-ieee802.3-c22";
+		reg = <0x05>;
+		ti,rx-internal-delay = <DP83867_RGMIIDCTL_1_75_NS>;
+		ti,tx-internal-delay = <DP83867_RGMIIDCTL_1_75_NS>;
+		led-cfg1 = <0x6b90>;
+		led-cfg2 = <0x0000>;
+	};
+	rgmii_phy0d: ethernet-phy@0d {
+		compatible = "ethernet-phy-id2000.a230",
+			"ethernet-phy-ieee802.3-c22";
+		reg = <0x0d>;
+		ti,rx-internal-delay = <DP83867_RGMIIDCTL_1_75_NS>;
+		ti,tx-internal-delay = <DP83867_RGMIIDCTL_1_75_NS>;
+		led-cfg1 = <0x6b90>;
+		led-cfg2 = <0x0000>;
+	};
+	sgmii_phy13: ethernet-phy@13 {
+		compatible = "ethernet-phy-id2000.a230",
+			"ethernet-phy-ieee802.3-c22";
+		reg = <0x13>;
+	};
+};
+
+&uqe {
+	tdma: ucc@2000 {
+		compatible = "fsl,ucc-tdm";
+		rx-clock-name = "clk8";
+		tx-clock-name = "clk9";
+		fsl,rx-sync-clock = "rsync_pin";
+		fsl,tx-sync-clock = "tsync_pin";
+		fsl,tx-timeslot = <0xfffffffe>;
+		fsl,rx-timeslot = <0xfffffffe>;
+		fsl,tdm-framer-type = "e1";
+		fsl,tdm-mode = "normal";
+		fsl,tdm-id = <0>;
+		fsl,siram-entry-id = <0>;
+	};
+
+	serial: ucc@2200 {
+		device_type = "serial";
+		compatible = "ucc_uart";
+		port-number = <1>;
+		rx-clock-name = "brg2";
+		tx-clock-name = "brg2";
+	};
+};
+
+&pwm6 {
+	status = "okay";
+};
+
+&pwm7 {
+	status = "okay";
+};
+
+&sai1 {
+	status = "okay";
+};

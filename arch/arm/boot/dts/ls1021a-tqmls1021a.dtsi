@@ -1,0 +1,114 @@
+/*
+ * Copyright 2013-2014 Freescale Semiconductor, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ */
+
+#include "ls1021a.dtsi"
+
+/ {
+	model = "TQMLS1021A SOM";
+
+	clocks {
+		sys_mclk: clock {
+			compatible = "fixed-clock";
+			#clock-cells = <0>;
+			clock-frequency = <24576000>;
+		};
+	};
+
+	regulators {
+		compatible = "simple-bus";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		reg_3p3v_som: regulator@0 {
+			compatible = "regulator-fixed";
+			reg = <0>;
+			regulator-name = "3P3V_SOM";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			regulator-always-on;
+		};
+	};
+};
+
+&esdhc {
+	compatible = "fsl,esdhc", "fsl,ls1021a-esdhc";
+	/* e-MMC over 8 data lines */
+	bus-width = <8>;
+	status = "okay";
+};
+
+&i2c0 {
+	status = "okay";
+
+	pmic0: mc34vr500@08 {
+		reg = <0x08>;
+		status = "disabled";
+	};
+
+	sensor0: sa56004@4c {
+		compatible = "nxp,sa56004";
+		reg = <0x4c>;
+		vcc-supply = <&reg_3p3v_som>;
+		status = "okay";
+	};
+
+	pmc0: pmc@11 {
+		reg = <0x11>;
+		interrupts = <GIC_SPI 165 IRQ_TYPE_LEVEL_HIGH>;
+		status = "disabled";
+	};
+
+	supervisor0: adm1069@4f {
+		reg = <0x4f>;
+		status = "disabled";
+	};
+
+	eeprom0: 24c64@50 {
+		compatible = "atmel,24c64";
+		reg = <0x50>;
+		pagesize = <32>;
+		status = "okay";
+	};
+
+	rtc: pcf85063@51 {
+		compatible = "nxp,pcf85063";
+		reg = <0x51>;
+		status = "okay";
+	};
+};
+
+&mdio0 {
+	tbi1: tbi-phy@8 {
+		compatible = "fsl,gianfar-tbi";
+		reg = <0x8>;
+		device_type = "tbi-phy";
+	};
+};
+
+&qspi {
+	compatible = "fsl,ls1021a-qspi";
+	fsl,qspi-has-second-chip;
+	status = "okay";
+
+	qflash0: mt25ql512@0 {
+		compatible = "micron,n25q512ax3";
+		#address-cells = <1>;
+		#size-cells = <1>;
+		spi-max-frequency = <20000000>;
+		reg = <0>;
+	};
+
+	qflash1: mt25ql512@1 {
+		compatible = "micron,n25q512ax3";
+		#address-cells = <1>;
+		#size-cells = <1>;
+		spi-max-frequency = <20000000>;
+		reg = <1>;
+	};
+};

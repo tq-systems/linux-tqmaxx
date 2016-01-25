@@ -8,6 +8,8 @@ Required properties:
 		for applicable values
 	- ti,fifo-depth - Transmitt FIFO depth- see dt-bindings/net/ti-dp83867.h
 		for applicable values
+	- led-cfg1 - Value of LED configuration register 1
+	- led-cfg2 - Value of LED configuration register 2
 
 Default child nodes are standard Ethernet PHY device
 nodes as described in Documentation/devicetree/bindings/net/phy.txt
