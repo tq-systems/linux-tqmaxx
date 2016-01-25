@@ -216,6 +216,8 @@
 		reg = <0x05>;
 		ti,rx-internal-delay = <DP83867_RGMIIDCTL_1_75_NS>;
 		ti,tx-internal-delay = <DP83867_RGMIIDCTL_1_75_NS>;
+		rx-skew-ps = <1750>;
+		tx-skew-ps = <1750>;
 		led-cfg1 = <0x6b90>;
 		led-cfg2 = <0x0000>;
 	};
@@ -225,6 +227,8 @@
 		reg = <0x0d>;
 		ti,rx-internal-delay = <DP83867_RGMIIDCTL_1_75_NS>;
 		ti,tx-internal-delay = <DP83867_RGMIIDCTL_1_75_NS>;
+		rx-skew-ps = <1750>;
+		tx-skew-ps = <1750>;
 		led-cfg1 = <0x6b90>;
 		led-cfg2 = <0x0000>;
 	};
