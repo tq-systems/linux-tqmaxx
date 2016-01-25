@@ -33,6 +33,8 @@
 /* Extended Registers */
 #define DP83867_RGMIICTL	0x0032
 #define DP83867_RGMIIDCTL	0x0086
+#define DP83867_LEDCR1		0x18
+#define DP83867_LEDCR2		0x19
 
 #define DP83867_SW_RESET	BIT(15)
 #define DP83867_SW_RESTART	BIT(14)
@@ -65,6 +67,8 @@ struct dp83867_private {
 	int rx_id_delay;
 	int tx_id_delay;
 	int fifo_depth;
+	int led_cfg1;
+	int led_cfg2;
 };
 
 static int dp83867_ack_interrupt(struct phy_device *phydev)
@@ -120,6 +124,16 @@ static int dp83867_of_init(struct phy_device *phydev)
 
 	ret = of_property_read_u32(of_node, "ti,tx-internal-delay",
 				   &dp83867->tx_id_delay);
+	if (ret)
+		return ret;
+
+	ret = of_property_read_u32(of_node, "led-cfg1",
+				&dp83867->led_cfg1);
+	if (ret)
+		return ret;
+
+	ret = of_property_read_u32(of_node, "led-cfg2",
+				&dp83867->led_cfg2);
 	if (ret)
 		return ret;
 
@@ -179,6 +193,9 @@ static int dp83867_config_init(struct phy_device *phydev)
 
 		delay = (dp83867->rx_id_delay |
 			(dp83867->tx_id_delay << DP83867_RGMII_TX_CLK_DELAY_SHIFT));
+
+		phy_write(phydev, DP83867_LEDCR1, dp83867->led_cfg1);
+		phy_write(phydev, DP83867_LEDCR2, dp83867->led_cfg2);
 
 		phy_write_mmd_indirect(phydev, DP83867_RGMIIDCTL,
 				       DP83867_DEVADDR, phydev->addr, delay);
