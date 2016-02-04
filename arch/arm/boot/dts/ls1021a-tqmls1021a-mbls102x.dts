@@ -9,6 +9,7 @@
 
 /dts-v1/;
 #include <dt-bindings/net/ti-dp83867.h>
+#include <dt-bindings/gpio/gpio.h>
 #include "ls1021a-tqmls1021a.dtsi"
 
 / {
@@ -25,14 +26,38 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 
-		reg_3p3v: regulator@0 {
+		reg_3p3v: regulator@1 {
 			compatible = "regulator-fixed";
-			reg = <0>;
+			reg = <1>;
 			regulator-name = "3P3V";
 			regulator-min-microvolt = <3300000>;
 			regulator-max-microvolt = <3300000>;
 			regulator-always-on;
 		};
+
+		reg_lcd: regulator@2 {
+			compatible = "regulator-fixed";
+			reg = <2>;
+			regulator-name = "LCD_PWR_EN";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			gpios = <&pca9554_1 4 GPIO_ACTIVE_HIGH>; /* LCD_PWR_EN */
+			enable-active-high;
+			regulator-always-on;
+		};
+	};
+
+	backlight_dcu: backlight@0 {
+		compatible = "gpio-backlight";
+		gpios = <&pca9530 0 GPIO_ACTIVE_HIGH>;
+		default-on;
+		status = "okay";
+	};
+
+	etm0700: panel_simple {
+		compatible = "edt,etm0700g0dh6";
+		backlight = <&backlight_dcu>;
+		power-supply = <&reg_lcd>;
 	};
 };
 
@@ -128,26 +153,34 @@
 &i2c0 {
 	status = "okay";
 
-	pca9554_0: pca954@20 {
+	pca9554_0: pca9554@20 {
 		compatible = "nxp,pca9554";
 		reg = <0x20>;
+
 		interrupt-parent = <&gpio1>;
 		interrupts = <24 IRQ_TYPE_EDGE_FALLING>;
 
 		interrupt-controller;
 		#interrupt-cells = <2>;
 
+		gpio-controller;
+		#gpio-cells = <2>;
+
 		status = "okay";
 	};
 
-	pca9554_1: pca954@21 {
+	pca9554_1: pca9554@21 {
 		compatible = "nxp,pca9554";
 		reg = <0x21>;
+
 		interrupt-parent = <&gpio1>;
 		interrupts = <25 IRQ_TYPE_EDGE_FALLING>;
 
 		interrupt-controller;
 		#interrupt-cells = <2>;
+
+		gpio-controller;
+		#gpio-cells = <2>;
 
 		status = "okay";
 	};
@@ -188,14 +221,24 @@
 		};
 	};
 
+	polytouch: edt-ft5x06@38 {
+		compatible = "edt,edt-ft5406", "edt,edt-ft5x06";
+		reg = <0x38>;
+		interrupt-parent = <&pca9554_0>;
+		interrupts = <6 IRQ_TYPE_EDGE_FALLING>;
+		/* STK_RST#: reset-gpios = <&gpio2 6 1>; */
+		wake-gpios = <&pca9554_1 4 0>;
+		status = "okay";
+	};
+
 	pca9530: pca9530@60 {
 		compatible = "nxp,pca9530";
 		gpio-controller;
 		#gpio-cells = <2>;
 		nxp,pwm = <0x80 0x80>;
 		nxp,psc = <0 0>;
-		nxp,typecodes = <0x5>;
-		nxp,statecodes = <0xb>;
+		nxp,typecodes = <0xF>;
+		nxp,statecodes = <0x4>;
 		reg = <0x60>;
 		status = "okay";
 	};
