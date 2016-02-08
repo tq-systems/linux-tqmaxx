@@ -68,6 +68,7 @@ struct panel_desc {
 	} delay;
 
 	u32 bus_format;
+	u32 bus_flags;
 };
 
 struct panel_simple {
@@ -140,6 +141,7 @@ static int panel_simple_get_fixed_modes(struct panel_simple *panel)
 	if (panel->desc->bus_format)
 		drm_display_info_set_bus_formats(&connector->display_info,
 						 &panel->desc->bus_format, 1);
+	connector->display_info.bus_flags = panel->desc->bus_flags;
 
 	return num;
 }
@@ -971,7 +973,8 @@ static const struct panel_desc nec_nl4827hc19_05b = {
 		.width = 95,
 		.height = 54,
 	},
-	.bus_format = MEDIA_BUS_FMT_RGB888_1X24
+	.bus_format = MEDIA_BUS_FMT_RGB888_1X24,
+	.bus_flags = DRM_BUS_FLAG_PIXDATA_POSEDGE,
 };
 
 static const struct display_timing okaya_rs800480t_7x0gp_timing = {
