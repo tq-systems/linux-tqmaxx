@@ -39,6 +39,11 @@
 #include <drm/drm_fb_helper.h>
 #include <drm/drm_crtc_helper.h>
 
+static bool drm_fbdev_emulation = true;
+module_param_named(fbdev_emulation, drm_fbdev_emulation, bool, 0600);
+MODULE_PARM_DESC(fbdev_emulation,
+		 "Enable legacy fbdev emulation [default=true]");
+
 static LIST_HEAD(kernel_fb_helper_list);
 
 /**
@@ -98,6 +103,9 @@ int drm_fb_helper_single_add_all_connectors(struct drm_fb_helper *fb_helper)
 	struct drm_connector *connector;
 	int i;
 
+	if (!drm_fbdev_emulation)
+		return 0;
+
 	list_for_each_entry(connector, &dev->mode_config.connector_list, head) {
 		struct drm_fb_helper_connector *fb_helper_connector;
 
@@ -123,6 +131,9 @@ int drm_fb_helper_add_one_connector(struct drm_fb_helper *fb_helper, struct drm_
 {
 	struct drm_fb_helper_connector **temp;
 	struct drm_fb_helper_connector *fb_helper_connector;
+
+	if (!drm_fbdev_emulation)
+		return 0;
 
 	WARN_ON(!mutex_is_locked(&fb_helper->dev->mode_config.mutex));
 	if (fb_helper->connector_count + 1 > fb_helper->connector_info_alloc_count) {
@@ -175,6 +186,9 @@ int drm_fb_helper_remove_one_connector(struct drm_fb_helper *fb_helper,
 {
 	struct drm_fb_helper_connector *fb_helper_connector;
 	int i, j;
+
+	if (!drm_fbdev_emulation)
+		return 0;
 
 	WARN_ON(!mutex_is_locked(&fb_helper->dev->mode_config.mutex));
 
@@ -381,6 +395,9 @@ int drm_fb_helper_restore_fbdev_mode_unlocked(struct drm_fb_helper *fb_helper)
 	struct drm_device *dev = fb_helper->dev;
 	bool do_delayed;
 	int ret;
+
+	if (!drm_fbdev_emulation)
+		return -ENODEV;
 
 	drm_modeset_lock_all(dev);
 	ret = restore_fbdev_mode(fb_helper);
@@ -630,6 +647,9 @@ int drm_fb_helper_init(struct drm_device *dev,
 	struct drm_crtc *crtc;
 	int i;
 
+	if (!drm_fbdev_emulation)
+		return 0;
+
 	if (!max_conn_count)
 		return -EINVAL;
 
@@ -672,6 +692,9 @@ EXPORT_SYMBOL(drm_fb_helper_init);
 
 void drm_fb_helper_fini(struct drm_fb_helper *fb_helper)
 {
+	if (!drm_fbdev_emulation)
+		return;
+
 	if (!list_empty(&fb_helper->kernel_fb_list)) {
 		list_del(&fb_helper->kernel_fb_list);
 		if (list_empty(&kernel_fb_helper_list)) {
@@ -1752,6 +1775,9 @@ int drm_fb_helper_initial_config(struct drm_fb_helper *fb_helper, int bpp_sel)
 	struct drm_device *dev = fb_helper->dev;
 	int count = 0;
 
+	if (!drm_fbdev_emulation)
+		return 0;
+
 	mutex_lock(&dev->mode_config.mutex);
 	count = drm_fb_helper_probe_connector_modes(fb_helper,
 						    dev->mode_config.max_width,
@@ -1794,6 +1820,9 @@ int drm_fb_helper_hotplug_event(struct drm_fb_helper *fb_helper)
 {
 	struct drm_device *dev = fb_helper->dev;
 	u32 max_width, max_height;
+
+	if (!drm_fbdev_emulation)
+		return 0;
 
 	mutex_lock(&fb_helper->dev->mode_config.mutex);
 	if (!fb_helper->fb || !drm_fb_helper_is_bound(fb_helper)) {
