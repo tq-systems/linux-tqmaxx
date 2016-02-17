@@ -127,12 +127,12 @@ static int dp83867_of_init(struct phy_device *phydev)
 	if (ret)
 		return ret;
 
-	ret = of_property_read_u32(of_node, "led-cfg1",
+	ret = of_property_read_u32(of_node, "ti,led-cfg1",
 				&dp83867->led_cfg1);
 	if (ret)
 		return ret;
 
-	ret = of_property_read_u32(of_node, "led-cfg2",
+	ret = of_property_read_u32(of_node, "ti,led-cfg2",
 				&dp83867->led_cfg2);
 	if (ret)
 		return ret;
@@ -194,12 +194,12 @@ static int dp83867_config_init(struct phy_device *phydev)
 		delay = (dp83867->rx_id_delay |
 			(dp83867->tx_id_delay << DP83867_RGMII_TX_CLK_DELAY_SHIFT));
 
-		phy_write(phydev, DP83867_LEDCR1, dp83867->led_cfg1);
-		phy_write(phydev, DP83867_LEDCR2, dp83867->led_cfg2);
-
 		phy_write_mmd_indirect(phydev, DP83867_RGMIIDCTL,
 				       DP83867_DEVADDR, phydev->addr, delay);
 	}
+
+	phy_write(phydev, DP83867_LEDCR1, dp83867->led_cfg1);
+	phy_write(phydev, DP83867_LEDCR2, dp83867->led_cfg2);
 
 	return 0;
 }
