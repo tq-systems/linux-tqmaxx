@@ -911,6 +911,9 @@ static int gfar_of_init(struct platform_device *ofdev, struct net_device **pdev)
 	if (of_get_property(np, "fsl,wake-on-filer", NULL))
 		priv->device_flags |= FSL_GIANFAR_DEV_HAS_WAKE_ON_FILER;
 
+	if (of_get_property(np, "fsl,dma-endian-le", NULL))
+		priv->device_flags |= FSL_GIANFAR_BDS_LITTLE_ENDIAN;
+
 	priv->phy_node = of_parse_phandle(np, "phy-handle", 0);
 
 	/* In the case of a fixed PHY, the DT node associated
@@ -2061,6 +2064,8 @@ void gfar_start(struct gfar_private *priv)
 	/* Make sure we aren't stopped */
 	tempval = gfar_read(&regs->dmactrl);
 	tempval &= ~(DMACTRL_GRS | DMACTRL_GTS);
+	if (priv->device_flags & FSL_GIANFAR_BDS_LITTLE_ENDIAN)
+		tempval |= DMACTRL_LE;
 	gfar_write(&regs->dmactrl, tempval);
 
 	for (i = 0; i < priv->num_grps; i++) {
