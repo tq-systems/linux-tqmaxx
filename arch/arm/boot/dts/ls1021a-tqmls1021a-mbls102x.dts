@@ -71,7 +71,7 @@
 	xceiver-supply = <&reg_3p3v>;
 };
 
-&dcu0 {
+&dcu {
 	fsl,panel = <&etm0700>;
 	status = "okay";
 };
