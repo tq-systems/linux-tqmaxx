@@ -155,6 +155,9 @@
 		interrupt-parent = <&gpio1>;
 		interrupts = <23 IRQ_TYPE_EDGE_FALLING>;
 
+		vcc-supply = <&reg_3p3v>;
+		vio-supply = <&reg_3p3v>;
+
 		status = "okay";
 
 		stmpe_gpio {
@@ -170,15 +173,15 @@
  * TODO:
  * this has to be configured per panel
  */
-			ts,sample-time = <4>;
-			ts,mod-12b = <1>;
-			ts,ref-sel = <0>;
-			ts,adc-freq = <1>;
-			ts,ave-ctrl = <1>;
-			ts,touch-det-delay = <3>;
-			ts,settling = <4>;
-			ts,fraction-z = <7>;
-			ts,i-drive = <1>;
+			st,sample-time = <4>;
+			st,mod-12b = <1>;
+			st,ref-sel = <0>;
+			st,adc-freq = <1>;
+			st,ave-ctrl = <1>;
+			st,touch-det-delay = <3>;
+			st,settling = <4>;
+			st,fraction-z = <7>;
+			st,i-drive = <1>;
 		};
 	};
 
