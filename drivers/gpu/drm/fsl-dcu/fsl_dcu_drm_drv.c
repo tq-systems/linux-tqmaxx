@@ -28,6 +28,58 @@
 #include "fsl_dcu_drm_crtc.h"
 #include "fsl_dcu_drm_drv.h"
 
+/* --- Enable Pixel clock in SCFG_PIXCLKCR */
+static const struct regmap_config fsl_scfg_regmap_config = {
+	.reg_bits = 32,
+	.reg_stride = 4,
+	.val_bits = 32,
+
+	.max_register = 0x28,
+	.cache_type = REGCACHE_FLAT,
+};
+
+static int scfg_config(struct device_node *np)
+{
+	struct device_node *scfg_np;
+	struct regmap *scfg_regmap;
+	struct platform_device *pdev;
+	struct resource *res;
+	void __iomem *base;
+
+	scfg_np = of_parse_phandle(np, "scfg-controller", 0);
+	if (!scfg_np)
+		return 0;
+
+	pdev = of_find_device_by_node(scfg_np);
+	if (!pdev)
+		return -EINVAL;
+
+	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+	if (!res)
+		return -ENODEV;
+
+	base = devm_ioremap_resource(&pdev->dev, res);
+	if (IS_ERR(base)) {
+		dev_err(&pdev->dev, "could not ioremap resource\n");
+		return PTR_ERR(base);
+	}
+
+	scfg_regmap = devm_regmap_init_mmio_clk(&pdev->dev,
+			NULL, base, &fsl_scfg_regmap_config);
+	if (IS_ERR(scfg_regmap)) {
+		dev_err(&pdev->dev, "regmap init failed\n");
+		return PTR_ERR(scfg_regmap);
+	}
+
+	regmap_write(scfg_regmap, SCFG_PIXCLKCR, SCFG_PIXCLKCR_PXCEN);
+	dev_info(&pdev->dev, "pixclk enabled\n");
+
+	devm_iounmap(&pdev->dev, base);
+
+	return 0;
+}
+/* --- */
+
 static bool fsl_dcu_drm_is_volatile_reg(struct device *dev, unsigned int reg)
 {
 	if (reg == DCU_INT_STATUS || reg == DCU_UPDATE_MODE)
@@ -342,6 +394,9 @@ static int fsl_dcu_drm_probe(struct platform_device *pdev)
 	if (!id)
 		return -ENODEV;
 	fsl_dev->soc = id->data;
+
+	if (scfg_config(dev->of_node))
+		dev_err(dev, "error enabling pixclk\n");
 
 	drm = drm_dev_alloc(driver, dev);
 	if (!drm)
