@@ -16,9 +16,9 @@
 	model = "TQMLS1021A SOM on MBLS102x";
 
 	aliases {
-		enet0_rgmii_phy = &rgmii_phy0d;
-		enet1_sgmii_phy = &sgmii_phy13;
-		enet2_rgmii_phy = &rgmii_phy05;
+		enet0_rgmii_phy = &rgmii_phy0c;
+		enet1_sgmii_phy = &sgmii_phy03;
+		enet2_rgmii_phy = &rgmii_phy04;
 	};
 
 	regulators {
@@ -96,7 +96,7 @@
 };
 
 &enet0 {
-	phy-handle = <&rgmii_phy0d>;
+	phy-handle = <&rgmii_phy0c>;
 	phy-connection-type = "rgmii-id";
 	mac-address = [ 00 00 00 00 00 00 ];
 	status = "okay";
@@ -104,14 +104,14 @@
 
 &enet1 {
 	tbi-handle = <&tbi1>;
-	phy-handle = <&sgmii_phy13>;
+	phy-handle = <&sgmii_phy03>;
 	phy-connection-type = "sgmii";
 	mac-address = [ 00 00 00 00 00 00 ];
 	status = "okay";
 };
 
 &enet2 {
-	phy-handle = <&rgmii_phy05>;
+	phy-handle = <&rgmii_phy04>;
 	phy-connection-type = "rgmii-id";
 	mac-address = [ 00 00 00 00 00 00 ];
 	status = "okay";
@@ -241,30 +241,32 @@
 };
 
 &mdio0 {
-	rgmii_phy05: ethernet-phy@05 {
+	rgmii_phy0c: ethernet-phy@0c {
 		compatible = "ethernet-phy-id2000.a230",
 			"ethernet-phy-ieee802.3-c22";
-		reg = <0x05>;
+		reg = <0x0c>;
 		ti,rx-internal-delay = <DP83867_RGMIIDCTL_1_75_NS>;
 		ti,tx-internal-delay = <DP83867_RGMIIDCTL_1_75_NS>;
 		ti,led-cfg1 = <0x6b90>;
 		ti,led-cfg2 = <0x0000>;
 		ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
 	};
-	rgmii_phy0d: ethernet-phy@0d {
+	sgmii_phy03: ethernet-phy@03 {
 		compatible = "ethernet-phy-id2000.a230",
 			"ethernet-phy-ieee802.3-c22";
-		reg = <0x0d>;
+		reg = <0x03>;
+		ti,led-cfg1 = <0x6b90>;
+		ti,led-cfg2 = <0x0000>;
+	};
+	rgmii_phy04: ethernet-phy@04 {
+		compatible = "ethernet-phy-id2000.a230",
+			"ethernet-phy-ieee802.3-c22";
+		reg = <0x04>;
 		ti,rx-internal-delay = <DP83867_RGMIIDCTL_1_75_NS>;
 		ti,tx-internal-delay = <DP83867_RGMIIDCTL_1_75_NS>;
 		ti,led-cfg1 = <0x6b90>;
 		ti,led-cfg2 = <0x0000>;
 		ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
-	};
-	sgmii_phy13: ethernet-phy@13 {
-		compatible = "ethernet-phy-id2000.a230",
-			"ethernet-phy-ieee802.3-c22";
-		reg = <0x13>;
 	};
 };
 
