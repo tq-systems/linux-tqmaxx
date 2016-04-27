@@ -309,3 +309,14 @@
 &sata {
 	status = "okay";
 };
+
+&dspi0 {
+	bus-num = <0>;
+	status = "okay";
+
+	spidev0: spidev@0 {
+		compatible = "rohm,dh2228fv";
+		reg = <0>;
+		spi-max-frequency = <100000>;
+	};
+};
