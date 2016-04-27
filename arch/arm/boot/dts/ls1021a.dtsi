@@ -642,7 +642,6 @@
 			fsl,magic-packet;
 			ranges;
 			dma-coherent;
-			fsl,dma-endian-le;
 
 			queue-group@2d10000 {
 				#address-cells = <2>;
@@ -672,7 +671,6 @@
 			model = "eTSEC";
 			ranges;
 			dma-coherent;
-			fsl,dma-endian-le;
 
 			queue-group@2d50000  {
 				#address-cells = <2>;
@@ -702,7 +700,6 @@
 			model = "eTSEC";
 			ranges;
 			dma-coherent;
-			fsl,dma-endian-le;
 
 			queue-group@2d90000  {
 				#address-cells = <2>;
