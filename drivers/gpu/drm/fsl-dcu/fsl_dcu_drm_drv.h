@@ -192,6 +192,7 @@ struct fsl_dcu_drm_device {
 	struct drm_fbdev_cma *fbdev;
 	struct drm_crtc crtc;
 	struct drm_encoder encoder;
+	struct drm_encoder_slave *slave;
 	struct fsl_dcu_drm_connector connector;
 	const struct fsl_dcu_soc_data *soc;
 };

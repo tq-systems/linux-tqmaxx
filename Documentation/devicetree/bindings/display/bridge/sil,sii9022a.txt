@@ -1,0 +1,55 @@
+Device-Tree bindings for the SiI902x hdmi transmitter.
+-----------------------------------------
+
+The SiI9022A is an ultra low-power HDMI transmitter. It supports resolutions from
+standard definition 480i/p and 576i/p all the way to high-definition 720p, 1080i,
+and 1080p, the highest resolution supported by HDTVs today. It also supports all
+PC resolutions up to UXGA for netbooks
+
+Required properties:
+- compatible: 	Should be "sil,sii9022a".
+- reg: 		The I2C address of the device.
+- interrupts:	Interrupt number to the cpu.
+
+Required nodes:
+
+The sii9022 has one video ports. Its connection is modelled using the OF
+graph bindings specified in Documentation/devicetree/bindings/graph.txt.
+
+- Video port 0 for the HDMI output
+
+Example:
+-------
+
+/ {
+	hdmi-out {
+		compatible = "hdmi-connector";
+		type = "a";
+
+		port {
+			hdmi_con: endpoint {
+				remote-endpoint = <&sii9022a_out>;
+			};
+		};
+	};
+};
+
+&i2c1 {
+    sii9022: hdmi@39 {
+            compatible = "sil,sii9022a";
+            reg = <0x39>;
+            interrupts = <GIC_SPI 167 IRQ_TYPE_EDGE_RISING>;
+
+            ports {
+                    #address-cells = <1>;
+                    #size-cells = <0>;
+
+                    port@0 {
+                            reg = <0>;
+                            sii9022_out: endpoint {
+                                    remote-endpoint = <&hdmi_con>;
+                            };
+                    };
+            };
+    };
+};
