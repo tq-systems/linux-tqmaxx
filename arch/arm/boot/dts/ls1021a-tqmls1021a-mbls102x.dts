@@ -74,6 +74,12 @@
 &dcu {
 	fsl,panel = <&etm0700>;
 	status = "okay";
+
+	port@0 {
+		dcu_out_hdmi: endpoint {
+			remote-endpoint = <&sii9022a_out>;
+		};
+	};
 };
 
 &esdhc {
@@ -144,6 +150,24 @@
 		#gpio-cells = <2>;
 
 		status = "okay";
+	};
+
+	sii9022a: hdmi@3b {
+		compatible = "sil,sii9022a";
+		reg = <0x3b>;
+		interrupts = <GIC_SPI 167 IRQ_TYPE_EDGE_RISING>;
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+				sii9022a_out: endpoint {
+					remote-endpoint = <&dcu_out_hdmi>;
+				};
+			};
+		};
 	};
 
 	stmpe811@41 {
