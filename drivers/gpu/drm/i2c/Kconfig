@@ -31,4 +31,10 @@ config DRM_I2C_NXP_TDA998X
 	help
 	  Support for NXP Semiconductors TDA998X HDMI encoders.
 
+config DRM_I2C_SII9022
+	tristate "Silicon Image sii9022 TMDS transmitter"
+	help
+	  Support for sii9022 and similar single-link (or dual-link
+	  when used in pairs) TMDS transmitters.
+
 endmenu
