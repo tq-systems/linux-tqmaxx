@@ -33,11 +33,6 @@
 
 static struct i2c_driver pcf85063_driver;
 
-struct pcf85063 {
-	struct rtc_device *rtc;
-	int voltage_low; /* indicates if a low_voltage was detected */
-};
-
 static int pcf85063_stop_clock(struct i2c_client *client, u8 *ctrl1)
 {
 	s32 ret;
@@ -171,8 +166,8 @@ static int pcf85063_probe(struct i2c_client *client,
 				const struct i2c_device_id *id)
 {
 	int i = 0, err = 0;
-	struct pcf85063 *pcf85063;
 	unsigned char buf[3];
+	struct rtc_device *rtc;
 
 	/* Control & status */
 	buf[PCF85063_REG_CTRL1] = 0;
@@ -184,16 +179,9 @@ static int pcf85063_probe(struct i2c_client *client,
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_I2C))
 		return -ENODEV;
 
-	pcf85063 = devm_kzalloc(&client->dev, sizeof(struct pcf85063),
-				GFP_KERNEL);
-	if (!pcf85063)
-		return -ENOMEM;
-
-	i2c_set_clientdata(client, pcf85063);
-
-	pcf85063->rtc = devm_rtc_device_register(&client->dev,
-				pcf85063_driver.driver.name,
-				&pcf85063_rtc_ops, THIS_MODULE);
+	rtc = devm_rtc_device_register(&client->dev,
+				       pcf85063_driver.driver.name,
+				       &pcf85063_rtc_ops, THIS_MODULE);
 
 	if (of_property_match_string(client->dev.of_node,
 				     "nxp,quartz_load", "12.5pF") == 0)
@@ -215,7 +203,7 @@ static int pcf85063_probe(struct i2c_client *client,
 		}
 	}
 
-	return PTR_ERR_OR_ZERO(pcf85063->rtc);
+	return PTR_ERR_OR_ZERO(rtc);
 }
 
 static const struct i2c_device_id pcf85063_id[] = {
