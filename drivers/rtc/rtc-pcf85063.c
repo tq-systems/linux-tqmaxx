@@ -20,7 +20,10 @@
 #define PCF85063_REG_CTRL1_CAP_SEL	BIT(0)
 #define PCF85063_REG_CTRL1_STOP		BIT(5)
 #define PCF85063_REG_CTRL2		0x01
+#define PCF85063_REG_CTRL2_CLKOUT_32KHZ	0x00
+#define PCF85063_REG_CTRL2_CLKOUT_LOW	0x07
 #define PCF85063_REG_OFFSET		0x02
+#define PCF85063_REG_OFFSET_MODE	0x80
 
 #define PCF85063_REG_SC			0x04 /* datetime */
 #define PCF85063_REG_SC_OS		0x80
@@ -165,14 +168,14 @@ static const struct rtc_class_ops pcf85063_rtc_ops = {
 static int pcf85063_probe(struct i2c_client *client,
 				const struct i2c_device_id *id)
 {
-	int i = 0, err = 0;
-	unsigned char buf[3];
+	int rc;
+	unsigned char regs[3];
 	struct rtc_device *rtc;
 
 	/* Control & status */
-	buf[PCF85063_REG_CTRL1] = 0;
-	buf[PCF85063_REG_CTRL2] = 7;
-	buf[PCF85063_REG_OFFSET] = 0x00;
+	regs[PCF85063_REG_CTRL1] = 0x00;
+	regs[PCF85063_REG_CTRL2] = PCF85063_REG_CTRL2_CLKOUT_32KHZ;
+	regs[PCF85063_REG_OFFSET] = PCF85063_REG_OFFSET_MODE;
 
 	dev_dbg(&client->dev, "%s\n", __func__);
 
@@ -185,22 +188,14 @@ static int pcf85063_probe(struct i2c_client *client,
 
 	if (of_property_match_string(client->dev.of_node,
 				     "nxp,quartz_load", "12.5pF") == 0)
-		buf[PCF85063_REG_CTRL1] |= PCF85063_REG_CTRL1_CAP_SEL;
-
-	if (of_property_match_string(client->dev.of_node,
-				     "nxp,quartz_load", "7pF") == 0)
-		buf[PCF85063_REG_CTRL1] &= ~PCF85063_REG_CTRL1_CAP_SEL;
+		regs[PCF85063_REG_CTRL1] |= PCF85063_REG_CTRL1_CAP_SEL;
 
 	/* write register's data */
-	for (i = 0; i < sizeof(buf); i++) {
-		unsigned char data[3] = { i, buf[i] };
-
-		err = i2c_master_send(client, data, sizeof(data));
-		if (err != sizeof(data)) {
-			dev_err(&client->dev, "%s: err=%d addr=%02x, data=%02x\n",
-			__func__, err, data[0], data[1]);
-			return -EIO;
-		}
+	rc = i2c_smbus_write_i2c_block_data(client, PCF85063_REG_CTRL1,
+					    sizeof(regs), regs);
+	if (rc < 0) {
+		dev_err(&client->dev, "device setup error\n");
+		return rc;
 	}
 
 	return PTR_ERR_OR_ZERO(rtc);
