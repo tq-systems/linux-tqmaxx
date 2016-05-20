@@ -16,10 +16,10 @@
 #include <linux/rtc.h>
 #include <linux/module.h>
 
-#define DRV_VERSION "0.0.1"
-
 #define PCF85063_REG_CTRL1		0x00 /* status */
+#define PCF85063_REG_CTRL1_CAP_SEL	BIT(0)
 #define PCF85063_REG_CTRL2		0x01
+#define PCF85063_REG_OFFSET		0x02
 
 #define PCF85063_REG_SC			0x04 /* datetime */
 #define PCF85063_REG_MN			0x05
@@ -61,12 +61,6 @@ static int pcf85063_get_datetime(struct i2c_client *client, struct rtc_time *tm)
 		},
 	};
 
-	/* read registers */
-	if ((i2c_transfer(client->adapter, msgs, 2)) != 2) {
-		dev_err(&client->dev, "%s: read error\n", __func__);
-		return -EIO;
-	}
-
 	tm->tm_sec = bcd2bin(buf[PCF85063_REG_SC] & 0x7F);
 	tm->tm_min = bcd2bin(buf[PCF85063_REG_MN] & 0x7F);
 	tm->tm_hour = bcd2bin(buf[PCF85063_REG_HR] & 0x3F); /* rtc hr 0-23 */
@@ -88,10 +82,6 @@ static int pcf85063_set_datetime(struct i2c_client *client, struct rtc_time *tm)
 	int i = 0, err = 0;
 	unsigned char buf[11];
 
-	/* Control & status */
-	buf[PCF85063_REG_CTRL1] = 0;
-	buf[PCF85063_REG_CTRL2] = 5;
-
 	/* hours, minutes and seconds */
 	buf[PCF85063_REG_SC] = bin2bcd(tm->tm_sec) & 0x7F;
 
@@ -111,13 +101,13 @@ static int pcf85063_set_datetime(struct i2c_client *client, struct rtc_time *tm)
 	buf[PCF85063_REG_YR] = bin2bcd(tm->tm_year % 100);
 
 	/* write register's data */
-	for (i = 0; i < sizeof(buf); i++) {
+	for (i = PCF85063_REG_SC; i < sizeof(buf); i++) {
 		unsigned char data[2] = { i, buf[i] };
 
 		err = i2c_master_send(client, data, sizeof(data));
 		if (err != sizeof(data)) {
 			dev_err(&client->dev, "%s: err=%d addr=%02x, data=%02x\n",
-					__func__, err, data[0], data[1]);
+				__func__, err, data[0], data[1]);
 			return -EIO;
 		}
 	}
@@ -143,7 +133,14 @@ static const struct rtc_class_ops pcf85063_rtc_ops = {
 static int pcf85063_probe(struct i2c_client *client,
 				const struct i2c_device_id *id)
 {
+	int i = 0, err = 0;
 	struct pcf85063 *pcf85063;
+	unsigned char buf[3];
+
+	/* Control & status */
+	buf[PCF85063_REG_CTRL1] = 0;
+	buf[PCF85063_REG_CTRL2] = 7;
+	buf[PCF85063_REG_OFFSET] = 0x00;
 
 	dev_dbg(&client->dev, "%s\n", __func__);
 
@@ -155,13 +152,31 @@ static int pcf85063_probe(struct i2c_client *client,
 	if (!pcf85063)
 		return -ENOMEM;
 
-	dev_info(&client->dev, "chip found, driver version " DRV_VERSION "\n");
-
 	i2c_set_clientdata(client, pcf85063);
 
 	pcf85063->rtc = devm_rtc_device_register(&client->dev,
 				pcf85063_driver.driver.name,
 				&pcf85063_rtc_ops, THIS_MODULE);
+
+	if (of_property_match_string(client->dev.of_node,
+				     "nxp,quartz_load", "12.5pF") == 0)
+		buf[PCF85063_REG_CTRL1] |= PCF85063_REG_CTRL1_CAP_SEL;
+
+	if (of_property_match_string(client->dev.of_node,
+				     "nxp,quartz_load", "7pF") == 0)
+		buf[PCF85063_REG_CTRL1] &= ~PCF85063_REG_CTRL1_CAP_SEL;
+
+	/* write register's data */
+	for (i = 0; i < sizeof(buf); i++) {
+		unsigned char data[3] = { i, buf[i] };
+
+		err = i2c_master_send(client, data, sizeof(data));
+		if (err != sizeof(data)) {
+			dev_err(&client->dev, "%s: err=%d addr=%02x, data=%02x\n",
+			__func__, err, data[0], data[1]);
+			return -EIO;
+		}
+	}
 
 	return PTR_ERR_OR_ZERO(pcf85063->rtc);
 }
@@ -194,4 +209,3 @@ module_i2c_driver(pcf85063_driver);
 MODULE_AUTHOR("Søren Andersen <san@rosetechnology.dk>");
 MODULE_DESCRIPTION("PCF85063 RTC driver");
 MODULE_LICENSE("GPL");
-MODULE_VERSION(DRV_VERSION);
