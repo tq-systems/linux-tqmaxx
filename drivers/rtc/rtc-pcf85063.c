@@ -49,8 +49,7 @@ static int pcf85063_stop_clock(struct i2c_client *client, u8 *ctrl1)
 	/* stop the clock */
 	ret |= PCF85063_REG_CTRL1_STOP;
 
-	ret = i2c_smbus_write_byte_data(client, PCF85063_REG_CTRL1, ret);
-	if (ret < 0) {
+	if (0 > i2c_smbus_write_byte_data(client, PCF85063_REG_CTRL1, ret)) {
 		dev_err(&client->dev, "Failing to stop the clock\n");
 		return -EIO;
 	}
@@ -104,13 +103,14 @@ static int pcf85063_get_datetime(struct i2c_client *client, struct rtc_time *tm)
 static int pcf85063_set_datetime(struct i2c_client *client, struct rtc_time *tm)
 {
 	int rc;
-	u8 regs[8];
+	u8 regs[7];
+	u8 ctrl1;
 
 	/*
 	 * to accurately set the time, reset the divider chain and keep it in
 	 * reset state until all time/date registers are written
 	 */
-	rc = pcf85063_stop_clock(client, &regs[7]);
+	rc = pcf85063_stop_clock(client, &ctrl1);
 	if (rc != 0)
 		return rc;
 
@@ -132,18 +132,24 @@ static int pcf85063_set_datetime(struct i2c_client *client, struct rtc_time *tm)
 	/* year and century */
 	regs[6] = bin2bcd(tm->tm_year % 100);
 
-	/*
-	 * after all time/date registers are written, let the 'address auto
-	 * increment' feature wrap around and write register CTRL1 to re-enable
-	 * the clock divider chain again
-	 */
-	regs[7] &= ~PCF85063_REG_CTRL1_STOP;
-
 	/* write all registers at once */
 	rc = i2c_smbus_write_i2c_block_data(client, PCF85063_REG_SC,
 					    sizeof(regs), regs);
 	if (rc < 0) {
 		dev_err(&client->dev, "date/time register write error\n");
+		return rc;
+	}
+
+	/*
+	 * after all time/date registers are written, write register CTRL1
+	 * to re-enable the clock divider chain again
+	 */
+	ctrl1 &= ~PCF85063_REG_CTRL1_STOP;
+
+	rc = i2c_smbus_write_i2c_block_data(client, PCF85063_REG_CTRL1,
+					    sizeof(ctrl1), &ctrl1);
+	if (rc < 0) {
+		dev_err(&client->dev, "CTRL1 register write error\n");
 		return rc;
 	}
 
