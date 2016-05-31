@@ -174,7 +174,6 @@
 			reg-names = "ahci", "sata-ecc";
 			interrupts = <GIC_SPI 101 IRQ_TYPE_LEVEL_HIGH>;
 			clocks = <&platform_clk 1>;
-			dma-coherent;
 			status = "disabled";
 		};
 
