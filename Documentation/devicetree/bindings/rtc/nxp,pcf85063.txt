@@ -7,10 +7,13 @@ Required properties:
 Optional properties:
 - nxp,quartz_load : Internal oscillator capacity for quartz crystals
 	Values usable for pcf85063 load capacitance are 7pF, 12.5pF
+- nxp,offset: raw hex value of offset register.
+	if not given, driver will keep current register value
 
 Example:
 	pcf85063: rtc@51 {
 		compatible = "nxp,pcf85063";
 		nxp,quartz_load = "12.5pF";
+		nxp,offset = <0x80>;
 		reg = <0x51>;
 	};
