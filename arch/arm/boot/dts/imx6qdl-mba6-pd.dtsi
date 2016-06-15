@@ -1,0 +1,35 @@
+/*
+ * Copyright 2016 Marco Felsch, TQ Systems GmbH
+ *
+ * The code contained herein is licensed under the GNU General Public
+ * License. You may obtain a copy of the GNU General Public License
+ * Version 2 or later at the following locations:
+ *
+ * http://www.opensource.org/licenses/gpl-license.html
+ * http://www.gnu.org/copyleft/gpl.html
+ */
+
+/ {
+	lcd@0 {
+		compatible = "fsl,lcd";
+		ipu_id = <0>;
+		disp_id = <0>;
+		lcd-supply = <&reg_mba6_3p3v>;
+		default_ifmt = "RGB666";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_lcd0_ipu1>;
+		status = "okay";
+	};
+};
+
+&backlight_pd {
+	status = "okay";
+	default-brightness-level = <0>;
+};
+
+&mxcfb3 {
+	interface_pix_fmt = "RGB666";
+	mode_str = "ETM0700-WVGA";
+	default_bpp = <32>;
+	status = "okay";
+};
