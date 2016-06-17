@@ -153,6 +153,16 @@
 		status = "okay";
 	};
 
+	pca9554_2: pca9554@22 {
+		compatible = "nxp,pca9554";
+		reg = <0x22>;
+
+		gpio-controller;
+		#gpio-cells = <2>;
+
+		status = "okay";
+	};
+
 	sii9022a: hdmi@3b {
 		compatible = "sil,sii9022a";
 		reg = <0x3b>;
