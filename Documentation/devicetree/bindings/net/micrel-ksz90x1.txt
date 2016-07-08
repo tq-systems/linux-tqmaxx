@@ -81,3 +81,6 @@ Examples:
 		phy = <&phy0>;
 		phy-mode = "rgmii-id";
 	};
+
+ - force-master: bool. force phy to master mode. This is a workaround
+        at least for KSZ9031 errata #2.
