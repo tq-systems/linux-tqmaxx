@@ -17,6 +17,11 @@
 	model = "TQ MBa53 starter kit";
 	compatible = "tq,mba53", "tq,tqma53", "fsl,imx53";
 
+	aliases {
+		mmc0 = &esdhc3; /* eMMC */
+		mmc1 = &esdhc2; /* SD */
+	};
+
 	chosen {
 		stdout-path = &uart2;
 	};
