@@ -105,6 +105,14 @@
 	status = "okay";
 };
 
+&fec {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_fec>;
+	phy-mode = "rmii";
+	phy-reset-gpios = <&gpio7 6 0>;
+	status = "okay";
+};
+
 &ldb {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lvds1_1>;
@@ -167,6 +175,23 @@
 			fsl,pins = <
 				MX53_PAD_GPIO_4__GPIO1_4	0x80000000 /* SD2_CD */
 				MX53_PAD_GPIO_2__GPIO1_2	0x80000000 /* SD2_WP */
+			>;
+		};
+
+		pinctrl_fec: fecgrp {
+			fsl,pins = <
+				MX53_PAD_FEC_MDC__FEC_MDC		0x004
+				MX53_PAD_FEC_MDIO__FEC_MDIO		0x1fc
+				MX53_PAD_FEC_REF_CLK__FEC_TX_CLK	0x182
+				MX53_PAD_FEC_RX_ER__FEC_RX_ER		0x1c0
+				MX53_PAD_FEC_CRS_DV__FEC_RX_DV		0x180
+				MX53_PAD_FEC_RXD1__FEC_RDATA_1		0x180
+				MX53_PAD_FEC_RXD0__FEC_RDATA_0		0x180
+				MX53_PAD_FEC_TX_EN__FEC_TX_EN		0x002
+				MX53_PAD_FEC_TXD1__FEC_TDATA_1		0x002
+				MX53_PAD_FEC_TXD0__FEC_TDATA_0		0x002
+				MX53_PAD_PATA_DA_0__GPIO7_6	 	0x102 /* #PHY_RESET */
+				MX53_PAD_PATA_DATA7__GPIO2_7	 	0x100 /* #PHY_INT */
 			>;
 		};
 	};
@@ -288,11 +313,6 @@
 		compatible = "lm75";
 		reg = <0x49>;
 	};
-};
-
-&fec {
-	phy-reset-gpios = <&gpio7 6 0>;
-	status = "okay";
 };
 
 &esdhc2 {
