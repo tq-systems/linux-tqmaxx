@@ -266,8 +266,10 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6dl-hummingboard.dtb \
 	imx6dl-mba6a.dtb \
 	imx6dl-mba6a-hdmi.dtb \
+	imx6dl-mba6a-lvds.dtb \
 	imx6dl-mba6b.dtb \
 	imx6dl-mba6b-hdmi.dtb \
+	imx6dl-mba6b-lvds.dtb \
 	imx6dl-nitrogen6x.dtb \
 	imx6dl-phytec-pbab01.dtb \
 	imx6dl-rex-basic.dtb \
@@ -306,8 +308,10 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6q-hummingboard.dtb \
 	imx6q-mba6a.dtb \
 	imx6q-mba6a-hdmi.dtb \
+	imx6q-mba6a-lvds.dtb \
 	imx6q-mba6b.dtb \
 	imx6q-mba6b-hdmi.dtb \
+	imx6q-mba6b-lvds.dtb \
 	imx6q-nitrogen6x.dtb \
 	imx6q-phytec-pbab01.dtb \
 	imx6q-rex-pro.dtb \
