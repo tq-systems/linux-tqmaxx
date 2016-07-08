@@ -14,6 +14,8 @@
 #define MOUSEDEV_MINOR_BASE	32
 #define MOUSEDEV_MINORS		31
 #define MOUSEDEV_MIX		63
+/* for blacklisting */
+#define VID_EETI		0x0EEF
 
 #include <linux/sched.h>
 #include <linux/slab.h>
@@ -1002,6 +1004,19 @@ static void mousedev_disconnect(struct input_handle *handle)
 	mousedev_destroy(mousedev);
 }
 
+static bool mousedev_match(struct input_handler *handler, struct input_dev *dev)
+{
+	/* avoid EETI touchscreens */
+	if (unlikely((BUS_USB == dev->id.bustype) &&
+		    (VID_EETI == dev->id.vendor)))
+		return false;
+	/* avoid EETI virtual devices */
+	if (unlikely((BUS_VIRTUAL == dev->id.bustype)) &&
+		    (VID_EETI == dev->id.vendor))
+		return false;
+	return true;
+}
+
 static const struct input_device_id mousedev_ids[] = {
 	{
 		.flags = INPUT_DEVICE_ID_MATCH_EVBIT |
@@ -1057,6 +1072,7 @@ static struct input_handler mousedev_handler = {
 	.event		= mousedev_event,
 	.connect	= mousedev_connect,
 	.disconnect	= mousedev_disconnect,
+	.match		= mousedev_match,
 	.legacy_minors	= true,
 	.minor		= MOUSEDEV_MINOR_BASE,
 	.name		= "mousedev",
