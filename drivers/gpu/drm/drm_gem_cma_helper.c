@@ -298,7 +298,16 @@ int drm_gem_cma_dumb_map_offset(struct drm_file *file_priv,
 		return -EINVAL;
 	}
 
-	*offset = drm_vma_node_offset_addr(&gem_obj->vma_node);
+	if (*offset == 0x5359485000000000) {
+		/*
+		 * DIRTY HACK: if offset contains 'PHYS' in the upper
+		 * 32 bits, return the physical address in there.
+		 */
+		*offset = drm_vma_node_offset_addr(&gem_obj->vma_node) |
+			(uint64_t)container_of(gem_obj, struct drm_gem_cma_object, base)->paddr << 32;
+	} else {
+		*offset = drm_vma_node_offset_addr(&gem_obj->vma_node);
+	}
 
 	drm_gem_object_unreference(gem_obj);
 
