@@ -58,6 +58,7 @@ struct cuse_conn {
 	struct fuse_conn	fc;	/* fuse connection */
 	struct cdev		*cdev;	/* associated character device */
 	struct device		*dev;	/* device representing @cdev */
+	struct file		*mmapfile;
 
 	/* init parameters, set once during initialization */
 	bool			unrestricted_ioctl;
@@ -175,10 +176,22 @@ static long cuse_file_compat_ioctl(struct file *file, unsigned int cmd,
 	return fuse_do_ioctl(file, cmd, arg, flags);
 }
 
+static int cuse_mmap(struct file *file, struct vm_area_struct * vma)
+{
+	struct fuse_file *ff = file->private_data;
+	struct cuse_conn *cc = fc_to_cc(ff->fc);
+
+	if (!cc->mmapfile || !cc->mmapfile->f_op->mmap)
+		return -ENOSYS;
+
+	return cc->mmapfile->f_op->mmap(cc->mmapfile, vma);
+}
+
 static const struct file_operations cuse_frontend_fops = {
 	.owner			= THIS_MODULE,
 	.read_iter		= cuse_read_iter,
 	.write_iter		= cuse_write_iter,
+	.mmap			= cuse_mmap,
 	.open			= cuse_open,
 	.release		= cuse_release,
 	.unlocked_ioctl		= cuse_file_ioctl,
@@ -194,6 +207,7 @@ static const struct file_operations cuse_frontend_fops = {
 
 struct cuse_devinfo {
 	const char		*name;
+	int			mmapfd;
 };
 
 /**
@@ -279,7 +293,12 @@ static int cuse_parse_devinfo(char *p, size_t len, struct cuse_devinfo *devinfo)
 			break;
 		if (strcmp(key, "DEVNAME") == 0)
 			devinfo->name = val;
-		else
+		else if (strcmp(key, "MMAPFD") == 0) {
+			int fd, err;
+			err = kstrtouint(val, 10, &fd);
+			if (!err)
+				devinfo->mmapfd = fd;
+		} else
 			printk(KERN_WARNING "CUSE: unknown device info \"%s\"\n",
 			       key);
 	}
@@ -386,6 +405,12 @@ static void cuse_process_init_reply(struct fuse_conn *fc, struct fuse_req *req)
 	cc->dev = dev;
 	cc->cdev = cdev;
 
+	if (devinfo.mmapfd) {
+		cc->mmapfile = fget(devinfo.mmapfd);
+		if (!cc->mmapfile)
+			printk(KERN_ERR "invalid mmap fd: %d\n", devinfo.mmapfd);
+	}
+
 	/* make the device available */
 	list_add(&cc->list, cuse_conntbl_head(devt));
 	mutex_unlock(&cuse_lock);
@@ -469,6 +494,8 @@ err:
 static void cuse_fc_release(struct fuse_conn *fc)
 {
 	struct cuse_conn *cc = fc_to_cc(fc);
+	if (cc->mmapfile)
+		fput(cc->mmapfile);
 	kfree_rcu(cc, fc.rcu);
 }
 
