@@ -93,6 +93,18 @@
 			regulator-max-microvolt = <3300000>;
 			regulator-always-on;
 		};
+
+		reg_pcie: regulator@3 {
+			compatible = "regulator-fixed";
+			reg = <3>;
+			regulator-name = "supply-pcie";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			gpio = <&gpio2 0 0>; /* PCIE.PWR_EN */
+			enable-active-high;
+			regulator-always-on;
+			vin_supply = <&reg_mba6_3p3v>;
+		};
 	};
 };
 
@@ -381,11 +393,8 @@
 &pcie {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pcie>;
-	reset-gpio = <&gpio6 7 0>;
-	power-on-gpio = <&gpio2 0 0>;
-	wake-up-gpio = <&gpio2 11 0>;
-	disable-gpio = <&gpio6 11 0>;
-	status = "disabled";
+	reset-gpio = <&gpio6 7 GPIO_ACTIVE_LOW>;
+	status = "okay";
 };
 
 &pwm1 {
