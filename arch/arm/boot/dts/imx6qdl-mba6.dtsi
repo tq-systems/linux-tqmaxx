@@ -48,6 +48,26 @@
 		};
 	};
 
+	backlight_ldb: backlight@0 {
+		compatible = "pwm-backlight";
+		pwms = <&pwm1 0 62500>;
+		brightness-levels = <0 96 128 160 192 224 255>;
+		default-brightness-level = <5>;
+		power-supply = <&reg_mba6_3p3v>;
+		enable-gpios = <&gpio4 5 GPIO_ACTIVE_HIGH>;
+		status = "disabled";
+	};
+
+	backlight_pd: backlight@1 {
+		compatible = "pwm-backlight";
+		pwms = <&pwm1 0 5000000>;
+		brightness-levels = <255 128 64 32 16 8 4 1 0>;
+		default-brightness-level = <6>;
+		power-supply = <&reg_mba6_3p3v>;
+		enable-gpios = <&gpio4 5 GPIO_ACTIVE_HIGH>;
+		status = "disabled";
+	};
+
 	beeper: beeper@0 {
 		compatible = "gpio-beeper";
 		gpios = <&gpio1 21 GPIO_ACTIVE_HIGH>;
@@ -239,6 +259,15 @@
 		};
 	};
 
+	backlight {
+		pinctrl_backlight: backlightgrp {
+			fsl,pins = <
+				/* LCD.BLT_EN */
+				MX6QDL_PAD_GPIO_19__GPIO4_IO05 0x0001b099
+			>;
+		};
+	};
+
 	beeper {
 		pinctrl_beeper: beepergrp {
 			fsl,pins = <
@@ -302,7 +331,6 @@
 				MX6QDL_PAD_EIM_D22__GPIO3_IO22 0x0001b099 /* OTG_PWR */
 				MX6QDL_PAD_GPIO_16__GPIO7_IO11 0x0001b099 /* LCD.PWR_EN */
 				MX6QDL_PAD_GPIO_7__GPIO1_IO07 0x0001b099 /* LCD.RESET */
-				MX6QDL_PAD_GPIO_19__GPIO4_IO05 0x0001b099 /* LCD.BLT_EN */
 				/* LCD.CONTRAST -> Rev 0100 only, not used on Rev.0200*/
 				MX6QDL_PAD_DI0_PIN4__GPIO4_IO20 0x0001b099
 
