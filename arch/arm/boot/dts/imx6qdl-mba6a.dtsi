@@ -15,6 +15,7 @@
 	interrupts-extended = <&gpio1 6 IRQ_TYPE_LEVEL_HIGH>,
 			      <&intc 0 119 IRQ_TYPE_LEVEL_HIGH>;
 	phy-mode = "rgmii";
+	force-master;
 	status = "okay";
 };
 
