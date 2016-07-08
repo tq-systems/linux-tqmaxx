@@ -1026,6 +1026,8 @@ static const struct ipu_platform_reg client_reg[] = {
 		},
 		.reg_offset = IPU_CM_CSI1_REG_OFS,
 		.name = "imx-ipuv3-camera",
+	}, {
+		.name = "imx-ipuv3-scaler",
 	},
 };
 
