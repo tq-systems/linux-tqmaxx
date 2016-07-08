@@ -51,6 +51,7 @@
 	beeper: beeper@0 {
 		compatible = "gpio-beeper";
 		gpios = <&gpio1 21 GPIO_ACTIVE_HIGH>;
+		status = "okay";
 	};
 
 	gpio-leds {
@@ -130,10 +131,10 @@
 };
 
 &i2c2 {
-	status = "disabled";
 	clock-frequency = <100000>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_i2c2>;
+	status = "disabled";
 };
 
 &iomuxc {
@@ -370,63 +371,63 @@
 };
 
 &pcie {
-	status = "disabled";
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pcie>;
 	reset-gpio = <&gpio6 7 0>;
 	power-on-gpio = <&gpio2 0 0>;
 	wake-up-gpio = <&gpio2 11 0>;
 	disable-gpio = <&gpio6 11 0>;
+	status = "disabled";
 };
 
 &pwm1 {
-	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pwm1>;
+	status = "okay";
 };
 
 &pwm3 {
-	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pwm3>;
+	status = "okay";
 };
 
 &pwm4 {
-	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pwm4>;
+	status = "okay";
 };
 
 &uart2 {
-	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart2>;
+	status = "okay";
 };
 
 &uart3 {
-	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart3>;
 	fsl,uart-has-rtscts;
+	status = "okay";
 };
 
 &uart4 {
-	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart4>;
 	fsl,uart-has-rtscts;
+	status = "okay";
 };
 
 &uart5 {
-	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart5>;
 	fsl,uart-has-rtscts;
+	status = "okay";
 };
 
 &usbh1 {
-	status = "okay";
 	disable-over-current;
+	status = "okay";
 };
 
 &usbotg {
@@ -450,4 +451,5 @@
 &wdog1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_wdog1>;
+	status = "okay";
 };
