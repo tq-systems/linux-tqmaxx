@@ -43,6 +43,8 @@
 
 #define IMX2_WDT_WCR		0x00		/* Control Register */
 #define IMX2_WDT_WCR_WT		(0xFF << 8)	/* -> Watchdog Timeout Field */
+#define IMX2_WDT_WCR_WDA	(1 << 5)	/* -> WDOG_B software assert */
+#define IMX2_WDT_WCR_SRS	(1 << 4)	/* -> WDOG_B software reset */
 #define IMX2_WDT_WCR_WRE	(1 << 3)	/* -> WDOG Reset Enable */
 #define IMX2_WDT_WCR_WDE	(1 << 2)	/* -> Watchdog Enable */
 #define IMX2_WDT_WCR_WDZST	(1 << 0)	/* -> Watchdog timer Suspend */
@@ -95,16 +97,28 @@ static const struct watchdog_info imx2_wdt_info = {
 static int imx2_restart_handler(struct notifier_block *this, unsigned long mode,
 				void *cmd)
 {
-	/* Assert SRS signal */
-	unsigned int wcr_enable = IMX2_WDT_WCR_WDE;
+	u32 val;
+	u32 wcr_enable;
 	struct imx2_wdt_device *wdev = container_of(this,
 						    struct imx2_wdt_device,
 						    restart_handler);
-	/* Assert WDOG_B signal */
-	if (wdev->wdog_b)
-		wcr_enable = 0x14;
 
-	regmap_write(wdev->regmap, 0, wcr_enable);
+	regmap_read(wdev->regmap, IMX2_WDT_WCR, &val);
+	wcr_enable = val;
+	wcr_enable |= IMX2_WDT_WCR_WDE;
+	/* clear timout mask */
+	wcr_enable &= ~IMX2_WDT_WCR_WT;
+	/* Assert WDOG_B signal */
+	if (wdev->wdog_b) {
+		wcr_enable |= IMX2_WDT_WCR_WRE;
+		wcr_enable &= ~(IMX2_WDT_WCR_WDA);
+	/* Assert SRS signal */
+	} else {
+		wcr_enable &= ~(IMX2_WDT_WCR_SRS);
+	}
+	pr_debug("%s: wcr %x -> %x\n", __func__, val, wcr_enable);
+
+	regmap_write(wdev->regmap, IMX2_WDT_WCR, wcr_enable);
 	/*
 	 * Due to imx6q errata ERR004346 (WDOG: WDOG SRS bit requires to be
 	 * written twice), we add another two writes to ensure there must be at
@@ -112,11 +126,13 @@ static int imx2_restart_handler(struct notifier_block *this, unsigned long mode,
 	 * the target check here, since the writes shouldn't be a huge burden
 	 * for other platforms.
 	 */
-	regmap_write(wdev->regmap, 0, wcr_enable);
-	regmap_write(wdev->regmap, 0, wcr_enable);
-
+	regmap_write(wdev->regmap, IMX2_WDT_WCR, wcr_enable);
+	regmap_write(wdev->regmap, IMX2_WDT_WCR, wcr_enable);
+	/* last resort -> reload the watchdog ... */
+	regmap_write(wdev->regmap, IMX2_WDT_WSR, IMX2_WDT_SEQ1);
+	regmap_write(wdev->regmap, IMX2_WDT_WSR, IMX2_WDT_SEQ2);
 	/* wait for reset to assert... */
-	mdelay(500);
+	mdelay(550);
 
 	return NOTIFY_DONE;
 }
@@ -329,6 +345,9 @@ static int __init imx2_wdt_probe(struct platform_device *pdev)
 	if (of_get_property(of_node, "fsl,wdog_b", NULL)) {
 		wdev->wdog_b = true;
 		dev_info(&pdev->dev, "use WDOG_B to reboot.\n");
+		regmap_read(wdev->regmap, IMX2_WDT_WCR, &val);
+		val |= IMX2_WDT_WCR_WRE;
+		regmap_write(wdev->regmap, IMX2_WDT_WCR, val);
 	}
 
 	wdog			= &wdev->wdog;
