@@ -109,6 +109,15 @@
 			>;
 		};
 
+		pinctrl_audmux: audmuxgrp {
+			fsl,pins = <
+				MX53_PAD_KEY_COL0__AUDMUX_AUD5_TXC	0x1e4
+				MX53_PAD_KEY_ROW0__AUDMUX_AUD5_TXD	0x1e4
+				MX53_PAD_KEY_COL1__AUDMUX_AUD5_TXFS	0x1e4
+				MX53_PAD_KEY_ROW1__AUDMUX_AUD5_RXD	0x1e4
+			>;
+		};
+
 		pinctrl_esdhc2: esdhc2grp {
 			fsl,pins = <
 				MX53_PAD_SD2_CMD__ESDHC2_CMD		0x1d4

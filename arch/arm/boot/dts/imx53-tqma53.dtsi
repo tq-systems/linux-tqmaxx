@@ -56,15 +56,6 @@
 
 &iomuxc {
 	imx53-tqma53 {
-		pinctrl_audmux: audmuxgrp {
-			fsl,pins = <
-				MX53_PAD_KEY_COL0__AUDMUX_AUD5_TXC	0x80000000
-				MX53_PAD_KEY_ROW0__AUDMUX_AUD5_TXD	0x80000000
-				MX53_PAD_KEY_COL1__AUDMUX_AUD5_TXFS	0x80000000
-				MX53_PAD_KEY_ROW1__AUDMUX_AUD5_RXD	0x80000000
-			>;
-		};
-
 		pinctrl_can1: can1grp {
 			fsl,pins = <
 				MX53_PAD_KEY_COL2__CAN1_TXCAN		0x80000000
