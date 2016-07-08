@@ -36,15 +36,6 @@
 	};
 };
 
-&ecspi1 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_ecspi1>;
-	fsl,spi-num-chipselects = <4>;
-	cs-gpios = <&gpio2 30 0>, <&gpio3 19 0>,
-		   <&gpio3 24 0>, <&gpio3 25 0>;
-	status = "disabled";
-};
-
 &esdhc3 { /* EMMC */
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_esdhc3>;
@@ -67,22 +58,6 @@
 			fsl,pins = <
 				MX53_PAD_KEY_COL4__CAN2_TXCAN		0x80000000
 				MX53_PAD_KEY_ROW4__CAN2_RXCAN		0x80000000
-			>;
-		};
-
-		pinctrl_cspi: cspigrp {
-			fsl,pins = <
-				MX53_PAD_SD1_DATA0__CSPI_MISO		0x1d5
-				MX53_PAD_SD1_CMD__CSPI_MOSI		0x1d5
-				MX53_PAD_SD1_CLK__CSPI_SCLK		0x1d5
-			>;
-		};
-
-		pinctrl_ecspi1: ecspi1grp {
-			fsl,pins = <
-				MX53_PAD_EIM_D16__ECSPI1_SCLK		0x80000000
-				MX53_PAD_EIM_D17__ECSPI1_MISO		0x80000000
-				MX53_PAD_EIM_D18__ECSPI1_MOSI		0x80000000
 			>;
 		};
 
@@ -182,15 +157,6 @@
 &i2c3 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_i2c3>;
-	status = "disabled";
-};
-
-&cspi {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_cspi>;
-	fsl,spi-num-chipselects = <3>;
-	cs-gpios = <&gpio1 18 0>, <&gpio1 19 0>,
-		   <&gpio1 21 0>;
 	status = "disabled";
 };
 
