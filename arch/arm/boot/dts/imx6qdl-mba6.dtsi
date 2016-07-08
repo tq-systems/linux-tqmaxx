@@ -84,6 +84,15 @@
 			enable-active-high;
 			vin_supply = <&reg_3p3v>;
 		};
+
+		reg_mba6_3p3v: regulator@2 {
+			compatible = "regulator-fixed";
+			regulator-name = "supply-mba6-3p3v";
+			reg = <2>;
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			regulator-always-on;
+		};
 	};
 };
 
@@ -441,7 +450,7 @@
 &usdhc2 { /* Baseboard Slot */
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usdhc2>;
-	vmmc-supply = <&reg_3p3v>;
+	vmmc-supply = <&reg_mba6_3p3v>;
 	cd-gpios = <&gpio1 4 0>;
 	wp-gpios = <&gpio1 2 0>;
 	status = "okay";
