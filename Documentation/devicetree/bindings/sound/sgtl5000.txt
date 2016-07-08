@@ -26,6 +26,9 @@ Optional properties:
 
 - VDDD-supply : the regulator provider of VDDD
 
+- mono-right : routes mono playback to the right chennel instead to the
+	left
+
 Example:
 
 codec: sgtl5000@0a {
