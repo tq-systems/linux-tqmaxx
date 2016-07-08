@@ -168,6 +168,16 @@
 			>;
 		};
 	};
+
+	uart3 {
+		pinctrl_uart3: uart3grp {
+			fsl,pins = <
+				MX53_PAD_PATA_CS_0__UART3_TXD_MUX	0x1e4
+				MX53_PAD_PATA_CS_1__UART3_RXD_MUX	0x1e4
+				MX53_PAD_GPIO_3__GPIO1_3		0x1e4
+			>;
+		};
+	};
 };
 
 &ipu_di1_disp1 {
@@ -216,10 +226,6 @@
 	status = "okay";
 };
 
-&uart3 {
-	status = "okay";
-};
-
 &ecspi1 {
 	status = "okay";
 };
@@ -242,6 +248,12 @@
 };
 
 &uart2 {
+	status = "okay";
+};
+
+&uart3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart3>;
 	status = "okay";
 };
 
