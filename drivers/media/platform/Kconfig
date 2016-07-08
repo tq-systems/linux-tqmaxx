@@ -29,6 +29,8 @@ config VIDEO_VIA_CAMERA
 
 source "drivers/media/platform/davinci/Kconfig"
 
+source "drivers/media/platform/imx/Kconfig"
+
 source "drivers/media/platform/omap/Kconfig"
 
 source "drivers/media/platform/blackfin/Kconfig"

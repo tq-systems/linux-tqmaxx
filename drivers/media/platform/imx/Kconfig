@@ -1,0 +1,2 @@
+config VIDEO_IMX_IPU_COMMON
+	tristate
