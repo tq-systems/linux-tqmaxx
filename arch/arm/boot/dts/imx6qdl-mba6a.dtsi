@@ -14,9 +14,6 @@
 	pinctrl-0 = <&pinctrl_enet>;
 	interrupts-extended = <&gpio1 6 IRQ_TYPE_LEVEL_HIGH>,
 			      <&intc 0 119 IRQ_TYPE_LEVEL_HIGH>;
-	phy-mode = "rgmii";
-	force-master;
-	status = "okay";
 };
 
 &i2c1 {
@@ -41,8 +38,10 @@
 	enet {
 		pinctrl_enet: enetgrp {
 			fsl,pins = <
-				 /* FEC phy reset */
-				MX6QDL_PAD_ENET_CRS_DV__GPIO1_IO25   0x1b099
+				/* FEC phy IRQ */
+				MX6QDL_PAD_ENET_TX_EN__GPIO1_IO28     0x00011008
+				/* FEC phy reset */
+				MX6QDL_PAD_ENET_CRS_DV__GPIO1_IO25    0x1b099
 				/* DSE = 100, 100k up, SPEED = MED */
 				MX6QDL_PAD_ENET_MDIO__ENET_MDIO       0xb0a0
 				MX6QDL_PAD_ENET_MDC__ENET_MDC         0xb0a0

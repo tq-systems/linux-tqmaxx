@@ -106,6 +106,29 @@
 	cs-gpios = <&gpio3 19 0>, <&gpio3 24 0>;
 };
 
+&fec {
+	phy-mode = "rgmii-id";
+	mac-address = [00 00 00 00 00 00];
+	local-mac-address = [00 00 00 00 00 00];
+	phy-handle = <&ethphy>;
+	status = "okay";
+
+	mdio {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		ethphy: ethernet-phy@3 {
+			compatible = "ethernet-phy-id0022.1622",
+				     "ethernet-phy-ieee802.3-c22";
+			reg = <3>;
+			force-master;
+			max-speed = <1000>;
+			interrupt-parent = <&gpio1>;
+			interrupts = <28 IRQ_TYPE_LEVEL_LOW>;
+		};
+	};
+};
+
 &i2c2 {
 	status = "disabled";
 	clock-frequency = <100000>;
