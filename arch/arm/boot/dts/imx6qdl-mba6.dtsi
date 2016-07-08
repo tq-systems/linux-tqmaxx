@@ -180,6 +180,9 @@
 
 &fec {
 	phy-mode = "rgmii-id";
+	phy-reset-gpios = <&gpio1 25 GPIO_ACTIVE_LOW>;
+	phy-reset-duration = <1>;
+	phy-reset-delay = <100>;
 	mac-address = [00 00 00 00 00 00];
 	local-mac-address = [00 00 00 00 00 00];
 	phy-handle = <&ethphy>;
