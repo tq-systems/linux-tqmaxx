@@ -108,5 +108,13 @@
 	vmmc-supply = <&reg_3p3v>;
 	non-removable;
 	bus-width = <8>;
+	#address-cells = <1>;
+	#size-cells = <0>;
 	status = "okay";
+
+	mmccard: mmccard@0 {
+		reg = <0>;
+		compatible = "mmc-card";
+		broken-hpi;
+	};
 };
