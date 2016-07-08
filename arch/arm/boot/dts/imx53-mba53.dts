@@ -151,6 +151,14 @@
 		};
 	};
 
+	pwm2 {
+		pinctrl_pwm2: pwm2-grp1 {
+			fsl,pins = <
+				MX53_PAD_GPIO_1__PWM2_PWMO 0x00000102 /* HYS */
+			>;
+		};
+	};
+
 	tve {
 		pinctrl_vga_sync_1: vgasync-grp1 {
 			fsl,pins = <
@@ -246,6 +254,12 @@
 };
 
 &i2c3 {
+	status = "okay";
+};
+
+&pwm2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm2>;
 	status = "okay";
 };
 
