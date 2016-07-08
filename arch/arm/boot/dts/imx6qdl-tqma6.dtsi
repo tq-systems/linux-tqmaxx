@@ -107,6 +107,7 @@
 	pinctrl-0 = <&pinctrl_usdhc3>;
 	vmmc-supply = <&reg_3p3v>;
 	non-removable;
+	disable-wp;
 	bus-width = <8>;
 	#address-cells = <1>;
 	#size-cells = <0>;
