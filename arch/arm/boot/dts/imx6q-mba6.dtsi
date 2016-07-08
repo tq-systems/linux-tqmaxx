@@ -17,7 +17,7 @@
 	status = "okay";
 
 	spidev5_0: spidev5-0@0 {
-		compatible = "spidev";
+		compatible = "tq,testdev";
 		spi-max-frequency = <1000000>;
 		reg = <0>;
 		status = "okay";
