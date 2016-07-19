@@ -1,0 +1,237 @@
+/*
+ * Copyright (C) 2015 Freescale Semiconductor, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+#include <dt-bindings/input/input.h>
+#include "imx6ul.dtsi"
+
+/ {
+	model = "TQMa6UL SOM";
+
+	memory {
+		reg = <0x80000000 0x10000000>;
+	};
+
+	usdhc2_pwrseq: emmc_pwrseq {
+		compatible = "mmc-pwrseq-emmc";
+		reset-gpios = <&gpio4 10 GPIO_ACTIVE_LOW>;
+	};
+};
+
+&cpu0 {
+	/*
+	 * on i.MX6UL, no seperated VDD_ARM_IN and VDD_SOC_IN,
+	 * to align with other platform and use the same cpufreq
+	 * driver, still use the seperated OPP define for arm
+	 * and soc.
+	 */
+	operating-points = <
+		/* kHz	uV */
+		528000	1175000
+		396000	1175000
+		198000	1175000
+	>;
+	fsl,soc-operating-points = <
+		/* KHz	uV */
+		528000	1175000
+		396000	1175000
+		198000	1175000
+	>;
+	arm-supply = <&reg_sw1b_core>;
+	soc-supply = <&reg_sw1b_core>;
+	fsl,arm-soc-shared = <1>;
+};
+
+&i2c4 {
+	clock-frequency = <100000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_i2c4>;
+	status = "okay";
+
+	pmic: pfuze3000@08 {
+		compatible = "fsl,pfuze3000";
+		reg = <0x08>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_pmic>;
+		/* TODO: add interrupts */
+
+		regulators {
+			reg_sw1a_3v3: sw1a {
+				regulator-min-microvolt = <700000>;
+				regulator-max-microvolt = <1475000>;
+				regulator-boot-on;
+				regulator-ramp-delay = <6250>;
+				/* not used */
+			};
+
+			reg_sw1b_core: sw1b {
+				regulator-min-microvolt = <700000>;
+				regulator-max-microvolt = <1475000>;
+				regulator-boot-on;
+				regulator-always-on;
+				regulator-ramp-delay = <6250>;
+			};
+
+			reg_sw2_3v3: sw2 {
+				regulator-min-microvolt = <2500000>;
+				regulator-max-microvolt = <3300000>;
+				regulator-boot-on;
+				regulator-always-on;
+			};
+
+			reg_sw3_ddr: sw3 {
+				regulator-min-microvolt = <900000>;
+				regulator-max-microvolt = <1650000>;
+				regulator-boot-on;
+				regulator-always-on;
+			};
+
+			reg_swbst: swbst {
+				regulator-min-microvolt = <5000000>;
+				regulator-max-microvolt = <5150000>;
+				/* not used */
+			};
+
+			reg_snvs_3v0: vsnvs {
+				regulator-min-microvolt = <1000000>;
+				regulator-max-microvolt = <3000000>;
+				regulator-boot-on;
+				regulator-always-on;
+			};
+
+			reg_vrefddr: vrefddr {
+				regulator-boot-on;
+				regulator-always-on;
+			};
+
+			reg_vccsd_3v3: vccsd {
+				regulator-min-microvolt = <2850000>;
+				regulator-max-microvolt = <3300000>;
+				/* not used */
+			};
+
+			reg_v33_3v3: v33 {
+				regulator-min-microvolt = <2850000>;
+				regulator-max-microvolt = <3300000>;
+				regulator-always-on;
+			};
+
+			reg_vldo1_3v3: vldo1 {
+				regulator-min-microvolt = <1800000>;
+				regulator-max-microvolt = <3300000>;
+				/* not used */
+			};
+
+			reg_vldo2: vldo2 {
+				regulator-min-microvolt = <800000>;
+				regulator-max-microvolt = <1550000>;
+				/* not used */
+			};
+
+			reg_vldo3_1v8: vldo3 {
+				regulator-min-microvolt = <1800000>;
+				regulator-max-microvolt = <3300000>;
+				regulator-always-on;
+			};
+
+			reg_vldo4_2v5: vldo4 {
+				regulator-min-microvolt = <1800000>;
+				regulator-max-microvolt = <3300000>;
+				regulator-always-on;
+			};
+		};
+	};
+
+	sensor0: lm75@48 {
+		compatible = "lm75";
+		reg = <0x48>;
+	};
+
+
+	eeprom0: 24c64@50 {
+		compatible = "atmel,24c64";
+		reg = <0x50>;
+		pagesize = <32>;
+		status = "okay";
+	};
+};
+
+&iomuxc {
+	imx6ul-tqma6ul {
+		pinctrl_i2c4: i2c4grp {
+			fsl,pins = <
+				MX6UL_PAD_UART2_TX_DATA__I2C4_SCL	0x4001b8b0
+				MX6UL_PAD_UART2_RX_DATA__I2C4_SDA	0x4001b8b0
+			>;
+		};
+
+		pinctrl_pmic: pmic {
+			fsl,pins = <
+				MX6UL_PAD_GPIO1_IO08__GPIO1_IO08 0x1b099  /* PMIC irq */
+			>;
+		};
+
+		pinctrl_qspi: qspigrp {
+			fsl,pins = <
+				MX6UL_PAD_NAND_WP_B__QSPI_A_SCLK      0x70a1
+				MX6UL_PAD_NAND_READY_B__QSPI_A_DATA00 0x70a1
+				MX6UL_PAD_NAND_CE0_B__QSPI_A_DATA01   0x70a1
+				MX6UL_PAD_NAND_CE1_B__QSPI_A_DATA02   0x70a1
+				MX6UL_PAD_NAND_CLE__QSPI_A_DATA03     0x70a1
+				MX6UL_PAD_NAND_DQS__QSPI_A_SS0_B      0x70a1
+			>;
+		};
+
+		pinctrl_usdhc2: usdhc2grp {
+			fsl,pins = <
+				MX6UL_PAD_NAND_RE_B__USDHC2_CLK		0x00010059
+				MX6UL_PAD_NAND_WE_B__USDHC2_CMD		0x00017059
+				MX6UL_PAD_NAND_DATA00__USDHC2_DATA0	0x00017059
+				MX6UL_PAD_NAND_DATA01__USDHC2_DATA1	0x00017059
+				MX6UL_PAD_NAND_DATA02__USDHC2_DATA2	0x00017059
+				MX6UL_PAD_NAND_DATA03__USDHC2_DATA3	0x00017059
+				MX6UL_PAD_NAND_DATA04__USDHC2_DATA4	0x00017059
+				MX6UL_PAD_NAND_DATA05__USDHC2_DATA5	0x00017059
+				MX6UL_PAD_NAND_DATA06__USDHC2_DATA6	0x00017059
+				MX6UL_PAD_NAND_DATA07__USDHC2_DATA7	0x00017059
+				/* rst */
+				MX6UL_PAD_NAND_ALE__GPIO4_IO10		0x0001b099
+			>;
+		};
+	};
+};
+
+&qspi {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_qspi>;
+	status = "okay";
+
+	flash0: n25q512ax3@0 {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "micron,n25q512ax3";
+		spi-max-frequency = <29000000>;
+		reg = <0>;
+	};
+};
+
+/* eMMC */
+&usdhc2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usdhc2>;
+	bus-width = <8>;
+	disable-wp;
+	non-removable;
+	vmmc-supply = <&reg_sw2_3v3>;
+	mmc-pwrseq = <&usdhc2_pwrseq>;
+	status = "okay";
+
+	mmccard: mmccard@0 {
+		reg = <0>;
+		compatible = "mmc-card";
+	};
+};
