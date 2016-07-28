@@ -180,7 +180,7 @@
 		/* interrupt-controller; */
 		/* interrupt-cells = <2>; */
 		gpio-controller;
-		gpio-cells = <2>;
+		#gpio-cells = <2>;
 		status = "okay";
 	};
 
@@ -191,9 +191,9 @@
 		interrupt-parent = <&gpio4>;
 		interrupts = <23 IRQ_TYPE_EDGE_FALLING>;
 		interrupt-controller;
-		interrupt-cells = <2>;
+		#interrupt-cells = <2>;
 		gpio-controller;
-		gpio-cells = <2>;
+		#gpio-cells = <2>;
 		status = "okay";
 	};
 };
