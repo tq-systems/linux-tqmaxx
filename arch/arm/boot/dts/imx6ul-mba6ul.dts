@@ -81,13 +81,13 @@
 			vin_supply = <&reg_mba6ul_3v3>;
 		};
 
-		reg_otgvbus_3v3: regulator@3 {
+		reg_otg2vbus_5v0: regulator@3 {
 			compatible = "regulator-fixed";
 			reg = <3>;
-			regulator-name = "otg-vbus-supply-3v3";
+			regulator-name = "otg2-vbus-supply-5v0";
 			regulator-min-microvolt = <5000000>;
 			regulator-max-microvolt = <5000000>;
-			vin_supply = <&reg_mba6ul_3v3>;
+			vin_supply = <&reg_mba6ul_5v0>;
 		};
 
 		reg_otg1vbus_5v0: regulator@4 {
@@ -374,11 +374,9 @@
 /* 7-port usb hub */
 /* id, pwr, oc pins not connected */
 &usbotg2 {
-	vbus-supply = <&reg_otgvbus_3v3>;
+	disable-over-current;
+	vbus-supply = <&reg_otg2vbus_5v0>;
 	dr_mode = "host";
-	srp-disable;
-	hnp-disable;
-	adp-disable;
 	status = "okay";
 };
 
