@@ -172,6 +172,14 @@
 };
 
 &i2c4 {
+	/* NXP SE97BTP with temperature sensor + eeprom */
+	eeprom1: se97@51 {
+		compatible = "nxp,spd";
+		reg = <0x51>;
+		pagesize = <16>;
+		status = "okay";
+	};
+
 	/* Output-Portexpander */
 	expander_out: pca9554@20 {
 		compatible = "nxp,pca9554";
@@ -196,6 +204,13 @@
 		#interrupt-cells = <2>;
 		gpio-controller;
 		#gpio-cells = <2>;
+		status = "okay";
+	};
+
+	/* NXP SE97BTP with temperature sensor + eeprom */
+	sensor1: se97@19 {
+		compatible = "nxp,jc42";
+		reg = <0x19>;
 		status = "okay";
 	};
 };
