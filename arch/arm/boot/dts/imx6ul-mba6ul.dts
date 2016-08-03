@@ -19,6 +19,29 @@
 		stdout-path = &uart1;
 	};
 
+	reserved-memory {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+
+		linux,cma {
+			compatible = "shared-dma-pool";
+			reusable;
+			size = <0x6000000>;
+			linux,cma-default;
+		};
+	};
+
+	backlight_lcd: backlight@0 {
+		compatible = "pwm-backlight";
+		pwms = <&pwm4 0 62500>;
+		brightness-levels = <0 96 128 160 192 224 255>;
+		default-brightness-level = <5>;
+		power-supply = <&reg_mba6ul_3v3>;
+		enable-gpios = <&expander_out 4 GPIO_ACTIVE_HIGH>;
+		status = "enable";
+	};
+
 	beeper: beeper@0 {
 		compatible = "pwm-beeper";
 		pwms = <&pwm2 0 5000>; /* 5us period */
@@ -115,6 +138,23 @@
 			regulator-always-on;
 			vin_supply = <&reg_mba6ul_3v3>;
 		};
+
+		reg_lcd_pwr: regulator@6 {
+			compatible = "regulator-gpio";
+			regulator-name = "lcd-pwr";
+			reg = <6>;
+			gpios = <&expander_out 1 GPIO_ACTIVE_HIGH>;
+			regulator-always-on;
+		};
+
+		reg_lvds_transmitter: regulator@7 {
+			compatible = "regulator-gpio";
+			regulator-name = "lvds-power";
+			reg = <7>;
+			gpios = <&expander_out 3 GPIO_ACTIVE_LOW>;
+			regulator-always-on;
+		};
+
 	};
 };
 
@@ -268,12 +308,57 @@
 			>;
 		};
 
+		pinctrl_lcdif: lcdifgrp {
+			fsl,pins = <
+				MX6UL_PAD_LCD_DATA00__LCDIF_DATA00	0x79
+				MX6UL_PAD_LCD_DATA01__LCDIF_DATA01	0x79
+				MX6UL_PAD_LCD_DATA02__LCDIF_DATA02	0x79
+				MX6UL_PAD_LCD_DATA03__LCDIF_DATA03	0x79
+				MX6UL_PAD_LCD_DATA04__LCDIF_DATA04	0x79
+				MX6UL_PAD_LCD_DATA05__LCDIF_DATA05	0x79
+				MX6UL_PAD_LCD_DATA06__LCDIF_DATA06	0x79
+				MX6UL_PAD_LCD_DATA07__LCDIF_DATA07	0x79
+				MX6UL_PAD_LCD_DATA08__LCDIF_DATA08	0x79
+				MX6UL_PAD_LCD_DATA09__LCDIF_DATA09	0x79
+				MX6UL_PAD_LCD_DATA10__LCDIF_DATA10	0x79
+				MX6UL_PAD_LCD_DATA11__LCDIF_DATA11	0x79
+				MX6UL_PAD_LCD_DATA12__LCDIF_DATA12	0x79
+				MX6UL_PAD_LCD_DATA13__LCDIF_DATA13	0x79
+				MX6UL_PAD_LCD_DATA14__LCDIF_DATA14	0x79
+				MX6UL_PAD_LCD_DATA15__LCDIF_DATA15	0x79
+				MX6UL_PAD_LCD_DATA16__LCDIF_DATA16	0x79
+				MX6UL_PAD_LCD_DATA17__LCDIF_DATA17	0x79
+				MX6UL_PAD_LCD_DATA18__LCDIF_DATA18	0x79
+				MX6UL_PAD_LCD_DATA19__LCDIF_DATA19	0x79
+				MX6UL_PAD_LCD_DATA20__LCDIF_DATA20	0x79
+				MX6UL_PAD_LCD_DATA21__LCDIF_DATA21	0x79
+				MX6UL_PAD_LCD_DATA22__LCDIF_DATA22	0x79
+				MX6UL_PAD_LCD_DATA23__LCDIF_DATA23	0x79
+
+				MX6UL_PAD_LCD_CLK__LCDIF_CLK		0x79
+				MX6UL_PAD_LCD_ENABLE__LCDIF_ENABLE	0x79
+				MX6UL_PAD_LCD_HSYNC__LCDIF_HSYNC	0x79
+				MX6UL_PAD_LCD_VSYNC__LCDIF_VSYNC	0x79
+				/* lcd reset */
+				/* place r2021, resolder r2022 and comment out */
+				/* MX6UL_PAD_LCD_RESET__GPIO3_IO04		0x79 */
+			>;
+		};
+
 		pinctrl_pwm2: pwm2grp {
 			fsl,pins = <
 				/* 100 k PD, DSE 120 OHM, SPPEED LO */
 				MX6UL_PAD_GPIO1_IO09__PWM2_OUT		0x00003050
 			>;
 		};
+
+		pinctrl_pwm4: pwm4grp {
+			fsl,pins = <
+				/* 100 k PD, DSE 120 OHM, SPPEED LO */
+				MX6UL_PAD_GPIO1_IO05__PWM4_OUT		0x00003050
+			>;
+		};
+
 
 		pinctrl_uart1: uart1grp {
 			fsl,pins = <
@@ -363,6 +448,36 @@
 	};
 };
 
+&lcdif {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_lcdif>;
+	display = <&display0>;
+	status = "okay";
+
+	display0: display {
+		bits-per-pixel = <16>;
+		bus-width = <24>;
+
+		display-timings {
+			native-mode = <&timing0>;
+			timing0: chimei-g104-x1 {
+				clock-frequency = <65000000>;
+				hactive = <1024>;
+				vactive = <768>;
+				hfront-porch = <75>;
+				hback-porch = <10>;
+				hsync-len = <255>; /* FIXME: typ < 256!*/
+				vback-porch = <100>;
+				vfront-porch = <10>;
+				vsync-len = <38>;
+				de-active = <1>;
+				hsync-active = <0>;
+				vsync-active = <0>;
+			};
+		};
+	};
+};
+
 &pxp {
 	status = "okay";
 };
@@ -370,6 +485,12 @@
 &pwm2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pwm2>;
+	status = "okay";
+};
+
+&pwm4 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm4>;
 	status = "okay";
 };
 
