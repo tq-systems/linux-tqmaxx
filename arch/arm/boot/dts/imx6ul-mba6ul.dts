@@ -145,7 +145,6 @@
 			reg = <6>;
 			gpio = <&expander_out 1 GPIO_ACTIVE_HIGH>;
 			enable-active-high;
-			regulator-always-on;
 		};
 
 		reg_lvds_transmitter: regulator@7 {
@@ -453,6 +452,7 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lcdif>;
 	display = <&display0>;
+	lcd-supply = <&reg_lcd_pwr>;
 	status = "okay";
 
 	display0: display {
