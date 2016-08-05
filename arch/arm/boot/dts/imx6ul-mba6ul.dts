@@ -140,10 +140,11 @@
 		};
 
 		reg_lcd_pwr: regulator@6 {
-			compatible = "regulator-gpio";
+			compatible = "regulator-fixed";
 			regulator-name = "lcd-pwr";
 			reg = <6>;
-			gpios = <&expander_out 1 GPIO_ACTIVE_HIGH>;
+			gpio = <&expander_out 1 GPIO_ACTIVE_HIGH>;
+			enable-active-high;
 			regulator-always-on;
 		};
 
