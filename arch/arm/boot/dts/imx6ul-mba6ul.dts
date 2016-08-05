@@ -148,11 +148,13 @@
 		};
 
 		reg_lvds_transmitter: regulator@7 {
-			compatible = "regulator-gpio";
+			compatible = "regulator-fixed";
 			regulator-name = "lvds-power";
 			reg = <7>;
-			gpios = <&expander_out 3 GPIO_ACTIVE_LOW>;
+			gpio = <&expander_out 3 GPIO_ACTIVE_HIGH>;
+			enable-active-high;
 			regulator-always-on;
+			vin_supply = <&reg_mba6ul_3v3>;
 		};
 
 	};
