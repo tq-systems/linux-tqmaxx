@@ -117,28 +117,39 @@ static int dp83867_of_init(struct phy_device *phydev)
 	if (!phydev->dev.of_node)
 		return -ENODEV;
 
-	ret = of_property_read_u32(of_node, "ti,rx-internal-delay",
-				   &dp83867->rx_id_delay);
-	if (ret)
-		return ret;
+	if ((phydev->interface >= PHY_INTERFACE_MODE_RGMII_ID) &&
+	    (phydev->interface <= PHY_INTERFACE_MODE_RGMII_RXID)) {
+		ret = of_property_read_u32(of_node, "ti,rx-internal-delay",
+					   &dp83867->rx_id_delay);
+		if (ret) {
+			dev_err(dev, "could not find ti,rx-internal-delay\n");
+			return ret;
+		}
 
-	ret = of_property_read_u32(of_node, "ti,tx-internal-delay",
-				   &dp83867->tx_id_delay);
-	if (ret)
-		return ret;
+		ret = of_property_read_u32(of_node, "ti,tx-internal-delay",
+					   &dp83867->tx_id_delay);
+		if (ret) {
+			dev_err(dev, "could not find ti,tx-internal-delay\n");
+			return ret;
+		}
+	}
 
 	ret = of_property_read_u32(of_node, "ti,led-cfg1",
 				&dp83867->led_cfg1);
 	if (ret)
-		return ret;
+		dev_dbg(dev, "could not find ti,led-cfg1\n");
 
 	ret = of_property_read_u32(of_node, "ti,led-cfg2",
 				&dp83867->led_cfg2);
 	if (ret)
-		return ret;
+		dev_dbg(dev, "could not find ti,led-cfg2\n");
 
-	return of_property_read_u32(of_node, "ti,fifo-depth",
+	ret = of_property_read_u32(of_node, "ti,fifo-depth",
 				   &dp83867->fifo_depth);
+	if (ret)
+		dev_dbg(dev, "could not find ti,fifo-depth\n");
+
+	return 0;
 }
 #else
 static int dp83867_of_init(struct phy_device *phydev)
