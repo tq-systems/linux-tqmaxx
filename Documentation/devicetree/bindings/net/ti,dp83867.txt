@@ -12,6 +12,7 @@ Optional properties:
 		for applicable values
 	- ti,led-cfg1 - Value of LED configuration register 1
 	- ti,led-cfg2 - Value of LED configuration register 2
+	- ti,led-cfg3 - Value of LED configuration register 3
 
 Default child nodes are standard Ethernet PHY device
 nodes as described in Documentation/devicetree/bindings/net/phy.txt
