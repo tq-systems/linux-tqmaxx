@@ -264,6 +264,19 @@
 		status = "okay";
 	};
 
+	/* need to be moved to i2c2 */
+	polytouch: edt-ft5x04@38 {
+		compatible = "edt,edt-ft5406", "edt,edt-ft5x06";
+		reg = <0x38>;
+		interrupt-parent = <&expander_in>;
+		interrupts = <3 IRQ_TYPE_EDGE_FALLING>;
+		wake-gpios = <&expander_out 1 GPIO_ACTIVE_HIGH>;
+		/* reset-gpios is controlled by stk reset */
+		gain = <20>;
+		status = "disabled";
+	};
+
+
 	/* NXP SE97BTP with temperature sensor + eeprom */
 	sensor1: se97@19 {
 		compatible = "nxp,jc42";
