@@ -1,0 +1,32 @@
+/*
+ * Copyright 2016 Marco Felsch, TQ Systems GmbH
+ *
+ * The code contained herein is licensed under the GNU General Public
+ * License. You may obtain a copy of the GNU General Public License
+ * Version 2 or later at the following locations:
+ *
+ * http://www.opensource.org/licenses/gpl-license.html
+ * http://www.gnu.org/copyleft/gpl.html
+ */
+
+&analog_touch {
+	status = "okay";
+};
+
+&backlight_pd {
+	status = "okay";
+};
+
+&lcdif {
+	display = <&display1>;
+	lcd-supply = <&reg_mba6ul_3v3>;
+	status = "okay";
+};
+
+&polytouch {
+	status = "okay";
+};
+
+&pwm4 {
+	status = "okay";
+};
