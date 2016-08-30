@@ -17,7 +17,7 @@
 	status = "okay";
 };
 
-&backlight_lcd {
+&backlight_lvds {
 	status = "okay";
 };
 

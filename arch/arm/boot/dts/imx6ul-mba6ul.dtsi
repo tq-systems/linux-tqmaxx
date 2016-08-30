@@ -30,7 +30,7 @@
 		};
 	};
 
-	backlight_lcd: backlight@0 {
+	backlight_lvds: backlight@0 {
 		compatible = "pwm-backlight";
 		pwms = <&pwm4 0 62500>;
 		brightness-levels = <0 96 128 160 192 224 255>;
