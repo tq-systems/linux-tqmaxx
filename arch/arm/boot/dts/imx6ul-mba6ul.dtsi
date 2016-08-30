@@ -6,8 +6,6 @@
  * published by the Free Software Foundation.
  */
 
-/dts-v1/;
-
 #include <dt-bindings/input/input.h>
 #include "imx6ul-tqma6ul.dtsi"
 
@@ -39,7 +37,7 @@
 		default-brightness-level = <5>;
 		power-supply = <&reg_mba6ul_3v3>;
 		enable-gpios = <&expander_out 4 GPIO_ACTIVE_HIGH>;
-		status = "okay";
+		status = "disabled";
 	};
 
 	beeper: beeper@0 {
@@ -145,6 +143,7 @@
 			reg = <6>;
 			gpio = <&expander_out 1 GPIO_ACTIVE_HIGH>;
 			enable-active-high;
+			status = "disabled";
 		};
 
 		reg_lvds_transmitter: regulator@7 {
@@ -155,6 +154,7 @@
 			enable-active-high;
 			regulator-always-on;
 			vin_supply = <&reg_mba6ul_3v3>;
+			status = "disabled";
 		};
 
 	};
@@ -455,7 +455,7 @@
 	pinctrl-0 = <&pinctrl_lcdif>;
 	display = <&display0>;
 	lcd-supply = <&reg_lcd_pwr>;
-	status = "okay";
+	status = "disabled";
 
 	display0: display {
 		bits-per-pixel = <16>;
@@ -500,7 +500,7 @@
 	clocks = <&clks IMX6UL_CLK_PWM4>,
 		 <&clks IMX6UL_CLK_PWM4>;
 	clock-names = "ipg", "per";
-	status = "okay";
+	status = "disabled";
 };
 
 &uart1 {
