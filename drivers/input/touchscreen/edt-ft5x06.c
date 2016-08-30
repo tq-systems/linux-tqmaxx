@@ -769,7 +769,7 @@ static int edt_ft5x06_ts_reset(struct i2c_client *client,
 		}
 
 		msleep(5);
-		gpio_set_value(tsdata->wake_pin, 1);
+		gpio_set_value_cansleep(tsdata->wake_pin, 1);
 	}
 	if (gpio_is_valid(tsdata->reset_pin)) {
 		/* this pulls reset down, enabling the low active reset */
@@ -784,7 +784,7 @@ static int edt_ft5x06_ts_reset(struct i2c_client *client,
 		}
 
 		msleep(5);
-		gpio_set_value(tsdata->reset_pin, 1);
+		gpio_set_value_cansleep(tsdata->reset_pin, 1);
 		msleep(300);
 	}
 
