@@ -9,7 +9,5 @@
  * http://www.gnu.org/copyleft/gpl.html
  */
 
-/dts-v1/;
-
-#include "imx6ul-mba6ul.dtsi"
+#include "imx6ul-mba6ul.dts"
 #include "imx6ul-mba6ul-lvds.dtsi"

@@ -6,6 +6,8 @@
  * published by the Free Software Foundation.
  */
 
+/dts-v1/;
+
 #include <dt-bindings/input/input.h>
 #include "imx6ul-tqma6ul.dtsi"
 
