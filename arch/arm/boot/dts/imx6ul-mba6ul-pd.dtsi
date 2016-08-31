@@ -9,6 +9,13 @@
  * http://www.gnu.org/copyleft/gpl.html
  */
 
+/ {
+	pxp_v4l2 {
+		compatible = "fsl,imx6ul-pxp-v4l2", "fsl,imx6sx-pxp-v4l2", "fsl,imx6sl-pxp-v4l2";
+		status = "okay";
+	};
+};
+
 &analog_touch {
 	status = "okay";
 };
@@ -28,5 +35,9 @@
 };
 
 &pwm4 {
+	status = "okay";
+};
+
+&pxp {
 	status = "okay";
 };
