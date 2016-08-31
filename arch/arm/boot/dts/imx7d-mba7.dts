@@ -131,12 +131,12 @@
 &iomuxc {
 	pinctrl-names = "default";
 
-	imx7d-mbma7 {
-
+	imx7d-mba7 {
 		pinctrl_enet1: enet1grp {
 			fsl,pins = <
-				MX7D_PAD_GPIO1_IO10__ENET1_MDIO		0x3
-				MX7D_PAD_GPIO1_IO11__ENET1_MDC		0x3
+				MX7D_PAD_GPIO1_IO10__ENET1_MDIO			0x02
+				MX7D_PAD_GPIO1_IO11__ENET1_MDC			0x00
+
 				MX7D_PAD_ENET1_RGMII_TXC__ENET1_RGMII_TXC	0x1
 				MX7D_PAD_ENET1_RGMII_TD0__ENET1_RGMII_TD0	0x1
 				MX7D_PAD_ENET1_RGMII_TD1__ENET1_RGMII_TD1	0x1
@@ -154,6 +154,9 @@
 
 		pinctrl_enet2: enet2grp {
 			fsl,pins = <
+				MX7D_PAD_SD2_CD_B__ENET2_MDIO			0x02
+				MX7D_PAD_SD2_WP__ENET2_MDC			0x00
+
 				MX7D_PAD_EPDC_GDSP__ENET2_RGMII_TXC		0x1
 				MX7D_PAD_EPDC_SDCE2__ENET2_RGMII_TD0		0x1
 				MX7D_PAD_EPDC_SDCE3__ENET2_RGMII_TD1		0x1
