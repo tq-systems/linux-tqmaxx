@@ -50,6 +50,10 @@
 	};
 };
 
+&cpu0 {
+	arm-supply = <&sw1a_reg>;
+};
+
 &i2c1 {
 	clock-frequency = <100000>;
 	pinctrl-names = "default";
