@@ -146,6 +146,22 @@
 			};
 		};
 	};
+
+	sensor0: lm75@48 {
+		compatible = "lm75";
+		reg = <0x48>;
+	};
+
+	eeprom0: m24c64@50 {
+		compatible = "st,24c64", "at24";
+		reg = <0x50>;
+		pagesize = <32>;
+	};
+
+	rtc1: ds1339@68 {
+		compatible = "ds1339";
+		reg = <0x68>;
+	};
 };
 
 &iomuxc {

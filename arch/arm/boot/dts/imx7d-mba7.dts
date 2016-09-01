@@ -129,6 +129,12 @@
 };
 */
 
+&i2c1 {
+	sensor1: lm75@49 {
+		compatible = "lm75";
+		reg = <0x49>;
+	};
+};
 
 &iomuxc {
 	pinctrl-names = "default";
