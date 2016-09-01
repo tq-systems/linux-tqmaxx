@@ -241,3 +241,7 @@
 	status = "okay";
 };
 
+&wdog1 {
+	status = "okay";
+};
+
