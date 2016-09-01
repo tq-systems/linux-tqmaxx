@@ -18,23 +18,6 @@
 	model = "TQ Systems i.MX6 UltraLite Baseboard";
 	compatible = "tqc,imx6ul-mba6ul", "fsl,imx6ul";
 
-	chosen {
-		stdout-path = &uart1;
-	};
-
-	reserved-memory {
-		#address-cells = <1>;
-		#size-cells = <1>;
-		ranges;
-
-		linux,cma {
-			compatible = "shared-dma-pool";
-			reusable;
-			size = <0x6000000>;
-			linux,cma-default;
-		};
-	};
-
 	backlight_lvds: backlight@0 {
 		compatible = "pwm-backlight";
 		pwms = <&pwm4 0 62500>;
@@ -58,6 +41,10 @@
 	beeper: beeper@0 {
 		compatible = "pwm-beeper";
 		pwms = <&pwm2 0 5000>; /* 5us period */
+	};
+
+	chosen {
+		stdout-path = &uart1;
 	};
 
 	gpio_buttons: gpio_keys {
@@ -166,7 +153,19 @@
 			vin_supply = <&reg_mba6ul_3v3>;
 			status = "disabled";
 		};
+	};
 
+	reserved-memory {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+
+		linux,cma {
+			compatible = "shared-dma-pool";
+			reusable;
+			size = <0x6000000>;
+			linux,cma-default;
+		};
 	};
 };
 
@@ -291,7 +290,6 @@
 		status = "okay";
 	};
 
-	/* need to be moved to i2c2 */
 	polytouch: edt-ft5x04@38 {
 		compatible = "edt,edt-ft5406", "edt,edt-ft5x06";
 		reg = <0x38>;
@@ -302,7 +300,6 @@
 		gain = <20>;
 		status = "disabled";
 	};
-
 
 	/* NXP SE97BTP with temperature sensor + eeprom */
 	sensor1: se97@19 {
@@ -410,7 +407,6 @@
 				MX6UL_PAD_GPIO1_IO05__PWM4_OUT		0x00003050
 			>;
 		};
-
 
 		pinctrl_uart1: uart1grp {
 			fsl,pins = <
