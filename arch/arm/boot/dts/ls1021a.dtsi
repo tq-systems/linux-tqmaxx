@@ -226,9 +226,12 @@
 		};
 
 		clockgen: clocking@1ee1000 {
+			compatible = "fsl,ls1021a-clockgen";
 			#address-cells = <1>;
 			#size-cells = <1>;
+			reg = <0 0x1ee1000 0x10000>;
 			ranges = <0x0 0x0 0x1ee1000 0x10000>;
+			clocks = <&sysclk>;
 
 			sysclk: sysclk {
 				compatible = "fixed-clock";
