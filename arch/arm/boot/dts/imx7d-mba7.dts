@@ -189,6 +189,15 @@
 			>;
 		};
 
+		pinctrl_uart7: uart7grp {
+			fsl,pins = <
+				MX7D_PAD_EPDC_DATA12__UART7_DCE_RX	0x7d
+				MX7D_PAD_EPDC_DATA13__UART7_DCE_TX	0x7d
+				MX7D_PAD_EPDC_DATA15__UART7_DCE_CTS	0x7d
+				/* RTS is not connected */
+			>;
+		};
+
 		pinctrl_usdhc1: usdhc1grp {
 			fsl,pins = <
 				MX7D_PAD_SD1_CMD__SD1_CMD	0x5e
@@ -217,6 +226,15 @@
 	pinctrl-0 = <&pinctrl_uart6>;
 	assigned-clocks = <&clks IMX7D_UART6_ROOT_SRC>;
 	assigned-clock-parents = <&clks IMX7D_OSC_24M_CLK>;
+	status = "okay";
+};
+
+&uart7 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart7>;
+	assigned-clocks = <&clks IMX7D_UART7_ROOT_SRC>;
+	assigned-clock-parents = <&clks IMX7D_OSC_24M_CLK>;
+	fsl,uart-has-rtscts;
 	status = "okay";
 };
 
