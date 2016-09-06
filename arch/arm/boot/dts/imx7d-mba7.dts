@@ -129,6 +129,18 @@
 };
 */
 
+&flexcan1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_flexcan1>;
+	status = "okay";
+};
+
+&flexcan2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_flexcan2>;
+	status = "okay";
+};
+
 &i2c1 {
 	sensor1: lm75@49 {
 		compatible = "lm75";
@@ -177,6 +189,20 @@
 				MX7D_PAD_EPDC_SDOE__ENET2_RGMII_RD2		0x1
 				MX7D_PAD_EPDC_SDSHR__ENET2_RGMII_RD3		0x1
 				MX7D_PAD_EPDC_SDCE0__ENET2_RGMII_RX_CTL		0x1
+			>;
+		};
+
+		pinctrl_flexcan1: flexcan1grp {
+			fsl,pins = <
+				MX7D_PAD_GPIO1_IO12__FLEXCAN1_RX	0x59
+				MX7D_PAD_GPIO1_IO13__FLEXCAN1_TX	0x59
+			>;
+		};
+
+		pinctrl_flexcan2: flexcan2grp {
+			fsl,pins = <
+				MX7D_PAD_GPIO1_IO14__FLEXCAN2_RX	0x59
+				MX7D_PAD_GPIO1_IO15__FLEXCAN2_TX	0x59
 			>;
 		};
 
