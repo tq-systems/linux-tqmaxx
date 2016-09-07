@@ -44,6 +44,7 @@
 /dts-v1/;
 
 #include <dt-bindings/input/input.h>
+#include <dt-bindings/net/ti-dp83867.h>
 #include "imx7d-tqma7.dtsi"
 
 / {
@@ -76,19 +77,39 @@
 			regulator-max-microvolt = <3300000>;
 			regulator-always-on;
 		};
+
+		reg_fec1_pwdn: regulator@1 {
+			compatible = "regulator-fixed";
+			reg = <1>;
+			regulator-name = "PWDN_FEC1";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			regulator-always-on;
+			gpio = <&gpio1 9 GPIO_ACTIVE_HIGH>;
+			enable-active-high;
+		};
+
+		reg_fec2_pwdn: regulator@2 {
+			compatible = "regulator-fixed";
+			reg = <2>;
+			regulator-name = "PWDN_FEC2";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			regulator-always-on;
+			gpio = <&gpio2 31 GPIO_ACTIVE_HIGH>;
+			enable-active-high;
+		};
 	};
 };
 
-/*
 &fec1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_enet1>;
-	pinctrl-assert-gpios = <&gpio_spi 5 GPIO_ACTIVE_HIGH>;
-	assigned-clocks = <&clks IMX7D_ENET1_TIME_ROOT_SRC>,
-			  <&clks IMX7D_ENET1_TIME_ROOT_CLK>;
-	assigned-clock-parents = <&clks IMX7D_PLL_ENET_MAIN_100M_CLK>;
-	assigned-clock-rates = <0>, <100000000>;
-	phy-mode = "rgmii";
+	phy-mode = "rgmii-id";
+	phy-reset-gpios = <&gpio7 15 GPIO_ACTIVE_LOW>;
+	phy-reset-duration = <1>;
+	phy-reset-delay = <1>;
+	phy-supply = <&reg_fec1_pwdn>;
 	phy-handle = <&ethphy1_0>;
 	fsl,magic-packet;
 	status = "okay";
@@ -100,19 +121,21 @@
 		ethphy1_0: ethernet-phy1@0 {
 			compatible = "ethernet-phy-ieee802.3-c22";
 			reg = <0>;
+			ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_25_NS>;
+			ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_75_NS>;
+			ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
 		};
 	};
 };
 
 &fec2 {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_enet2 &pinctrl_enet2_epdc0_en>;
-	pinctrl-assert-gpios = <&gpio1 4 GPIO_ACTIVE_LOW>;
-	assigned-clocks = <&clks IMX7D_ENET2_TIME_ROOT_SRC>,
-			  <&clks IMX7D_ENET2_TIME_ROOT_CLK>;
-	assigned-clock-parents = <&clks IMX7D_PLL_ENET_MAIN_100M_CLK>;
-	assigned-clock-rates = <0>, <100000000>;
-	phy-mode = "rgmii";
+	pinctrl-0 = <&pinctrl_enet2>;
+	phy-mode = "rgmii-id";
+	phy-reset-gpios = <&gpio2 28 GPIO_ACTIVE_LOW>;
+	phy-reset-duration = <1>;
+	phy-reset-delay = <1>;
+	phy-supply = <&reg_fec2_pwdn>;
 	phy-handle = <&ethphy2_0>;
 	fsl,magic-packet;
 	status = "okay";
@@ -124,10 +147,12 @@
 		ethphy2_0: ethernet-phy2@0 {
 			compatible = "ethernet-phy-ieee802.3-c22";
 			reg = <0>;
+			ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_25_NS>;
+			ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_75_NS>;
+			ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
 		};
 	};
 };
-*/
 
 &flexcan1 {
 	pinctrl-names = "default";
@@ -167,6 +192,12 @@
 				MX7D_PAD_ENET1_RGMII_RD2__ENET1_RGMII_RD2	0x1
 				MX7D_PAD_ENET1_RGMII_RD3__ENET1_RGMII_RD3	0x1
 				MX7D_PAD_ENET1_RGMII_RX_CTL__ENET1_RGMII_RX_CTL	0x1
+
+				/* Reset: SION, 100kPU, HYS, SRE_SLOW, DSE_0 */
+				MX7D_PAD_ENET1_COL__GPIO7_IO15			0x4000007c
+
+				/* INT/PWDN: SION, 100kPU, HYS, SRE_SLOW, DSE_0 */
+				MX7D_PAD_GPIO1_IO09__GPIO1_IO9			0x4000007c
 			>;
 		};
 
@@ -187,6 +218,12 @@
 				MX7D_PAD_EPDC_SDOE__ENET2_RGMII_RD2		0x1
 				MX7D_PAD_EPDC_SDSHR__ENET2_RGMII_RD3		0x1
 				MX7D_PAD_EPDC_SDCE0__ENET2_RGMII_RX_CTL		0x1
+
+				/* Reset: SION, 100kPU, HYS, SRE_SLOW, DSE_0 */
+				MX7D_PAD_EPDC_BDR0__GPIO2_IO28			0x4000007c
+
+				/* INT/PWDN: SION, 100kPU, HYS, SRE_SLOW, DSE_0 */
+				MX7D_PAD_EPDC_PWR_STAT__GPIO2_IO31		0x4000007c
 			>;
 		};
 
