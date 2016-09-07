@@ -28,9 +28,9 @@
 		status = "disabled";
 	};
 
-	backlight_pd: backlight@0 {
+	backlight_pd: backlight@1 {
 		compatible = "pwm-backlight";
-		pwms = <&pwm1 0 5000000>;
+		pwms = <&pwm4 0 5000000>;
 		brightness-levels = <255 128 64 32 16 8 4 1 0>;
 		default-brightness-level = <5>;
 		power-supply = <&reg_mba6ul_3v3>;
