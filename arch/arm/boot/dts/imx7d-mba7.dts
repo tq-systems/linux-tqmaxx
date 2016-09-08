@@ -236,7 +236,11 @@
 				MX7D_PAD_SD1_WP__GPIO5_IO1	0x7c
 			>;
 		};
+	};
+};
 
+&iomuxc_lpsr {
+	imx7d-mba7 {
 		pinctrl_wdog1: wdog1grp {
 			fsl,pins = <
 				MX7D_PAD_GPIO1_IO00__WDOD1_WDOG_B	0x7c
