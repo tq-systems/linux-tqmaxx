@@ -135,6 +135,17 @@ config ARM_IMX7D_CPUFREQ
 
 	  If in doubt, say N.
 
+if ARM_IMX7D_CPUFREQ && ARM_IMX6Q_CPUFREQ
+
+config IMX_BUSFREQ
+	bool
+	depends on ARCH_MXC
+	depends on HAVE_IMX_BUSFREQ
+	help
+	  this enables the IMX busfreq support
+
+endif
+
 config ARM_INTEGRATOR
 	tristate "CPUfreq driver for ARM Integrator CPUs"
 	depends on ARCH_INTEGRATOR

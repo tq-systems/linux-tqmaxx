@@ -79,6 +79,9 @@ config HAVE_IMX_SRC
 	def_bool y if SMP
 	select ARCH_HAS_RESET_CONTROLLER
 
+config HAVE_IMX_BUSFREQ
+	bool
+
 config IMX_HAVE_IOMUX_V1
 	bool
 
@@ -570,6 +573,7 @@ config SOC_IMX6
 	select HAVE_IMX_GPC
 	select HAVE_IMX_MMDC
 	select HAVE_IMX_SRC
+	select HAVE_IMX_BUSFREQ
 	select MFD_SYSCON
 	select HAVE_ARM_SCU if SMP
 	select HAVE_ARM_TWD if SMP
@@ -645,6 +649,7 @@ config SOC_IMX7D
 	select PINCTRL_IMX7D
 	select HAVE_IMX_MU
 	select HAVE_IMX_RPMSG
+	select HAVE_IMX_BUSFREQ
 	select RPMSG
 	select KEYBOARD_SNVS_PWRKEY
 

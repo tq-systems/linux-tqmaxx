@@ -178,7 +178,12 @@ static inline int imx_ddrc_get_ddr_type(void) { return 0; }
 #endif
 void imx_cpu_die(unsigned int cpu);
 int imx_cpu_kill(unsigned int cpu);
+#ifdef CONFIG_IMX_BUSFREQ
 void imx_busfreq_map_io(void);
+#else
+static inline void imx_busfreq_map_io(void)
+{}
+#endif
 void imx7d_low_power_idle(void);
 void imx6sx_low_power_idle(void);
 void imx6ul_low_power_idle(void);
