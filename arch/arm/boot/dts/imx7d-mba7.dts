@@ -149,8 +149,6 @@
 };
 
 &iomuxc {
-	pinctrl-names = "default";
-
 	imx7d-mba7 {
 		pinctrl_enet1: enet1grp {
 			fsl,pins = <
