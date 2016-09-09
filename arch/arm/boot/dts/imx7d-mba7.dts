@@ -122,6 +122,8 @@
 			ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_25_NS>;
 			ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_75_NS>;
 			ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
+			ti,led-function = <0x0db0>;	/* LED1: Link/Activity, LED2: error */
+			ti,led-ctrl = <0x1001>;		/* active low, LED1/2 driven by phy */
 			ti,invert_line_drv;
 			ti,port_mirror;
 		};
@@ -150,6 +152,8 @@
 			ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_25_NS>;
 			ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_75_NS>;
 			ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
+			ti,led-function = <0x0db0>;	/* LED1: Link/Activity, LED2: error */
+			ti,led-ctrl = <0x1001>;		/* active low, LED1/2 driven by phy */
 			ti,invert_line_drv;
 			ti,port_mirror;
 		};
