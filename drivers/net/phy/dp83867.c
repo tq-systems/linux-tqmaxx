@@ -28,6 +28,8 @@
 #define MII_DP83867_PHYCTRL	0x10
 #define MII_DP83867_MICR	0x12
 #define MII_DP83867_ISR		0x13
+#define MII_DP83867_LEDCR1	0x18
+#define MII_DP83867_LEDCR2	0x19
 #define DP83867_CTRL		0x1f
 #define DP83867_CFG3		0x1e
 
@@ -92,6 +94,8 @@ struct dp83867_private {
 	int io_impedance;
 	int port_mirroring;
 	bool rxctrl_strap_quirk;
+	u32 led_function;
+	u32 led_ctrl;
 };
 
 static int dp83867_ack_interrupt(struct phy_device *phydev)
@@ -167,6 +171,16 @@ static int dp83867_of_init(struct phy_device *phydev)
 
 	dp83867->rxctrl_strap_quirk = of_property_read_bool(of_node,
 					"ti,dp83867-rxctrl-strap-quirk");
+
+	ret = of_property_read_u32(of_node, "ti,led-function",
+				   &dp83867->led_function);
+	if (ret)
+		dp83867->led_function = 0xffffffff;
+
+	ret = of_property_read_u32(of_node, "ti,led-ctrl",
+				   &dp83867->led_ctrl);
+	if (ret)
+		dp83867->led_ctrl = 0xffffffff;
 
 	ret = of_property_read_u32(of_node, "ti,rx-internal-delay",
 				   &dp83867->rx_id_delay);
@@ -297,6 +311,13 @@ static int dp83867_config_init(struct phy_device *phydev)
 
 	if (dp83867->port_mirroring != DP83867_PORT_MIRROING_KEEP)
 		dp83867_config_port_mirroring(phydev);
+
+	/* LED function */
+	if (dp83867->led_function != 0xffffffff)
+		phy_write(phydev, MII_DP83867_LEDCR1, dp83867->led_function);
+	/* led controls */
+	if (dp83867->led_ctrl != 0xffffffff)
+		phy_write(phydev, MII_DP83867_LEDCR2, dp83867->led_ctrl);
 
 	return 0;
 }
