@@ -58,6 +58,7 @@
 /* PHY CTRL bits */
 #define DP83867_PHYCR_FIFO_DEPTH_SHIFT		14
 #define DP83867_PHYCR_FIFO_DEPTH_MASK		(3 << 14)
+#define DP83867_PHYCR_LINE_DRIVER_INV_EN	BIT(1)
 
 /* RGMIIDCTL bits */
 #define DP83867_RGMII_TX_CLK_DELAY_SHIFT	4
@@ -66,6 +67,7 @@ struct dp83867_private {
 	int rx_id_delay;
 	int tx_id_delay;
 	int fifo_depth;
+	bool invert_line_drv;
 };
 
 static int dp83867_ack_interrupt(struct phy_device *phydev)
@@ -110,6 +112,9 @@ static int dp83867_of_init(struct phy_device *phydev)
 
 	if (!of_node)
 		return -ENODEV;
+
+	dp83867->invert_line_drv =
+		of_property_read_bool(of_node, "ti,invert_line_drv");
 
 	ret = of_property_read_u32(of_node, "ti,rx-internal-delay",
 				   &dp83867->rx_id_delay);
@@ -184,6 +189,16 @@ static int dp83867_config_init(struct phy_device *phydev)
 
 		phy_write_mmd_indirect(phydev, DP83867_RGMIIDCTL,
 				       DP83867_DEVADDR, phydev->addr, delay);
+	}
+
+	if (dp83867->invert_line_drv) {
+		val = phy_read(phydev, MII_DP83867_PHYCTRL);
+		if (val < 0)
+			return val;
+		val |= DP83867_PHYCR_LINE_DRIVER_INV_EN;
+		ret = phy_write(phydev, MII_DP83867_PHYCTRL, val);
+		if (ret)
+			return ret;
 	}
 
 	return 0;
