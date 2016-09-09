@@ -28,6 +28,8 @@
 #define MII_DP83867_PHYCTRL	0x10
 #define MII_DP83867_MICR	0x12
 #define MII_DP83867_ISR		0x13
+#define MII_DP83867_LEDCR1	0x18
+#define MII_DP83867_LEDCR2	0x19
 #define DP83867_CTRL		0x1f
 
 /* Extended Registers */
@@ -71,6 +73,8 @@ struct dp83867_private {
 	int rx_id_delay;
 	int tx_id_delay;
 	int fifo_depth;
+	u32 led_function;
+	u32 led_ctrl;
 	bool invert_line_drv;
 	bool port_mirror;
 };
@@ -123,6 +127,16 @@ static int dp83867_of_init(struct phy_device *phydev)
 
 	dp83867->port_mirror =
 		of_property_read_bool(of_node, "ti,port_mirror");
+
+	ret = of_property_read_u32(of_node, "ti,led-function",
+				   &dp83867->led_function);
+	if (ret)
+		return ret;
+
+	ret = of_property_read_u32(of_node, "ti,led-ctrl",
+				   &dp83867->led_ctrl);
+	if (ret)
+		return ret;
 
 	ret = of_property_read_u32(of_node, "ti,rx-internal-delay",
 				   &dp83867->rx_id_delay);
@@ -220,6 +234,11 @@ static int dp83867_config_init(struct phy_device *phydev)
 				       DP83867_DEVADDR, phydev->addr,
 				       val);
 	}
+
+	/* LED configuration */
+	phy_write(phydev, MII_DP83867_LEDCR1, dp83867->led_function);
+	/* active low, LED1/2 driven by phy */
+	phy_write(phydev, MII_DP83867_LEDCR2, dp83867->led_ctrl);
 
 	return 0;
 }
