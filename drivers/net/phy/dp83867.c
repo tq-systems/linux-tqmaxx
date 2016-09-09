@@ -31,6 +31,7 @@
 #define DP83867_CTRL		0x1f
 
 /* Extended Registers */
+#define DP83867_CFG4		0x0031
 #define DP83867_RGMIICTL	0x0032
 #define DP83867_RGMIIDCTL	0x0086
 
@@ -60,6 +61,9 @@
 #define DP83867_PHYCR_FIFO_DEPTH_MASK		(3 << 14)
 #define DP83867_PHYCR_LINE_DRIVER_INV_EN	BIT(1)
 
+/* CFG4 bits */
+#define DP83867_PORT_MIRROR_EN			BIT(0)
+
 /* RGMIIDCTL bits */
 #define DP83867_RGMII_TX_CLK_DELAY_SHIFT	4
 
@@ -68,6 +72,7 @@ struct dp83867_private {
 	int tx_id_delay;
 	int fifo_depth;
 	bool invert_line_drv;
+	bool port_mirror;
 };
 
 static int dp83867_ack_interrupt(struct phy_device *phydev)
@@ -115,6 +120,9 @@ static int dp83867_of_init(struct phy_device *phydev)
 
 	dp83867->invert_line_drv =
 		of_property_read_bool(of_node, "ti,invert_line_drv");
+
+	dp83867->port_mirror =
+		of_property_read_bool(of_node, "ti,port_mirror");
 
 	ret = of_property_read_u32(of_node, "ti,rx-internal-delay",
 				   &dp83867->rx_id_delay);
@@ -199,6 +207,18 @@ static int dp83867_config_init(struct phy_device *phydev)
 		ret = phy_write(phydev, MII_DP83867_PHYCTRL, val);
 		if (ret)
 			return ret;
+	}
+
+	if (dp83867->port_mirror) {
+		val = phy_read_mmd_indirect(phydev, DP83867_CFG4,
+					    DP83867_DEVADDR,
+					    phydev->addr);
+		if (val < 0)
+			return val;
+		val |= DP83867_PORT_MIRROR_EN;
+		phy_write_mmd_indirect(phydev, DP83867_CFG4,
+				       DP83867_DEVADDR, phydev->addr,
+				       val);
 	}
 
 	return 0;
