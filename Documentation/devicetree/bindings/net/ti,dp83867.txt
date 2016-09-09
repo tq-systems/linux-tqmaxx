@@ -11,6 +11,7 @@ Required properties:
 
 Optional properties:
 	- ti,invert_line_drv - Enable line driver inversion, value: boolean
+	- ti,port_mirror - Enable port mirroring, value: boolean
 
 Default child nodes are standard Ethernet PHY device
 nodes as described in Documentation/devicetree/bindings/net/phy.txt
@@ -22,6 +23,7 @@ Example:
 		ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_25_NS>;
 		ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_75_NS>;
 		ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
+		ti,port_mirror;
 	};
 
 Datasheet can be found:
