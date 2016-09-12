@@ -184,6 +184,12 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_i2c2>;
 	status = "okay";
+
+	usb-hub@2d {
+		compatible = "smsc,usb4604";
+		reg = <0x2d>;
+		initial-mode = <1>; /* HUB-MODE */
+	};
 };
 
 &iomuxc {
