@@ -97,6 +97,17 @@
 			gpio = <&gpio2 31 GPIO_ACTIVE_HIGH>;
 			enable-active-high;
 		};
+
+		reg_usb_otg1_vbus: regulator@3 {
+			compatible = "regulator-fixed";
+			reg = <3>;
+			regulator-name = "VBUS_USBOTG1";
+			regulator-min-microvolt = <5000000>;
+			regulator-max-microvolt = <5000000>;
+			gpio = <&gpio1 5 GPIO_ACTIVE_HIGH>;
+			enable-active-high;
+			regulator-always-on;
+		};
 	};
 };
 
@@ -304,6 +315,13 @@
 
 &iomuxc_lpsr {
 	imx7d-mba7 {
+		pinctrl_usbotg1: usbotg1grp {
+			fsl,pins = <
+				MX7D_PAD_GPIO1_IO04__USB_OTG1_OC	0x0c
+				MX7D_PAD_GPIO1_IO05__GPIO1_IO5		0x59
+			>;
+		};
+
 		pinctrl_wdog1: wdog1grp {
 			fsl,pins = <
 				MX7D_PAD_GPIO1_IO00__WDOD1_WDOG_B	0x7c
@@ -330,6 +348,17 @@
 };
 
 &usbh {
+	status = "okay";
+};
+
+&usbotg1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usbotg1>;
+	vbus-supply = <&reg_usb_otg1_vbus>;
+	srp-disable;
+	hnp-disable;
+	adp-disable;
+	dr_mode = "host";
 	status = "okay";
 };
 
