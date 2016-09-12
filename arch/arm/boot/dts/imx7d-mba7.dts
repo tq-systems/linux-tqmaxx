@@ -181,6 +181,13 @@
 	};
 };
 
+&i2c2 {
+	clock-frequency = <100000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_i2c2>;
+	status = "okay";
+};
+
 &iomuxc {
 	imx7d-mba7 {
 		pinctrl_enet1: enet1grp {
@@ -246,6 +253,13 @@
 			fsl,pins = <
 				MX7D_PAD_GPIO1_IO14__FLEXCAN2_RX	0x59
 				MX7D_PAD_GPIO1_IO15__FLEXCAN2_TX	0x59
+			>;
+		};
+
+		pinctrl_i2c2: i2c2grp {
+			fsl,pins = <
+				MX7D_PAD_I2C2_SCL__I2C2_SCL		0x4000007f
+				MX7D_PAD_I2C2_SDA__I2C2_SDA		0x4000007f
 			>;
 		};
 
