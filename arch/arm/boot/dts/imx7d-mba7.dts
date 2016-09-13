@@ -110,6 +110,38 @@
 			enable-active-high;
 			regulator-always-on;
 		};
+
+		reg_usb_otg2_vbus: regulator@4 {
+			compatible = "regulator-fixed";
+			reg = <4>;
+			regulator-name = "VBUS_USBOTG2";
+			regulator-min-microvolt = <5000000>;
+			regulator-max-microvolt = <5000000>;
+			gpio = <&gpio1 7 GPIO_ACTIVE_HIGH>;
+			enable-active-high;
+		};
+
+		reg_mpcie_1v5: regulator@5 {
+			compatible = "regulator-fixed";
+			reg = <5>;
+			regulator-name = "VCC1V5_MPCIE";
+			regulator-min-microvolt = <1500000>;
+			regulator-max-microvolt = <1500000>;
+			gpio = <&pcf8574_0 2 GPIO_ACTIVE_HIGH>;
+			enable-active-high;
+			regulator-always-on;
+		};
+
+		reg_mpcie_3v3: regulator@6 {
+			compatible = "regulator-fixed";
+			reg = <6>;
+			regulator-name = "VCC3V3_MPCIE";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			gpio = <&pcf8574_0 4 GPIO_ACTIVE_HIGH>;
+			enable-active-high;
+			regulator-always-on;
+		};
 	};
 };
 
@@ -304,6 +336,14 @@
 			>;
 		};
 
+		pinctrl_pcie: pciegrp {
+			fsl,pins = <
+				/* MX7D_PAD_EPDC_PWR_COM__GPIO2_IO30	0x52 #pcie_wake */
+				MX7D_PAD_SD2_CLK__GPIO5_IO12		0x52 /* #pcie_rst */
+				MX7D_PAD_EPDC_BDR1__GPIO2_IO29		0x52 /* #pcie_dis */
+			>;
+		};
+
 		pinctrl_uart6: uart6grp {
 			fsl,pins = <
 				MX7D_PAD_EPDC_DATA08__UART6_DCE_RX	0x7d
@@ -348,12 +388,30 @@
 			>;
 		};
 
+		pinctrl_usbotg2: usbotg2grp {
+			fsl,pins = <
+				MX7D_PAD_GPIO1_IO06__USB_OTG2_OC	0x0c
+				MX7D_PAD_GPIO1_IO07__GPIO1_IO7		0x59
+			>;
+		};
+
+
 		pinctrl_wdog1: wdog1grp {
 			fsl,pins = <
 				MX7D_PAD_GPIO1_IO00__WDOD1_WDOG_B	0x7c
 			>;
 		};
 	};
+};
+
+&pcie {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pcie>;
+	reset-gpio = <&gpio5 12 GPIO_ACTIVE_LOW>;
+	disable-gpio = <&gpio2 29 GPIO_ACTIVE_LOW>;
+	/* power-on-gpio = <&gpio2 30 GPIO_ACTIVE_LOW>; */
+	/* fsl,use-internal-clk; */
+	status = "okay";
 };
 
 &uart6 {
@@ -381,6 +439,17 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usbotg1>;
 	vbus-supply = <&reg_usb_otg1_vbus>;
+	srp-disable;
+	hnp-disable;
+	adp-disable;
+	dr_mode = "host";
+	status = "okay";
+};
+
+&usbotg2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usbotg2>;
+	vbus-supply = <&reg_usb_otg2_vbus>;
 	srp-disable;
 	hnp-disable;
 	adp-disable;
