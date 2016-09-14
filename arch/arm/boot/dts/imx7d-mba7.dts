@@ -64,6 +64,40 @@
 		stdout-path = &uart6;
 	};
 
+	gpio_buttons: gpio_keys {
+		compatible = "gpio-keys";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		button@0 {
+			/* #SWITCH_A */
+			label = "S11";
+			linux,code = <KEY_1>;
+			gpios = <&pcf8574_0 5 GPIO_ACTIVE_LOW>;
+		};
+
+		button@1 {
+			/* #SWITCH_B */
+			label = "S12";
+			linux,code = <KEY_2>;
+			gpios = <&pcf8574_0 6 GPIO_ACTIVE_LOW>;
+		};
+
+		button@2 {
+			/* #SWITCH_C */
+			label = "S13";
+			linux,code = <KEY_3>;
+			gpios = <&pcf8574_0 7 GPIO_ACTIVE_LOW>;
+		};
+
+		button@3 {
+			lable = "POWER";
+			gpio-key,wakeup = <1>;
+			linux,code = <KEY_POWER>;
+			gpios = <&gpio1 3 GPIO_ACTIVE_LOW>;
+		};
+	};
+
 	regulators {
 		compatible = "simple-bus";
 		#address-cells = <1>;
