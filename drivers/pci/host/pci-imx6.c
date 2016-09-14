@@ -47,6 +47,7 @@
 static u32 ddr_test_region = 0, test_region_size = SZ_2M;
 
 struct imx6_pcie {
+	bool			int_clk;
 	int			dis_gpio;
 	int			power_on_gpio;
 	int			reset_gpio;
@@ -451,8 +452,16 @@ static void imx6_pcie_init_phy(struct pcie_port *pp)
 			dev_err(pp->dev, "failed to enable pcie regulator.\n");
 
 		/* pcie phy ref clock select; 1? internal pll : external osc */
-		regmap_update_bits(imx6_pcie->iomuxc_gpr, IOMUXC_GPR12,
-				BIT(5), 0);
+		if (imx6_pcie->int_clk) {
+			regmap_update_bits(imx6_pcie->iomuxc_gpr,
+				IOMUXC_GPR12, IMX7D_GPR12_PCIE_PHY_REFCLK_SEL,
+				IMX7D_GPR12_PCIE_PHY_REFCLK_SEL);
+		} else {
+			regmap_update_bits(imx6_pcie->iomuxc_gpr,
+				IOMUXC_GPR12,
+				IMX7D_GPR12_PCIE_PHY_REFCLK_SEL, 0);
+		}
+
 	} else if (is_imx6sx_pcie(imx6_pcie)) {
 		/* Force PCIe PHY reset */
 		regmap_update_bits(imx6_pcie->iomuxc_gpr, IOMUXC_GPR5,
@@ -1173,6 +1182,10 @@ static int __init imx6_pcie_probe(struct platform_device *pdev)
 			"pcie clock source missing or invalid\n");
 		return PTR_ERR(imx6_pcie->pcie);
 	}
+
+	/* check clk src */
+	if (is_imx7d_pcie(imx6_pcie))
+		imx6_pcie->int_clk = of_property_read_bool(np, "fsl,use-internal-clk");
 
 	/* Grab GPR config register range */
 	if (is_imx7d_pcie(imx6_pcie)) {

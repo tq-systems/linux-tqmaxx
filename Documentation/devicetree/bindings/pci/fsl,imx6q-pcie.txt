@@ -13,6 +13,10 @@ Required properties:
 - clock-names: Must include the following additional entries:
 	- "pcie_phy"
 
+Optional properties:
+- fsl,use-internal-clk: Source the phy pll from the internal clock otherwise
+			from a external src. Boolean value only for imx7d.
+
 Example:
 
 	pcie@0x01000000 {
