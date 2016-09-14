@@ -197,6 +197,30 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_i2c2>;
 	status = "okay";
+
+	pcf8574_0: pcf8574@38 {
+		compatible = "nxp,pcf8574a";
+		reg = <0x38>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_pcf8574_0>;
+
+		lines-initial-states = <0xff>;
+		interrupt-parent = <&gpio7>;
+		interrupts = <12 IRQ_TYPE_EDGE_FALLING>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		interrupt-controller;
+		#interrupt-cells = <2>;
+	};
+
+	pcf8574_1: pcf8574@39 {
+		compatible = "nxp,pcf8574a";
+		reg = <0x39>;
+
+		lines-initial-states = <0x1f>;
+		gpio-controller;
+		#gpio-cells = <2>;
+	};
 };
 
 &iomuxc {
@@ -271,6 +295,12 @@
 			fsl,pins = <
 				MX7D_PAD_I2C2_SCL__I2C2_SCL		0x4000007f
 				MX7D_PAD_I2C2_SDA__I2C2_SDA		0x4000007f
+			>;
+		};
+
+		pinctrl_pcf8574_0: pcf8574_0grp {
+			fsl,pins = <
+				MX7D_PAD_ENET1_TX_CLK__GPIO7_IO12	0x0c
 			>;
 		};
 
