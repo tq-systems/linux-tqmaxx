@@ -58,6 +58,15 @@
 		mmc2 = &usdhc2;
 	};
 
+	backlight_lvds: backlight@0 {
+		compatible = "pwm-backlight";
+		pwms = <&pwm1 0 62500>;
+		brightness-levels = <0 96 128 160 192 224 255>;
+		default-brightness-level = <5>;
+		enable-gpios = <&gpio1 2 GPIO_ACTIVE_HIGH>;
+		status = "disabled";
+	};
+
 	chosen {
 		bootargs="ttymxc5,115200";
 		linux,stdout-path = &uart6;
@@ -186,6 +195,18 @@
 			gpio = <&pcf8574_0 3 GPIO_ACTIVE_HIGH>;
 			enable-active-high;
 			regulator-always-on;
+		};
+
+		reg_lvds_transmitter: regulator@8 {
+			compatible = "regulator-fixed";
+			reg = <8>;
+			regulator-name = "#SHTDN_LVDS";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			gpio = <&pcf8574_1 1 GPIO_ACTIVE_HIGH>;
+			enable-active-high;
+			regulator-always-on;
+			status = "disabled";
 		};
 	};
 };
@@ -375,6 +396,45 @@
 			>;
 		};
 
+		pinctrl_lcdif_dat: lcdifdatgrp {
+			fsl,pins = <
+				MX7D_PAD_LCD_DATA00__LCD_DATA0		0x79
+				MX7D_PAD_LCD_DATA01__LCD_DATA1		0x79
+				MX7D_PAD_LCD_DATA02__LCD_DATA2		0x79
+				MX7D_PAD_LCD_DATA03__LCD_DATA3		0x79
+				MX7D_PAD_LCD_DATA04__LCD_DATA4		0x79
+				MX7D_PAD_LCD_DATA05__LCD_DATA5		0x79
+				MX7D_PAD_LCD_DATA06__LCD_DATA6		0x79
+				MX7D_PAD_LCD_DATA07__LCD_DATA7		0x79
+				MX7D_PAD_LCD_DATA08__LCD_DATA8		0x79
+				MX7D_PAD_LCD_DATA09__LCD_DATA9		0x79
+				MX7D_PAD_LCD_DATA10__LCD_DATA10		0x79
+				MX7D_PAD_LCD_DATA11__LCD_DATA11		0x79
+				MX7D_PAD_LCD_DATA12__LCD_DATA12		0x79
+				MX7D_PAD_LCD_DATA13__LCD_DATA13		0x79
+				MX7D_PAD_LCD_DATA14__LCD_DATA14		0x79
+				MX7D_PAD_LCD_DATA15__LCD_DATA15		0x79
+				MX7D_PAD_LCD_DATA16__LCD_DATA16		0x79
+				MX7D_PAD_LCD_DATA17__LCD_DATA17		0x79
+				MX7D_PAD_LCD_DATA18__LCD_DATA18		0x79
+				MX7D_PAD_LCD_DATA19__LCD_DATA19		0x79
+				MX7D_PAD_LCD_DATA20__LCD_DATA20		0x79
+				MX7D_PAD_LCD_DATA21__LCD_DATA21		0x79
+				MX7D_PAD_LCD_DATA22__LCD_DATA22		0x79
+				MX7D_PAD_LCD_DATA23__LCD_DATA23		0x79
+			>;
+		};
+
+		pinctrl_lcdif_ctrl0: lcdifctrl0grp {
+			fsl,pins = <
+				MX7D_PAD_LCD_CLK__LCD_CLK		0x79
+				MX7D_PAD_LCD_ENABLE__LCD_ENABLE		0x79
+				MX7D_PAD_LCD_VSYNC__LCD_VSYNC		0x79
+				MX7D_PAD_LCD_HSYNC__LCD_HSYNC		0x79
+				MX7D_PAD_LCD_RESET__LCD_RESET		0x79
+			>;
+		};
+
 		pinctrl_pcf8574_0: pcf8574_0grp {
 			fsl,pins = <
 				MX7D_PAD_ENET1_TX_CLK__GPIO7_IO12	0x0c
@@ -426,6 +486,19 @@
 
 &iomuxc_lpsr {
 	imx7d-mba7 {
+		pinctrl_lcdif_ctrl1: lcdifctrl1grp {
+			fsl,pins = <
+				MX7D_PAD_GPIO1_IO02__GPIO1_IO2		0x79 /* LCD_BLT_EN */
+				MX7D_PAD_GPIO1_IO03__GPIO1_IO3		0x79 /* LCD_PWR_EN */
+			>;
+		};
+
+		pinctrl_pwm1: pwm1grp {
+			fsl,pins = <
+				MX7D_PAD_GPIO1_IO01__PWM1_OUT		0x30 /* LCD_CONTRAST */
+			>;
+		};
+
 		pinctrl_usbotg1: usbotg1grp {
 			fsl,pins = <
 				MX7D_PAD_GPIO1_IO04__USB_OTG1_OC	0x0c
@@ -449,6 +522,64 @@
 	};
 };
 
+&lcdif {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_lcdif_dat
+		     &pinctrl_lcdif_ctrl0
+		     &pinctrl_lcdif_ctrl1>;
+	enable-gpio = <&gpio1 3 GPIO_ACTIVE_HIGH>;
+	display = <&display0>;
+	status = "disabled";
+
+	display0: display@0 {
+		bits-per-pixel = <32>; /* 32: RGB888/666 mode */
+		bus-width = <24>;
+
+		display-timings {
+			native-mode = <&timing0>;
+			timing0: chimei-g104-x1 {
+				clock-frequency = <65000000>;
+				hactive = <1024>;
+				vactive = <768>;
+				hfront-porch = <75>;
+				hback-porch = <10>;
+				hsync-len = <255>; /* FIXME: typ < 256!*/
+				vback-porch = <100>;
+				vfront-porch = <10>;
+				vsync-len = <38>;
+				de-active = <1>;
+				hsync-active = <0>;
+				vsync-active = <0>;
+			};
+		};
+	};
+
+	/* ET0700G0DH6 + ETM0700G0DH6 + ETM0700G0BDH6 */
+	display1: display@1 {
+		bits-per-pixel = <32>; /* 32: RGB888/666 mode */
+		bus-width = <24>; /* change it to 18 for new hw rev.  */
+
+		display-timings {
+			native-mode = <&timing1>;
+			timing1: 800x480p62 {
+				clock-frequency = <33260000>;
+				hactive = <800>;
+				vactive = <480>;
+				hback-porch = <216>;
+				hfront-porch = <40>;
+				vback-porch = <35>;
+				vfront-porch = <10>;
+				hsync-len = <128>;
+				vsync-len = <2>;
+				hsync-active = <0>;
+				vsync-active = <0>;
+				de-active = <1>;
+				pixelclk-active = <0>;
+			};
+		};
+	};
+};
+
 &pcie {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pcie>;
@@ -457,6 +588,12 @@
 	/* power-on-gpio = <&gpio2 30 GPIO_ACTIVE_LOW>; */
 	/* fsl,use-internal-clk; */
 	status = "okay";
+};
+
+&pwm1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm1>;
+	status = "disabled";
 };
 
 &uart6 {
