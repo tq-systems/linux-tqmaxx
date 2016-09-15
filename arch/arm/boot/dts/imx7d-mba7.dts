@@ -176,6 +176,17 @@
 			enable-active-high;
 			regulator-always-on;
 		};
+
+		reg_mba_12v0: regulator@7 {
+			compatible = "regulator-fixed";
+			reg = <7>;
+			regulator-name = "VCC12V0_MBA7";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			gpio = <&pcf8574_0 3 GPIO_ACTIVE_HIGH>;
+			enable-active-high;
+			regulator-always-on;
+		};
 	};
 };
 
