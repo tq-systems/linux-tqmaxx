@@ -179,6 +179,19 @@
 			>;
 		};
 
+		pinctrl_qspi1: qspi1grp {
+			fsl,pins = <
+				MX7D_PAD_EPDC_DATA00__QSPI_A_DATA0	0x51
+				MX7D_PAD_EPDC_DATA01__QSPI_A_DATA1	0x51
+				MX7D_PAD_EPDC_DATA02__QSPI_A_DATA2	0x51
+				MX7D_PAD_EPDC_DATA03__QSPI_A_DATA3	0x51
+				MX7D_PAD_EPDC_DATA05__QSPI_A_SCLK	0x51
+				MX7D_PAD_EPDC_DATA06__QSPI_A_SS0_B	0x51
+				/* #QSPI_RESET */
+				MX7D_PAD_EPDC_DATA04__GPIO2_IO4		0x14
+			>;
+		};
+
 		pinctrl_usdhc3: usdhc3grp {
 			fsl,pins = <
 				MX7D_PAD_SD3_CMD__SD3_CMD		0x59
@@ -226,6 +239,20 @@
 				MX7D_PAD_SD3_STROBE__SD3_STROBE         0x1b
 			>;
 		};
+	};
+};
+
+&qspi1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_qspi1>;
+	status = "okay";
+
+	flash0: n25q512ax3@0 {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "micron,n25q512ax3";
+		spi-max-frequency = <29000000>;
+		reg = <0>;
 	};
 };
 
