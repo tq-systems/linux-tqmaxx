@@ -67,6 +67,11 @@
 		status = "disabled";
 	};
 
+	beeper {
+		compatible = "gpio-beeper";
+		gpios = <&pcf8574_1 0 GPIO_ACTIVE_HIGH>;
+	};
+
 	chosen {
 		bootargs="ttymxc5,115200";
 		linux,stdout-path = &uart6;
