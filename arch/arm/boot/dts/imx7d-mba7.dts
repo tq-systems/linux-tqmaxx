@@ -103,13 +103,6 @@
 			linux,code = <KEY_3>;
 			gpios = <&pcf8574_0 7 GPIO_ACTIVE_LOW>;
 		};
-
-		button@3 {
-			lable = "POWER";
-			gpio-key,wakeup = <1>;
-			linux,code = <KEY_POWER>;
-			gpios = <&gpio1 3 GPIO_ACTIVE_LOW>;
-		};
 	};
 
 	regulators {
