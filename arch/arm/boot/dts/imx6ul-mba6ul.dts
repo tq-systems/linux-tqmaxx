@@ -18,6 +18,11 @@
 	model = "TQ Systems i.MX6 UltraLite Baseboard";
 	compatible = "tqc,imx6ul-mba6ul", "fsl,imx6ul";
 
+	aliases {
+		mmc1 = &usdhc1;
+		mmc0 = &usdhc2;
+	};
+
 	backlight_lvds: backlight@0 {
 		compatible = "pwm-backlight";
 		pwms = <&pwm4 0 62500>;
