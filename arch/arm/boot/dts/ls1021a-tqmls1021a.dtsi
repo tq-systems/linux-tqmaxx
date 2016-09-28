@@ -34,6 +34,10 @@
 			regulator-always-on;
 		};
 	};
+
+	timer {
+		always-on;
+	};
 };
 
 &esdhc {
