@@ -479,6 +479,7 @@
 				MX7D_PAD_EPDC_DATA13__UART7_DCE_TX	0x7d
 				MX7D_PAD_EPDC_DATA15__UART7_DCE_CTS	0x7d
 				/* RTS is not connected */
+				MX7D_PAD_EPDC_DATA14__UART7_DCE_RTS	0x00
 			>;
 		};
 
