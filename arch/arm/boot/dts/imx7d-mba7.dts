@@ -309,10 +309,12 @@
 	pinctrl-0 = <&pinctrl_i2c2>;
 	status = "okay";
 
+	/* TODO: remove it, we fix HW */
 	usb-hub@2d {
 		compatible = "smsc,usb4604";
 		reg = <0x2d>;
 		initial-mode = <1>; /* HUB-MODE */
+		status = "disabled";
 	};
 
 	pcf8574_0: pcf8574@38 {
