@@ -459,8 +459,8 @@
 		pinctrl_pcie: pciegrp {
 			fsl,pins = <
 				/* MX7D_PAD_EPDC_PWR_COM__GPIO2_IO30	0x52 #pcie_wake */
-				MX7D_PAD_SD2_CLK__GPIO5_IO12		0x52 /* #pcie_rst */
-				MX7D_PAD_EPDC_BDR1__GPIO2_IO29		0x52 /* #pcie_dis */
+				MX7D_PAD_SD2_CLK__GPIO5_IO12		0x11 /* #pcie_rst */
+				MX7D_PAD_EPDC_BDR1__GPIO2_IO29		0x11 /* #pcie_dis */
 			>;
 		};
 
