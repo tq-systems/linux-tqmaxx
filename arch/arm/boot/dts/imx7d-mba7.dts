@@ -515,6 +515,12 @@
 			>;
 		};
 
+		pinctrl_pwm4: pwm4grp {
+			fsl,pins = <
+				MX7D_PAD_GPIO1_IO00__PWM4_OUT		0x30
+			>;
+		};
+
 		pinctrl_usbotg1: usbotg1grp {
 			fsl,pins = <
 				MX7D_PAD_GPIO1_IO04__USB_OTG1_OC	0x0c
@@ -609,6 +615,13 @@
 &pwm1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pwm1>;
+	status = "disabled";
+};
+
+/* TODO: not usable, WDOG1_B */
+&pwm4 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm4>;
 	status = "disabled";
 };
 
