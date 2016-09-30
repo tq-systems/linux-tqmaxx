@@ -392,6 +392,9 @@
 };
 
 &iomuxc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_hog_mba7_1>;
+
 	imx7d-mba7 {
 		pinctrl_ecspi1: ecspi1grp {
 			fsl,pins = <
@@ -468,6 +471,14 @@
 			fsl,pins = <
 				MX7D_PAD_GPIO1_IO14__FLEXCAN2_RX	0x59
 				MX7D_PAD_GPIO1_IO15__FLEXCAN2_TX	0x59
+			>;
+		};
+
+		pinctrl_hog_mba7_1: hogmba71grp {
+			fsl,pins = <
+				/* TODO: WDOG2_B / WDOG2_RESET not usable */
+				MX7D_PAD_ENET1_RX_CLK__GPIO7_IO13	0x4000007c
+				MX7D_PAD_ENET1_CRS__GPIO7_IO14		0x4000007c
 			>;
 		};
 
