@@ -215,12 +215,7 @@
 	bus-width = <8>;
 	disable-wp;
 	non-removable;
-	vmmc-supply = <&reg_sw2_3v3>;
+	no-1-8-v;
 	mmc-pwrseq = <&usdhc2_pwrseq>;
 	status = "okay";
-
-	mmccard: mmccard@0 {
-		reg = <0>;
-		compatible = "mmc-card";
-	};
 };
