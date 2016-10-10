@@ -726,7 +726,7 @@
 	/* ET0700G0DH6 + ETM0700G0DH6 + ETM0700G0BDH6 */
 	display1: display@1 {
 		bits-per-pixel = <32>; /* 32: RGB888/666 mode */
-		bus-width = <24>; /* change it to 18 for new hw rev.  */
+		bus-width = <18>;
 
 		display-timings {
 			native-mode = <&timing1>;
