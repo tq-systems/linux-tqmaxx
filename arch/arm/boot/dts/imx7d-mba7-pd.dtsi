@@ -58,5 +58,11 @@
 
 &lcdif {
 	display = <&display1>;
+	/* GPIO1_IO3 is controlled by polytouch driver */
+	/delete-property/ enable-gpio;
+	status = "okay";
+};
+
+&polytouch {
 	status = "okay";
 };
