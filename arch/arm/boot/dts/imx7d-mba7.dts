@@ -67,6 +67,15 @@
 		status = "disabled";
 	};
 
+	backlight_pd: backlight@1 {
+		compatible = "pwm-backlight";
+		pwms = <&pwm1 0 5000000>;
+		brightness-levels = <255 128 64 32 16 8 4 1 0>;
+		default-brightness-level = <5>;
+		enable-gpios = <&gpio1 2 GPIO_ACTIVE_HIGH>;
+		status = "disabled";
+	};
+
 	beeper {
 		compatible = "gpio-beeper";
 		gpios = <&pcf8574_1 0 GPIO_ACTIVE_HIGH>;
