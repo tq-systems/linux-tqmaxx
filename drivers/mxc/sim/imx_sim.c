@@ -1306,6 +1306,7 @@ static long sim_ioctl(struct file *file,
 	switch (cmd) {
 
 	case SIM_IOCTL_GET_ATR:
+		pr_debug("%s entering SIM_IOCTL_GET_ATR.\n", __func__);
 		if (sim->present != SIM_PRESENT_DETECTED) {
 			pr_err("NO card ...\n");
 			errval = -SIM_E_NOCARD;
@@ -1364,10 +1365,12 @@ static long sim_ioctl(struct file *file,
 
 	case SIM_IOCTL_DEACTIVATE:
 
+		pr_debug("%s entering SIM_IOCTL_DEACTIVATE.\n", __func__);
 		sim_deactivate(sim);
 		break;
 
 	case SIM_IOCTL_COLD_RESET:
+		pr_debug("%s entering SIM_IOCTL_COLD_RESET.\n", __func__);
 		sim->present = SIM_PRESENT_REMOVED;
 		sim->state = SIM_STATE_REMOVED;
 		sim_reset_module(sim);
@@ -1378,10 +1381,12 @@ static long sim_ioctl(struct file *file,
 		break;
 
 	case SIM_IOCTL_WARM_RESET:
+		pr_debug("%s entering SIM_IOCTL_WARM_RESET.\n", __func__);
 		sim_warm_reset(sim);
 		break;
 
 	case SIM_IOCTL_XMT:
+		pr_debug("%s entering SIM_IOCTL_XMT.\n", __func__);
 		ret = copy_from_user(&sim->xmt_remaining, &(((sim_xmt_t *)arg)->xmt_length),
 				     sizeof(uint32_t));
 		if (ret || sim->xmt_remaining > SIM_XMT_BUFFER_SIZE) {
@@ -1463,6 +1468,7 @@ static long sim_ioctl(struct file *file,
 		break;
 
 	case SIM_IOCTL_RCV:
+		pr_debug("%s entering SIM_IOCTL_RCV.\n", __func__);
 		if (sim->present != SIM_PRESENT_DETECTED) {
 			errval = -SIM_E_NOCARD;
 			break;
@@ -1553,6 +1559,7 @@ copy_data:
 		break;
 
 	case SIM_IOCTL_SET_PROTOCOL:
+		pr_debug("%s entering SIM_IOCTL_SET_PROTOCOL.\n", __func__);
 		ret = copy_from_user(&sim->protocol_type, (int *)arg,
 				     sizeof(int));
 		if (ret)
@@ -1560,6 +1567,7 @@ copy_data:
 		break;
 
 	case SIM_IOCTL_SET_TIMING:
+		pr_debug("%s entering SIM_IOCTL_SET_TIMING.\n", __func__);
 		ret = copy_from_user(&sim->timing_data, (sim_timing_t *)arg,
 				     sizeof(sim_timing_t));
 		if (ret) {
@@ -1576,6 +1584,7 @@ copy_data:
 		break;
 
 	case SIM_IOCTL_SET_BAUD:
+		pr_debug("%s entering SIM_IOCTL_SET_BAUD.\n", __func__);
 		ret = copy_from_user(&sim->baud_rate, (sim_baud_t *)arg,
 					sizeof(sim_baud_t));
 
@@ -1589,6 +1598,7 @@ copy_data:
 
 		break;
 	case SIM_IOCTL_WAIT:
+		pr_debug("%s entering SIM_IOCTL_WAIT.\n", __func__);
 		ret = copy_from_user(&delay, (unsigned int *)arg,
 					sizeof(unsigned int));
 
@@ -1602,15 +1612,18 @@ copy_data:
 		break;
 
 	case SIM_IOCTL_GET_PRESENSE:
+		pr_debug("%s entering SIM_IOCTL_GET_PRESENSE.\n", __func__);
 		if (put_user(sim->present, (int *)arg))
 			errval = -SIM_E_ACCESS;
 		break;
 
 	case SIM_IOCTL_CARD_LOCK:
+		pr_debug("%s entering SIM_IOCTL_CARD_LOCK.\n", __func__);
 		errval = sim_card_lock(sim);
 		break;
 
 	case SIM_IOCTL_CARD_EJECT:
+		pr_debug("%s entering SIM_IOCTL_CARD_EJECT.\n", __func__);
 		errval = sim_card_eject(sim);
 		break;
 
