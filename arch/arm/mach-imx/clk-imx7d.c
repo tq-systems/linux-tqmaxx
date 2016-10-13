@@ -927,5 +927,8 @@ static void __init imx7d_clocks_init(struct device_node *ccm_node)
 
 	/* set parent of SIM1 root clock */
 	imx_clk_set_parent(clks[IMX7D_SIM1_ROOT_SRC], clks[IMX7D_PLL_SYS_MAIN_120M_CLK]);
+
+	/* set parent of SIM2 root clock */
+	imx_clk_set_parent(clks[IMX7D_SIM2_ROOT_SRC], clks[IMX7D_PLL_SYS_MAIN_120M_CLK]);
 }
 CLK_OF_DECLARE(imx7d, "fsl,imx7d-ccm", imx7d_clocks_init);
