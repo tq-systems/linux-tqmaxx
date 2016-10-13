@@ -785,8 +785,11 @@
 &sim2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_sim2_1>;
+	clocks = <&clks IMX7D_SIM2_ROOT_CLK>;
+	clock-names = "sim";
+	assigned-clocks = <&clks IMX7D_SIM2_ROOT_CLK>;
+	assigned-clock-rates = <67500000>;
 	port = <0>;
-	sven_low_active;
 	status = "okay";
 };
 
