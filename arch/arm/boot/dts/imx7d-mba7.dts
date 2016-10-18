@@ -298,6 +298,20 @@
 	};
 };
 
+&ecspi2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_ecspi2>;
+	fsl,spi-num-chipselects = <1>;
+	status = "okay";
+
+	spidev2_0: spidev2-0@0 {
+		compatible = "tq,testdev";
+		spi-max-frequency = <5000000>;
+		reg = <0>;
+		status = "okay";
+	};
+};
+
 &fec1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_enet1>;
@@ -458,6 +472,15 @@
 				MX7D_PAD_UART1_RX_DATA__ECSPI1_SS1		0x74
 				MX7D_PAD_UART1_TX_DATA__ECSPI1_SS2		0x74
 				MX7D_PAD_UART2_RX_DATA__ECSPI1_SS3		0x74
+			>;
+		};
+
+		pinctrl_ecspi2: ecspi2grp {
+			fsl,pins = <
+				MX7D_PAD_ECSPI2_MISO__ECSPI2_MISO		0x7c
+				MX7D_PAD_ECSPI2_MOSI__ECSPI2_MOSI		0x74
+				MX7D_PAD_ECSPI2_SCLK__ECSPI2_SCLK		0x74
+				MX7D_PAD_ECSPI2_SS0__ECSPI2_SS0			0x74
 			>;
 		};
 
