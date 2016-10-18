@@ -231,9 +231,6 @@ static int panel_simple_enable(struct drm_panel *panel)
 	return 0;
 }
 
-extern struct edid *sii902x_drm_get_edid(struct drm_connector *connector,
-					 struct i2c_adapter *adapter);
-
 static int panel_simple_get_modes(struct drm_panel *panel)
 {
 	struct panel_simple *p = to_panel_simple(panel);
@@ -241,7 +238,7 @@ static int panel_simple_get_modes(struct drm_panel *panel)
 
 	/* probe EDID if a DDC bus is available */
 	if (p->ddc) {
-		struct edid *edid = sii902x_drm_get_edid(panel->connector,
+		struct edid *edid = drm_get_edid(panel->connector,
 							 p->ddc);
 		drm_mode_connector_update_edid_property(panel->connector, edid);
 		if (edid) {
