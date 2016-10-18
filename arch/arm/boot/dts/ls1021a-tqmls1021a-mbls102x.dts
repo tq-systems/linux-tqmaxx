@@ -58,7 +58,6 @@
 		compatible = "edt,etm0700g0dh6";
 		backlight = <&backlight_dcu>;
 		power-supply = <&reg_lcd>;
-		ddc-i2c-bus = <&i2c0>;
 	};
 };
 
