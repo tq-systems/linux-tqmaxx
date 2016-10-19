@@ -41,28 +41,5 @@
  *     OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/ {
-	pxp_v4l2_out {
-		compatible = "fsl,imx7d-pxp-v4l2", "fsl,imx6sx-pxp-v4l2", "fsl,imx6sl-pxp-v4l2";
-		status = "okay";
-	};
-};
-
-&backlight_pd {
-	status = "okay";
-};
-
-&epxp {
-	status = "okay";
-};
-
-&lcdif {
-	display = <&display1>;
-	/* GPIO1_IO3 is controlled by polytouch driver */
-	/delete-property/ enable-gpio;
-	status = "okay";
-};
-
-&polytouch {
-	status = "okay";
-};
+#include "imx7d-mba7-pd.dts"
+#include "imx7d-mba7-pd-dmb.dtsi"
