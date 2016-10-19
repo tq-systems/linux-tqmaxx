@@ -1,0 +1,21 @@
+/*
+ * Copyright 2016 Marco Felsch, TQ Systems GmbH
+ *
+ * The code contained herein is licensed under the GNU General Public
+ * License. You may obtain a copy of the GNU General Public License
+ * Version 2 or later at the following locations:
+ *
+ * http://www.opensource.org/licenses/gpl-license.html
+ * http://www.gnu.org/copyleft/gpl.html
+ */
+
+&analog_touch {
+	status = "disabled";
+};
+
+&backlight_pd {
+	pwms = <&pwm4 0 20000>; /* 50 kHz */
+	brightness-levels = <0 1 4 8 16 32 64 128 255>;
+	default-brightness-level = <8>;
+	status = "okay";
+};
