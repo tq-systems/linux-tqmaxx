@@ -793,13 +793,14 @@
 		};
 	};
 
-	/* ET0700G0DH6 + ETM0700G0DH6 + ETM0700G0BDH6 */
 	display1: display@1 {
 		bits-per-pixel = <32>; /* 32: RGB888/666 mode */
 		bus-width = <18>;
 
 		display-timings {
 			native-mode = <&timing1>;
+
+			/* ET0700G0DH6 + ETM0700G0DH6 + ETM0700G0BDH6 */
 			timing1: 800x480p62 {
 				clock-frequency = <33260000>;
 				hactive = <800>;
@@ -815,16 +816,8 @@
 				de-active = <1>;
 				pixelclk-active = <0>;
 			};
-		};
-	};
 
-	/* S070WS12H-O-CT21 */
-	display2: display@2 {
-		bits-per-pixel = <32>; /* 32: RGB888/666 mode */
-		bus-width = <18>;
-
-		display-timings {
-			native-mode = <&timing2>;
+			/* S070WS12H-O-CT21 */
 			timing2: 1024x600p62 {
 				clock-frequency = <33260000>;
 				hactive = <1024>;
