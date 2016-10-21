@@ -367,6 +367,19 @@
 		};
 	};
 
+	ft5x06 {
+		pinctrl_ft5x06: ft5x06grp {
+			fsl,pins = <
+			/* LCD.RESET -> TSC /RST */
+			MX6QDL_PAD_GPIO_7__GPIO1_IO07  0x00001090
+			/* LCD.PWR_EN -> TSC /WAKE */
+			MX6QDL_PAD_GPIO_16__GPIO7_IO11 0x00001090
+			/* TSC Interrupt line: HYS, PKE, SPEED MED, DSE 240 OHM */
+			MX6QDL_PAD_EIM_D25__GPIO3_IO25 0x00013088
+			>;
+		};
+	};
+
 	gpiobuttons {
 		pinctrl_gpiobuttons: gpiogrp {
 			fsl,pins = <
@@ -381,8 +394,6 @@
 		pinctrl_hog: hoggrp {
 			fsl,pins = <
 				MX6QDL_PAD_EIM_D22__GPIO3_IO22 0x0001b099 /* OTG_PWR */
-				MX6QDL_PAD_GPIO_16__GPIO7_IO11 0x0001b099 /* LCD.PWR_EN */
-				MX6QDL_PAD_GPIO_7__GPIO1_IO07 0x0001b099 /* LCD.RESET */
 				/* LCD.CONTRAST -> Rev 0100 only, not used on Rev.0200*/
 				MX6QDL_PAD_DI0_PIN4__GPIO4_IO20 0x0001b099
 
