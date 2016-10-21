@@ -10,25 +10,49 @@
  */
 
 / {
+	backlight_lcd: backlight@2 {
+		compatible = "pwm-backlight";
+		pwms = <&pwm1 0 20000>;
+		brightness-levels = <0 1 4 8 16 32 64 128 255>;
+		default-brightness-level = <6>;
+		power-supply = <&reg_mba6_3p3v>;
+		enable-gpios = <&gpio4 5 GPIO_ACTIVE_HIGH>;
+		status = "okay";
+	};
+
 	lcd@0 {
 		compatible = "fsl,lcd";
 		ipu_id = <0>;
 		disp_id = <0>;
 		lcd-supply = <&reg_mba6_3p3v>;
 		default_ifmt = "RGB666";
+/*		default_ifmt = "RGB24"; */
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_lcd0_ipu1>;
 		status = "okay";
 	};
 };
 
-&backlight_pd {
-	status = "okay";
-	default-brightness-level = <0>;
+&i2c1 {
+	lcd0_tsc: edt-ft5x06@38 {
+		compatible = "edt-ft5x06";
+		reg = <0x38>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_ft5x06>;
+		interrupt-parent = <&gpio3>;
+		interrupts = <25 0x0>;
+		/* LCD.PWR_EN -> TSC /WAKE */
+		wake-gpios = <&gpio7 11 GPIO_ACTIVE_HIGH>;
+		/* LCD.RESET -> TSC /RST */
+		reset-gpios = <&gpio1 7 GPIO_ACTIVE_LOW>;
+		status = "okay";
+	};
 };
+
 
 &mxcfb3 {
 	interface_pix_fmt = "RGB666";
+/*	interface_pix_fmt = "RGB24"; */
 	mode_str = "ETM0700-WVGA";
 	default_bpp = <32>;
 	status = "okay";
