@@ -55,6 +55,39 @@ static struct fb_videomode lcdif_modedb[] = {
 	FB_SYNC_CLK_LAT_FALL,
 	FB_VMODE_NONINTERLACED,
 	0,},
+	{
+		/* 800x480 @ 60 Hz , pixel clk @ 33.3MHz */
+		.name = "S070WV106H-CT44",
+		.refresh = 60,
+		.xres = 800,
+		.yres = 480,
+		.pixclock = KHZ2PICOS(33300),
+		.left_margin = 216,
+		.right_margin = 40,
+		.upper_margin = 35,
+		.lower_margin = 10,
+		.hsync_len = 128,
+		.vsync_len = 2,
+		.sync = FB_SYNC_CLK_LAT_FALL,
+		.vmode = FB_VMODE_NONINTERLACED,
+		.flag = 0,
+	}, {
+		/* 800x480 @ 60 Hz , pixel clk @ 51.2MHz */
+		.name = "S070WV106H-0-CT21",
+		.refresh = 60,
+		.xres = 1024,
+		.yres = 600,
+		.pixclock = KHZ2PICOS(51200),
+		.left_margin = 160,
+		.right_margin = 140,
+		.upper_margin = 12,
+		.lower_margin = 20,
+		.hsync_len = 20,
+		.vsync_len = 3,
+		.sync = FB_SYNC_CLK_LAT_FALL,
+		.vmode = FB_VMODE_NONINTERLACED,
+		.flag = 0,
+	},
 };
 static int lcdif_modedb_sz = ARRAY_SIZE(lcdif_modedb);
 
