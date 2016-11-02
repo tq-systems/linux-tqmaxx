@@ -651,5 +651,6 @@
 	wp-gpios = <&gpio1 18 GPIO_ACTIVE_HIGH>;
 	bus-width = <4>;
 	vmmc-supply = <&reg_mba6ul_3v3>;
+	no-1-8-v;
 	status = "okay";
 };
