@@ -816,6 +816,15 @@
 				de-active = <1>;
 				pixelclk-active = <0>;
 			};
+		};
+	};
+
+	display2: display@2 {
+		bits-per-pixel = <32>; /* 32: RGB888/666 mode */
+		bus-width = <18>;
+
+		display-timings {
+			native-mode = <&timing2>;
 
 			/* S070WS12H-O-CT21 */
 			timing2: 1024x600p62 {
