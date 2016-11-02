@@ -48,8 +48,6 @@
 	status = "okay";
 };
 
-&display1 {
-	display-timings {
-		native-mode = <&timing2>;
-	};
+&lcdif {
+	display = <&display2>;
 };
