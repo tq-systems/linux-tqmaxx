@@ -19,3 +19,9 @@
 	default-brightness-level = <8>;
 	status = "okay";
 };
+
+&polytouch {
+	touchscreen-size-x = <800>;
+	touchscreen-size-y = <480>;
+	status = "okay";
+};

@@ -31,6 +31,15 @@
 };
 
 &polytouch {
+	/*
+	 * HACHHACK:
+	 * do not use size settings, display touch reads out 1792 x 1024
+	 * (tested with ETM0700G0BDH6)
+	 */
+/*
+	touchscreen-size-x = <800>;
+	touchscreen-size-y = <480>;
+*/
 	status = "okay";
 };
 
