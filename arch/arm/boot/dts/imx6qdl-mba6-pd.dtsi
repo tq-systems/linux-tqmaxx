@@ -45,6 +45,8 @@
 		wake-gpios = <&gpio7 11 GPIO_ACTIVE_HIGH>;
 		/* LCD.RESET -> TSC /RST */
 		reset-gpios = <&gpio1 7 GPIO_ACTIVE_LOW>;
+		touchscreen-size-x = <1024>;
+		touchscreen-size-y = <600>;
 		status = "okay";
 	};
 };
