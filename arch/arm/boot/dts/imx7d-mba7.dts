@@ -414,7 +414,6 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_pcf8574_0>;
 
-/*		lines-initial-states = <0xff>; */
 		lines-initial-states = <0xe0>;
 		interrupt-parent = <&gpio7>;
 		interrupts = <12 IRQ_TYPE_EDGE_FALLING>;
@@ -428,7 +427,6 @@
 		compatible = "nxp,pcf8574a";
 		reg = <0x39>;
 
-/*		lines-initial-states = <0x1f>; */
 		lines-initial-states = <0x1f>;
 		gpio-controller;
 		#gpio-cells = <2>;
