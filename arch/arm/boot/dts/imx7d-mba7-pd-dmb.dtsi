@@ -41,6 +41,32 @@
  *     OTHER DEALINGS IN THE SOFTWARE.
  */
 
+/ {
+	display_dmb: display {
+		bits-per-pixel = <32>; /* 32: RGB888/666 mode */
+		bus-width = <18>;
+
+		display-timings {
+			native-mode = <&timing2>;
+
+			/* S070WS12H-O-CT21 */
+			timing2: 1024x600p62 {
+				clock-frequency = <51200000>;
+				hactive = <1024>;
+				vactive = <600>;
+				hback-porch = <140>;
+				hfront-porch = <140 160 180>;
+				vback-porch = <20>;
+				vfront-porch = <2 12 22>;
+				hsync-len = <20>;
+				vsync-len = <3>;
+				de-active = <1>;
+				pixelclk-active = <0>;
+			};
+		};
+	};
+};
+
 &backlight {
 	pwms = <&pwm1 0 20000>; /* 50 kHz */
 	brightness-levels = <0 1 4 8 16 32 64 128 255>;
@@ -49,5 +75,5 @@
 };
 
 &lcdif {
-	display = <&display2>;
+	display = <&display_dmb>;
 };

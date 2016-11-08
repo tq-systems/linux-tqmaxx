@@ -42,6 +42,32 @@
  */
 
 / {
+	display_etm0700: display {
+		bits-per-pixel = <32>; /* 32: RGB888/666 mode */
+		bus-width = <18>;
+
+		display-timings {
+			native-mode = <&timing1>;
+
+			/* ET0700G0DH6 + ETM0700G0DH6 + ETM0700G0BDH6 */
+			timing1: 800x480p62 {
+				clock-frequency = <33260000>;
+				hactive = <800>;
+				vactive = <480>;
+				hback-porch = <216>;
+				hfront-porch = <40>;
+				vback-porch = <35>;
+				vfront-porch = <10>;
+				hsync-len = <128>;
+				vsync-len = <2>;
+				hsync-active = <0>;
+				vsync-active = <0>;
+				de-active = <1>;
+				pixelclk-active = <0>;
+			};
+		};
+	};
+
 	pxp_v4l2_out {
 		compatible = "fsl,imx7d-pxp-v4l2", "fsl,imx6sx-pxp-v4l2", "fsl,imx6sl-pxp-v4l2";
 		status = "okay";
@@ -60,7 +86,7 @@
 };
 
 &lcdif {
-	display = <&display1>;
+	display = <&display_etm0700>;
 	/* GPIO1_IO3 is controlled by polytouch driver */
 	/delete-property/ enable-gpio;
 	status = "okay";

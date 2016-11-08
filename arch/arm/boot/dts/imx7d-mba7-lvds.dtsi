@@ -42,6 +42,29 @@
  */
 
 / {
+	display_lvds: display {
+		bits-per-pixel = <32>; /* 32: RGB888/666 mode */
+		bus-width = <24>;
+
+		display-timings {
+			native-mode = <&timing0>;
+			timing0: chimei-g104-x1 {
+				clock-frequency = <65000000>;
+				hactive = <1024>;
+				vactive = <768>;
+				hfront-porch = <75>;
+				hback-porch = <10>;
+				hsync-len = <255>; /* FIXME: typ < 256!*/
+				vback-porch = <100>;
+				vfront-porch = <10>;
+				vsync-len = <38>;
+				de-active = <1>;
+				hsync-active = <0>;
+				vsync-active = <0>;
+			};
+		};
+	};
+
 	pxp_v4l2_out {
 		compatible = "fsl,imx7d-pxp-v4l2", "fsl,imx6sx-pxp-v4l2", "fsl,imx6sl-pxp-v4l2";
 		status = "okay";
@@ -60,6 +83,7 @@
 };
 
 &lcdif {
+	display = <&display_lvds>;
 	status = "okay";
 };
 
