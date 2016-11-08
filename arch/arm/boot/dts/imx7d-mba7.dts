@@ -58,20 +58,11 @@
 		mmc2 = &usdhc2;
 	};
 
-	backlight_lvds: backlight@0 {
+	backlight: pwm_backlight {
 		compatible = "pwm-backlight";
-		pwms = <&pwm1 0 62500>;
-		brightness-levels = <0 96 128 160 192 224 255>;
-		default-brightness-level = <5>;
-		enable-gpios = <&gpio1 2 GPIO_ACTIVE_HIGH>;
-		status = "disabled";
-	};
-
-	backlight_pd: backlight@1 {
-		compatible = "pwm-backlight";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_pwmbacklight1>;
 		pwms = <&pwm1 0 5000000>;
-		brightness-levels = <255 128 64 32 16 8 4 1 0>;
-		default-brightness-level = <5>;
 		enable-gpios = <&gpio1 2 GPIO_ACTIVE_HIGH>;
 		status = "disabled";
 	};
@@ -737,9 +728,14 @@
 
 &iomuxc_lpsr {
 	imx7d-mba7 {
-		pinctrl_lcdif_ctrl1: lcdifctrl1grp {
+		pinctrl_pwmbacklight1: pwmbacklight1grp {
 			fsl,pins = <
 				MX7D_PAD_GPIO1_IO02__GPIO1_IO2		0x10 /* LCD_BLT_EN */
+			>;
+		};
+
+		pinctrl_lcdif_ctrl1: lcdifctrl1grp {
+			fsl,pins = <
 				MX7D_PAD_GPIO1_IO03__GPIO1_IO3		0x10 /* LCD_PWR_EN */
 			>;
 		};

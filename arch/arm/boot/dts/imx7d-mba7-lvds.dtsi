@@ -48,7 +48,10 @@
 	};
 };
 
-&backlight_lvds {
+&backlight {
+	pwms = <&pwm1 0 62500>;
+	brightness-levels = <0 96 128 160 192 224 255>;
+	default-brightness-level = <5>;
 	status = "okay";
 };
 
