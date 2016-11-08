@@ -408,6 +408,8 @@
 	polytouch: edt-ft5x04@38 {
 		compatible = "edt,edt-ft5406", "edt,edt-ft5x06";
 		reg = <0x38>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_polytouch0 &pinctrl_polytouch1> ;
 		interrupt-parent = <&gpio4>;
 		interrupts = <19 IRQ_TYPE_EDGE_FALLING>;
 		wake-gpios = <&gpio1 3 GPIO_ACTIVE_HIGH>;
@@ -598,7 +600,6 @@
 				MX7D_PAD_LCD_ENABLE__LCD_ENABLE		0x71
 				MX7D_PAD_LCD_VSYNC__LCD_VSYNC		0x71
 				MX7D_PAD_LCD_HSYNC__LCD_HSYNC		0x71
-				MX7D_PAD_LCD_RESET__GPIO3_IO4		0x71
 			>;
 		};
 
@@ -616,8 +617,9 @@
 			>;
 		};
 
-		pinctrl_polytouch: polygrp {
+		pinctrl_polytouch0: polytouch0grp {
 			fsl,pins = <
+				MX7D_PAD_LCD_RESET__GPIO3_IO4		0x71
 				MX7D_PAD_ECSPI1_SS0__GPIO4_IO19		0x7c /* #irq */
 			>;
 		};
@@ -740,9 +742,9 @@
 			>;
 		};
 
-		pinctrl_lcdif_ctrl1: lcdifctrl1grp {
+		pinctrl_polytouch1: polytouch1grp {
 			fsl,pins = <
-				MX7D_PAD_GPIO1_IO03__GPIO1_IO3		0x10 /* LCD_PWR_EN */
+				MX7D_PAD_GPIO1_IO03__GPIO1_IO3		0x71 /* LCD_PWR_EN */
 			>;
 		};
 
@@ -784,9 +786,7 @@
 &lcdif {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lcdif_dat
-		     &pinctrl_lcdif_ctrl0
-		     &pinctrl_lcdif_ctrl1>;
-	enable-gpio = <&gpio1 3 GPIO_ACTIVE_HIGH>;
+		     &pinctrl_lcdif_ctrl0>;
 	status = "disabled";
 };
 

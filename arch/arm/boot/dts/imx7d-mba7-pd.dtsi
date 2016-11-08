@@ -87,8 +87,6 @@
 
 &lcdif {
 	display = <&display_etm0700>;
-	/* GPIO1_IO3 is controlled by polytouch driver */
-	/delete-property/ enable-gpio;
 	status = "okay";
 };
 
