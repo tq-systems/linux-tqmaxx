@@ -399,6 +399,26 @@
 		iov-supply = <&reg_audio_3v3>;
 	};
 
+	polytouch: edt-ft5x04@38 {
+		compatible = "edt,edt-ft5406", "edt,edt-ft5x06";
+		reg = <0x38>;
+		interrupt-parent = <&gpio4>;
+		interrupts = <19 IRQ_TYPE_EDGE_FALLING>;
+		wake-gpios = <&gpio1 3 GPIO_ACTIVE_HIGH>;
+		reset-gpios = <&gpio3 4 GPIO_ACTIVE_LOW>;
+		gain = <20>;
+		status = "disabled";
+	};
+
+	pcf8574_1: pcf8574@39 {
+		compatible = "nxp,pcf8574a";
+		reg = <0x39>;
+
+		lines-initial-states = <0x1f>;
+		gpio-controller;
+		#gpio-cells = <2>;
+	};
+
 	pcf8574_0: pcf8574@3c {
 		compatible = "nxp,pcf8574a";
 		reg = <0x3c>;
@@ -412,26 +432,6 @@
 		#gpio-cells = <2>;
 		interrupt-controller;
 		#interrupt-cells = <2>;
-	};
-
-	pcf8574_1: pcf8574@39 {
-		compatible = "nxp,pcf8574a";
-		reg = <0x39>;
-
-		lines-initial-states = <0x1f>;
-		gpio-controller;
-		#gpio-cells = <2>;
-	};
-
-	polytouch: edt-ft5x04@38 {
-		compatible = "edt,edt-ft5406", "edt,edt-ft5x06";
-		reg = <0x38>;
-		interrupt-parent = <&gpio4>;
-		interrupts = <19 IRQ_TYPE_EDGE_FALLING>;
-		wake-gpios = <&gpio1 3 GPIO_ACTIVE_HIGH>;
-		reset-gpios = <&gpio3 4 GPIO_ACTIVE_LOW>;
-		gain = <20>;
-		status = "disabled";
 	};
 };
 
