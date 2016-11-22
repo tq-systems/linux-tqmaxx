@@ -902,6 +902,7 @@
 	wp-gpios = <&gpio5 1 GPIO_ACTIVE_HIGH>;
 	vmmc-supply = <&reg_sd1_vmmc>;
 	bus-width = <4>;
+	no-1-8-v;
 	status = "okay";
 };
 
