@@ -683,9 +683,13 @@ static int usbmisc_imx7d_init(struct imx_usbmisc_data *data)
 	reg = readl(usbmisc->base);
 	if (data->disable_oc) {
 		reg |= MX6_BM_OVER_CUR_DIS;
-	} else if (data->oc_polarity == 1) {
-		/* High active */
-		reg &= ~(MX6_BM_OVER_CUR_DIS | MX6_BM_OVER_CUR_POLARITY);
+	} else {
+		reg &= ~(MX6_BM_OVER_CUR_DIS);
+		if (data->oc_polarity == 1)
+			/* High active */
+			reg &= ~(MX6_BM_OVER_CUR_POLARITY);
+		else
+			reg |= (MX6_BM_OVER_CUR_POLARITY);
 	}
 	writel(reg, usbmisc->base);
 
