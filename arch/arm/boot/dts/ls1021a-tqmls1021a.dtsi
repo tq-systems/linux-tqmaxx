@@ -103,15 +103,46 @@
 	status = "okay";
 
 	qflash0: mt25ql512@0 {
-		compatible = "micron,n25q512ax3";
+		compatible = "micron,n25q512ax3", "cfi-flash";
 		#address-cells = <1>;
 		#size-cells = <1>;
 		spi-max-frequency = <20000000>;
 		reg = <0>;
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			uboot@0 {
+				label = "U-Boot-PBL";
+				reg = <0x0 0xC0000>;
+			};
+
+			env@c0000 {
+				label = "U-Boot Environment";
+				reg = <0xc0000 0x10000>;
+			};
+
+			dtb@d0000 {
+				label = "DTB";
+				reg = <0xd0000 0x10000>;
+			};
+
+			linux@e0000 {
+				label = "Linux";
+				reg = <0xe0000 0x800000>;
+			};
+
+			rootfs@900000 {
+				label = "RootFS";
+				reg = <0x900000 0x3700000>;
+			};
+		};
 	};
 
 	qflash1: mt25ql512@1 {
-		compatible = "micron,n25q512ax3";
+		compatible = "micron,n25q512ax3", "cfi-flash";
 		#address-cells = <1>;
 		#size-cells = <1>;
 		spi-max-frequency = <20000000>;
