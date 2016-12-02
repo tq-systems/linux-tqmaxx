@@ -680,18 +680,21 @@ static int usbmisc_imx7d_init(struct imx_usbmisc_data *data)
 		return -EINVAL;
 
 	spin_lock_irqsave(&usbmisc->lock, flags);
-	reg = readl(usbmisc->base);
-	if (data->disable_oc) {
-		reg |= MX6_BM_OVER_CUR_DIS;
-	} else {
-		reg &= ~(MX6_BM_OVER_CUR_DIS);
-		if (data->oc_polarity == 1)
-			/* High active */
-			reg &= ~(MX6_BM_OVER_CUR_POLARITY);
-		else
-			reg |= (MX6_BM_OVER_CUR_POLARITY);
+
+	if (data->phy_mode != USBPHY_INTERFACE_MODE_HSIC) {
+		reg = readl(usbmisc->base);
+		if (data->disable_oc) {
+			reg |= MX6_BM_OVER_CUR_DIS;
+		} else {
+			reg &= ~(MX6_BM_OVER_CUR_DIS);
+			if (data->oc_polarity == 1)
+				/* High active */
+				reg &= ~(MX6_BM_OVER_CUR_POLARITY);
+			else
+				reg |= (MX6_BM_OVER_CUR_POLARITY);
+		}
+		writel(reg, usbmisc->base);
 	}
-	writel(reg, usbmisc->base);
 
 	reg = readl(usbmisc->base + MX7D_USBNC_USB_CTRL2);
 	reg &= ~MX7D_USB_VBUS_WAKEUP_SOURCE_MASK;
