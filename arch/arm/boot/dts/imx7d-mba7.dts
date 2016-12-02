@@ -740,7 +740,7 @@
 
 		pinctrl_polytouch1: polytouch1grp {
 			fsl,pins = <
-				MX7D_PAD_GPIO1_IO03__GPIO1_IO3		0x71 /* LCD_PWR_EN */
+				MX7D_PAD_GPIO1_IO03__GPIO1_IO3		0x10 /* LCD_PWR_EN */
 			>;
 		};
 
