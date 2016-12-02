@@ -24,6 +24,7 @@
 #include <linux/mfd/syscon.h>
 #include <linux/regulator/consumer.h>
 #include <linux/busfreq-imx.h>
+#include <linux/usb/of.h>
 
 #include "ci.h"
 #include "ci_hdrc_imx.h"
@@ -183,6 +184,8 @@ static struct imx_usbmisc_data *usbmisc_get_init_data(struct device *dev)
 		return ERR_PTR(-EPROBE_DEFER);
 
 	data->dev = &misc_pdev->dev;
+
+	data->phy_mode = of_usb_get_phy_mode(np);
 
 	if (of_find_property(np, "disable-over-current", NULL))
 		data->disable_oc = 1;

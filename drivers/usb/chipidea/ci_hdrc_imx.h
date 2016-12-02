@@ -53,6 +53,7 @@ struct imx_usbmisc_data {
 	 */
 	unsigned int osc_clkgate_delay;
 	enum usb_dr_mode available_role;
+	int phy_mode; /* i.MX7 can not detect phy_mode using index */
 };
 
 int imx_usbmisc_init(struct imx_usbmisc_data *);
