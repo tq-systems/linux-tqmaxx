@@ -268,24 +268,24 @@
 	fsl,spi-num-chipselects = <3>;
 	status = "okay";
 
-	spidev1_1: spidev1-1@1 {
+	spidev1_0: spidev1-0@0 {
 		compatible = "tq,testdev";
 		spi-max-frequency = <5000000>;
+		reg = <0>;
+		status = "okay";
+	};
+
+	spidev1_1: spidev1-1@1 {
+		compatible = "tq,testdev";
+		spi-max-frequency = <10000000>;
 		reg = <1>;
 		status = "okay";
 	};
 
 	spidev1_2: spidev1-2@2 {
 		compatible = "tq,testdev";
-		spi-max-frequency = <10000000>;
-		reg = <2>;
-		status = "okay";
-	};
-
-	spidev1_3: spidev1-3@3 {
-		compatible = "tq,testdev";
 		spi-max-frequency = <25000000>;
-		reg = <3>;
+		reg = <2>;
 		status = "okay";
 	};
 };
