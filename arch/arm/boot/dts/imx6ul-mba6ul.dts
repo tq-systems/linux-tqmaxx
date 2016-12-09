@@ -179,6 +179,15 @@
 			regulator-always-on;
 			vin_supply = <&reg_mba6ul_3v3>;
 		};
+
+		reg_audio_3v3: regulator@9 {
+			compatible = "regulator-fixed";
+			regulator-name = "VCC3V3_AUDIO";
+			reg = <9>;
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			regulator-always-on;
+		};
 	};
 
 	reserved-memory {
@@ -193,6 +202,19 @@
 			linux,cma-default;
 		};
 	};
+
+	sound {
+		compatible = "fsl,imx6ul-mba6ul-tlv320aic32x4",
+			     "fsl,imx-audio-tlv320aic32x4";
+		model = "imx6ul-mba6ul-tlv320aic32";
+		ssi-controller = <&sai1>;
+		audio-codec = <&codec>;
+	};
+};
+
+&clks {
+	assigned-clocks = <&clks IMX6UL_CLK_PLL4_AUDIO_DIV>;
+	assigned-clock-rates = <768000000>;
 };
 
 &fec1 {
@@ -254,6 +276,15 @@
 };
 
 &i2c4 {
+	codec: tlv320aic32x4@18 {
+		compatible = "ti,tlv320aic32x4";
+		reg = <0x18>;
+		clocks = <&clks IMX6UL_CLK_SAI1>;
+		clock-names = "mclk";
+		ldoin-supply = <&reg_audio_3v3>;
+		iov-supply = <&reg_audio_3v3>;
+	};
+
 	analog_touch: stmpe811@41 {
 		compatible = "st,stmpe811";
 		reg = <0x41>;
@@ -439,6 +470,16 @@
 			>;
 		};
 
+		pinctrl_sai1: sai1grp {
+			fsl,pins = <
+				MX6UL_PAD_CSI_DATA05__SAI1_TX_BCLK	0x1b0b1
+				MX6UL_PAD_CSI_DATA04__SAI1_TX_SYNC	0x1b0b1
+				MX6UL_PAD_CSI_DATA07__SAI1_TX_DATA	0x1f0b8
+				MX6UL_PAD_CSI_DATA06__SAI1_RX_DATA	0x110b0
+				MX6UL_PAD_CSI_DATA01__SAI1_MCLK		0x1b0b1
+			>;
+		};
+
 		pinctrl_uart1: uart1grp {
 			fsl,pins = <
 				MX6UL_PAD_UART1_TX_DATA__UART1_DCE_TX	0x1b0b1
@@ -599,6 +640,17 @@
 		 <&clks IMX6UL_CLK_PWM4>;
 	clock-names = "ipg", "per";
 	status = "disabled";
+};
+
+&sai1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_sai1>;
+	assigned-clocks = <&clks IMX6UL_CLK_SAI1_SEL>,
+			  <&clks IMX6UL_CLK_SAI1>;
+	assigned-clock-parents = <&clks IMX6UL_CLK_PLL4_AUDIO_DIV>;
+	assigned-clock-rates = <0>, <24000000>;
+	fsl,sai-mclk-direction-output;
+	status = "okay";
 };
 
 &uart1 {
