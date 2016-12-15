@@ -23,21 +23,8 @@
 		mmc0 = &usdhc2;
 	};
 
-	backlight_lvds: backlight@0 {
+	backlight: pwm_backlight {
 		compatible = "pwm-backlight";
-		pwms = <&pwm4 0 62500>;
-		brightness-levels = <0 96 128 160 192 224 255>;
-		default-brightness-level = <5>;
-		power-supply = <&reg_mba6ul_3v3>;
-		enable-gpios = <&expander_out 4 GPIO_ACTIVE_HIGH>;
-		status = "disabled";
-	};
-
-	backlight_pd: backlight@1 {
-		compatible = "pwm-backlight";
-		pwms = <&pwm4 0 5000000>;
-		brightness-levels = <255 128 64 32 16 8 4 1 0>;
-		default-brightness-level = <5>;
 		power-supply = <&reg_mba6ul_3v3>;
 		enable-gpios = <&expander_out 4 GPIO_ACTIVE_HIGH>;
 		status = "disabled";

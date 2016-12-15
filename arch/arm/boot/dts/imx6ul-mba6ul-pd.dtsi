@@ -20,7 +20,10 @@
 	status = "okay";
 };
 
-&backlight_pd {
+&backlight {
+	pwms = <&pwm4 0 5000000>;
+	brightness-levels = <255 128 64 32 16 8 4 1 0>;
+	default-brightness-level = <5>;
 	status = "okay";
 };
 
