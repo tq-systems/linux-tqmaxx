@@ -52,18 +52,18 @@
 	status = "okay";
 };
 
-&reg_lcd_pwr {
-	status = "okay";
-};
-
-&reg_lvds_transmitter {
-	status = "okay";
-};
-
 &pwm4 {
 	status = "okay";
 };
 
 &pxp {
+	status = "okay";
+};
+
+&reg_lcd_pwr {
+	status = "okay";
+};
+
+&reg_lvds_transmitter {
 	status = "okay";
 };
