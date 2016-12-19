@@ -426,9 +426,9 @@ static int imx6_pcie_deassert_core_reset(struct pcie_port *pp)
 	/* Some boards don't have PCIe reset GPIO. */
 	if (gpio_is_valid(imx6_pcie->reset_gpio)) {
 		gpio_set_value_cansleep(imx6_pcie->reset_gpio, 0);
-		mdelay(20);
+		mdelay(200);
 		gpio_set_value_cansleep(imx6_pcie->reset_gpio, 1);
-		mdelay(20);
+		mdelay(200);
 	}
 
 	/*
@@ -453,7 +453,7 @@ static int imx6_pcie_deassert_core_reset(struct pcie_port *pp)
 		 * some delay are required by 6qp, after the SW_RST is
 		 * cleared, before access the cfg register.
 		 */
-		udelay(200);
+		udelay(2000);
 	}
 
 	/* Configure the PHY when 100Mhz external OSC is used as input clock */
