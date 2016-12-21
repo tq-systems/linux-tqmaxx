@@ -390,12 +390,20 @@ static int usbmisc_imx6q_init(struct imx_usbmisc_data *data)
 	spin_lock_irqsave(&usbmisc->lock, flags);
 
 	reg = readl(usbmisc->base + data->index * 4);
+	pr_info("%s: %x@%x\n", __func__, reg, (u32)usbmisc->base + data->index * 4);
 	if (data->disable_oc) {
 		reg |= MX6_BM_OVER_CUR_DIS;
-	} else if (data->oc_polarity == 1) {
-		/* High active */
-		reg &= ~(MX6_BM_OVER_CUR_DIS | MX6_BM_OVER_CUR_POLARITY);
+	} else {
+		reg &= ~(MX6_BM_OVER_CUR_DIS);
+
+		if (data->oc_polarity == 1) {
+			/* High active */
+			reg &= (~(MX6_BM_OVER_CUR_POLARITY));
+		} else {
+			reg |= (MX6_BM_OVER_CUR_POLARITY);
+		}
 	}
+	pr_info("%s: %x@%x\n", __func__, reg, (u32)usbmisc->base + data->index * 4);
 	writel(reg, usbmisc->base + data->index * 4);
 
 	/* SoC non-burst setting */
