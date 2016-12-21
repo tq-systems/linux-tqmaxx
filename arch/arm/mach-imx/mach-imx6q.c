@@ -309,11 +309,15 @@ static void __init imx6q_enet_clk_sel(void)
 	struct regmap *gpr;
 
 	gpr = syscon_regmap_lookup_by_compatible("fsl,imx6q-iomuxc-gpr");
-	if (!IS_ERR(gpr))
+	if (!IS_ERR(gpr)) {
+		unsigned int sel = IMX6Q_GPR5_ENET_TX_CLK_SEL;
+		if (of_machine_is_compatible("tq,tqma6qp"))
+			sel = 0;
 		regmap_update_bits(gpr, IOMUXC_GPR5,
-				   IMX6Q_GPR5_ENET_TX_CLK_SEL, IMX6Q_GPR5_ENET_TX_CLK_SEL);
-	else
+				   IMX6Q_GPR5_ENET_TX_CLK_SEL, 0);
+	} else {
 		pr_err("failed to find fsl,imx6q-iomux-gpr regmap\n");
+	}
 }
 
 static inline void imx6q_enet_init(void)
