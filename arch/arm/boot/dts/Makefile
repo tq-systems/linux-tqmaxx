@@ -317,6 +317,8 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6q-mba6b-hdmi.dtb \
 	imx6q-mba6b-lvds.dtb \
 	imx6q-mba6b-pd.dtb \
+	imx6q-nav.dtb \
+	imx6q-nav-hdmi.dtb \
 	imx6q-nitrogen6x.dtb \
 	imx6q-phytec-pbab01.dtb \
 	imx6q-rex-pro.dtb \
