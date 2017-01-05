@@ -124,6 +124,10 @@
 	};
 };
 
+&ecspi1 {
+	status = "disabled";
+};
+
 &fec {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_enet>;
