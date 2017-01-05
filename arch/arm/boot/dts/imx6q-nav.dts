@@ -116,11 +116,55 @@
 			regulator-max-microvolt = <3300000>;
 			regulator-always-on;
 		};
+
+		reg_audio: regulator@4 {
+			compatible = "regulator-fixed";
+			reg = <4>;
+			regulator-name = "vcc3v3-audio";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+		};
+	};
+
+	sound {
+		compatible = "fsl,imx6-tqma6x-tlv320aic32x4",
+			     "fsl,imx-audio-tlv320aic32x4";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_audmux>;
+		model = "imx6-tqma6x-tlv320aic32";
+		ssi-controller = <&ssi1>;
+		audio-codec = <&codec>;
+		mux-int-port = <1>;
+		mux-ext-port = <3>;
 	};
 
 	v4l2_out {
 		compatible = "fsl,mxc_v4l2_output";
 		status = "okay";
+	};
+};
+
+&audmux {
+	status = "okay";
+
+	ssi0 {
+		fsl,audmux-port = <MX31_AUDMUX_PORT1_SSI0>;
+		fsl,port-config = <
+			(IMX_AUDMUX_V2_PTCR_SYN |
+				IMX_AUDMUX_V2_PTCR_TFSDIR |
+				IMX_AUDMUX_V2_PTCR_TFSEL(MX31_AUDMUX_PORT3_SSI_PINS_3) |
+				IMX_AUDMUX_V2_PTCR_TCLKDIR |
+				IMX_AUDMUX_V2_PTCR_TCSEL(MX31_AUDMUX_PORT3_SSI_PINS_3))
+			IMX_AUDMUX_V2_PDCR_RXDSEL(MX31_AUDMUX_PORT3_SSI_PINS_3)
+		>;
+	};
+
+	aud3 {
+		fsl,audmux-port = <MX31_AUDMUX_PORT3_SSI_PINS_3>;
+		fsl,port-config = <
+			IMX_AUDMUX_V2_PTCR_SYN
+			IMX_AUDMUX_V2_PDCR_RXDSEL(MX31_AUDMUX_PORT1_SSI0)
+		>;
 	};
 };
 
@@ -156,8 +200,40 @@
 	};
 };
 
+&i2c1 {
+	codec: tlv320aic32x4@18 {
+		compatible = "ti,tlv320aic32x4";
+		reg = <0x18>;
+		clocks = <&clks IMX6QDL_CLK_CKO>;
+		clock-names = "mclk";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_codec>;
+		ldoin-supply = <&reg_audio>;
+		iov-supply = <&reg_nav_3p3v>;
+		reset-gpios = <&gpio5 20 GPIO_ACTIVE_LOW>;
+	};
+};
+
 &iomuxc {
 	imx6q-nav {
+		pinctrl_audmux: audmuxgrp {
+			fsl,pins = <
+				MX6QDL_PAD_CSI0_DAT7__AUD3_RXD  0x1b0b0
+				MX6QDL_PAD_CSI0_DAT4__AUD3_TXC  0x1b0b0
+				MX6QDL_PAD_CSI0_DAT5__AUD3_TXD  0x1b0b0
+				MX6QDL_PAD_CSI0_DAT6__AUD3_TXFS 0x1b0b0
+			>;
+		};
+
+		pinctrl_codec: codecgrp {
+			fsl,pins = <
+				/* CLK */
+				MX6QDL_PAD_CSI0_MCLK__CCM_CLKO1     0xb0
+				/* RESET */
+				MX6QDL_PAD_CSI0_DATA_EN__GPIO5_IO20 0x4001b099
+			>;
+		};
+
 		pinctrl_enet: enetgrp {
 			fsl,pins = <
 				/* DSE = 100, 100k up, SPEED = MED */
@@ -226,6 +302,11 @@
 
 &snvs_rtc {
 	status = "disabled";
+};
+
+&ssi1 {
+	fsl,mode = "i2s-slave";
+	status = "okay";
 };
 
 &uart2 {
