@@ -217,7 +217,7 @@
 };
 
 &snvs_poweroff {
-	status = "okay";
+	status = "disabled";
 };
 
 &snvs_rtc {
