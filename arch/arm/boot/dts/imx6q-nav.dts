@@ -215,6 +215,9 @@
 };
 
 &iomuxc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_hog>;
+
 	imx6q-nav {
 		pinctrl_audmux: audmuxgrp {
 			fsl,pins = <
@@ -253,6 +256,23 @@
 				MX6QDL_PAD_GPIO_7__GPIO1_IO07		0x4001b099
 				/* ENET ping patch */
 				MX6QDL_PAD_GPIO_6__ENET_IRQ		0x000b1
+			>;
+		};
+
+		pinctrl_hog: hoggrp {
+			fsl,pins = <
+				/* testpoint gpio */
+				MX6QDL_PAD_DISP0_DAT17__GPIO5_IO11	0x0001b099
+				MX6QDL_PAD_DISP0_DAT19__GPIO5_IO13	0x0001b099
+				/* revision detection */
+				MX6QDL_PAD_EIM_CS1__GPIO2_IO24		0x0001b099
+				MX6QDL_PAD_EIM_OE__GPIO2_IO25		0x0001b099
+				MX6QDL_PAD_EIM_D27__GPIO3_IO27		0x0001b099
+				MX6QDL_PAD_EIM_D29__GPIO3_IO29		0x0001b099
+				/* IR sender */
+				MX6QDL_PAD_NANDF_CLE__GPIO6_IO07	0x0001b099
+				/* zero credit */
+				MX6QDL_PAD_SD4_DAT3__GPIO2_IO11		0x0001b099
 			>;
 		};
 
