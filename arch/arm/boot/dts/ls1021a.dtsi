@@ -193,6 +193,7 @@
 			sdhci,auto-cmd12;
 			big-endian;
 			bus-width = <4>;
+			fsl,rcpm-wakeup = <&rcpm 0x00000080 0x0>;
 			status = "disabled";
 		};
 
@@ -261,6 +262,7 @@
 		rcpm: rcpm@1ee2000 {
 			compatible = "fsl,ls1021a-rcpm", "fsl,qoriq-rcpm-2.1";
 			reg = <0x0 0x1ee2000 0x0 0x10000>;
+			fsl,#rcpm-wakeup-cells = <2>;
 		};
 
 		tmu: tmu@1f00000 {
@@ -372,6 +374,7 @@
 			interrupts = <GIC_SPI 88 IRQ_TYPE_LEVEL_HIGH>;
 			clock-names = "i2c";
 			clocks = <&clockgen 4 1>;
+			fsl,rcpm-wakeup = <&rcpm 0x0 0x80000000>;
 			status = "disabled";
 		};
 
@@ -503,6 +506,7 @@
 			interrupts = <GIC_SPI 80 IRQ_TYPE_LEVEL_HIGH>;
 			clocks = <&clockgen 4 1>;
 			clock-names = "ipg";
+			fsl,rcpm-wakeup = <&rcpm 0x0 0x40000000>;
 			status = "disabled";
 		};
 
@@ -559,7 +563,7 @@
 			#gpio-cells = <2>;
 			interrupt-controller;
 			#interrupt-cells = <2>;
-			sleep = <&rcpm 0x00000040 0x0>;
+			fsl,rcpm-wakeup = <&rcpm 0x00000040 0x0>;
 		};
 
 		gpio2: gpio@2310000 {
@@ -725,6 +729,7 @@
 			fsl,magic-packet;
 			ranges;
 			dma-coherent;
+			fsl,rcpm-wakeup = <&rcpm 0x80000000 0x0>;
 
 			queue-group@2d10000 {
 				#address-cells = <2>;
