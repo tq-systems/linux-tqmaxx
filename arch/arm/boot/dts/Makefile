@@ -411,6 +411,7 @@ dtb-$(CONFIG_SOC_IMX7D) += \
 	imx7d-19x19-lpddr2-arm2.dtb \
 	imx7d-mba7.dtb \
 	imx7d-mba7-lvds.dtb \
+	imx7d-mba7-otg.dtb \
 	imx7d-mba7-pd.dtb \
 	imx7d-mba7-pd-dmb.dtb \
 	imx7d-sdb.dtb \
