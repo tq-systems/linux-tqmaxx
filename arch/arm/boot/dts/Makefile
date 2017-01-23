@@ -341,7 +341,9 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6dl-gw553x.dtb \
 	imx6dl-hummingboard.dtb \
 	imx6dl-mba6a.dtb \
+	imx6dl-mba6a-hdmi.dtb \
 	imx6dl-mba6b.dtb \
+	imx6dl-mba6b-hdmi.dtb \
 	imx6dl-nit6xlite.dtb \
 	imx6dl-nitrogen6x.dtb \
 	imx6dl-phytec-pbab01.dtb \
@@ -386,7 +388,9 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6q-icore-rqs.dtb \
 	imx6q-marsboard.dtb \
 	imx6q-mba6a.dtb \
+	imx6q-mba6a-hdmi.dtb \
 	imx6q-mba6b.dtb \
+	imx6q-mba6b-hdmi.dtb \
 	imx6q-nitrogen6x.dtb \
 	imx6q-nitrogen6_max.dtb \
 	imx6q-novena.dtb \
