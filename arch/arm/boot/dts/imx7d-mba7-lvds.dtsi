@@ -84,6 +84,7 @@
 
 &lcdif {
 	display = <&display_lvds>;
+	lcd-supply = <&reg_lvds_transmitter>;
 	status = "okay";
 };
 
