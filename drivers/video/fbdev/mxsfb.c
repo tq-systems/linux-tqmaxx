@@ -2282,8 +2282,13 @@ static int mxsfb_probe(struct platform_device *pdev)
 	}
 
 	host->reg_lcd = devm_regulator_get(&pdev->dev, "lcd");
-	if (IS_ERR(host->reg_lcd))
+	if (IS_ERR(host->reg_lcd)) {
+		if (-EPROBE_DEFER == PTR_ERR(host->reg_lcd)) {
+			ret = -EPROBE_DEFER;
+			goto fb_release;
+		}
 		host->reg_lcd = NULL;
+	}
 
 	fb_info->pseudo_palette = devm_kcalloc(&pdev->dev, 16, sizeof(u32),
 					       GFP_KERNEL);
