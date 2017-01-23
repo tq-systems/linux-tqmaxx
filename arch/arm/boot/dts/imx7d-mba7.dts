@@ -205,8 +205,8 @@
 			compatible = "regulator-fixed";
 			reg = <7>;
 			regulator-name = "VCC12V0_MBA7";
-			regulator-min-microvolt = <3300000>;
-			regulator-max-microvolt = <3300000>;
+			regulator-min-microvolt = <12000000>;
+			regulator-max-microvolt = <12000000>;
 			gpio = <&gpioexp 11 GPIO_ACTIVE_HIGH>;
 			enable-active-high;
 		};
