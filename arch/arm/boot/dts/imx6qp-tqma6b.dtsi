@@ -11,8 +11,8 @@
 
 #include "imx6q.dtsi"
 #include "imx6qp.dtsi"
-#include "imx6qdl-tqma6.dtsi"
 #include "imx6qdl-tqma6b.dtsi"
+#include "imx6qdl-tqma6.dtsi"
 
 / {
 	memory: memory {
