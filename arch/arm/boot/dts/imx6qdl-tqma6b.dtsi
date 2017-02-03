@@ -1,0 +1,35 @@
+/*
+ * Copyright 2013 Sascha Hauer, Pengutronix
+ * Copyright 2013-2017 Markus Niebel <Markus.Niebel@tq-group.com>
+ *
+ * The code contained herein is licensed under the GNU General Public
+ * License. You may obtain a copy of the GNU General Public License
+ * Version 2 or later at the following locations:
+ *
+ * http://www.opensource.org/licenses/gpl-license.html
+ * http://www.gnu.org/copyleft/gpl.html
+ */
+
+&i2c3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_i2c3_tqma6>;
+	clock-frequency = <100000>;
+	status = "okay";
+
+	pmic: pf0100@08 {
+		compatible = "fsl,pfuze100";
+		reg = <0x08>;
+	};
+
+	sensor0: lm75@48 {
+		compatible = "lm75";
+		reg = <0x48>;
+	};
+
+	eeprom0: m24c64@50 {
+		compatible = "st,24c64", "at24";
+		reg = <0x50>;
+		pagesize = <32>;
+	};
+};
+
