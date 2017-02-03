@@ -27,8 +27,37 @@
 	};
 };
 
+&ecspi1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_ecspi1>;
+	fsl,spi-num-chipselects = <1>;
+	cs-gpios = <&gpio3 19 0>;
+	status = "okay";
+
+	flash: m25p80@0 {
+		status = "okay";
+		compatible = "micron,n25q128a13", "n25q128a13";
+		spi-max-frequency = <50000000>;
+		reg = <0>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		m25p,fast-read;
+	};
+};
+
 &iomuxc {
 	tqma6 {
+		pinctrl_ecspi1: ecspi1grp {
+			fsl,pins = <
+				/* HYS, SPEED = MED, 100k up, DSE = 011, SRE_FAST */
+				MX6QDL_PAD_EIM_D17__ECSPI1_MISO 0x1b099
+				MX6QDL_PAD_EIM_D18__ECSPI1_MOSI 0xb099
+				MX6QDL_PAD_EIM_D16__ECSPI1_SCLK 0xb099
+				 /* eCSPI1 SS1 */
+				MX6QDL_PAD_EIM_D19__GPIO3_IO19 0xb099
+			>;
+		};
+
 		pinctrl_i2c1_tqma6: i2c1-tqma6grp {
 			fsl,pins = <
 				MX6QDL_PAD_CSI0_DAT8__I2C1_SDA 0x4001b899
