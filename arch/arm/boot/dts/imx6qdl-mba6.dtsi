@@ -172,6 +172,20 @@
 	status = "okay";
 };
 
+&ecspi1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_ecspi1>, <&pinctrl_ecspi1_mba6>;
+	fsl,spi-num-chipselects = <2>;
+	cs-gpios = <&gpio3 19 0>, <&gpio3 24 0>;
+
+	spidev1_1: spidev1-1@1 {
+		compatible = "tq,testdev";
+		spi-max-frequency = <1000000>;
+		reg = <1>;
+		status = "okay";
+	};
+};
+
 &fec {
 	phy-mode = "rgmii-id";
 	phy-reset-gpios = <&gpio1 25 GPIO_ACTIVE_LOW>;
@@ -242,6 +256,12 @@
 		pinctrl_codec: codecgrp {
 			fsl,pins = <
 				MX6QDL_PAD_CSI0_MCLK__CCM_CLKO1 0xb0 /* CLK */
+			>;
+		};
+
+		pinctrl_ecspi1_mba6: ecspimba6grp {
+			fsl,pins = <
+				MX6QDL_PAD_EIM_D24__GPIO3_IO24 0xb099 /* eCSPI1 SS2 */
 			>;
 		};
 
