@@ -18,6 +18,14 @@
 		stdout-path = &uart2;
 	};
 
+	beeper: gpio-beeper {
+		compatible = "gpio-beeper";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpiobeeper>;
+		gpios = <&gpio1 21 GPIO_ACTIVE_HIGH>;
+		status = "okay";
+	};
+
 	gpio_buttons: gpio-buttons {
 		compatible = "gpio-keys";
 		#address-cells = <1>;
@@ -150,6 +158,12 @@
 				MX6QDL_PAD_RGMII_RX_CTL__RGMII_RX_CTL 0x0038
 				/* HYS = 1, DSE = 111, 100k up, SPEED = HIGH */
 				MX6QDL_PAD_ENET_REF_CLK__ENET_TX_CLK  0x1b0f0
+			>;
+		};
+
+		pinctrl_gpiobeeper: gpiobeepergrp {
+			fsl,pins = <
+				MX6QDL_PAD_SD1_DAT3__GPIO1_IO21 0xb099
 			>;
 		};
 
