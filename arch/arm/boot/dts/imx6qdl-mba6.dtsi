@@ -52,6 +52,25 @@
 		};
 	};
 
+	gpio-leds {
+		compatible = "gpio-leds";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpioled>;
+		status = "okay";
+
+		led1 {
+			label = "led1";
+			gpios = <&gpio6 16 GPIO_ACTIVE_LOW>;
+			linux,default-trigger = "default-on";
+		};
+
+		led2 {
+			label = "led2";
+			gpios = <&gpio6 31 GPIO_ACTIVE_LOW>;
+			linux,default-trigger = "heartbeat";
+		};
+	};
+
 	regulators {
 		reg_mba6_3p3v: regulator@1 {
 			compatible = "regulator-fixed";
@@ -172,6 +191,13 @@
 				MX6QDL_PAD_GPIO_17__GPIO7_IO12 0x0001b099
 				MX6QDL_PAD_GPIO_18__GPIO7_IO13 0x0001b099
 				MX6QDL_PAD_GPIO_8__GPIO1_IO08 0x0001b099
+			>;
+		};
+
+		pinctrl_gpioled: gpioledgrp {
+			fsl,pins = <
+				MX6QDL_PAD_NANDF_CS3__GPIO6_IO16 0xb099 /* LED V15 */
+				MX6QDL_PAD_EIM_BCLK__GPIO6_IO31 0xb099 /* LED V16 */
 			>;
 		};
 
