@@ -100,7 +100,6 @@
 			reg_vccsd_3v3: vccsd {
 				regulator-min-microvolt = <2850000>;
 				regulator-max-microvolt = <3300000>;
-				/* not used */
 			};
 
 			reg_v33_3v3: v33 {
