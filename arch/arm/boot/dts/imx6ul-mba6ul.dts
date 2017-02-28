@@ -44,7 +44,7 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_gpio>;
+		pinctrl-0 = <&pinctrl_buttons>;
 
 		button@0 {
 			label = "s14";
@@ -400,7 +400,7 @@
 			>;
 		};
 
-		pinctrl_gpio: gpiogrp {
+		pinctrl_buttons: buttonsgrp {
 			fsl,pins = <
 				MX6UL_PAD_GPIO1_IO03__GPIO1_IO03	0x100b0
 			>;
