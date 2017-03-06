@@ -3211,6 +3211,7 @@ static void fec_reset_phy(struct platform_device *pdev)
 	int err, phy_reset;
 	bool active_high = false;
 	int msec = 1;
+	int delay_msec = 0;
 	struct device_node *np = pdev->dev.of_node;
 
 	if (!np)
@@ -3220,6 +3221,11 @@ static void fec_reset_phy(struct platform_device *pdev)
 	/* A sane reset duration should not be longer than 1s */
 	if (msec > 1000)
 		msec = 1;
+
+	of_property_read_u32(np, "phy-reset-delay", &delay_msec);
+	/* A sane reset delay should not be longer than 1s */
+	if (delay_msec > 1000)
+		delay_msec = 10;
 
 	phy_reset = of_get_named_gpio(np, "phy-reset-gpios", 0);
 	if (!gpio_is_valid(phy_reset))
@@ -3241,6 +3247,12 @@ static void fec_reset_phy(struct platform_device *pdev)
 		usleep_range(msec * 1000, msec * 1000 + 1000);
 
 	gpio_set_value_cansleep(phy_reset, !active_high);
+	if (delay_msec) {
+		if (delay_msec > 20)
+			msleep(delay_msec);
+		else
+			usleep_range(delay_msec * 1000, delay_msec * 1000 + 1000);
+	}
 }
 #else /* CONFIG_OF */
 static void fec_reset_phy(struct platform_device *pdev)
