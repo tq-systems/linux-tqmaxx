@@ -346,10 +346,15 @@ struct mmc_host *mmc_alloc_host(int extra, struct device *dev)
 {
 	int err;
 	struct mmc_host *host;
+	int alias_id;
 
 	host = kzalloc(sizeof(struct mmc_host) + extra, GFP_KERNEL);
 	if (!host)
 		return NULL;
+
+	alias_id = of_alias_get_id(dev->of_node, "mmc");
+	if (alias_id < 0)
+		alias_id = 0;
 
 	/* scanning will be enabled when we're ready */
 	host->rescan_disable = 1;
@@ -361,7 +366,7 @@ again:
 	}
 
 	spin_lock(&mmc_host_lock);
-	err = ida_get_new(&mmc_host_ida, &host->index);
+	err = ida_get_new_above(&mmc_host_ida, alias_id, &host->index);
 	spin_unlock(&mmc_host_lock);
 
 	if (err == -EAGAIN) {
