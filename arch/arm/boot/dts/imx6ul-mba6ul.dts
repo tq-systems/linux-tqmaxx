@@ -272,37 +272,10 @@
 		iov-supply = <&reg_audio_3v3>;
 	};
 
-	analog_touch: stmpe811@41 {
-		compatible = "st,stmpe811";
-		reg = <0x41>;
-		interrupts = <21 IRQ_TYPE_EDGE_FALLING>;
-		interrupt-parent = <&gpio4>;
-		interrupt-controller;
-		status = "disabled";
-
-		stmpe_touchscreen {
-			compatible = "st,stmpe-ts";
-			st,adc-freq = <1>;      /* 3.25 MHz ADC clock speed */
-			st,ave-ctrl = <3>;      /* 8 sample average control */
-			st,fraction-z = <7>;    /* 7 length fractional part in z */
-			/*
-			 * 50 mA typical 80 mA max touchscreen drivers
-			 * current limit value
-			 */
-			st,i-drive = <1>;
-			st,mod-12b = <1>;       /* 12-bit ADC */
-			st,ref-sel = <0>;       /* internal ADC reference */
-			st,sample-time = <4>;   /* ADC converstion time: 80 clocks */
-			st,settling = <3>;      /* 1 ms panel driver settling time */
-			st,touch-det-delay = <5>; /* 5 ms touch detect interrupt delay */
-		};
-	};
-
 	/* NXP SE97BTP with temperature sensor + eeprom */
-	eeprom1: se97@51 {
-		compatible = "nxp,spd";
-		reg = <0x51>;
-		pagesize = <16>;
+	sensor1: se97@19 {
+		compatible = "nxp,jc42";
+		reg = <0x19>;
 		status = "okay";
 	};
 
@@ -344,10 +317,37 @@
 		status = "disabled";
 	};
 
+	analog_touch: stmpe811@41 {
+		compatible = "st,stmpe811";
+		reg = <0x41>;
+		interrupts = <21 IRQ_TYPE_EDGE_FALLING>;
+		interrupt-parent = <&gpio4>;
+		interrupt-controller;
+		status = "disabled";
+
+		stmpe_touchscreen {
+			compatible = "st,stmpe-ts";
+			st,adc-freq = <1>;      /* 3.25 MHz ADC clock speed */
+			st,ave-ctrl = <3>;      /* 8 sample average control */
+			st,fraction-z = <7>;    /* 7 length fractional part in z */
+			/*
+			 * 50 mA typical 80 mA max touchscreen drivers
+			 * current limit value
+			 */
+			st,i-drive = <1>;
+			st,mod-12b = <1>;       /* 12-bit ADC */
+			st,ref-sel = <0>;       /* internal ADC reference */
+			st,sample-time = <4>;   /* ADC converstion time: 80 clocks */
+			st,settling = <3>;      /* 1 ms panel driver settling time */
+			st,touch-det-delay = <5>; /* 5 ms touch detect interrupt delay */
+		};
+	};
+
 	/* NXP SE97BTP with temperature sensor + eeprom */
-	sensor1: se97@19 {
-		compatible = "nxp,jc42";
-		reg = <0x19>;
+	eeprom1: se97@51 {
+		compatible = "nxp,spd";
+		reg = <0x51>;
+		pagesize = <16>;
 		status = "okay";
 	};
 };
