@@ -34,10 +34,11 @@
 			};
 		};
 	};
-};
 
-&analog_touch {
-	status = "disabled";
+	pxp_v4l2 {
+		compatible = "fsl,imx6ul-pxp-v4l2", "fsl,imx6sx-pxp-v4l2", "fsl,imx6sl-pxp-v4l2";
+		status = "okay";
+	};
 };
 
 &backlight {
@@ -55,5 +56,13 @@
 &polytouch {
 	touchscreen-size-x = <800>;
 	touchscreen-size-y = <480>;
+	status = "okay";
+};
+
+&pwm4 {
+	status = "okay";
+};
+
+&pxp {
 	status = "okay";
 };
