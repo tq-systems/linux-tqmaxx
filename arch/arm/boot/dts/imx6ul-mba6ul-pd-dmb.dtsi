@@ -9,6 +9,33 @@
  * http://www.gnu.org/copyleft/gpl.html
  */
 
+/ {
+	/* ET0700G0DH6 + ETM0700G0DH6 + ETM0700G0BDH6 + S070WV106H-CT44 */
+	display_etm0700_dmb: display {
+		bits-per-pixel = <32>; /* 32: RGB888/666 mode */
+		bus-width = <24>; /* change it to 18 for new hw rev.  */
+
+		display-timings {
+			native-mode = <&timing1>;
+			timing1: 800x480p62 {
+				clock-frequency = <33260000>;
+				hactive = <800>;
+				vactive = <480>;
+				hback-porch = <216>;
+				hfront-porch = <40>;
+				vback-porch = <35>;
+				vfront-porch = <10>;
+				hsync-len = <128>;
+				vsync-len = <2>;
+				hsync-active = <0>;
+				vsync-active = <0>;
+				de-active = <1>;
+				pixelclk-active = <0>;
+			};
+		};
+	};
+};
+
 &analog_touch {
 	status = "disabled";
 };
@@ -17,6 +44,11 @@
 	pwms = <&pwm4 0 20000>; /* 50 kHz */
 	brightness-levels = <0 1 4 8 16 32 64 128 255>;
 	default-brightness-level = <8>;
+	status = "okay";
+};
+
+&lcdif {
+	display = <&display_etm0700_dmb>;
 	status = "okay";
 };
 
