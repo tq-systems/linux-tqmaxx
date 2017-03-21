@@ -13,7 +13,7 @@
 	status = "disabled";
 };
 
-&backlight_pd {
+&backlight {
 	pwms = <&pwm4 0 20000>; /* 50 kHz */
 	brightness-levels = <0 1 4 8 16 32 64 128 255>;
 	default-brightness-level = <8>;

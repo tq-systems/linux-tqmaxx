@@ -16,15 +16,18 @@
 	};
 };
 
+&backlight {
+	pwms = <&pwm4 0 62500>;
+	brightness-levels = <0 96 128 160 192 224 255>;
+	default-brightness-level = <5>;
+	status = "okay";
+};
+
 &reg_lcd_pwr {
 	status = "okay";
 };
 
 &reg_lvds_transmitter {
-	status = "okay";
-};
-
-&backlight_lvds {
 	status = "okay";
 };
 
