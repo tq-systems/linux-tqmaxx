@@ -1,0 +1,79 @@
+/*
+ * Copyright 2016 Marco Felsch, TQ Systems GmbH
+ *
+ * The code contained herein is licensed under the GNU General Public
+ * License. You may obtain a copy of the GNU General Public License
+ * Version 2 or later at the following locations:
+ *
+ * http://www.opensource.org/licenses/gpl-license.html
+ * http://www.gnu.org/copyleft/gpl.html
+ */
+
+/ {
+	/* ET0700G0DH6 + ETM0700G0DH6 + ETM0700G0BDH6 + S070WV106H-CT44 */
+	display_etm0700_dmb: display {
+		bits-per-pixel = <32>; /* 32: RGB888/666 mode */
+		bus-width = <24>; /* change it to 18 for new hw rev.  */
+
+		display-timings {
+			native-mode = <&timing1>;
+			timing1: 800x480p62 {
+				clock-frequency = <33260000>;
+				hactive = <800>;
+				vactive = <480>;
+				hback-porch = <216>;
+				hfront-porch = <40>;
+				vback-porch = <35>;
+				vfront-porch = <10>;
+				hsync-len = <128>;
+				vsync-len = <2>;
+				hsync-active = <0>;
+				vsync-active = <0>;
+				de-active = <1>;
+				pixelclk-active = <0>;
+			};
+		};
+	};
+
+	pxp_v4l2 {
+		compatible = "fsl,imx6ul-pxp-v4l2", "fsl,imx6sx-pxp-v4l2", "fsl,imx6sl-pxp-v4l2";
+		status = "okay";
+	};
+};
+
+&analog_touch {
+	status = "okay";
+};
+
+&backlight {
+	pwms = <&pwm2 0 5000000>;
+	brightness-levels = <255 128 64 32 16 8 4 1 0>;
+	default-brightness-level = <5>;
+	status = "okay";
+};
+
+&lcdif {
+	display = <&display_etm0700_dmb>;
+	status = "okay";
+};
+
+&polytouch {
+	/*
+	 * HACHHACK:
+	 * do not use size settings, display touch reads out 1792 x 1024
+	 * (tested with ETM0700G0BDH6)
+	 */
+/*
+	touchscreen-size-x = <800>;
+	touchscreen-size-y = <480>;
+*/
+	status = "okay";
+};
+
+&pwm4 {
+	status = "okay";
+};
+
+&pxp {
+	status = "okay";
+};
