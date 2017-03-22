@@ -457,6 +457,12 @@
 				MX6UL_PAD_UART1_RTS_B__GPIO1_IO19	0x0001b099
 			>;
 		};
+
+		pinctrl_wdog1: wdog1grp {
+			fsl,pins = <
+				MX6UL_PAD_GPIO1_IO08__WDOG1_WDOG_B	0x0001b099
+			>;
+		};
 	};
 };
 
@@ -532,5 +538,12 @@
 	vmmc-supply = <&reg_vccsd_3v3>;
 	/* TODO: ??? */
 	no-1-8-v;
+	status = "okay";
+};
+
+&wdog1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_wdog1>;
+	fsl,wdog_b;
 	status = "okay";
 };
