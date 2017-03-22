@@ -397,9 +397,10 @@ dtb-$(CONFIG_SOC_IMX6UL) += \
 	imx6ul-9x9-evk-csi.dtb \
 	imx6ul-9x9-evk-ldo.dtb \
 	imx6ul-mba6ul.dtb \
-	imx6ul-mba6ul-lvds.dtb \
-	imx6ul-mba6ul-pd.dtb \
-	imx6ul-mba6ul-pd-dmb.dtb
+	imx6ul-mba6ul-rev0100.dtb \
+	imx6ul-mba6ul-rev0100-lvds.dtb \
+	imx6ul-mba6ul-rev0100-pd.dtb \
+	imx6ul-mba6ul-rev0100-pd-dmb.dtb
 dtb-$(CONFIG_SOC_IMX6ULL) += \
 	imx6ull-14x14-ddr3-arm2.dtb \
 	imx6ull-14x14-ddr3-arm2-adc.dtb \
