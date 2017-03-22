@@ -34,6 +34,39 @@
 		stdout-path = &uart1;
 	};
 
+	gpio_buttons: gpio_keys {
+		compatible = "gpio-keys";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_buttons>;
+
+		button@0 {
+			label = "s14";
+			linux,code = <KEY_1>;
+			gpios = <&expander_in0 0 GPIO_ACTIVE_LOW>;
+		};
+
+		button@1 {
+			label = "s6";
+			linux,code = <KEY_2>;
+			gpios = <&expander_in0 1 GPIO_ACTIVE_LOW>;
+		};
+
+		button@2 {
+			label = "s7";
+			linux,code = <KEY_3>;
+			gpios = <&expander_in0 2 GPIO_ACTIVE_LOW>;
+		};
+
+		button@3 {
+			label = "POWER";
+			gpio-key,wakeup = <1>;
+			linux,code = <KEY_POWER>;
+			gpios = <&gpio1 3 GPIO_ACTIVE_LOW>;
+		};
+	};
+
 	regulators {
 		compatible = "simple-bus";
 		#address-cells = <1>;
@@ -330,6 +363,12 @@
 
 &iomuxc {
 	imx6ul-mba6ul {
+		pinctrl_buttons: buttonsgrp {
+			fsl,pins = <
+				MX6UL_PAD_GPIO1_IO03__GPIO1_IO03	0x100b0
+			>;
+		};
+
 		pinctrl_enet1: enet1grp {
 			fsl,pins = <
 				MX6UL_PAD_ENET1_RX_EN__ENET1_RX_EN	0x1b0b0
