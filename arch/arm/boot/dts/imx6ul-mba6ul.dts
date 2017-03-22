@@ -26,7 +26,7 @@
 	backlight: pwm_backlight {
 		compatible = "pwm-backlight";
 		power-supply = <&reg_mba6ul_3v3>;
-		enable-gpios = <&expander_out 4 GPIO_ACTIVE_HIGH>;
+		enable-gpios = <&expander_out0 4 GPIO_ACTIVE_HIGH>;
 		status = "disabled";
 	};
 
@@ -101,7 +101,7 @@
 			compatible = "regulator-fixed";
 			regulator-name = "lcd-pwr";
 			reg = <6>;
-			gpio = <&expander_out 1 GPIO_ACTIVE_HIGH>;
+			gpio = <&expander_out0 1 GPIO_ACTIVE_HIGH>;
 			enable-active-high;
 			status = "disabled";
 		};
@@ -110,7 +110,7 @@
 			compatible = "regulator-fixed";
 			regulator-name = "lvds-power";
 			reg = <7>;
-			gpio = <&expander_out 3 GPIO_ACTIVE_HIGH>;
+			gpio = <&expander_out0 3 GPIO_ACTIVE_HIGH>;
 			enable-active-high;
 			regulator-always-on;
 			vin_supply = <&reg_mba6ul_3v3>;
@@ -123,7 +123,7 @@
 			reg = <8>;
 			regulator-min-microvolt = <3300000>;
 			regulator-max-microvolt = <3300000>;
-			gpio = <&expander_out 2 GPIO_ACTIVE_HIGH>;
+			gpio = <&expander_out0 2 GPIO_ACTIVE_HIGH>;
 			enable-active-high;
 			regulator-always-on;
 			vin_supply = <&reg_mba6ul_3v3>;
@@ -190,7 +190,7 @@
 		ethphy0: ethernet-phy@0 {
 			compatible = "ethernet-phy-ieee802.3-c22";
 			max-speed = <100>;
-			interrupt-parent = <&expander_in>;
+			interrupt-parent = <&expander_in0>;
 			interrupts = <6 IRQ_TYPE_EDGE_FALLING>;
 			reg = <0>;
 		};
@@ -198,7 +198,7 @@
 		ethphy1: ethernet-phy@1 {
 			compatible = "ethernet-phy-ieee802.3-c22";
 			max-speed = <100>;
-			interrupt-parent = <&expander_in>;
+			interrupt-parent = <&expander_in0>;
 			interrupts = <7 IRQ_TYPE_EDGE_FALLING>;
 			reg = <1>;
 		};
@@ -241,7 +241,7 @@
 	};
 
 	/* Output-Portexpander */
-	expander_out: pca9554@20 {
+	expander_out0: pca9554@20 {
 		compatible = "nxp,pca9554";
 		reg = <0x20>;
 		/* Interrupt not connected (R410) */
@@ -255,7 +255,7 @@
 	};
 
 	/* Input-Portexpander */
-	expander_in: pca9554@21 {
+	expander_in0: pca9554@21 {
 		compatible = "nxp,pca9554";
 		reg = <0x21>;
 		interrupt-parent = <&gpio4>;
@@ -267,12 +267,21 @@
 		status = "okay";
 	};
 
+	/* Input-Portexpander */
+	expander_out1: pca9554@22 {
+		compatible = "nxp,pca9554";
+		reg = <0x22>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		status = "okay";
+	};
+
 	polytouch: edt-ft5x04@38 {
 		compatible = "edt,edt-ft5406", "edt,edt-ft5x06";
 		reg = <0x38>;
-		interrupt-parent = <&expander_in>;
+		interrupt-parent = <&expander_in0>;
 		interrupts = <3 IRQ_TYPE_EDGE_FALLING>;
-		wake-gpios = <&expander_out 1 GPIO_ACTIVE_HIGH>;
+		wake-gpios = <&expander_out0 1 GPIO_ACTIVE_HIGH>;
 		/* reset-gpios is controlled by stk reset */
 		gain = <20>;
 		status = "disabled";
