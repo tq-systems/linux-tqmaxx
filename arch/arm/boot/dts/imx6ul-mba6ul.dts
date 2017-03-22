@@ -172,6 +172,9 @@
 	phy-mode = "rmii";
 	phy-handle = <&ethphy0>;
 	phy-supply = <&reg_fec_3v3>;
+	phy-reset-gpios = <&expander_out1 1 GPIO_ACTIVE_LOW>;
+	phy-reset-duration = <25>;
+	phy-reset-delay = <1>;
 	status = "okay";
 };
 
@@ -181,6 +184,9 @@
 	phy-mode = "rmii";
 	phy-handle = <&ethphy1>;
 	phy-supply = <&reg_fec_3v3>;
+	phy-reset-gpios = <&expander_out1 2 GPIO_ACTIVE_LOW>;
+	phy-reset-duration = <25>;
+	phy-reset-delay = <1>;
 	status = "okay";
 
 	mdio {
