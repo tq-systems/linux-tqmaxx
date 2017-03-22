@@ -30,6 +30,11 @@
 		status = "disabled";
 	};
 
+	beeper: beeper@0 {
+		compatible = "gpio-beeper";
+		gpios = <&expander_out1 6 GPIO_ACTIVE_HIGH>;
+	};
+
 	chosen {
 		stdout-path = &uart1;
 	};
