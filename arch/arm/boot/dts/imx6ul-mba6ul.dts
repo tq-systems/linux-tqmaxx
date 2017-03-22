@@ -229,9 +229,13 @@
 		iov-supply = <&reg_audio_3v3>;
 	};
 
-	/* NXP SE97BTP with temperature sensor + eeprom */
-	sensor1: se97@19 {
-		compatible = "nxp,jc42";
+	/*
+	 * NXP SE97BTP with temperature sensor + eeprom
+	 * ATTENTION: do not use correct dt compatible since this will conflict
+	 * with hwmon sysfs ABI and break device registration
+	 */
+	temp1: jc42@19 {
+		compatible = "jc42";
 		reg = <0x19>;
 		status = "okay";
 	};
@@ -301,7 +305,7 @@
 	};
 
 	/* NXP SE97BTP with temperature sensor + eeprom */
-	eeprom1: se97@51 {
+	eeprom2: se97@51 {
 		compatible = "nxp,spd";
 		reg = <0x51>;
 		pagesize = <16>;
