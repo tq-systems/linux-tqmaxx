@@ -72,6 +72,23 @@
 		};
 	};
 
+	gpio-leds {
+		compatible = "gpio-leds";
+		status = "okay";
+
+		led1 {
+			label = "led1";
+			gpios = <&expander_out1 4 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "default-on";
+		};
+
+		led2 {
+			label = "led2";
+			gpios = <&expander_out1 5 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "heartbeat";
+		};
+	};
+
 	regulators {
 		compatible = "simple-bus";
 		#address-cells = <1>;
