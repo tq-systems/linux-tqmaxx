@@ -194,11 +194,13 @@ dtb-$(CONFIG_ARCH_MXC) += \
 	imx6dl-mba6a-lvds.dtb \
 	imx6dl-mba6a-multi.dtb \
 	imx6dl-mba6a-pd.dtb \
+	imx6dl-mba6a-ssififo.dtb \
 	imx6dl-mba6b.dtb \
 	imx6dl-mba6b-hdmi.dtb \
 	imx6dl-mba6b-lvds.dtb \
 	imx6dl-mba6b-multi.dtb \
 	imx6dl-mba6b-pd.dtb \
+	imx6dl-mba6b-ssififo.dtb \
 	imx6dl-mba6x.dtb \
 	imx6dl-mba6x-hdmi.dtb \
 	imx6dl-mba6x-lvds.dtb \
@@ -228,6 +230,7 @@ dtb-$(CONFIG_ARCH_MXC) += \
 	imx6q-mba6a-lvds.dtb \
 	imx6q-mba6a-multi.dtb \
 	imx6q-mba6a-pd.dtb \
+	imx6q-mba6a-ssififo.dtb \
 	imx6q-mba6b.dtb \
 	imx6q-mba6b-hdmi.dtb \
 	imx6q-mba6b-lvds.dtb \
@@ -239,6 +242,7 @@ dtb-$(CONFIG_ARCH_MXC) += \
 	imx6q-mba6x-lvdsdual.dtb \
 	imx6q-mba6x-multi.dtb \
 	imx6q-mba6x-pd.dtb \
+	imx6q-mba6b-ssififo.dtb \
 	imx6q-phytec-pbab01.dtb \
 	imx6q-sabreauto.dtb \
 	imx6q-sabrelite.dtb \
