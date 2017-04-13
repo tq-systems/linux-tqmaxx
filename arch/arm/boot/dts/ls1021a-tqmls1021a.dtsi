@@ -73,9 +73,9 @@
 		status = "disabled";
 	};
 
-	eeprom0: 24c64@50 {
+	eeprom0: 24c64@54 {
 		compatible = "atmel,24c64";
-		reg = <0x50>;
+		reg = <0x54>;
 		pagesize = <32>;
 		status = "okay";
 	};
