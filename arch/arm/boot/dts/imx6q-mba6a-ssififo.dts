@@ -9,6 +9,6 @@
  * http://www.gnu.org/copyleft/gpl.html
  */
 
-#include "imx6q-mba6b.dts"
+#include "imx6q-mba6a.dts"
 #include "imx6qdl-mba6-ssififo.dtsi"
 
