@@ -268,11 +268,13 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6dl-mba6a.dtb \
 	imx6dl-mba6a-hdmi.dtb \
 	imx6dl-mba6a-lvds.dtb \
+	imx6dl-mba6a-otg.dtb \
 	imx6dl-mba6a-pd.dtb \
 	imx6dl-mba6a-ssififo.dtb \
 	imx6dl-mba6b.dtb \
 	imx6dl-mba6b-hdmi.dtb \
 	imx6dl-mba6b-lvds.dtb \
+	imx6dl-mba6b-otg.dtb \
 	imx6dl-mba6b-pd.dtb \
 	imx6dl-mba6b-ssififo.dtb \
 	imx6dl-nitrogen6x.dtb \
@@ -314,11 +316,13 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6q-mba6a.dtb \
 	imx6q-mba6a-hdmi.dtb \
 	imx6q-mba6a-lvds.dtb \
+	imx6q-mba6a-otg.dtb \
 	imx6q-mba6a-pd.dtb \
 	imx6q-mba6a-ssififo.dtb \
 	imx6q-mba6b.dtb \
 	imx6q-mba6b-hdmi.dtb \
 	imx6q-mba6b-lvds.dtb \
+	imx6q-mba6b-otg.dtb \
 	imx6q-mba6b-pd.dtb \
 	imx6q-mba6b-ssififo.dtb \
 	imx6q-nitrogen6x.dtb \
@@ -331,6 +335,7 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6q-sabreauto-gpmi-weim.dtb \
 	imx6qp-mba6b.dtb \
 	imx6qp-mba6b-hdmi.dtb \
+	imx6qp-mba6b-otg.dtb \
 	imx6qp-mba6b-ssififo.dtb \
 	imx6qp-sabreauto.dtb \
 	imx6qp-sabreauto-ecspi.dtb \
