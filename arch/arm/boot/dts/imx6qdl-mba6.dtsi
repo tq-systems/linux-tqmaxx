@@ -393,7 +393,6 @@
 	hog {
 		pinctrl_hog: hoggrp {
 			fsl,pins = <
-				MX6QDL_PAD_EIM_D22__GPIO3_IO22 0x0001b099 /* OTG_PWR */
 				/* LCD.CONTRAST -> Rev 0100 only, not used on Rev.0200*/
 				MX6QDL_PAD_DI0_PIN4__GPIO4_IO20 0x0001b099
 
@@ -588,6 +587,8 @@
 			fsl,pins = <
 				MX6QDL_PAD_EIM_D21__USB_OTG_OC 0x0001b0b0
 				MX6QDL_PAD_GPIO_1__USB_OTG_ID  0x00017059
+				/* OTG_PWR */
+				MX6QDL_PAD_EIM_D22__GPIO3_IO22 0x0001b099
 			>;
 		};
 	};
