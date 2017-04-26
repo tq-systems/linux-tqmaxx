@@ -426,6 +426,7 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6qp-sabresd.dtb \
 	imx6qp-mba6b.dtb \
 	imx6qp-mba6b-hdmi.dtb \
+	imx6qp-mba6b-lvds.dtb \
 	imx6qp-mba6b-pd.dtb
 dtb-$(CONFIG_SOC_IMX6SL) += \
 	imx6sl-evk.dtb \
