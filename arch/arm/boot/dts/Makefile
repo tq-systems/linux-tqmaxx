@@ -338,6 +338,7 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6qp-mba6b-otg.dtb \
 	imx6qp-mba6b-pd.dtb \
 	imx6qp-mba6b-ssififo.dtb \
+	imx6qp-mba6b-lvds.dtb \
 	imx6qp-sabreauto.dtb \
 	imx6qp-sabreauto-ecspi.dtb \
 	imx6qp-sabreauto-flexcan1.dtb \
