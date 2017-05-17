@@ -72,7 +72,7 @@ static struct fb_videomode lcdif_modedb[] = {
 		.vmode = FB_VMODE_NONINTERLACED,
 		.flag = 0,
 	}, {
-		/* 800x480 @ 60 Hz , pixel clk @ 51.2MHz */
+		/* 1024x600 @ 60 Hz , pixel clk @ 51.2MHz */
 		.name = "S070WV106H-0-CT21",
 		.refresh = 60,
 		.xres = 1024,
