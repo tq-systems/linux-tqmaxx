@@ -13,7 +13,8 @@
 	backlight_lcd: backlight@2 {
 		compatible = "pwm-backlight";
 		pwms = <&pwm1 0 20000>;
-		brightness-levels = <0 1 4 8 16 32 64 128 255>;
+		brightness-levels = <255 128 64 32 16 8 4 1 0>;
+/*		brightness-levels = <0 1 4 8 16 32 64 128 255>; */
 		default-brightness-level = <6>;
 		power-supply = <&reg_mba6_3p3v>;
 		enable-gpios = <&gpio4 5 GPIO_ACTIVE_HIGH>;
@@ -45,8 +46,8 @@
 		wake-gpios = <&gpio7 11 GPIO_ACTIVE_HIGH>;
 		/* LCD.RESET -> TSC /RST */
 		reset-gpios = <&gpio1 7 GPIO_ACTIVE_LOW>;
-		touchscreen-size-x = <1024>;
-		touchscreen-size-y = <600>;
+		touchscreen-size-x = <1791>;
+		touchscreen-size-y = <1023>;
 		status = "okay";
 	};
 };
