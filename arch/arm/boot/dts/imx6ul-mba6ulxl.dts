@@ -9,17 +9,13 @@
  * http://www.gnu.org/copyleft/gpl.html
  */
 
+/dts-v1/;
+
 #include <dt-bindings/input/input.h>
 #include "imx6ul-tqma6ulxl.dtsi"
+#include "imx6ul-mba6ul.dtsi"
 
 / {
-	model = "TQMa6UL SOM";
-};
-
-&reg_tqma6ul_3v3 {
-	vin-supply = <&reg_sw2>;
-};
-
-&reg_sw2 {
-	regulator-always-on;
+	model = "TQ Systems i.MX6 UltraLite Baseboard with TQMa6ULxL";
+	compatible = "tqc,imx6ul-mba6ulxl", "fsl,imx6ul";
 };
