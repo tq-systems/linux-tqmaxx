@@ -337,6 +337,8 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6qp-mba6b-hdmi.dtb \
 	imx6qp-mba6b-otg.dtb \
 	imx6qp-mba6b-pd.dtb \
+	imx6qp-mba6b-pd-dmb-ct21.dtb \
+	imx6qp-mba6b-pd-dmb-ct44.dtb \
 	imx6qp-mba6b-ssififo.dtb \
 	imx6qp-mba6b-lvds.dtb \
 	imx6qp-sabreauto.dtb \
