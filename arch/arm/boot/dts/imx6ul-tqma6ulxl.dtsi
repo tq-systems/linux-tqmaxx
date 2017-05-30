@@ -240,6 +240,10 @@
 	};
 };
 
+&snvs_rtc {
+	status = "disabled";
+};
+
 /* eMMC */
 &usdhc2 {
 	pinctrl-names = "default";
