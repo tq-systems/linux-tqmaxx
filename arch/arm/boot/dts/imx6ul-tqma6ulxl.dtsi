@@ -125,12 +125,14 @@
 			reg_vldo1_3v3: vldo1 {
 				regulator-min-microvolt = <1800000>;
 				regulator-max-microvolt = <3300000>;
+				regulator-boot-on;
 				/* not used */
 			};
 
 			reg_vldo2: vldo2 {
 				regulator-min-microvolt = <800000>;
 				regulator-max-microvolt = <1550000>;
+				regulator-boot-on;
 				/* not used */
 			};
 
