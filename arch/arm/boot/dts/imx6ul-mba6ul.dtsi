@@ -119,6 +119,8 @@
 		reg_otg2vbus_5v0: regulator@3 {
 			compatible = "regulator-fixed";
 			reg = <3>;
+			gpio = <&expander_out1 0 GPIO_ACTIVE_HIGH>;
+			enable-active-high;
 			regulator-name = "otg2-vbus-supply-5v0";
 			regulator-min-microvolt = <5000000>;
 			regulator-max-microvolt = <5000000>;
