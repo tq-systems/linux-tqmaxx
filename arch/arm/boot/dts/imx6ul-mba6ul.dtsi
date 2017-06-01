@@ -245,16 +245,20 @@
 		ethphy0: ethernet-phy@0 {
 			compatible = "ethernet-phy-ieee802.3-c22";
 			max-speed = <100>;
+/*
 			interrupt-parent = <&expander_in0>;
-			interrupts = <6 IRQ_TYPE_EDGE_FALLING>;
+			interrupts = <6 IRQ_TYPE_LEVEL_LOW>;
+*/
 			reg = <0>;
 		};
 
 		ethphy1: ethernet-phy@1 {
 			compatible = "ethernet-phy-ieee802.3-c22";
 			max-speed = <100>;
+/*
 			interrupt-parent = <&expander_in0>;
-			interrupts = <7 IRQ_TYPE_EDGE_FALLING>;
+			interrupts = <7 IRQ_TYPE_LEVEL_LOW>;
+*/
 			reg = <1>;
 		};
 	};
