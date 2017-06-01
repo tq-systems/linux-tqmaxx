@@ -301,7 +301,7 @@
 		reg = <0x20>;
 		/* Interrupt not connected (R410) */
 		/* interrupt-parent = <&gpio4>; */
-		/* interrupts = <24 IRQ_TYPE_EDGE_FALLING>; */
+		/* interrupts = <24 IRQ_TYPE_LEVEL_LOW>; */
 		/* interrupt-controller; */
 		/* interrupt-cells = <2>; */
 		gpio-controller;
@@ -313,8 +313,10 @@
 	expander_in0: pca9554@21 {
 		compatible = "nxp,pca9554";
 		reg = <0x21>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_expander_in0>;
 		interrupt-parent = <&gpio4>;
-		interrupts = <23 IRQ_TYPE_EDGE_FALLING>;
+		interrupts = <23 IRQ_TYPE_LEVEL_LOW>;
 		interrupt-controller;
 		#interrupt-cells = <2>;
 		gpio-controller;
@@ -412,6 +414,12 @@
 				/* mdio */
 				MX6UL_PAD_GPIO1_IO07__ENET2_MDC		0x1b0b0
 				MX6UL_PAD_GPIO1_IO06__ENET2_MDIO	0x1b0b0
+			>;
+		};
+
+		pinctrl_expander_in0: expanderin0grp {
+			fsl,pins = <
+				MX6UL_PAD_CSI_DATA02__GPIO4_IO23	0x1b0b1
 			>;
 		};
 
