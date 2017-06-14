@@ -423,6 +423,7 @@ dtb-$(CONFIG_SOC_IMX6UL) += \
 	imx6ul-mba6ulxl.dtb \
 	imx6ul-mba6ulxl-con.dtb \
 	imx6ul-mba6ulxl-lvds.dtb \
+	imx6ul-mba6ulxl-otg.dtb \
 	imx6ul-mba6ulxl-pd.dtb \
 	imx6ul-mba6ulxl-pd-dmb.dtb
 dtb-$(CONFIG_SOC_IMX6ULL) += \
