@@ -31,6 +31,7 @@
 #define DP83867_CTRL		0x1f
 
 /* Extended Registers */
+#define DP83867_CFG4		0x0031
 #define DP83867_RGMIICTL	0x0032
 #define DP83867_RGMIIDCTL	0x0086
 #define DP83867_LEDCR1		0x18
@@ -71,6 +72,7 @@ struct dp83867_private {
 	int led_cfg1;
 	int led_cfg2;
 	int led_cfg3;
+	bool rxctrl_strap_quirk;
 };
 
 static int dp83867_ack_interrupt(struct phy_device *phydev)
@@ -118,6 +120,9 @@ static int dp83867_of_init(struct phy_device *phydev)
 
 	if (!phydev->dev.of_node)
 		return -ENODEV;
+
+	dp83867->rxctrl_strap_quirk = of_property_read_bool(of_node,
+					"ti,dp83867-rxctrl-strap-quirk");
 
 	if ((phydev->interface >= PHY_INTERFACE_MODE_RGMII_ID) &&
 	    (phydev->interface <= PHY_INTERFACE_MODE_RGMII_RXID)) {
@@ -183,6 +188,15 @@ static int dp83867_config_init(struct phy_device *phydev)
 			return ret;
 	} else {
 		dp83867 = (struct dp83867_private *)phydev->priv;
+	}
+
+	/* RX_DV/RX_CTRL strapped in mode 1 or mode 2 workaround */
+	if (dp83867->rxctrl_strap_quirk) {
+		val = phy_read_mmd_indirect(phydev, DP83867_CFG4,
+					    DP83867_DEVADDR, phydev->addr);
+		val &= ~BIT(7);
+		phy_write_mmd_indirect(phydev, DP83867_CFG4,
+				       DP83867_DEVADDR, phydev->addr, val);
 	}
 
 	if (phy_interface_is_rgmii(phydev)) {
