@@ -115,27 +115,27 @@
 
 			uboot@0 {
 				label = "U-Boot-PBL";
-				reg = <0x0 0xC0000>;
+				reg = <0x0 0xe0000>;
 			};
 
-			env@c0000 {
+			env@e0000 {
 				label = "U-Boot Environment";
-				reg = <0xc0000 0x10000>;
+				reg = <0xe0000 0x10000>;
 			};
 
-			dtb@d0000 {
+			dtb@f0000 {
 				label = "DTB";
-				reg = <0xd0000 0x10000>;
+				reg = <0xf0000 0x10000>;
 			};
 
-			linux@e0000 {
+			linux@100000 {
 				label = "Linux";
-				reg = <0xe0000 0x800000>;
+				reg = <0x100000 0x700000>;
 			};
 
-			rootfs@900000 {
+			rootfs@800000 {
 				label = "RootFS";
-				reg = <0x900000 0x3700000>;
+				reg = <0x800000 0x3800000>;
 			};
 		};
 	};
