@@ -98,7 +98,6 @@
 };
 
 &qspi {
-	fsl,qspi-has-second-chip;
 	status = "okay";
 
 	qflash0: mt25ql512@0 {
@@ -138,13 +137,5 @@
 				reg = <0x800000 0x3800000>;
 			};
 		};
-	};
-
-	qflash1: mt25ql512@1 {
-		compatible = "micron,n25q512ax3", "cfi-flash";
-		#address-cells = <1>;
-		#size-cells = <1>;
-		spi-max-frequency = <20000000>;
-		reg = <1>;
 	};
 };
