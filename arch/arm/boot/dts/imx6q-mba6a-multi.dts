@@ -19,10 +19,6 @@
 	status = "okay";
 };
 
-&disp0 {
-	status = "okay";
-};
-
 &ldb {
 	status = "okay";
 
