@@ -10,15 +10,5 @@
  */
 
 #include "imx6q-mba6a.dts"
+#include "imx6qdl-mba6-pd.dtsi"
 
-&backlight_pd {
-	status = "okay";
-};
-
-&disp0 {
-	status = "okay";
-};
-
-&disp0_tsc {
-	status = "okay";
-};
