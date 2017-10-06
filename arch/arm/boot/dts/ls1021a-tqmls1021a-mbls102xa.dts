@@ -71,6 +71,18 @@
 	xceiver-supply = <&reg_3p3v>;
 };
 
+/* Temperatur trip point references:
+ * Values copied from ls1021a.dtsi.
+ * Please change according to any custom requirements.
+ */
+&cpu_alert {
+	temperature = <85000>;
+};
+
+&cpu_crit {
+	temperature = <95000>;
+};
+
 &dcu {
 	fsl,panel = <&etm0700>;
 	status = "okay";
