@@ -12,6 +12,7 @@
 
 #include <linux/clk.h>
 #include <linux/clk-provider.h>
+#include <linux/cpu_cooling.h>
 #include <linux/cpufreq.h>
 #include <linux/errno.h>
 #include <linux/init.h>
@@ -34,6 +35,7 @@
 struct cpu_data {
 	struct clk **pclk;
 	struct cpufreq_frequency_table *table;
+	struct thermal_cooling_device *cdev;
 };
 
 static u32 get_bus_freq(void)
@@ -234,12 +236,39 @@ static int __exit qoriq_cpufreq_cpu_exit(struct cpufreq_policy *policy)
 {
 	struct cpu_data *data = policy->driver_data;
 
+	cpufreq_cooling_unregister(data->cdev);
 	kfree(data->pclk);
 	kfree(data->table);
 	kfree(data);
 	policy->driver_data = NULL;
 
 	return 0;
+}
+
+static void qoriq_cpufreq_ready(struct cpufreq_policy *policy)
+{
+	struct cpu_data *data = policy->driver_data;
+	struct device_node *np = of_get_cpu_node(policy->cpu, NULL);
+
+	if (WARN_ON(!np))
+		return;
+
+	/*
+	 * For now, just loading the cooling device;
+	 * thermal DT code takes care of matching them.
+	 */
+	if (of_find_property(np, "#cooling-cells", NULL)) {
+		data->cdev = of_cpufreq_cooling_register(np,
+							 policy->related_cpus);
+		if (IS_ERR(data->cdev)) {
+			pr_err("running qoriq cpufreq without cooling device: %ld\n",
+				PTR_ERR(data->cdev));
+
+			data->cdev = NULL;
+		}
+	}
+
+	of_node_put(np);
 }
 
 static int qoriq_cpufreq_target(struct cpufreq_policy *policy,
@@ -259,6 +288,7 @@ static struct cpufreq_driver qoriq_cpufreq_driver = {
 	.exit		= __exit_p(qoriq_cpufreq_cpu_exit),
 	.verify		= cpufreq_generic_frequency_table_verify,
 	.target_index	= qoriq_cpufreq_target,
+	.ready		= qoriq_cpufreq_ready,
 	.get		= cpufreq_generic_get,
 	.attr		= cpufreq_generic_attr,
 };
