@@ -94,11 +94,6 @@
 	};
 };
 
-&esdhc {
-	/* SD card over 4 data lines (overwrites module)*/
-	bus-width = <4>;
-};
-
 &uart0 {
 	status = "okay";
 };
