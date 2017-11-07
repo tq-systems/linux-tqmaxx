@@ -726,6 +726,8 @@ _SetPower(
 #endif
 #endif
 
+    priv = Platform->priv;
+
     if (Enable)
     {
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3,14,0)
@@ -911,18 +913,19 @@ _AdjustDriver(
 
     /* Override PM callbacks to add runtime PM callbacks. */
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3,5,0)
+
+#ifdef CONFIG_PM
     /* Fill local structure with original value. */
     memcpy(&gpu_pm_ops, driver->driver.pm, sizeof(struct dev_pm_ops));
 
     /* Add runtime PM callback. */
-#ifdef CONFIG_PM
     gpu_pm_ops.runtime_suspend = gpu_runtime_suspend;
     gpu_pm_ops.runtime_resume = gpu_runtime_resume;
     gpu_pm_ops.runtime_idle = NULL;
-#endif
 
     /* Replace callbacks. */
     driver->driver.pm = &gpu_pm_ops;
+#endif
 #endif
     return gcvSTATUS_OK;
 }
