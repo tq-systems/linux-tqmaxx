@@ -355,6 +355,7 @@ static ssize_t mxc_hdmi_store_hdcp_enable(struct device *dev,
 		sprintf(event_string, "EVENT=hdcpenable");
 		kobject_uevent_env(&hdmi->pdev->dev.kobj, KOBJ_CHANGE, envp);
 	}
+	dev_info(&hdmi->pdev->dev, "%s: UEVENT %s\n", __func__, event_string);
 
 	return count;
 
@@ -2024,6 +2025,7 @@ static void hotplug_worker(struct work_struct *work)
 
 			sprintf(event_string, "EVENT=plugin");
 			kobject_uevent_env(&hdmi->pdev->dev.kobj, KOBJ_CHANGE, envp);
+			dev_info(&hdmi->pdev->dev, "%s: UEVENT %s\n", __func__, event_string);
 #ifdef CONFIG_MXC_HDMI_CEC
 			mxc_hdmi_cec_handle(0x80);
 #endif
@@ -2041,12 +2043,13 @@ static void hotplug_worker(struct work_struct *work)
 
 			sprintf(event_string, "EVENT=plugout");
 			kobject_uevent_env(&hdmi->pdev->dev.kobj, KOBJ_CHANGE, envp);
+			dev_info(&hdmi->pdev->dev, "%s: UEVENT %s\n", __func__, event_string);
 #ifdef CONFIG_MXC_HDMI_CEC
 			mxc_hdmi_cec_handle(0x100);
 #endif
 
 		} else
-			dev_dbg(&hdmi->pdev->dev, "EVENT=none?\n");
+			dev_warn(&hdmi->pdev->dev, "EVENT=none?\n");
 	}
 
 	/* Lock here to ensure full powerdown sequence
@@ -2078,6 +2081,7 @@ static void hdcp_hdp_worker(struct work_struct *work)
 	/* HDCP interrupt */
 	sprintf(event_string, "EVENT=hdcpint");
 	kobject_uevent_env(&hdmi->pdev->dev.kobj, KOBJ_CHANGE, envp);
+	dev_info(&hdmi->pdev->dev, "%s: UEVENT %s\n", __func__, event_string);
 
 	/* Unmute interrupts in HDCP application*/
 }
