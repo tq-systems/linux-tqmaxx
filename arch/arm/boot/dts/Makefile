@@ -326,6 +326,7 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6q-mba6b-pd.dtb \
 	imx6q-mba6b-ssififo.dtb \
 	imx6q-nav.dtb \
+	imx6q-nav-hdcp.dtb \
 	imx6q-nav-hdmi.dtb \
 	imx6q-navb.dtb \
 	imx6q-navb-hdmi.dtb \
