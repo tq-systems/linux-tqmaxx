@@ -10,7 +10,12 @@
 #include "ls1021a.dtsi"
 
 / {
-	model = "TQMLS1021A SOM";
+	model = "TQMLS102xA SOM";
+
+	aliases {
+		spi0 = &qspi;
+		i2c0 = &i2c0;
+	};
 
 	clocks {
 		sys_mclk: clock {
@@ -77,6 +82,7 @@
 		compatible = "atmel,24c64";
 		reg = <0x54>;
 		pagesize = <32>;
+		u-boot,i2c-offset-len = <2>;
 		status = "okay";
 	};
 
