@@ -258,6 +258,5 @@
 	disable-wp;
 	non-removable;
 	no-1-8-v;
-	mmc-pwrseq = <&usdhc2_pwrseq>;
 	status = "okay";
 };
