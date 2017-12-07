@@ -24,6 +24,12 @@
 	regulator-always-on;
 };
 
+&reg_vldo4 {
+	regulator-min-microvolt = <1800000>;
+	regulator-max-microvolt = <1800000>;
+	regulator-always-on;
+};
+
 /* eMMC */
 &usdhc2 {
 	vmmc-supply = <&reg_sw2>;
