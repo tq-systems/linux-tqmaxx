@@ -233,10 +233,10 @@
 	pinctrl-0 = <&pinctrl_qspi>;
 	status = "okay";
 
-	flash0: n25q512ax3@0 {
+	flash0: n25q512a@0 {
 		#address-cells = <1>;
 		#size-cells = <1>;
-		compatible = "micron,n25q512ax3";
+		compatible = "micron,n25q512a";
 		spi-max-frequency = <29000000>;
 		reg = <0>;
 	};
