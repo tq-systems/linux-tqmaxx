@@ -269,7 +269,7 @@
 &flash0 {
 	uboot@0 {
 		label = "U-Boot";
-		reg = <0x0 0xe0000>;
+		reg = <0x0 0xd0000>;
 	};
 
 	env1@d0000 {
