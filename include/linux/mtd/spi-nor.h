@@ -65,6 +65,8 @@
 #define SPINOR_OP_WD_EVCR      0x61    /* Write EVCR register */
 #define SPINOR_OP_RD_VCR	0x85    /* Read VCR register */
 #define SPINOR_OP_WR_VCR	0x81    /* Write VCR register */
+#define SPINOR_OP_RD_NVCR	0xb5    /* Read NVCR register */
+#define SPINOR_OP_WR_NVCR	0xb1    /* Write NVCR register */
 
 /* Status Register bits. */
 #define SR_WIP			1	/* Write in progress */
