@@ -594,10 +594,12 @@ static int fsl_qspi_get_seqid(struct fsl_qspi *q, u8 cmd)
 		return SEQID_RDSR;
 	case SPINOR_OP_BE_4K:
 	case SPINOR_OP_SE:
+	case SPINOR_OP_SE_4B:
 		return SEQID_SE;
 	case SPINOR_OP_CHIP_ERASE:
 		return SEQID_CHIP_ERASE;
 	case SPINOR_OP_PP:
+	case SPINOR_OP_PP_4B:
 		return SEQID_PP;
 	case SPINOR_OP_RDID:
 		return SEQID_RDID;
