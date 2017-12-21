@@ -1176,7 +1176,8 @@ int spi_nor_scan(struct spi_nor *nor, const char *name, enum read_mode mode)
 	else if (mtd->size > 0x1000000) {
 		/* enable 4-byte addressing if the device exceeds 16MiB */
 		nor->addr_width = 4;
-		if (JEDEC_MFR(info) == CFI_MFR_AMD) {
+		switch (JEDEC_MFR(info)) {
+		case CFI_MFR_AMD:
 			/* Dedicated 4-byte command set */
 			switch (nor->flash_read) {
 			case SPI_NOR_DDR_QUAD:
@@ -1199,8 +1200,35 @@ int spi_nor_scan(struct spi_nor *nor, const char *name, enum read_mode mode)
 			/* No small sector erase for 4-byte command set */
 			nor->erase_opcode = SPINOR_OP_SE_4B;
 			mtd->erasesize = info->sector_size;
-		} else
+			break;
+		case CFI_MFR_ST: /* Micron, actually */
+			dev_info(dev, "%s use 4B command set\n", id->name);
+			/* Dedicated 4-byte command set */
+			switch (nor->flash_read) {
+			case SPI_NOR_DDR_QUAD:
+				nor->read_opcode = SPINOR_OP_READ4_1_4_4_D;
+				break;
+			case SPI_NOR_QUAD:
+				nor->read_opcode = SPINOR_OP_READ4_1_1_4;
+				break;
+			case SPI_NOR_DUAL:
+				nor->read_opcode = SPINOR_OP_READ4_1_1_2;
+				break;
+			case SPI_NOR_FAST:
+				nor->read_opcode = SPINOR_OP_READ4_FAST;
+				break;
+			case SPI_NOR_NORMAL:
+				nor->read_opcode = SPINOR_OP_READ4;
+				break;
+			}
+			nor->program_opcode = SPINOR_OP_PP_4B;
+			/* No small sector erase for 4-byte command set */
+			nor->erase_opcode = SPINOR_OP_SE_4B;
+			mtd->erasesize = info->sector_size;
+			break;
+		default:
 			set_4byte(nor, info, 1);
+		}
 	} else {
 		nor->addr_width = 3;
 	}

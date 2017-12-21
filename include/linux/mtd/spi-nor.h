@@ -40,6 +40,7 @@
 #define SPINOR_OP_RDFSR		0x70	/* Read flag status register */
 
 /* 4-byte address opcodes - used on Spansion and some Macronix flashes. */
+/* 4-byte address opcodes - also used on newer Micron flashes. */
 #define SPINOR_OP_READ4		0x13	/* Read data bytes (low frequency) */
 #define SPINOR_OP_READ4_FAST	0x0c	/* Read data bytes (high frequency) */
 #define SPINOR_OP_READ4_1_1_2	0x3c	/* Read data bytes (Dual SPI) */
