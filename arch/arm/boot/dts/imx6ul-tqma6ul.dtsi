@@ -16,6 +16,7 @@
 	model = "TQMa6UL SOM";
 };
 
+/* TODO: move to TQMa6ULxL for new revision */
 &flash0 {
 	spi-max-frequency = <33000000>;
 };
@@ -86,10 +87,12 @@
 	};
 };
 
+/* TODO: move to TQMa6ULxL for new revision */
 &reg_sw2 {
 	regulator-always-on;
 };
 
+/* TODO: move if TQMa6ULxL has support for 1.8V IO voltage */
 &reg_vldo4 {
 	regulator-min-microvolt = <1800000>;
 	regulator-max-microvolt = <1800000>;
@@ -104,7 +107,9 @@
 	pinctrl-1 = <&pinctrl_usdhc2_100mhz>;
 	pinctrl-2 = <&pinctrl_usdhc2_200mhz>;
 
+	/* TODO: move to TQMa6ULxL for new revision */
 	vmmc-supply = <&reg_sw2>;
 	vqmmc-supply = <&reg_vldo4>;
+	/* TODO: remove if TQMa6ULxL has also support for 1.8V IO voltage */
 	/delete-property/ no-1-8-v;
 };
