@@ -111,7 +111,4 @@
 	vmmc-supply = <&reg_sw2>;
 	vqmmc-supply = <&reg_vldo4>;
 	/delete-property/ no-1-8-v;
-
-	voltage-ranges = <1800 1800>;
-	max-frequency = <175000000>;
 };
