@@ -86,10 +86,6 @@
 	};
 };
 
-&reg_tqma6ul_3v3 {
-	vin-supply = <&reg_sw2>;
-};
-
 &reg_sw2 {
 	regulator-always-on;
 };
