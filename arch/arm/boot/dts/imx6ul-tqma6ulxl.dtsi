@@ -139,12 +139,14 @@
 			reg_vldo3: vldo3 {
 				regulator-min-microvolt = <1800000>;
 				regulator-max-microvolt = <3300000>;
-				regulator-always-on;
+				regulator-boot-on;
+				/* not used */
 			};
 
 			reg_vldo4: vldo4 {
 				regulator-min-microvolt = <1800000>;
-				regulator-max-microvolt = <3300000>;
+				regulator-max-microvolt = <1800000>;
+				regulator-fixed;
 				regulator-always-on;
 			};
 		};
@@ -200,7 +202,7 @@
 
 		pinctrl_qspi: qspigrp {
 			fsl,pins = <
-				MX6UL_PAD_NAND_WP_B__QSPI_A_SCLK      0x70a1
+				MX6UL_PAD_NAND_WP_B__QSPI_A_SCLK      0x70b9
 				MX6UL_PAD_NAND_READY_B__QSPI_A_DATA00 0x70b9
 				MX6UL_PAD_NAND_CE0_B__QSPI_A_DATA01   0x70b9
 				MX6UL_PAD_NAND_CE1_B__QSPI_A_DATA02   0x70b9
@@ -211,18 +213,52 @@
 
 		pinctrl_usdhc2: usdhc2grp {
 			fsl,pins = <
-				MX6UL_PAD_NAND_RE_B__USDHC2_CLK		0x00010059
+				MX6UL_PAD_NAND_RE_B__USDHC2_CLK		0x00017051
 				MX6UL_PAD_NAND_WE_B__USDHC2_CMD		0x00017051
-				MX6UL_PAD_NAND_DATA00__USDHC2_DATA0	0x00017059
-				MX6UL_PAD_NAND_DATA01__USDHC2_DATA1	0x00017059
-				MX6UL_PAD_NAND_DATA02__USDHC2_DATA2	0x00017059
-				MX6UL_PAD_NAND_DATA03__USDHC2_DATA3	0x00017059
-				MX6UL_PAD_NAND_DATA04__USDHC2_DATA4	0x00017059
-				MX6UL_PAD_NAND_DATA05__USDHC2_DATA5	0x00017059
-				MX6UL_PAD_NAND_DATA06__USDHC2_DATA6	0x00017059
-				MX6UL_PAD_NAND_DATA07__USDHC2_DATA7	0x00017059
+				MX6UL_PAD_NAND_DATA00__USDHC2_DATA0	0x00017051
+				MX6UL_PAD_NAND_DATA01__USDHC2_DATA1	0x00017051
+				MX6UL_PAD_NAND_DATA02__USDHC2_DATA2	0x00017051
+				MX6UL_PAD_NAND_DATA03__USDHC2_DATA3	0x00017051
+				MX6UL_PAD_NAND_DATA04__USDHC2_DATA4	0x00017051
+				MX6UL_PAD_NAND_DATA05__USDHC2_DATA5	0x00017051
+				MX6UL_PAD_NAND_DATA06__USDHC2_DATA6	0x00017051
+				MX6UL_PAD_NAND_DATA07__USDHC2_DATA7	0x00017051
 				/* rst */
-				MX6UL_PAD_NAND_ALE__GPIO4_IO10		0x0001b099
+				MX6UL_PAD_NAND_ALE__GPIO4_IO10		0x0001b051
+			>;
+		};
+
+		pinctrl_usdhc2_100mhz: usdhc2grp_100mhz {
+			fsl,pins = <
+				MX6UL_PAD_NAND_RE_B__USDHC2_CLK		0x000170e1
+				MX6UL_PAD_NAND_WE_B__USDHC2_CMD		0x000170f1
+				MX6UL_PAD_NAND_DATA00__USDHC2_DATA0	0x000170f1
+				MX6UL_PAD_NAND_DATA01__USDHC2_DATA1	0x000170f1
+				MX6UL_PAD_NAND_DATA02__USDHC2_DATA2	0x000170f1
+				MX6UL_PAD_NAND_DATA03__USDHC2_DATA3	0x000170f1
+				MX6UL_PAD_NAND_DATA04__USDHC2_DATA4	0x000170f1
+				MX6UL_PAD_NAND_DATA05__USDHC2_DATA5	0x000170f1
+				MX6UL_PAD_NAND_DATA06__USDHC2_DATA6	0x000170f1
+				MX6UL_PAD_NAND_DATA07__USDHC2_DATA7	0x000170f1
+				/* rst */
+				MX6UL_PAD_NAND_ALE__GPIO4_IO10		0x0001b051
+			>;
+		};
+
+		pinctrl_usdhc2_200mhz: usdhc2grp_200mhz {
+			fsl,pins = <
+				MX6UL_PAD_NAND_RE_B__USDHC2_CLK		0x000170f1
+				MX6UL_PAD_NAND_WE_B__USDHC2_CMD		0x000170e1
+				MX6UL_PAD_NAND_DATA00__USDHC2_DATA0	0x000170e1
+				MX6UL_PAD_NAND_DATA01__USDHC2_DATA1	0x000170e1
+				MX6UL_PAD_NAND_DATA02__USDHC2_DATA2	0x000170e1
+				MX6UL_PAD_NAND_DATA03__USDHC2_DATA3	0x000170e1
+				MX6UL_PAD_NAND_DATA04__USDHC2_DATA4	0x000170e1
+				MX6UL_PAD_NAND_DATA05__USDHC2_DATA5	0x000170e1
+				MX6UL_PAD_NAND_DATA06__USDHC2_DATA6	0x000170e1
+				MX6UL_PAD_NAND_DATA07__USDHC2_DATA7	0x000170e1
+				/* rst */
+				MX6UL_PAD_NAND_ALE__GPIO4_IO10		0x0001b051
 			>;
 		};
 	};
@@ -237,7 +273,7 @@
 		#address-cells = <1>;
 		#size-cells = <1>;
 		compatible = "micron,n25q512a";
-		spi-max-frequency = <29000000>;
+		spi-max-frequency = <33000000>;
 		reg = <0>;
 	};
 };
@@ -248,15 +284,16 @@
 
 /* eMMC */
 &usdhc2 {
-	pinctrl-names = "default";
+	pinctrl-names = "default", "state_100mhz" , "state_200mhz";
 	pinctrl-0 = <&pinctrl_usdhc2>;
+	pinctrl-1 = <&pinctrl_usdhc2_100mhz>;
+	pinctrl-2 = <&pinctrl_usdhc2_200mhz>;
 
 	vmmc-supply = <&reg_tqma6ul_3v3>;
-	vqmmc-supply = <&reg_tqma6ul_3v3>;
+	vqmmc-supply = <&reg_vldo4>;
 
 	bus-width = <8>;
 	disable-wp;
 	non-removable;
-	no-1-8-v;
 	status = "okay";
 };
