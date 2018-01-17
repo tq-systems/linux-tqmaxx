@@ -28,6 +28,8 @@
 #define MII_DP83867_PHYCTRL	0x10
 #define MII_DP83867_MICR	0x12
 #define MII_DP83867_ISR		0x13
+#define DP83867_LEDCR1		0x18
+#define DP83867_LEDCR2		0x19
 #define DP83867_CTRL		0x1f
 #define DP83867_CFG3		0x1e
 
@@ -92,6 +94,8 @@ struct dp83867_private {
 	int io_impedance;
 	int port_mirroring;
 	bool rxctrl_strap_quirk;
+	int led_cfg1;
+	int led_cfg2;
 };
 
 static int dp83867_ack_interrupt(struct phy_device *phydev)
@@ -188,6 +192,16 @@ static int dp83867_of_init(struct phy_device *phydev)
 	if (of_property_read_bool(of_node, "enet-phy-lane-no-swap"))
 		dp83867->port_mirroring = DP83867_PORT_MIRROING_DIS;
 
+	ret = of_property_read_u32(of_node, "led-cfg1",
+				&dp83867->led_cfg1);
+	if (ret)
+		return ret;
+
+	ret = of_property_read_u32(of_node, "led-cfg2",
+				&dp83867->led_cfg2);
+	if (ret)
+		return ret;
+
 	return of_property_read_u32(of_node, "ti,fifo-depth",
 				   &dp83867->fifo_depth);
 }
@@ -283,6 +297,9 @@ static int dp83867_config_init(struct phy_device *phydev)
 			phy_write_mmd(phydev, DP83867_DEVADDR,
 				      DP83867_IO_MUX_CFG, val);
 		}
+
+		phy_write(phydev, DP83867_LEDCR1, dp83867->led_cfg1);
+		phy_write(phydev, DP83867_LEDCR2, dp83867->led_cfg2);
 	}
 
 	/* Enable Interrupt output INT_OE in CFG3 register */
