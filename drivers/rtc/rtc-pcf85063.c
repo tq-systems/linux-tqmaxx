@@ -30,6 +30,7 @@
 #define PCF85063_REG_CTRL1_CAP_SEL	BIT(0)
 #define PCF85063_REG_CTRL1_STOP		BIT(5)
 #define PCF85063_REG_CTRL2		0x01
+#define PCF85063_REG_OFFSET		0x02
 
 #define PCF85063_REG_SC			0x04 /* datetime */
 #define PCF85063_REG_SC_OS		0x80
@@ -219,6 +220,7 @@ static int pcf85063_probe(struct i2c_client *client,
 {
 	struct rtc_device *rtc;
 	int err;
+	int offset;
 
 	dev_dbg(&client->dev, "%s\n", __func__);
 
@@ -239,6 +241,19 @@ static int pcf85063_probe(struct i2c_client *client,
 	rtc = devm_rtc_device_register(&client->dev,
 				       pcf85063_driver.driver.name,
 				       &pcf85063_rtc_ops, THIS_MODULE);
+
+	if (! of_property_read_u32(client->dev.of_node, "nxp,offset",
+				 &offset)) {
+		u8 reg = (u8)(offset & 0xFF);
+		/* write register data */
+		err = i2c_smbus_write_i2c_block_data(client, PCF85063_REG_OFFSET,
+						     sizeof(reg), &reg);
+	}
+
+	if (err < 0) {
+		dev_err(&client->dev, "device setup error\n");
+		return err;
+	}
 
 	return PTR_ERR_OR_ZERO(rtc);
 }
