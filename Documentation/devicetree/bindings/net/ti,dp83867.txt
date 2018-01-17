@@ -8,10 +8,6 @@ Required properties:
 	- ti,tx-internal-delay - RGMII Transmit Clock Delay - see dt-bindings/net/ti-dp83867.h
 		for applicable values. Required only if interface type is
 		PHY_INTERFACE_MODE_RGMII_ID or PHY_INTERFACE_MODE_RGMII_TXID
-	- ti,fifo-depth - Transmitt FIFO depth- see dt-bindings/net/ti-dp83867.h
-		for applicable values
-	- ti,led-cfg1 - Value of LED configuration register 1
-	- ti,led-cfg2 - Value of LED configuration register 2
 
 Optional property:
 	- ti,min-output-impedance - MAC Interface Impedance control to set
@@ -27,6 +23,10 @@ Optional property:
 				    software needs to take when this pin is
 				    strapped in these modes. See data manual
 				    for details.
+	- ti,fifo-depth 	  - Transmit FIFO depth - see dt-bindings/net/ti-dp83867.h
+				                          for applicable values
+	- ti,led-cfg1		  - Value of LED configuration register 1
+	- ti,led-cfg2		  - Value of LED configuration register 2
 
 Note: ti,min-output-impedance and ti,max-output-impedance are mutually
       exclusive. When both properties are present ti,max-output-impedance
