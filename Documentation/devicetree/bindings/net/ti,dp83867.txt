@@ -10,8 +10,8 @@ Required properties:
 		PHY_INTERFACE_MODE_RGMII_ID or PHY_INTERFACE_MODE_RGMII_TXID
 	- ti,fifo-depth - Transmitt FIFO depth- see dt-bindings/net/ti-dp83867.h
 		for applicable values
-	- led-cfg1 - Value of LED configuration register 1
-	- led-cfg2 - Value of LED configuration register 2
+	- ti,led-cfg1 - Value of LED configuration register 1
+	- ti,led-cfg2 - Value of LED configuration register 2
 
 Optional property:
 	- ti,min-output-impedance - MAC Interface Impedance control to set
