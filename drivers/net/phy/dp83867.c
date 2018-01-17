@@ -30,6 +30,7 @@
 #define MII_DP83867_ISR		0x13
 #define DP83867_LEDCR1		0x18
 #define DP83867_LEDCR2		0x19
+#define DP83867_LEDCR3		0x1A
 #define DP83867_CTRL		0x1f
 #define DP83867_CFG3		0x1e
 
@@ -99,6 +100,7 @@ struct dp83867_private {
 	int clk_output_sel;
 	int led_cfg1;
 	int led_cfg2;
+	int led_cfg3;
 };
 
 static int dp83867_ack_interrupt(struct phy_device *phydev)
@@ -212,6 +214,11 @@ static int dp83867_of_init(struct phy_device *phydev)
 				&dp83867->led_cfg2);
 	if (ret)
 		dev_dbg(dev, "could not find ti,led-cfg2\n");
+
+	ret = of_property_read_u32(of_node, "ti,led-cfg3",
+				&dp83867->led_cfg3);
+	if (ret)
+		dev_dbg(dev, "could not find ti,led-cfg3\n");
 
 	ret = of_property_read_u32(of_node, "ti,fifo-depth",
 				   &dp83867->fifo_depth);
@@ -337,6 +344,7 @@ static int dp83867_config_init(struct phy_device *phydev)
 
 	phy_write(phydev, DP83867_LEDCR1, dp83867->led_cfg1);
 	phy_write(phydev, DP83867_LEDCR2, dp83867->led_cfg2);
+	phy_write(phydev, DP83867_LEDCR3, dp83867->led_cfg3);
 
 	return 0;
 }
