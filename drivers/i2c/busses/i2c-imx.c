@@ -29,6 +29,9 @@
  *
  */
 
+/** Includes *******************************************************************
+*******************************************************************************/
+
 #include <linux/clk.h>
 #include <linux/completion.h>
 #include <linux/delay.h>
@@ -433,7 +436,7 @@ static int i2c_imx_bus_busy(struct imx_i2c_struct *i2c_imx, int for_busy)
 			break;
 		if (!for_busy && !(temp & I2SR_IBB))
 			break;
-		if (time_after(jiffies, orig_jiffies + msecs_to_jiffies(500))) {
+		if (time_after(jiffies, orig_jiffies + msecs_to_jiffies(100))) {
 			dev_dbg(&i2c_imx->adapter.dev,
 				"<%s> I2C bus is busy\n", __func__);
 			return -ETIMEDOUT;
@@ -565,7 +568,27 @@ static void i2c_imx_stop(struct imx_i2c_struct *i2c_imx)
 	}
 
 	if (!i2c_imx->stopped) {
-		i2c_imx_bus_busy(i2c_imx, 0);
+		int ret = i2c_imx_bus_busy(i2c_imx, 0);
+
+		if (ret == -ETIMEDOUT) {
+			unsigned char sr = imx_i2c_read_reg(i2c_imx,
+								IMX_I2C_I2SR);
+			int retries = 8;
+
+			while ((retries--) && (sr & I2SR_IBB)) {
+				temp |= I2CR_RSTA;
+				imx_i2c_write_reg(temp, i2c_imx, IMX_I2C_I2CR);
+				udelay(10);
+				imx_i2c_write_reg(temp, i2c_imx, IMX_I2C_I2CR);
+				udelay(10);
+				sr = imx_i2c_read_reg(i2c_imx, IMX_I2C_I2SR);
+			}
+
+			if (retries < 0)
+				dev_err(&i2c_imx->adapter.dev,
+					"could not recover busy bus. (SR %x)\n",
+					sr);
+		}
 		i2c_imx->stopped = 1;
 	}
 
