@@ -27,6 +27,7 @@ Optional property:
 				                          for applicable values
 	- ti,led-cfg1		  - Value of LED configuration register 1
 	- ti,led-cfg2		  - Value of LED configuration register 2
+	- ti,led-cfg3		  - Value of LED configuration register 3
 
 Note: ti,min-output-impedance and ti,max-output-impedance are mutually
       exclusive. When both properties are present ti,max-output-impedance
