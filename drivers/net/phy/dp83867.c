@@ -195,15 +195,19 @@ static int dp83867_of_init(struct phy_device *phydev)
 	ret = of_property_read_u32(of_node, "ti,led-cfg1",
 				&dp83867->led_cfg1);
 	if (ret)
-		return ret;
+		dev_dbg(dev, "could not find ti,led-cfg1\n");
 
 	ret = of_property_read_u32(of_node, "ti,led-cfg2",
 				&dp83867->led_cfg2);
 	if (ret)
-		return ret;
+		dev_dbg(dev, "could not find ti,led-cfg2\n");
 
-	return of_property_read_u32(of_node, "ti,fifo-depth",
+	ret = of_property_read_u32(of_node, "ti,fifo-depth",
 				   &dp83867->fifo_depth);
+	if (ret)
+		dev_dbg(dev, "could not find ti,fifo-depth\n");
+
+	return 0;
 }
 #else
 static int dp83867_of_init(struct phy_device *phydev)
