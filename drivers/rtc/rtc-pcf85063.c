@@ -197,12 +197,12 @@ static int pcf85063_probe(struct i2c_client *client,
 {
 	struct rtc_device *rtc;
 	int err;
+	int offset;
 	unsigned char regs[3];
 
 	/* Control & status */
 	regs[PCF85063_REG_CTRL1] = 0x00;
 	regs[PCF85063_REG_CTRL2] = PCF85063_REG_CTRL2_CLKOUT_32KHZ;
-	regs[PCF85063_REG_OFFSET] = PCF85063_REG_OFFSET_MODE;
 
 	dev_dbg(&client->dev, "%s\n", __func__);
 
@@ -222,6 +222,16 @@ static int pcf85063_probe(struct i2c_client *client,
 	if (of_property_match_string(client->dev.of_node,
 				     "nxp,quartz_load", "12.5pF") == 0)
 		regs[PCF85063_REG_CTRL1] |= PCF85063_REG_CTRL1_CAP_SEL;
+
+	if (of_property_read_u32(client->dev.of_node, "nxp,offset",
+				 &offset)) {
+		i2c_smbus_read_i2c_block_data(client, PCF85063_REG_OFFSET,
+					      1, &regs[PCF85063_REG_OFFSET]);
+		dev_dbg(&client->dev,
+			"no offset found - keeping current value: 0x%02x\n",
+			regs[PCF85063_REG_OFFSET]);
+	} else
+		regs[PCF85063_REG_OFFSET] = (u8)(offset & 0xFF);
 
 	/* write register's data */
 	err = i2c_smbus_write_i2c_block_data(client, PCF85063_REG_CTRL1,
