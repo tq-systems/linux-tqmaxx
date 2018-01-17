@@ -647,6 +647,7 @@ config SOC_IMX7D
 	select SOC_IMX7
 	select PCI_DOMAINS if PCI
 	select PINCTRL_IMX7D
+	select HAVE_IMX_AMP
 	select HAVE_IMX_MU
 	select HAVE_IMX_RPMSG
 	select HAVE_IMX_BUSFREQ
