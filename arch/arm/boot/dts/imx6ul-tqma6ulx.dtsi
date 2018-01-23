@@ -13,22 +13,8 @@
 #include "imx6ul-tqma6ul.dtsi"
 
 / {
-	model = "TQMa6ULxL SOM";
-
-	regulators_tqma6ul {
-		compatible = "simple-bus";
-		#address-cells = <1>;
-		#size-cells = <0>;
-
-		reg_tqma6ul_3v3: regulator@0 {
-			compatible = "regulator-fixed";
-			regulator-name = "supply-tqma6ul-3v3";
-			reg = <0>;
-			regulator-min-microvolt = <3300000>;
-			regulator-max-microvolt = <3300000>;
-			regulator-always-on;
-		};
-	};};
+	model = "TQMa6ULx SOM";
+};
 
 &iomuxc {
 	imx6ul-tqma6ul {

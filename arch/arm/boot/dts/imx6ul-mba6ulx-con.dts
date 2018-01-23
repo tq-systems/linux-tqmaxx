@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Marco Felsch, TQ Systems GmbH
+ * Copyright 2017 Marco Felsch, TQ Systems GmbH
  *
  * The code contained herein is licensed under the GNU General Public
  * License. You may obtain a copy of the GNU General Public License
@@ -9,5 +9,5 @@
  * http://www.gnu.org/copyleft/gpl.html
  */
 
-#include "imx6ul-mba6ul.dts"
-#include "imx6ul-mba6ul-pd.dtsi"
+#include "imx6ul-mba6ulx.dts"
+#include "imx6ul-mba6ul-con.dtsi"

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Marco Felsch, TQ Systems GmbH
+ * Copyright 2017 Marco Felsch, TQ Systems GmbH
  *
  * The code contained herein is licensed under the GNU General Public
  * License. You may obtain a copy of the GNU General Public License
@@ -9,13 +9,5 @@
  * http://www.gnu.org/copyleft/gpl.html
  */
 
-/dts-v1/;
-
-#include <dt-bindings/input/input.h>
-#include "imx6ul-tqma6ul.dtsi"
-#include "imx6ul-mba6ul.dtsi"
-
-/ {
-	model = "TQ Systems i.MX6 UltraLite Baseboard with TQMa6UL";
-	compatible = "tqc,imx6ul-mba6ul", "fsl,imx6ul";
-};
+#include "imx6ul-mba6ulx.dts"
+#include "imx6ul-mba6ul-otg.dtsi"

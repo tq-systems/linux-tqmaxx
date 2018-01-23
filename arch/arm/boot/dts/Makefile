@@ -410,12 +410,12 @@ dtb-$(CONFIG_SOC_IMX6UL) += \
 	imx6ul-9x9-evk-btwifi.dtb \
 	imx6ul-9x9-evk-csi.dtb \
 	imx6ul-9x9-evk-ldo.dtb \
-	imx6ul-mba6ul.dtb \
-	imx6ul-mba6ul-con.dtb \
-	imx6ul-mba6ul-lvds.dtb \
-	imx6ul-mba6ul-otg.dtb \
-	imx6ul-mba6ul-pd.dtb \
-	imx6ul-mba6ul-pd-dmb.dtb \
+	imx6ul-mba6ulx.dtb \
+	imx6ul-mba6ulx-con.dtb \
+	imx6ul-mba6ulx-lvds.dtb \
+	imx6ul-mba6ulx-otg.dtb \
+	imx6ul-mba6ulx-pd.dtb \
+	imx6ul-mba6ulx-pd-dmb.dtb \
 	imx6ul-mba6ulxl.dtb \
 	imx6ul-mba6ulxl-con.dtb \
 	imx6ul-mba6ulxl-lvds.dtb \

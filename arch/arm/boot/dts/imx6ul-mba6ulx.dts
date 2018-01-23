@@ -9,5 +9,13 @@
  * http://www.gnu.org/copyleft/gpl.html
  */
 
-#include "imx6ul-mba6ul.dts"
-#include "imx6ul-mba6ul-pd-dmb.dtsi"
+/dts-v1/;
+
+#include <dt-bindings/input/input.h>
+#include "imx6ul-tqma6ulx.dtsi"
+#include "imx6ul-mba6ul.dtsi"
+
+/ {
+	model = "TQ Systems i.MX6 UltraLite Baseboard with TQMa6ULx";
+	compatible = "tqc,imx6ul-mba6ulx", "fsl,imx6ul";
+};
