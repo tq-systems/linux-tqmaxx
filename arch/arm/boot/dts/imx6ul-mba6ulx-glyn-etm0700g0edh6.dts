@@ -11,4 +11,4 @@
 
 #include "imx6ul-mba6ulx.dts"
 #include "imx6ul-mba6ul-lcdif.dtsi"
-#include "imx6ul-mba6ul-pd.dtsi"
+#include "imx6ul-mba6ul-glyn-etm0700g0edh6.dtsi"

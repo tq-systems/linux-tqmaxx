@@ -10,10 +10,9 @@
  */
 
 / {
-	/* ET0700G0DH6 + ETM0700G0DH6 + ETM0700G0BDH6 + S070WV106H-CT44 */
-	display_etm0700_dmb: display {
-		bits-per-pixel = <32>; /* 32: RGB888/666 mode */
-		/* change it to 18 for new hw rev. */
+	/* ETM0700G0EDH6 */
+	display_etm0700: display {
+		bits-per-pixel = <32>; /* 32: RGB8880 */
 		bus-width = <24>; 
 
 		display-timings {
@@ -38,7 +37,7 @@
 };
 
 &analog_touch {
-	status = "okay";
+	status = "disabled";
 };
 
 &backlight {
@@ -48,9 +47,8 @@
 	status = "okay";
 };
 
-
 &lcdif {
-	display = <&display_etm0700_dmb>;
+	display = <&display_etm0700>;
 	status = "okay";
 };
 
