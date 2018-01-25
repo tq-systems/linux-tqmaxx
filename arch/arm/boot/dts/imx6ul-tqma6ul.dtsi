@@ -184,10 +184,10 @@
 	pinctrl-0 = <&pinctrl_qspi>;
 	status = "okay";
 
-	flash0: n25q512a@0 {
+	flash0: spinor@0 {
 		#address-cells = <1>;
 		#size-cells = <1>;
-		compatible = "micron,n25q512a";
+		compatible = "jedec,spi-nor";
 		spi-max-frequency = <33000000>;
 		reg = <0>;
 	};
