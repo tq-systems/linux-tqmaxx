@@ -41,6 +41,9 @@
 	status = "okay";
 };
 
+/* for lcd reset != #stkrst */
+/* place r2021, resolder r2022 and iomux following: */
+/* MX6UL_PAD_LCD_RESET__GPIO3_IO04	0x79 */
 &lcdif {
 	display = <&display_lvds>;
 	lcd-supply = <&reg_lcd_pwr>;
