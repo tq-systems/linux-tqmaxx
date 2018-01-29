@@ -42,7 +42,7 @@
 
 &backlight {
 	pwms = <&pwm2 0 5000000>;
-	brightness-levels = <255 128 64 32 16 8 4 1 0>;
+	brightness-levels = <255 228 196 160 128 96 64 32 16>;
 	default-brightness-level = <5>;
 	status = "okay";
 };
