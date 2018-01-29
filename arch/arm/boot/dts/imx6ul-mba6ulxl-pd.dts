@@ -10,4 +10,5 @@
  */
 
 #include "imx6ul-mba6ulxl.dts"
+#include "imx6ul-mba6ul-lcdif.dtsi"
 #include "imx6ul-mba6ul-pd.dtsi"

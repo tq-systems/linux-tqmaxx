@@ -10,10 +10,10 @@
  */
 
 / {
-	/* ET0700G0DH6 + ETM0700G0DH6 + ETM0700G0BDH6 + S070WV106H-CT44 */
-	display_etm0700_dmb: display {
+	/* S070WV106H-CT44 */
+	display_ct44: display {
 		bits-per-pixel = <32>; /* 32: RGB888/666 mode */
-		bus-width = <24>; /* change it to 18 for new hw rev.  */
+		bus-width = <24>;
 
 		display-timings {
 			native-mode = <&timing1>;
@@ -34,11 +34,6 @@
 			};
 		};
 	};
-
-	pxp_v4l2 {
-		compatible = "fsl,imx6ul-pxp-v4l2", "fsl,imx6sx-pxp-v4l2", "fsl,imx6sl-pxp-v4l2";
-		status = "okay";
-	};
 };
 
 &backlight {
@@ -49,20 +44,12 @@
 };
 
 &lcdif {
-	display = <&display_etm0700_dmb>;
+	display = <&display_ct44>;
 	status = "okay";
 };
 
 &polytouch {
 	touchscreen-size-x = <800>;
 	touchscreen-size-y = <480>;
-	status = "okay";
-};
-
-&pwm4 {
-	status = "okay";
-};
-
-&pxp {
 	status = "okay";
 };
