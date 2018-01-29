@@ -412,6 +412,7 @@ dtb-$(CONFIG_SOC_IMX6UL) += \
 	imx6ul-9x9-evk-ldo.dtb \
 	imx6ul-mba6ulx.dtb \
 	imx6ul-mba6ulx-con.dtb \
+	imx6ul-mba6ulx-dmb-ct21.dtb \
 	imx6ul-mba6ulx-dmb-ct44.dtb \
 	imx6ul-mba6ulx-glyn-etm0700g0dh6.dtb \
 	imx6ul-mba6ulx-glyn-etm0700g0edh6.dtb \
@@ -419,6 +420,7 @@ dtb-$(CONFIG_SOC_IMX6UL) += \
 	imx6ul-mba6ulx-otg.dtb \
 	imx6ul-mba6ulxl.dtb \
 	imx6ul-mba6ulxl-con.dtb \
+	imx6ul-mba6ulxl-dmb-ct21.dtb \
 	imx6ul-mba6ulxl-dmb-ct44.dtb \
 	imx6ul-mba6ulxl-glyn-etm0700g0dh6.dtb \
 	imx6ul-mba6ulxl-glyn-etm0700g0edh6.dtb \
