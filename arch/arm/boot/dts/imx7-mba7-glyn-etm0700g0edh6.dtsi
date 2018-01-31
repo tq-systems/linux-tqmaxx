@@ -42,24 +42,23 @@
  */
 
 / {
+	/* ETM0700G0EDH6, DS 2016/04/06, ver 3 */
 	display_etm0700: display {
-		bits-per-pixel = <32>; /* 32: RGB888/666 mode */
+		bits-per-pixel = <32>; /* 32: RGB8880 */
 		bus-width = <18>;
 
 		display-timings {
 			native-mode = <&timing1>;
-
-			/* ET0700G0DH6 + ETM0700G0DH6 + ETM0700G0BDH6 */
 			timing1: 800x480p62 {
 				clock-frequency = <33260000>;
 				hactive = <800>;
 				vactive = <480>;
-				hback-porch = <216>;
 				hfront-porch = <40>;
-				vback-porch = <35>;
-				vfront-porch = <10>;
 				hsync-len = <128>;
+				hback-porch = <88>;
+				vfront-porch = <10>;
 				vsync-len = <2>;
+				vback-porch = <33>;
 				hsync-active = <0>;
 				vsync-active = <0>;
 				de-active = <1>;
@@ -70,8 +69,9 @@
 };
 
 &backlight {
-	pwms = <&pwm1 0 5000000>;
-	brightness-levels = <255 128 64 32 16 8 4 1 0>;
+	/* 1 kHz as stated by GLYN FAE */
+	pwms = <&pwm1 0 1000000>;
+	brightness-levels = <255 200 180 160 128 96 64 32 16>;
 	default-brightness-level = <5>;
 	status = "okay";
 };
@@ -82,13 +82,17 @@
 };
 
 &polytouch {
+	gain = <1>;
+	offset = <0>;
+	threshold = <0x0f>;
+
+	/* no wake gpio for this variant */
+	/delete-property/ wake-gpios;
+
 	/*
-	 * do not use size settings, display touch reads out 1792 x 1024
-	 * tested with ETM0700G0BDH6
+	 * do not use size settings, display touch reads
+	 * out and uses 1792 x 1024 (tested with ETM0700G0EDH6)
 	 */
-/*
-	touchscreen-size-x = <800>;
-	touchscreen-size-y = <480>;
-*/
+
 	status = "okay";
 };
