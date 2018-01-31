@@ -755,7 +755,8 @@ dtb-$(CONFIG_SOC_DRA7XX) += \
 	dra72-evm-revc.dtb \
 	dra71-evm.dtb \
 	dra76-evm.dtb \
-	tqma572x-mba57xx.dtb
+	tqma572x-mba57xx.dtb \
+	am572x-mba57xx.dtb
 dtb-$(CONFIG_ARCH_ORION5X) += \
 	orion5x-kuroboxpro.dtb \
 	orion5x-lacie-d2-network.dtb \
