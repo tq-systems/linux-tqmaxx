@@ -464,10 +464,10 @@ dtb-$(CONFIG_SOC_IMX7D) += \
 	imx7d-12x12-lpddr3-arm2-pcie.dtb \
 	imx7d-19x19-lpddr2-arm2.dtb \
 	imx7d-mba7.dtb \
+	imx7d-mba7-dmb-ct21.dtb \
+	imx7d-mba7-glyn-etm0700g0edh6.dtb \
 	imx7d-mba7-lvds.dtb \
 	imx7d-mba7-otg.dtb \
-	imx7d-mba7-pd.dtb \
-	imx7d-mba7-pd-dmb.dtb \
 	imx7d-sdb.dtb \
 	imx7d-sdb-epdc.dtb \
 	imx7d-sdb-gpmi-weim.dtb \
