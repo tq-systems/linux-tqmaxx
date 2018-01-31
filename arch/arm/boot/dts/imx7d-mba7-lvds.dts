@@ -42,4 +42,5 @@
  */
 
 #include "imx7d-mba7.dts"
-#include "imx7d-mba7-lvds.dtsi"
+#include "imx7-mba7-lcdif.dtsi"
+#include "imx7-mba7-lvds.dtsi"
