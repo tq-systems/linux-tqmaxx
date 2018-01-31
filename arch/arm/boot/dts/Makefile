@@ -785,7 +785,8 @@ dtb-merge-$(CONFIG_SOC_DRA7XX) += \
 	dra76-evm-ov5640.dtb \
 	dra76-evm-tfp410.dtb \
 	dra76-evm-tfp410-ov490.dtb \
-	dra76-evm-tfp410-ov5640.dtb
+	dra76-evm-tfp410-ov5640.dtb \
+	tqma572x-mba57xx.dtb
 ifeq ($(CONFIG_SOC_DRA7XX),y)
 dts-dirs += ti
 endif
