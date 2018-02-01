@@ -418,14 +418,14 @@ dtb-$(CONFIG_SOC_IMX6UL) += \
 	imx6ul-mba6ulx-glyn-etm0700g0edh6.dtb \
 	imx6ul-mba6ulx-lvds.dtb \
 	imx6ul-mba6ulx-otg.dtb \
-	imx6ul-mba6ulxl.dtb \
-	imx6ul-mba6ulxl-con.dtb \
-	imx6ul-mba6ulxl-dmb-ct21.dtb \
-	imx6ul-mba6ulxl-dmb-ct44.dtb \
-	imx6ul-mba6ulxl-glyn-etm0700g0dh6.dtb \
-	imx6ul-mba6ulxl-glyn-etm0700g0edh6.dtb \
-	imx6ul-mba6ulxl-lvds.dtb \
-	imx6ul-mba6ulxl-otg.dtb
+	imx6ul-mba6ulx-lga.dtb \
+	imx6ul-mba6ulx-lga-con.dtb \
+	imx6ul-mba6ulx-lga-dmb-ct21.dtb \
+	imx6ul-mba6ulx-lga-dmb-ct44.dtb \
+	imx6ul-mba6ulx-lga-glyn-etm0700g0dh6.dtb \
+	imx6ul-mba6ulx-lga-glyn-etm0700g0edh6.dtb \
+	imx6ul-mba6ulx-lga-lvds.dtb \
+	imx6ul-mba6ulx-lga-otg.dtb
 dtb-$(CONFIG_SOC_IMX6ULL) += \
 	imx6ull-14x14-ddr3-arm2.dtb \
 	imx6ull-14x14-ddr3-arm2-adc.dtb \

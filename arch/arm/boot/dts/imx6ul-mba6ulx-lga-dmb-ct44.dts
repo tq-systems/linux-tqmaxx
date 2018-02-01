@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2016 Marco Felsch, TQ Systems GmbH
  *
@@ -10,6 +9,6 @@
  * http://www.gnu.org/copyleft/gpl.html
  */
 
-#include "imx6ul-mba6ulxl.dts"
+#include "imx6ul-mba6ulx-lga.dts"
 #include "imx6ul-mba6ul-lcdif.dtsi"
-#include "imx6ul-mba6ul-glyn-etm0700g0edh6.dtsi"
+#include "imx6ul-mba6ul-dmb-ct44.dtsi"

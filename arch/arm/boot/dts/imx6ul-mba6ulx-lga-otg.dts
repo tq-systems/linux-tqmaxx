@@ -9,5 +9,5 @@
  * http://www.gnu.org/copyleft/gpl.html
  */
 
-#include "imx6ul-mba6ulxl.dts"
-#include "imx6ul-mba6ul-con.dtsi"
+#include "imx6ul-mba6ulx-lga.dts"
+#include "imx6ul-mba6ul-otg.dtsi"
