@@ -51,12 +51,13 @@
 
 &polytouch {
 	/* reset-gpios is controlled by stk reset */
-	gain = <20>;
+	gain = <1>;
+	offset = <0>;
+	threshold = <0x0f>;
 
 	/*
-	 * HACKHACK:
 	 * do not use size settings, display touch reads
-	 * out 1792 x 1024 (tested with ETM0700G0DH6)
+	 * out and uses 1792 x 1024 (tested with ETM0700G0EDH6)
 	 */
 
 	status = "okay";
