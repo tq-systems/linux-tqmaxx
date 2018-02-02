@@ -10,7 +10,11 @@
  */
 
 / {
-	/* S070WV106H-CT44 */
+	/* compatible:
+	 * S070WV106H-CT44 v1.0 2017/02/21
+	 * S070SWV29HG-DC44 v 3.0 2017/02/21
+	 * Truecolor FB needed - pin config on display adapter
+	 */
 	display_ct44: display {
 		bits-per-pixel = <32>; /* 32: RGB888/666 mode */
 		bus-width = <24>;
@@ -18,15 +22,15 @@
 		display-timings {
 			native-mode = <&timing1>;
 			timing1: 800x480p62 {
-				clock-frequency = <33260000>;
+				clock-frequency = <26300000 33300000 46800000>;
 				hactive = <800>;
 				vactive = <480>;
-				hback-porch = <216>;
-				hfront-porch = <40>;
-				vback-porch = <35>;
-				vfront-porch = <10>;
-				hsync-len = <128>;
+				hfront-porch = <210>;
+				hsync-len = <2>;
+				hback-porch = <44>;
+				vfront-porch = <22>;
 				vsync-len = <2>;
+				vback-porch = <21>;
 				hsync-active = <0>;
 				vsync-active = <0>;
 				de-active = <1>;
