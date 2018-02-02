@@ -37,8 +37,9 @@
 };
 
 &backlight {
-	pwms = <&pwm2 0 5000000>;
-	brightness-levels = <255 228 196 160 128 96 64 32 16>;
+	/* 1 kHz as stated by GLYN FAE */
+	pwms = <&pwm2 0 1000000>;
+	brightness-levels = <255 200 180 160 128 96 64 32 16>;
 	default-brightness-level = <5>;
 	status = "okay";
 };
