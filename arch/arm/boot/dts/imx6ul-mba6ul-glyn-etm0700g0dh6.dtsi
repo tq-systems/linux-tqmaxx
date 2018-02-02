@@ -10,7 +10,7 @@
  */
 
 / {
-	/* ETM0700G0DH6 */
+	/* ETM0700G0DH6  DS 2011/07/27, ver 2  */
 	display_etm0700: display {
 		bits-per-pixel = <32>; /* 32: RGB8880 mode */
 		bus-width = <24>; 
@@ -18,20 +18,19 @@
 		display-timings {
 			native-mode = <&timing1>;
 			timing1: 800x480p62 {
-				/* clock-frequency = <33260000>; */
-				clock-frequency = <20000000>;
+				clock-frequency = <33260000>;
 				hactive = <800>;
 				vactive = <480>;
-				hback-porch = <216>;
 				hfront-porch = <40>;
-				vback-porch = <35>;
-				vfront-porch = <10>;
 				hsync-len = <128>;
+				hback-porch = <88>;
+				vfront-porch = <10>;
 				vsync-len = <2>;
+				vback-porch = <33>;
 				hsync-active = <0>;
 				vsync-active = <0>;
 				de-active = <1>;
-				pixelclk-active = <0>;
+				pixelclk-active = <1>;
 			};
 		};
 	};
@@ -93,7 +92,6 @@
 	gain = <20>;
 
 	/*
-	 * HACKHACK:
 	 * do not use size settings, display touch reads
 	 * out 1792 x 1024 (tested with ETM0700G0DH6)
 	 */
