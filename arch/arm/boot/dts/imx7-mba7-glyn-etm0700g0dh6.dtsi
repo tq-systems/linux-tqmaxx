@@ -1,0 +1,92 @@
+/*
+ * Copyright (C) 2016 TQ Systems GmbH
+ * Author: Marco Felsch <Marco.Felsch@tq-group.com>
+ *
+ * This file is dual-licensed: you can use it either under the terms
+ * of the GPL or the X11 license, at your option. Note that this dual
+ * licensing only applies to this file, and not this project as a
+ * whole.
+ *
+ *  a) This file is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 2 of the
+ *     License, or (at your option) any later version.
+ *
+ *     This file is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ * Or, alternatively,
+ *
+ *  b) Permission is hereby granted, free of charge, to any person
+ *     obtaining a copy of this software and associated documentation
+ *     files (the "Software"), to deal in the Software without
+ *     restriction, including without limitation the rights to use,
+ *     copy, modify, merge, publish, distribute, sublicense, and/or
+ *     sell copies of the Software, and to permit persons to whom the
+ *     Software is furnished to do so, subject to the following
+ *     conditions:
+ *
+ *     The above copyright notice and this permission notice shall be
+ *     included in all copies or substantial portions of the Software.
+ *
+ *     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ *     EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ *     OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ *     NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *     HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *     WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ *     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ *     OTHER DEALINGS IN THE SOFTWARE.
+ */
+
+/ {
+	/* ETM0700G0DH6  DS 2011/07/27, ver 2  */
+	display_etm0700: display {
+		bits-per-pixel = <32>; /* 32: RGB8880 */
+		bus-width = <18>;
+
+		display-timings {
+			native-mode = <&timing1>;
+			timing1: 800x480p62 {
+				clock-frequency = <33260000>;
+				hactive = <800>;
+				vactive = <480>;
+				hfront-porch = <40>;
+				hsync-len = <128>;
+				hback-porch = <88>;
+				vfront-porch = <10>;
+				vsync-len = <2>;
+				vback-porch = <33>;
+				hsync-active = <0>;
+				vsync-active = <0>;
+				de-active = <1>;
+				pixelclk-active = <1>;
+			};
+		};
+	};
+};
+
+&backlight {
+	pwms = <&pwm1 0 5000000>;
+	brightness-levels = <255 228 196 160 128 96 64 32 16>;
+	default-brightness-level = <5>;
+	status = "okay";
+};
+
+&lcdif {
+	display = <&display_etm0700>;
+	status = "okay";
+};
+
+&polytouch {
+	gain = <20>;
+
+	/*
+	 * do not use size settings, display touch reads
+	 * out 1792 x 1024 (tested with ETM0700G0DH6)
+	 */
+
+	status = "okay";
+};

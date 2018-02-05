@@ -259,7 +259,7 @@
 	pinctrl-0 = <&pinctrl_qspi1>;
 	status = "okay";
 
-	flash0: n25q512ax3@0 {
+	flash0: spinor@0 {
 		#address-cells = <1>;
 		#size-cells = <1>;
 		compatible = "jedec,spi-nor";
