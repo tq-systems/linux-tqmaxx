@@ -40,7 +40,8 @@
 };
 
 &backlight {
-	pwms = <&pwm2 0 20000>; /* 50 kHz */
+	/* 50000 ... 1000 nsec -> 20 ... 1000 kHz */
+	pwms = <&pwm2 0 20000>;
 	brightness-levels = <0 2 4 8 16 32 64 128 255>;
 	default-brightness-level = <8>;
 	status = "okay";
