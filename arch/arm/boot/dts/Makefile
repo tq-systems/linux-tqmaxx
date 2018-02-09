@@ -470,6 +470,7 @@ dtb-$(CONFIG_SOC_IMX7D) += \
 	imx7d-mba7-glyn-etm0700g0edh6.dtb \
 	imx7d-mba7-lvds.dtb \
 	imx7d-mba7-otg.dtb \
+	imx7d-mba7-r0100.dtb \
 	imx7d-sdb.dtb \
 	imx7d-sdb-epdc.dtb \
 	imx7d-sdb-gpmi-weim.dtb \
@@ -490,7 +491,8 @@ dtb-$(CONFIG_SOC_IMX7D) += \
 	imx7s-mba7-glyn-etm0700g0dh6.dtb \
 	imx7s-mba7-glyn-etm0700g0edh6.dtb \
 	imx7s-mba7-lvds.dtb \
-	imx7s-mba7-otg.dtb
+	imx7s-mba7-otg.dtb \
+	imx7s-mba7-r0100.dtb
 dtb-$(CONFIG_SOC_LS1021A) += \
 	ls1021a-qds.dtb \
 	ls1021a-twr.dtb
