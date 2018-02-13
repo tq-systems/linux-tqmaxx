@@ -465,10 +465,16 @@ dtb-$(CONFIG_SOC_IMX7D) += \
 	imx7d-19x19-lpddr2-arm2.dtb \
 	imx7d-mba7.dtb \
 	imx7d-mba7-dmb-ct21.dtb \
+	imx7d-mba7-dmb-ct21-r0100.dtb \
 	imx7d-mba7-dmb-ct44.dtb \
+	imx7d-mba7-dmb-ct44-r0100.dtb \
 	imx7d-mba7-glyn-etm0700g0dh6.dtb \
+	imx7d-mba7-glyn-etm0700g0dh6-r0100.dtb \
 	imx7d-mba7-glyn-etm0700g0edh6.dtb \
+	imx7d-mba7-glyn-etm0700g0edh6-r0100.dtb \
 	imx7d-mba7-lvds.dtb \
+	imx7d-mba7-lvds-r0100.dtb \
+	imx7d-mba7-otg-r0100.dtb \
 	imx7d-mba7-otg.dtb \
 	imx7d-mba7-r0100.dtb \
 	imx7d-sdb.dtb \
@@ -487,11 +493,17 @@ dtb-$(CONFIG_SOC_IMX7D) += \
 	imx7d-sdb-reva-wm8960.dtb \
 	imx7s-mba7.dtb \
 	imx7s-mba7-dmb-ct21.dtb \
+	imx7s-mba7-dmb-ct21-r0100.dtb \
 	imx7s-mba7-dmb-ct44.dtb \
+	imx7s-mba7-dmb-ct44-r0100.dtb \
+	imx7s-mba7-glyn-etm0700g0dh6-r0100.dtb \
 	imx7s-mba7-glyn-etm0700g0dh6.dtb \
 	imx7s-mba7-glyn-etm0700g0edh6.dtb \
+	imx7s-mba7-glyn-etm0700g0edh6-r0100.dtb \
 	imx7s-mba7-lvds.dtb \
+	imx7s-mba7-lvds-r0100.dtb \
 	imx7s-mba7-otg.dtb \
+	imx7s-mba7-otg-r0100.dtb \
 	imx7s-mba7-r0100.dtb
 dtb-$(CONFIG_SOC_LS1021A) += \
 	ls1021a-qds.dtb \
