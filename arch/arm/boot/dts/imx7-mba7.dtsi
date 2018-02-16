@@ -513,14 +513,6 @@
 			>;
 		};
 
-		pinctrl_pcie: pciegrp {
-			fsl,pins = <
-				MX7D_PAD_EPDC_PWR_COM__GPIO2_IO30	0x70 /* #pcie_wake */
-				MX7D_PAD_SD2_CLK__GPIO5_IO12		0x70 /* #pcie_rst */
-				MX7D_PAD_EPDC_BDR1__GPIO2_IO29		0x70 /* #pcie_dis */
-			>;
-		};
-
 		pinctrl_sai1: sai1grp {
 			fsl,pins = <
 				MX7D_PAD_SAI1_MCLK__SAI1_MCLK		0x11
@@ -652,19 +644,6 @@
 			>;
 		};
 	};
-};
-
-&pcie {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_pcie>;
-	/* 1.5V logically from 3.3V */
-	/* TODO: probe deferal not supported */
-	/* pcie-bus-supply = <&reg_mpcie_1v5>; */
-	reset-gpio = <&gpio5 12 GPIO_ACTIVE_LOW>;
-	disable-gpio = <&gpio2 29 GPIO_ACTIVE_LOW>;
-	power-on-gpio = <&gpio2 30 GPIO_ACTIVE_LOW>;
-	/* TODO: ext_osc? */
-	status = "okay";
 };
 
 &pwm1 {
