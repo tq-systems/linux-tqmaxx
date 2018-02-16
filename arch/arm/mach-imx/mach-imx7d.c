@@ -160,6 +160,7 @@ static void __init imx7d_init_late(void)
 
 static const char *imx7d_dt_compat[] __initconst = {
 	"fsl,imx7d",
+	"fsl,imx7s",
 	NULL,
 };
 
