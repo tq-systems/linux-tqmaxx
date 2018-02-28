@@ -203,6 +203,13 @@
 	status = "okay";
 };
 
+&i2c2 {
+	clock-frequency = <100000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_i2c2>;
+	status = "okay";
+};
+
 &i2c4 {
 	/* port expander */
 	expander: pca9554@22 {
@@ -303,6 +310,13 @@
 
 		pinctrl_hog_mba6ulxl: hogmba6ulxlgrp {
 			fsl,pins = <
+			>;
+		};
+
+		pinctrl_i2c2: i2c2grp {
+			fsl,pins = <
+				MX6UL_PAD_CSI_HSYNC__I2C2_SCL		0x4001b8b0
+				MX6UL_PAD_CSI_VSYNC__I2C2_SDA		0x4001b8b0
 			>;
 		};
 
