@@ -43,6 +43,16 @@
 
 #include "imx7-tqma7.dtsi"
 
+/delete-node/ &sensor0;
+/delete-node/ &eeprom1;
+
+&i2c1 {
+	sensor0: lm75@48 {
+		compatible = "lm75";
+		reg = <0x48>;
+	};
+};
+
 &iomuxc {
 	imx7d-tqma7 {
 		pinctrl_usdhc3: usdhc3grp {
