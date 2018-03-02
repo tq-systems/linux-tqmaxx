@@ -247,7 +247,13 @@
 		interrupt-controller;
 		#interrupt-cells = <2>;
 		status = "okay";
-/* TODO: hog port 2 as output high (boot cfg en#) */
+
+		boot_cfg_en {
+			gpio-hog;
+			gpios = <2>;
+			output-high;
+			line-name = "boot_cfg_en";
+		};
 	};
 
 	analog_touch: stmpe811@41 {
