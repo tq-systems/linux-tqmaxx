@@ -98,6 +98,8 @@
 			reg = <6>;
 			gpio = <&gpio1 2 GPIO_ACTIVE_HIGH>;
 			enable-active-high;
+			/* always on -> VIO for STMPE, otherwise I2C stall */
+			regulator-always-on;
 			regulator-min-microvolt = <3300000>;
 			regulator-max-microvolt = <3300000>;
 			vin_supply = <&reg_mba6ul_3v3>;
