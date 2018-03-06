@@ -172,6 +172,21 @@
 	status = "disabled";
 };
 
+&ecspi5 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_ecspi5>;
+	fsl,spi-num-chipselects = <1>;
+	cs-gpios = <&gpio1 17 0>;
+	status = "okay";
+
+	spidev5_0: spidev5-0@0 {
+		compatible = "ir-spi-led";
+		spi-max-frequency = <1000000>;
+		reg = <0>;
+		status = "okay";
+	};
+};
+
 &fec {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_enet>;
@@ -237,6 +252,13 @@
 			>;
 		};
 
+		pinctrl_ecspi5: ecspi5grp {
+			fsl,pins = <
+					/* IR sender */
+				MX6QDL_PAD_SD1_CMD__ECSPI5_MOSI 0xb099
+			>;
+		};
+
 		pinctrl_enet: enetgrp {
 			fsl,pins = <
 				/* DSE = 100, 100k up, SPEED = MED */
@@ -269,8 +291,6 @@
 				MX6QDL_PAD_EIM_OE__GPIO2_IO25		0x0001b099
 				MX6QDL_PAD_EIM_D27__GPIO3_IO27		0x0001b099
 				MX6QDL_PAD_EIM_D29__GPIO3_IO29		0x0001b099
-				/* IR sender */
-				MX6QDL_PAD_NANDF_CLE__GPIO6_IO07	0x0001b099
 				/* zero credit */
 				MX6QDL_PAD_SD4_DAT3__GPIO2_IO11		0x0001b099
 			>;
