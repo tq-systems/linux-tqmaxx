@@ -1266,21 +1266,28 @@ struct rc_dev *rc_allocate_device(enum rc_driver_type type)
 	if (!dev)
 		return NULL;
 
-	dev->input_dev = input_allocate_device();
-	if (!dev->input_dev) {
-		kfree(dev);
-		return NULL;
+	if (type != RC_DRIVER_IR_RAW_TX) 
+	{
+		dev->input_dev = input_allocate_device();
+		
+		if (!dev->input_dev) 
+		{
+			kfree(dev);
+			return NULL;
+		}
+		
+		dev->input_dev->getkeycode = ir_getkeycode;
+		dev->input_dev->setkeycode = ir_setkeycode;
+		input_set_drvdata(dev->input_dev, dev);
+		setup_timer(&dev->timer_keyup, ir_timer_keyup,
+                           (unsigned long)dev);
+
+		spin_lock_init(&dev->rc_map.lock);
+		spin_lock_init(&dev->keylock);
 	}
-
-	dev->input_dev->getkeycode = ir_getkeycode;
-	dev->input_dev->setkeycode = ir_setkeycode;
-	input_set_drvdata(dev->input_dev, dev);
-
-	spin_lock_init(&dev->rc_map.lock);
-	spin_lock_init(&dev->keylock);
+	
 	mutex_init(&dev->lock);
-	setup_timer(&dev->timer_keyup, ir_timer_keyup, (unsigned long)dev);
-
+	
 	dev->dev.type = &rc_dev_type;
 	dev->dev.class = &rc_class;
 	device_initialize(&dev->dev);
@@ -1379,7 +1386,7 @@ out_table:
 
 static void rc_free_rx_device(struct rc_dev *dev)
 {
-       if (!dev)
+       if (!dev || dev->driver_type == RC_DRIVER_IR_RAW_TX)
                return;
 
        ir_free_table(&dev->rc_map);
@@ -1408,7 +1415,9 @@ int rc_register_device(struct rc_dev *dev)
 	} while (test_and_set_bit(devno, ir_core_dev_number));
 
 	dev->dev.groups = dev->sysfs_groups;
-	dev->sysfs_groups[attr++] = &rc_dev_protocol_attr_grp;
+	if (dev->driver_type != RC_DRIVER_IR_RAW_TX)
+			dev->sysfs_groups[attr++] = &rc_dev_protocol_attr_grp;
+
 	if (dev->s_filter)
 		dev->sysfs_groups[attr++] = &rc_dev_filter_attr_grp;
 	if (dev->s_wakeup_filter)
@@ -1416,14 +1425,6 @@ int rc_register_device(struct rc_dev *dev)
 	if (dev->change_wakeup_protocol)
 		dev->sysfs_groups[attr++] = &rc_dev_wakeup_protocol_attr_grp;
 	dev->sysfs_groups[attr++] = NULL;
-
-	/*
-	 * Take the lock here, as the device sysfs node will appear
-	 * when device_add() is called, which may trigger an ir-keytable udev
-	 * rule, which will in turn call show_protocols and access
-	 * dev->enabled_protocols before it has been initialized.
-	 */
-	mutex_lock(&dev->lock);
 
 	dev->devno = devno;
 	dev_set_name(&dev->dev, "rc%ld", dev->devno);
@@ -1440,21 +1441,25 @@ int rc_register_device(struct rc_dev *dev)
 		path ? path : "N/A");
 	kfree(path);
 
-	rc = rc_setup_rx_device(dev);
-	if (rc)
-		goto out_dev;
+	if (dev->driver_type != RC_DRIVER_IR_RAW_TX) 
+	{
+		rc = rc_setup_rx_device(dev);
+		if (rc)
+			goto out_dev;
+	}
 
-	if (dev->driver_type == RC_DRIVER_IR_RAW) {
+	if (dev->driver_type == RC_DRIVER_IR_RAW ||
+		dev->driver_type == RC_DRIVER_IR_RAW_TX) 
+	{
 		/* Load raw decoders, if they aren't already */
 		if (!raw_init) {
 			IR_dprintk(1, "Loading raw decoders\n");
 			ir_raw_init();
 			raw_init = true;
 		}
-		/* calls ir_register_device so unlock mutex here*/
-		mutex_unlock(&dev->lock);
+
 		rc = ir_raw_event_register(dev);
-		mutex_lock(&dev->lock);
+
 		if (rc < 0)
 			goto out_rx;
 	}
