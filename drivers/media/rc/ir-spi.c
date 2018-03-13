@@ -141,6 +141,7 @@ static int ir_spi_probe(struct spi_device *spi)
 		return -ENOMEM;
 
 	idata->regulator = devm_regulator_get(&spi->dev, "irda_regulator");
+	
 	if (IS_ERR(idata->regulator))
 		return PTR_ERR(idata->regulator);
 
@@ -156,6 +157,7 @@ static int ir_spi_probe(struct spi_device *spi)
 	idata->rc->s_tx_carrier    = ir_spi_set_tx_carrier;
 	idata->rc->s_tx_duty_cycle = ir_spi_set_duty_cycle;
 	idata->rc->driver_name     = IR_SPI_DRIVER_NAME;
+	idata->rc->map_name        = RC_MAP_EMPTY;
 	idata->rc->priv            = idata;
 	idata->spi                 = spi;
 
