@@ -1306,14 +1306,12 @@ void rc_free_device(struct rc_dev *dev)
 }
 EXPORT_SYMBOL_GPL(rc_free_device);
 
-int rc_register_device(struct rc_dev *dev)
+static int rc_setup_rx_device(struct rc_dev *dev)
 {
-	static bool raw_init = false; /* raw decoders loaded? */
+	int rc;
 	struct rc_map *rc_map;
-	const char *path;
-	int rc, devno, attr = 0;
 
-	if (!dev || !dev->map_name)
+	if (!dev->map_name)
 		return -EINVAL;
 
 	rc_map = rc_map_get(dev->map_name);
@@ -1321,6 +1319,21 @@ int rc_register_device(struct rc_dev *dev)
 		rc_map = rc_map_get(RC_MAP_EMPTY);
 	if (!rc_map || !rc_map->scan || rc_map->size == 0)
 		return -EINVAL;
+
+	rc = ir_setkeytable(dev, rc_map);
+	if (rc)
+		return rc;
+
+	if (dev->change_protocol)
+	{
+		u64 rc_type = (1ll << rc_map->rc_type);
+
+		rc = dev->change_protocol(dev, &rc_type);
+		if (rc < 0)
+			goto out_table;
+
+		dev->enabled_protocols = rc_type;
+	}
 
 	set_bit(EV_KEY, dev->input_dev->evbit);
 	set_bit(EV_REP, dev->input_dev->evbit);
@@ -1330,6 +1343,61 @@ int rc_register_device(struct rc_dev *dev)
 		dev->input_dev->open = ir_open;
 	if (dev->close)
 		dev->input_dev->close = ir_close;
+
+       /*
+        * Default delay of 250ms is too short for some protocols, especially
+        * since the timeout is currently set to 250ms. Increase it to 500ms,
+        * to avoid wrong repetition of the keycodes. Note that this must be
+        * set after the call to input_register_device().
+        */
+       dev->input_dev->rep[REP_DELAY] = 500;
+
+       /*
+        * As a repeat event on protocols like RC-5 and NEC take as long as
+        * 110/114ms, using 33ms as a repeat period is not the right thing
+        * to do.
+        */
+       dev->input_dev->rep[REP_PERIOD] = 125;
+
+       dev->input_dev->dev.parent = &dev->dev;
+       memcpy(&dev->input_dev->id, &dev->input_id, sizeof(dev->input_id));
+       dev->input_dev->phys = dev->input_phys;
+       dev->input_dev->name = dev->input_name;
+
+       /* rc_open will be called here */
+       rc = input_register_device(dev->input_dev);
+       if (rc)
+               goto out_table;
+
+       return 0;
+
+out_table:
+       ir_free_table(&dev->rc_map);
+
+       return rc;
+}
+
+static void rc_free_rx_device(struct rc_dev *dev)
+{
+       if (!dev)
+               return;
+
+       ir_free_table(&dev->rc_map);
+
+       input_unregister_device(dev->input_dev);
+       dev->input_dev = NULL;
+}
+
+int rc_register_device(struct rc_dev *dev)
+{
+       static bool raw_init; /* 'false' default value, raw decoders loaded? */
+       const char *path;
+       int attr = 0;
+       int devno;
+       int rc;
+
+       if (!dev)
+               return -EINVAL;
 
 	do {
 		devno = find_first_zero_bit(ir_core_dev_number,
@@ -1364,39 +1432,6 @@ int rc_register_device(struct rc_dev *dev)
 	if (rc)
 		goto out_unlock;
 
-	rc = ir_setkeytable(dev, rc_map);
-	if (rc)
-		goto out_dev;
-
-	dev->input_dev->dev.parent = &dev->dev;
-	memcpy(&dev->input_dev->id, &dev->input_id, sizeof(dev->input_id));
-	dev->input_dev->phys = dev->input_phys;
-	dev->input_dev->name = dev->input_name;
-
-	/* input_register_device can call ir_open, so unlock mutex here */
-	mutex_unlock(&dev->lock);
-
-	rc = input_register_device(dev->input_dev);
-
-	mutex_lock(&dev->lock);
-
-	if (rc)
-		goto out_table;
-
-	/*
-	 * Default delay of 250ms is too short for some protocols, especially
-	 * since the timeout is currently set to 250ms. Increase it to 500ms,
-	 * to avoid wrong repetition of the keycodes. Note that this must be
-	 * set after the call to input_register_device().
-	 */
-	dev->input_dev->rep[REP_DELAY] = 500;
-
-	/*
-	 * As a repeat event on protocols like RC-5 and NEC take as long as
-	 * 110/114ms, using 33ms as a repeat period is not the right thing
-	 * to do.
-	 */
-	dev->input_dev->rep[REP_PERIOD] = 125;
 
 	path = kobject_get_path(&dev->dev.kobj, GFP_KERNEL);
 	printk(KERN_INFO "%s: %s as %s\n",
@@ -1404,6 +1439,10 @@ int rc_register_device(struct rc_dev *dev)
 		dev->input_name ? dev->input_name : "Unspecified device",
 		path ? path : "N/A");
 	kfree(path);
+
+	rc = rc_setup_rx_device(dev);
+	if (rc)
+		goto out_dev;
 
 	if (dev->driver_type == RC_DRIVER_IR_RAW) {
 		/* Load raw decoders, if they aren't already */
@@ -1417,37 +1456,18 @@ int rc_register_device(struct rc_dev *dev)
 		rc = ir_raw_event_register(dev);
 		mutex_lock(&dev->lock);
 		if (rc < 0)
-			goto out_input;
+			goto out_rx;
 	}
 
-	if (dev->change_protocol) {
-		u64 rc_type = (1ll << rc_map->rc_type);
-		if (dev->driver_type == RC_DRIVER_IR_RAW)
-			rc_type |= RC_BIT_LIRC;
-		rc = dev->change_protocol(dev, &rc_type);
-		if (rc < 0)
-			goto out_raw;
-		dev->enabled_protocols = rc_type;
-	}
 
-	mutex_unlock(&dev->lock);
-
-	IR_dprintk(1, "Registered rc%ld (driver: %s, remote: %s, mode %s)\n",
+	IR_dprintk(1, "Registered rc%ld (driver: %s)\n",
 		   dev->devno,
-		   dev->driver_name ? dev->driver_name : "unknown",
-		   rc_map->name ? rc_map->name : "unknown",
-		   dev->driver_type == RC_DRIVER_IR_RAW ? "raw" : "cooked");
+		   dev->driver_name ? dev->driver_name : "unknown");
 
 	return 0;
 
-out_raw:
-	if (dev->driver_type == RC_DRIVER_IR_RAW)
-		ir_raw_event_unregister(dev);
-out_input:
-	input_unregister_device(dev->input_dev);
-	dev->input_dev = NULL;
-out_table:
-	ir_free_table(&dev->rc_map);
+out_rx:
+	rc_free_rx_device(dev);
 out_dev:
 	device_del(&dev->dev);
 out_unlock:
@@ -1469,12 +1489,7 @@ void rc_unregister_device(struct rc_dev *dev)
 	if (dev->driver_type == RC_DRIVER_IR_RAW)
 		ir_raw_event_unregister(dev);
 
-	/* Freeing the table should also call the stop callback */
-	ir_free_table(&dev->rc_map);
-	IR_dprintk(1, "Freed keycode table\n");
-
-	input_unregister_device(dev->input_dev);
-	dev->input_dev = NULL;
+	rc_free_rx_device(dev);
 
 	device_del(&dev->dev);
 
