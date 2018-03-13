@@ -859,7 +859,7 @@ static struct rc_dev *redrat3_init_rc_dev(struct redrat3_dev *rr3)
 	int ret = -ENODEV;
 	u16 prod = le16_to_cpu(rr3->udev->descriptor.idProduct);
 
-	rc = rc_allocate_device();
+	rc = rc_allocate_device(RC_DRIVER_IR_RAW);
 	if (!rc) {
 		dev_err(dev, "remote input dev allocation failed\n");
 		goto out;
@@ -877,7 +877,6 @@ static struct rc_dev *redrat3_init_rc_dev(struct redrat3_dev *rr3)
 	usb_to_input_id(rr3->udev, &rc->input_id);
 	rc->dev.parent = dev;
 	rc->priv = rr3;
-	rc->driver_type = RC_DRIVER_IR_RAW;
 	rc->allowed_protocols = RC_BIT_ALL;
 	rc->timeout = US_TO_NS(2750);
 	rc->tx_ir = redrat3_transmit_ir;

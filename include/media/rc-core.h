@@ -29,9 +29,16 @@ do {								\
 		printk(KERN_DEBUG pr_fmt(fmt), ##__VA_ARGS__);	\
 } while (0)
 
+/**
+ * enum rc_driver_type - type of the RC output
+ *
+ * @RC_DRIVER_SCANCODE:	Driver or hardware generates a scancode
+ * @RC_DRIVER_IR_RAW:	Driver or hardware generates pulse/space sequences.
+ *			It needs a Infra-Red pulse/space decoder
+ */
 enum rc_driver_type {
-	RC_DRIVER_SCANCODE = 0,	/* Driver or hardware generates a scancode */
-	RC_DRIVER_IR_RAW,	/* Needs a Infra-Red pulse/space decoder */
+	RC_DRIVER_SCANCODE = 0,
+	RC_DRIVER_IR_RAW,
 };
 
 /**
@@ -182,8 +189,14 @@ struct rc_dev {
  * basically creates an input_dev and properly reports the device as a
  * Remote Controller, at sys/class/rc.
  */
+/**
+ * rc_allocate_device - Allocates a RC device
+ *
+ * @rc_driver_type: specifies the type of the RC output to be allocated
+ * returns a pointer to struct rc_dev.
+ */
+struct rc_dev *rc_allocate_device(enum rc_driver_type);
 
-struct rc_dev *rc_allocate_device(void);
 void rc_free_device(struct rc_dev *dev);
 int rc_register_device(struct rc_dev *dev);
 void rc_unregister_device(struct rc_dev *dev);

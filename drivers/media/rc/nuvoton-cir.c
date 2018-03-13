@@ -979,7 +979,7 @@ static int nvt_probe(struct pnp_dev *pdev, const struct pnp_device_id *dev_id)
 		return ret;
 
 	/* input device for IR remote (and tx) */
-	rdev = rc_allocate_device();
+	rdev = rc_allocate_device(RC_DRIVER_IR_RAW);
 	if (!rdev)
 		goto exit_free_dev_rdev;
 
@@ -1042,7 +1042,6 @@ static int nvt_probe(struct pnp_dev *pdev, const struct pnp_device_id *dev_id)
 
 	/* Set up the rc device */
 	rdev->priv = nvt;
-	rdev->driver_type = RC_DRIVER_IR_RAW;
 	rdev->allowed_protocols = RC_BIT_ALL;
 	rdev->open = nvt_open;
 	rdev->close = nvt_close;

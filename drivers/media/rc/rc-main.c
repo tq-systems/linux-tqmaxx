@@ -1258,7 +1258,7 @@ static struct device_type rc_dev_type = {
 	.uevent		= rc_dev_uevent,
 };
 
-struct rc_dev *rc_allocate_device(void)
+struct rc_dev *rc_allocate_device(enum rc_driver_type type)
 {
 	struct rc_dev *dev;
 
@@ -1284,6 +1284,8 @@ struct rc_dev *rc_allocate_device(void)
 	dev->dev.type = &rc_dev_type;
 	dev->dev.class = &rc_class;
 	device_initialize(&dev->dev);
+
+	dev->driver_type = type;
 
 	__module_get(THIS_MODULE);
 	return dev;

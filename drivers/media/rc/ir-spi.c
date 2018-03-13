@@ -147,7 +147,7 @@ static int ir_spi_probe(struct spi_device *spi)
 
 	spi_set_drvdata(spi, idata);
 
-	rc = rc_allocate_device();
+	rc = rc_allocate_device(RC_DRIVER_IR_RAW);
 	if (!rc) {
 		ret = -ENOMEM;
 		goto err_rcdev;

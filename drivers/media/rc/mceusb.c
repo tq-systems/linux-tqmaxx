@@ -1209,7 +1209,7 @@ static struct rc_dev *mceusb_init_rc_dev(struct mceusb_dev *ir)
 	struct rc_dev *rc;
 	int ret;
 
-	rc = rc_allocate_device();
+	rc = rc_allocate_device(RC_DRIVER_IR_RAW);
 	if (!rc) {
 		dev_err(dev, "remote dev allocation failed");
 		goto out;
@@ -1229,7 +1229,6 @@ static struct rc_dev *mceusb_init_rc_dev(struct mceusb_dev *ir)
 	usb_to_input_id(ir->usbdev, &rc->input_id);
 	rc->dev.parent = dev;
 	rc->priv = ir;
-	rc->driver_type = RC_DRIVER_IR_RAW;
 	rc->allowed_protocols = RC_BIT_ALL;
 	rc->timeout = MS_TO_NS(100);
 	if (!ir->flags.no_tx) {
