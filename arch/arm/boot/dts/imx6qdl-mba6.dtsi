@@ -360,19 +360,6 @@
 		};
 	};
 
-	ft5x06 {
-		pinctrl_ft5x06: ft5x06grp {
-			fsl,pins = <
-			/* LCD.RESET -> TSC /RST */
-			MX6QDL_PAD_GPIO_7__GPIO1_IO07  0x00001090
-			/* LCD.PWR_EN -> TSC /WAKE */
-			MX6QDL_PAD_GPIO_16__GPIO7_IO11 0x00001090
-			/* TSC Interrupt line: HYS, PKE, SPEED MED, DSE 240 OHM */
-			MX6QDL_PAD_EIM_D25__GPIO3_IO25 0x00013088
-			>;
-		};
-	};
-
 	gpiobuttons {
 		pinctrl_gpiobuttons: gpiogrp {
 			fsl,pins = <
