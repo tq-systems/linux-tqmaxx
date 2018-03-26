@@ -49,41 +49,74 @@ static struct fb_videomode lcdif_modedb[] = {
 	FB_VMODE_NONINTERLACED,
 	0,},
 	{
-	/* 800x480 @ 60 Hz , pixel clk @ 33.26MHz */
-	"ETM0700-WVGA", 60, 800, 480, 30066, 216, 40, 35, 10,
-	128, 2,
-	FB_SYNC_CLK_LAT_FALL,
-	FB_VMODE_NONINTERLACED,
-	0,},
-	{
-		/* 800x480 @ 60 Hz , pixel clk @ 33.3MHz */
-		.name = "S070WV106H-CT44",
+		/* ETM0700G0DH6  DS 2011/07/27, ver 2 */
+		.name = "ETM0700G0DH6",
 		.refresh = 60,
 		.xres = 800,
 		.yres = 480,
-		.pixclock = KHZ2PICOS(33300),
-		.left_margin = 216,
-		.right_margin = 40,
-		.upper_margin = 35,
-		.lower_margin = 10,
+		.pixclock = KHZ2PICOS(33260),
+		.left_margin = 88,  /* hback porch */
+		.right_margin = 40, /* hfront porch */
+		.upper_margin = 33, /* vback porch */
+		.lower_margin = 10, /* vfront_porch */
 		.hsync_len = 128,
 		.vsync_len = 2,
 		.sync = FB_SYNC_CLK_LAT_FALL,
 		.vmode = FB_VMODE_NONINTERLACED,
 		.flag = 0,
 	}, {
-		/* 1024x600 @ 60 Hz , pixel clk @ 51.2MHz */
+		/* ETM0700G0EDH6, DS 2016/04/06, ver 3 */
+		.name = "ETM0700G0EDH6",
+		.refresh = 60,
+		.xres = 800,
+		.yres = 480,
+		.pixclock = KHZ2PICOS(33260),
+		.left_margin = 88,  /* hback porch */
+		.right_margin = 40, /* hfront porch */
+		.upper_margin = 33, /* vback porch */
+		.lower_margin = 10, /* vfront_porch */
+		.hsync_len = 128,
+		.vsync_len = 2,
+		.sync = 0,
+		.vmode = FB_VMODE_NONINTERLACED,
+		.flag = 0,
+	}, {
+		/*
+		 * S070WV106H-CT44 v1.0 2017/02/21
+		 * S070SWV29HG-DC44 v 3.0 2017/02/21
+		 */
+		.name = "S070WV106H-CT44",
+		.refresh = 60,
+		.xres = 800,
+		.yres = 480,
+		.pixclock = KHZ2PICOS(33300),
+		.left_margin = 44,   /* hback porch */
+		.right_margin = 210, /* hfront porch */
+		.upper_margin = 21,  /* vback porch */
+		.lower_margin = 22,  /* vfront_porch */
+		.hsync_len = 2,
+		.vsync_len = 2,
+		/* TBD: is this really correct */
+		.sync = FB_SYNC_CLK_LAT_FALL,
+		.vmode = FB_VMODE_NONINTERLACED,
+		.flag = 0,
+	}, {
+		/*
+		 * S070WS12H-O-CT21 rev. 2.0 2016/02/18
+		 * S070PWS19HP-FC21 ver 2.0 2017/2/21
+		 */
 		.name = "S070WV106H-0-CT21",
 		.refresh = 60,
 		.xres = 1024,
 		.yres = 600,
 		.pixclock = KHZ2PICOS(51200),
-		.left_margin = 160,
-		.right_margin = 140,
-		.upper_margin = 12,
-		.lower_margin = 20,
+		.left_margin = 140,  /* hback porch */
+		.right_margin = 160, /* hfront porch */
+		.upper_margin = 20,  /* vback porch */
+		.lower_margin = 12,  /* vfront_porch */
 		.hsync_len = 20,
 		.vsync_len = 3,
+		/* TBD: is this really correct */
 		.sync = FB_SYNC_CLK_LAT_FALL,
 		.vmode = FB_VMODE_NONINTERLACED,
 		.flag = 0,
