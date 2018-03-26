@@ -18,7 +18,7 @@
 		status = "disabled";
 	};
 
-	lcd@0 {
+	lcd: lcd {
 		compatible = "fsl,lcd";
 		ipu_id = <0>;
 		disp_id = <0>;
@@ -27,12 +27,11 @@
 /*		default_ifmt = "RGB24"; */
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_lcd0_ipu1>;
-		status = "okay";
 	};
 };
 
 &i2c1 {
-	lcd0_tsc: edt-ft5x06@38 {
+	polytouch: edt-ft5x06@38 {
 		compatible = "edt-ft5x06";
 		reg = <0x38>;
 		pinctrl-names = "default";
@@ -43,7 +42,7 @@
 		wake-gpios = <&gpio7 11 GPIO_ACTIVE_HIGH>;
 		/* LCD.RESET -> TSC /RST */
 		reset-gpios = <&gpio1 7 GPIO_ACTIVE_LOW>;
-		status = "okay";
+		status = "disabled";
 	};
 };
 
