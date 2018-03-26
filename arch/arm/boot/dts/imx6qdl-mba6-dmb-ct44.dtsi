@@ -1,0 +1,38 @@
+/*
+ * Copyright 2016 Marco Felsch, TQ Systems GmbH
+ *
+ * The code contained herein is licensed under the GNU General Public
+ * License. You may obtain a copy of the GNU General Public License
+ * Version 2 or later at the following locations:
+ *
+ * http://www.opensource.org/licenses/gpl-license.html
+ * http://www.gnu.org/copyleft/gpl.html
+ */
+
+&backlight {
+	/* 50000 ... 1000 nsec -> 20 ... 1000 kHz */
+	pwms = <&pwm1 0 20000>;
+	brightness-levels = <0 1 4 8 16 32 64 128 255>;
+	default-brightness-level = <8>;
+	status = "okay";
+};
+
+&lcd {
+	status = "okay";
+};
+
+&mxcfb3 {
+	interface_pix_fmt = "RGB666";
+	mode_str = "S070WV106H-CT44";
+	default_bpp = <16>;
+	status = "okay";
+};
+
+&polytouch {
+	gain = <20>;
+
+	touchscreen-size-x = <800>;
+	touchscreen-size-y = <480>;
+
+	status = "okay";
+};
