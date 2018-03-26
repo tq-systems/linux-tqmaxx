@@ -266,6 +266,7 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6dl-gw552x.dtb \
 	imx6dl-hummingboard.dtb \
 	imx6dl-mba6a.dtb \
+	imx6dl-mba6a-dmb-ct21.dtb \
 	imx6dl-mba6a-dmb-ct44.dtb \
 	imx6dl-mba6a-hdmi.dtb \
 	imx6dl-mba6a-lvds.dtb \
@@ -275,6 +276,7 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6dl-mba6a-ssififo.dtb \
 	imx6dl-mba6b.dtb \
 	imx6dl-mba6b-dmb-ct44.dtb \
+	imx6dl-mba6b-dmb-ct21.dtb \
 	imx6dl-mba6b-hdmi.dtb \
 	imx6dl-mba6b-lvds.dtb \
 	imx6dl-mba6b-otg.dtb \
@@ -318,6 +320,7 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6q-gw552x.dtb \
 	imx6q-hummingboard.dtb \
 	imx6q-mba6a.dtb \
+	imx6q-mba6a-dmb-ct21.dtb \
 	imx6q-mba6a-dmb-ct44.dtb \
 	imx6q-mba6a-hdmi.dtb \
 	imx6q-mba6a-lvds.dtb \
@@ -326,6 +329,7 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6q-mba6a-glyn-etm0700g0edh6.dtb \
 	imx6q-mba6a-ssififo.dtb \
 	imx6q-mba6b.dtb \
+	imx6q-mba6b-dmb-ct21.dtb \
 	imx6q-mba6b-dmb-ct44.dtb \
 	imx6q-mba6b-hdmi.dtb \
 	imx6q-mba6b-lvds.dtb \
@@ -342,6 +346,7 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6q-sabreauto-flexcan1.dtb \
 	imx6q-sabreauto-gpmi-weim.dtb \
 	imx6qp-mba6b.dtb \
+	imx6qp-mba6b-dmb-ct21.dtb \
 	imx6qp-mba6b-dmb-ct44.dtb \
 	imx6qp-mba6b-hdmi.dtb \
 	imx6qp-mba6b-otg.dtb \
