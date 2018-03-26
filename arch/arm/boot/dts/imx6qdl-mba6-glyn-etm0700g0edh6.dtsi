@@ -1,0 +1,38 @@
+/*
+ * Copyright 2018 Markus Niebel, TQ Systems GmbH
+ *
+ * The code contained herein is licensed under the GNU General Public
+ * License. You may obtain a copy of the GNU General Public License
+ * Version 2 or later at the following locations:
+ *
+ * http://www.opensource.org/licenses/gpl-license.html
+ * http://www.gnu.org/copyleft/gpl.html
+ */
+
+&backlight {
+	/* 1 kHz as stated by GLYN FAE */
+	pwms = <&pwm1 0 1000000>;
+	brightness-levels = <255 200 180 160 128 96 64 32 16>;
+	default-brightness-level = <5>;
+	status = "okay";
+};
+
+&lcd {
+	status = "okay";
+};
+
+&mxcfb3 {
+	interface_pix_fmt = "RGB666";
+	mode_str = "ETM0700G0EDH6";
+	default_bpp = <32>;
+	status = "okay";
+};
+
+&polytouch {
+	gain = <1>;
+	offset = <0>;
+	threshold = <0x0f>;
+	/* wake gpios not used */
+	/delete-property/ wake-gpios;
+	status = "okay";
+};

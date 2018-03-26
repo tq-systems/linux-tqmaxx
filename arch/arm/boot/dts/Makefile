@@ -270,12 +270,14 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6dl-mba6a-lvds.dtb \
 	imx6dl-mba6a-otg.dtb \
 	imx6dl-mba6a-glyn-etm0700g0dh6.dtb \
+	imx6dl-mba6a-glyn-etm0700g0edh6.dtb \
 	imx6dl-mba6a-ssififo.dtb \
 	imx6dl-mba6b.dtb \
 	imx6dl-mba6b-hdmi.dtb \
 	imx6dl-mba6b-lvds.dtb \
 	imx6dl-mba6b-otg.dtb \
 	imx6dl-mba6b-glyn-etm0700g0dh6.dtb \
+	imx6dl-mba6b-glyn-etm0700g0edh6.dtb \
 	imx6dl-mba6b-ssififo.dtb \
 	imx6dl-nitrogen6x.dtb \
 	imx6dl-phytec-pbab01.dtb \
@@ -318,12 +320,14 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6q-mba6a-lvds.dtb \
 	imx6q-mba6a-otg.dtb \
 	imx6q-mba6a-glyn-etm0700g0dh6.dtb \
+	imx6q-mba6a-glyn-etm0700g0edh6.dtb \
 	imx6q-mba6a-ssififo.dtb \
 	imx6q-mba6b.dtb \
 	imx6q-mba6b-hdmi.dtb \
 	imx6q-mba6b-lvds.dtb \
 	imx6q-mba6b-otg.dtb \
 	imx6q-mba6b-glyn-etm0700g0dh6.dtb \
+	imx6q-mba6b-glyn-etm0700g0edh6.dtb \
 	imx6q-mba6b-ssififo.dtb \
 	imx6q-nitrogen6x.dtb \
 	imx6q-phytec-pbab01.dtb \
@@ -337,6 +341,7 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6qp-mba6b-hdmi.dtb \
 	imx6qp-mba6b-otg.dtb \
 	imx6qp-mba6b-glyn-etm0700g0dh6.dtb \
+	imx6qp-mba6b-glyn-etm0700g0edh6.dtb \
 	imx6qp-mba6b-ssififo.dtb \
 	imx6qp-mba6b-lvds.dtb \
 	imx6qp-sabreauto.dtb \
