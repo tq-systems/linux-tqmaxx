@@ -15,6 +15,7 @@
 #include "tqma572x.dtsi"
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/interrupt-controller/irq.h>
+#include <dt-bindings/net/ti-dp83867.h>
 
 / {
 	model = "TQ TQMa5728 MBa57xx";
@@ -352,14 +353,32 @@
 
 &cpsw_emac0 {
         phy_id = <&davinci_mdio>, <2>;
-        phy-mode = "rgmii";
+	phy-mode = "rgmii-id";
         dual_emac_res_vlan = <1>;
 };
 
 &cpsw_emac1 {
         phy_id = <&davinci_mdio>, <3>;
-        phy-mode = "rgmii";
+	phy-mode = "rgmii-id";
         dual_emac_res_vlan = <2>;
+};
+
+&davinci_mdio {
+	dp83867_0: ethernet-phy@2 {
+		reg = <2>;
+		ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_75_NS>;
+		ti,tx-internal-delay = <DP83867_RGMIIDCTL_250_PS>;
+		ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_8_B_NIB>;
+		ti,min-output-impedance;
+	};
+
+	dp83867_1: ethernet-phy@3 {
+		reg = <3>;
+		ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_75_NS>;
+		ti,tx-internal-delay = <DP83867_RGMIIDCTL_250_PS>;
+		ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_8_B_NIB>;
+		ti,min-output-impedance;
+	};
 };
 
 &usb2_phy1 {
