@@ -96,6 +96,10 @@
 		compatible = "fixed-clock";
 		clock-frequency = <20000000>;
 	};
+
+	ocp {
+		/delete-node/ rtc@48838000;
+	};
 };
 
 &i2c1 {
