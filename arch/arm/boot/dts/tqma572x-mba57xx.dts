@@ -30,10 +30,29 @@
                 compatible = "gpio-keys";
         };
 
+	vcc_5v: fixedregulator-vcc_5v {
+		compatible = "regulator-fixed";
+		regulator-name = "VCC5V";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		regulator-always-on;
+		regulator-boot-on;
+	};
+
+	vcc_3v3: fixedregulator-vcc_3v3 {
+		compatible = "regulator-fixed";
+		regulator-name = "VCC3V3";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-always-on;
+		regulator-boot-on;
+	};
+
 	vcc_1v5: fixedregulator-vcc_1v5 {
                 /* TPS62090RGT */
                 compatible = "regulator-fixed";
                 regulator-name = "VCC1V5";
+		vin-supply = <&vcc_5v>;
                 regulator-min-microvolt = <1500000>;
                 regulator-max-microvolt = <1500000>;
 		gpio = <&expander2 1 GPIO_ACTIVE_HIGH>;
@@ -45,6 +64,7 @@
                 /* TPS62090RGT */
                 compatible = "regulator-fixed";
                 regulator-name = "VCC1V1";
+		vin-supply = <&vcc_5v>;
                 regulator-min-microvolt = <1100000>;
                 regulator-max-microvolt = <1100000>;
                 gpio = <&expander2 2 GPIO_ACTIVE_HIGH>;
@@ -56,11 +76,12 @@
                 /* TPS62090RGT */
                 compatible = "regulator-fixed";
                 regulator-name = "VCC3V3_DISPLAY";
+		vin-supply = <&vcc_5v>;
                 regulator-min-microvolt = <3300000>;
                 regulator-max-microvolt = <3300000>;
                 gpio = <&expander1 14 GPIO_ACTIVE_HIGH>;
                 enable-active-high;
-                regulator-boot-off;
+		regulator-boot-on;
         };
 
         leds-iio {
@@ -256,7 +277,8 @@
                 interrupt-controller;
                 interrupt-cells = <2>;
                 gpio-controller;
-                #gpio-cells = <2>;
+		#gpio-cells = <2>;
+		vcc-supply = <&vcc_3v3>;
                 status = "okay";
         };
 
@@ -266,6 +288,7 @@
 		reg = <0x21>;
 		#gpio-cells = <2>;
 		gpio-controller;
+		vcc-supply = <&vcc_3v3>;
 		status = "okay";
 	};
 
