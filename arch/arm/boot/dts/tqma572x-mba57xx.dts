@@ -170,18 +170,15 @@
 	 */
         lcd0: display {
                 compatible = "osddisplays,osd070t1718-19ts", "panel-dpi";
-
                 label = "lcd";
-
                 backlight = <&lcd_bl>;
-
 		/* lcd power enable LCD_PWR_EN */
                 enable-gpios = <&expander1 12 GPIO_ACTIVE_HIGH>,
 		/* 3v3_display power enable PWR_EN_3V3_DISPLAY */
 			       <&expander1 14 GPIO_ACTIVE_HIGH>;
 		/* display reset DISPLAY_RST#; R559 not placed */
 		/* reset-gpios = <&expander1 7 GPIO_ACTIVE_HIGH> */
-
+		vcc-supply = <&vcc_3v3_display>;
                 panel-timing {
                         clock-frequency = <33000000>;
                         hactive = <800>;
@@ -197,7 +194,6 @@
                         de-active = <1>;
                         pixelclk-active = <1>;
                 };
-
                 port {
                         lcd_in: endpoint {
                                 remote-endpoint = <&dpi_out>;
@@ -216,6 +212,7 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&backlight_pins_default>;
 		enable-gpios = <&expander1 13 GPIO_ACTIVE_HIGH>;
+		power-supply = <&vcc_5v>;
         };
 
         buzzer {
