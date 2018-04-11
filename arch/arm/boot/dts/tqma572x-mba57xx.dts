@@ -414,10 +414,6 @@
 	phy-supply = <&vcc_1v1>;
 };
 
-&usb2_phy2 {
-        phy-supply = <&ldousb_reg>;
-};
-
 &usb1 {
         dr_mode = "host";
 };
