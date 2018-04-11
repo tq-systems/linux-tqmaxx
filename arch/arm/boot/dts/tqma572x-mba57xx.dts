@@ -48,6 +48,7 @@
 		regulator-boot-on;
 	};
 
+	/* miniPCIe */
 	vcc_1v5: fixedregulator-vcc_1v5 {
                 /* TPS62090RGT */
                 compatible = "regulator-fixed";
@@ -60,6 +61,7 @@
 		regulator-boot-on;
         };
 
+	/* USB hub */
         vcc_1v1: fixedregulator-vcc_1v1 {
                 /* TPS62090RGT */
                 compatible = "regulator-fixed";
