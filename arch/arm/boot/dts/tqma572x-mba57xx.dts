@@ -407,7 +407,11 @@
 };
 
 &usb2_phy1 {
-        phy-supply = <&ldousb_reg>;
+	/* Reference usb hub supply here.
+	 * Otherwise if usb hub supply is referenced nowhere it is
+	 * disabled by the kernel.
+	 */
+	phy-supply = <&vcc_1v1>;
 };
 
 &usb2_phy2 {
