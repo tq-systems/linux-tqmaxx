@@ -13,14 +13,12 @@
 #include "ls1021a-tqmls1021a.dtsi"
 
 / {
-	model = "TQMLS102xA SOM on MBLS102xA";
+	model = "TQMLS1021A SOM on MBLS102x";
 
 	aliases {
 		enet0_rgmii_phy = &rgmii_phy0c;
 		enet1_sgmii_phy = &sgmii_phy03;
 		enet2_rgmii_phy = &rgmii_phy04;
-		spi1 = &dspi0;
-		i2c1 = &i2c1;
 	};
 
 	regulators {
@@ -46,12 +44,6 @@
 			gpios = <&pca9554_1 4 GPIO_ACTIVE_HIGH>; /* LCD_PWR_EN */
 			enable-active-high;
 			regulator-always-on;
-		};
-	};
-
-	soc {
-		usb3@3100000 {
-			compatible = "fsl,layerscape-dwc3", "snps,dwc3";
 		};
 	};
 
