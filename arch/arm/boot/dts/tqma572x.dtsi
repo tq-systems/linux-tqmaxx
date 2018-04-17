@@ -325,7 +325,7 @@
 	/* NXP SE97BTP with temperature sensor + eeprom */
 	eeprom1: se97@57 {
 		compatible = "nxp,spd";
-		reg = <0x50>;
+		reg = <0x57>;
 		pagesize = <16>;
 		status = "okay";
 	};
