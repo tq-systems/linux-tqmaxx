@@ -17,10 +17,18 @@
 #include "fsl_dcu_drm_crtc.h"
 #include "fsl_dcu_drm_drv.h"
 
+static void fsl_dcu_drm_output_poll_changed(struct drm_device *dev)
+{
+	struct fsl_dcu_drm_device *fsl_dev = dev->dev_private;
+
+	drm_fbdev_cma_hotplug_event(fsl_dev->fbdev);
+}
+
 static const struct drm_mode_config_funcs fsl_dcu_drm_mode_config_funcs = {
 	.atomic_check = drm_atomic_helper_check,
 	.atomic_commit = drm_atomic_helper_commit,
 	.fb_create = drm_fb_cma_create,
+	.output_poll_changed = fsl_dcu_drm_output_poll_changed,
 };
 
 int fsl_dcu_drm_modeset_init(struct fsl_dcu_drm_device *fsl_dev)
@@ -42,6 +50,10 @@ int fsl_dcu_drm_modeset_init(struct fsl_dcu_drm_device *fsl_dev)
 	ret = fsl_dcu_drm_encoder_create(fsl_dev, &fsl_dev->crtc);
 	if (ret)
 		goto err;
+
+	ret = fsl_dcu_drm_hdmienc_create(fsl_dev, &fsl_dev->crtc);
+	if (ret)
+		DRM_ERROR("Failed to create HDMI encoder\n");
 
 	ret = fsl_dcu_create_outputs(fsl_dev);
 	if (ret)
