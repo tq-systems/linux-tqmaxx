@@ -99,6 +99,10 @@
 
 	ocp {
 		/delete-node/ rtc@48838000;
+
+		axi@1 {
+			status = "okay";
+		};
 	};
 };
 

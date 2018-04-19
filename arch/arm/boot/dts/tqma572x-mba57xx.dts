@@ -584,6 +584,10 @@
         /* PCIe reset R532 not placed */
 };
 
+&pcie2_phy {
+	status = "okay";
+};
+
 &sata {
         status = "okay";
 };
