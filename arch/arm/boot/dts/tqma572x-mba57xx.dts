@@ -22,6 +22,14 @@
 	compatible = "tq,tqma5728-mba57xx", "tq,tqma5728", "ti,am5728",
 		     "ti,dra742", "ti,dra74", "ti,dra7";
 
+	aliases {
+		display0 = &hdmi0;
+		display1 = &lcd;
+		ethernet2 = &pruss2_emac0;
+		ethernet3 = &pruss2_emac1;
+	};
+
+
         chosen {
                 stdout-path = &uart3;
         };
@@ -167,38 +175,53 @@
                 };
         };
 
-	/* TODO: template from am57xx-evm-common.dtsi
-	 * replace with actual TQ display
-	 */
-        lcd0: display {
-                compatible = "osddisplays,osd070t1718-19ts", "panel-dpi";
+	/* ET0700G0DH6 + ETM0700G0DH6 + ETM0700G0BDH6 + S070WV106H-CT44 */
+	lcd: display {
+		compatible = "panel-dpi";
+		bits-per-pixel = <32>; /* 32: RGB888/666 mode */
+		/* change it to 18 for new hw rev. */
+		bus-width = <24>;
                 label = "lcd";
                 backlight = <&lcd_bl>;
 		/* lcd power enable LCD_PWR_EN */
-                enable-gpios = <&expander1 12 GPIO_ACTIVE_HIGH>,
-		/* 3v3_display power enable PWR_EN_3V3_DISPLAY */
-			       <&expander1 14 GPIO_ACTIVE_HIGH>;
-		/* display reset DISPLAY_RST#; R559 not placed */
-		/* reset-gpios = <&expander1 7 GPIO_ACTIVE_HIGH> */
-		vcc-supply = <&vcc_3v3_display>;
-                panel-timing {
-                        clock-frequency = <33000000>;
-                        hactive = <800>;
-                        vactive = <480>;
-                        hfront-porch = <210>;
-                        hback-porch = <16>;
-                        hsync-len = <30>;
-                        vback-porch = <10>;
-                        vfront-porch = <22>;
-                        vsync-len = <13>;
-                        hsync-active = <0>;
-                        vsync-active = <0>;
-                        de-active = <1>;
-                        pixelclk-active = <1>;
+		enable-gpios = <&expander1 12 GPIO_ACTIVE_HIGH>;
+
+		panel-timing {
+			clock-frequency = <33260000>;
+			hactive = <800>;
+			vactive = <480>;
+			hback-porch = <216>;
+			hfront-porch = <40>;
+			vback-porch = <35>;
+			vfront-porch = <10>;
+			hsync-len = <128>;
+			vsync-len = <2>;
+			hsync-active = <0>;
+			vsync-active = <0>;
+			de-active = <1>;
+			pixelclk-active = <0>;
                 };
-                port {
-                        lcd_in: endpoint {
-                                remote-endpoint = <&dpi_out>;
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+				lcd_in: endpoint {
+					remote-endpoint = <&dpi_out>;
+					data-lines = <24>;
+				};
+			};
+
+			port@1 {
+				reg = <1>;
+				lcd_out: endpoint {
+					/*
+					 * lanes and remote-endpoint defined per
+					 * panel.
+					 */
+				};
                         };
                 };
         };
