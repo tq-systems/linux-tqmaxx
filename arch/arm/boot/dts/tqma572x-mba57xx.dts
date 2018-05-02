@@ -177,7 +177,7 @@
 
 	/* ET0700G0DH6 + ETM0700G0DH6 + ETM0700G0BDH6 + S070WV106H-CT44 */
 	lcd: display {
-		compatible = "panel-dpi";
+		compatible = "emerging,et0700g0dh6", "panel-dpi";
 		bits-per-pixel = <32>; /* 32: RGB888/666 mode */
 		/* change it to 18 for new hw rev. */
 		bus-width = <24>;
@@ -503,9 +503,7 @@
                 #address-cells = <1>;
                 #size-cells = <0>;
 
-                port@0 {
-                        reg = <0>;
-
+		port {
                         dpi_out: endpoint {
                                 remote-endpoint = <&lcd_in>;
                                 data-lines = <24>;
