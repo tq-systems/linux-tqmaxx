@@ -346,10 +346,8 @@
 	ds1339_rtc: ds1339@68 {
 		compatible = "dallas,ds1339";
 		reg = <0x68>;
-		interrupts-extended =
-			<&crossbar_mpu GIC_SPI 2 IRQ_TYPE_EDGE_FALLING>,
-			<&dra7_pmx_core 0x418>;
-		interrupt-names = "irq", "wakeup";
+		interrupt-parent = <&gpio1>;
+		interrupts = <0 IRQ_TYPE_EDGE_FALLING>;
 		vcc-supply = <&vdd_3v3>;
 		wakeup-source;
 		status = "okay";
@@ -516,4 +514,17 @@
 	mboxes = <&mailbox6 &mbox_dsp2_ipc3x>;
 	timers = <&timer6>;
 	watchdog-timers = <&timer13>;
+};
+
+&dra7_pmx_core {
+	gpio1_pins: pinmux_gpio1_pins {
+		pinctrl-single,pins = <
+			DRA7XX_CORE_IOPAD(0x3818, MUX_MODE14 | PIN_INPUT | WAKEUP_EN) /* wakeup0.gpio1_0 */
+		>;
+	};
+};
+
+&gpio1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&gpio1_pins>;
 };
