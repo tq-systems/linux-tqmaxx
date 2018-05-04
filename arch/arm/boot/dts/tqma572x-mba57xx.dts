@@ -287,6 +287,16 @@
                         DRA7XX_CORE_IOPAD(0x380c, PIN_INPUT | MUX_MODE1) /* i2c2_scl.hdmi1_ddc_sda */
                 >;
         };
+	gpio1_pins: pinmux_gpio1_pins {
+		pinctrl-single,pins = <
+			DRA7XX_CORE_IOPAD(0x3818, MUX_MODE14 | PIN_INPUT | WAKEUP_EN) /* wakeup0.gpio1_0 */
+		>;
+	};
+	gpio2_pins: pinmux_gpio2_pins {
+		pinctrl-single,pins = <
+			DRA7XX_CORE_IOPAD(0x3470, MUX_MODE14 | PIN_INPUT | WAKEUP_EN) /* gpmc_a12.gpio2_2 */
+		>;
+	};
 };
 
 &i2c4 {
@@ -305,6 +315,7 @@
 		#gpio-cells = <2>;
 		vcc-supply = <&vcc_3v3>;
                 status = "okay";
+		wakeup-source;
         };
 
 	/* Output GPIO Port Expander 8 bit */
@@ -362,6 +373,7 @@
         status = "okay";
         interrupts-extended = <&crossbar_mpu GIC_SPI 69 IRQ_TYPE_LEVEL_HIGH
                                &dra7_pmx_core 0x3c0>;
+	wakeup-source;
 };
 
 /* RS485 */
@@ -613,3 +625,12 @@
         status = "okay";
 };
 
+&gpio1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&gpio1_pins>;
+};
+
+&gpio2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&gpio2_pins>;
+};
