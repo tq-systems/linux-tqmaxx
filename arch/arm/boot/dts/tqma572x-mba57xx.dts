@@ -384,8 +384,8 @@
 };
 
 &buttons {
-        #address-cells = <1>;
-        #size-cells = <0>;
+	#address-cells = <1>;
+	#size-cells = <0>;
 
         button0 {
                 label = "button_1";
@@ -399,7 +399,7 @@
                 wakeup-source;
         };
 
-        buttons2 {
+	button2 {
                 label = "button_3";
                 gpios = <&expander1 3 GPIO_ACTIVE_LOW>;
                 wakeup-source;
