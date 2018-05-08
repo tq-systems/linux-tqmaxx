@@ -16,6 +16,7 @@
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/interrupt-controller/irq.h>
 #include <dt-bindings/net/ti-dp83867.h>
+#include <dt-bindings/input/input.h>
 
 / {
 	model = "TQ TQMa5728 MBa57xx";
@@ -385,18 +386,21 @@
         button0 {
                 label = "button_1";
                 gpios = <&expander1 1 GPIO_ACTIVE_LOW>;
+		linux,code = <KEY_HOME>;
                 wakeup-source;
         };
 
         button1 {
                 label = "button_2";
                 gpios = <&expander1 2 GPIO_ACTIVE_LOW>;
+		linux,code = <KEY_UP>;
                 wakeup-source;
         };
 
 	button2 {
                 label = "button_3";
                 gpios = <&expander1 3 GPIO_ACTIVE_LOW>;
+		linux,code = <KEY_DOWN>;
                 wakeup-source;
         };
 };
