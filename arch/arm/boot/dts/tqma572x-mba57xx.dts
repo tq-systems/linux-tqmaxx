@@ -158,7 +158,7 @@
                 interrupt-parent = <&pruss2_intc>;
 
                 pruss2_emac0: ethernet-mii0 {
-                        phy-handle = <&pruss2_eth0_phy>;
+			phy-handle = <&dp83822_0>;
                         phy-mode = "mii";
                         interrupts = <20>, <22>;
                         interrupt-names = "rx", "tx";
@@ -167,7 +167,7 @@
                 };
 
                 pruss2_emac1: ethernet-mii1 {
-                        phy-handle = <&pruss2_eth1_phy>;
+			phy-handle = <&dp83822_1>;
                         phy-mode = "mii";
                         interrupts = <21>, <23>;
                         interrupt-names = "rx", "tx";
@@ -587,11 +587,14 @@
 
 &pruss2_mdio {
         status = "okay";
-        pruss2_eth0_phy: ethernet-phy@0 {
+	reset-gpios = <&expander1 6 GPIO_ACTIVE_LOW>,
+		      <&expander1 7 GPIO_ACTIVE_LOW>;
+	reset-delay-us = <2>;
+	dp83822_0: ethernet-phy@0 {
                 reg = <0>;
         };
 
-        pruss2_eth1_phy: ethernet-phy@1 {
+	dp83822_1: ethernet-phy@1 {
                 reg = <1>;
         };
 };
