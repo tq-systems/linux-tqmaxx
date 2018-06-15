@@ -1,0 +1,90 @@
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * Device Tree file for TQ LS1012A MBLS1012AL Board.
+ *
+ * Copyright 2018 TQ Systems GmbH
+ * Max Merchel <Max.Merchel@tq-group.com>
+ */
+
+/dts-v1/;
+
+#include "ls1012a-tqmls1012al.dtsi"
+
+/ {
+	model = "TQMLS1012AL on MBLS1012AL";
+	compatible = "tqc,ls1012a-tqmls1012al-tqmbls1012al", "fsl,ls1012a";
+
+	aliases {
+		serial0 = &duart0;
+		/* use MAC from U-Boot environment */
+		ethernet0 = &pfe_mac0;
+		ethernet1 = &pfe_mac1;
+	};
+
+	chosen {
+		linux,stdout-path = &duart0;
+		stdout-path = &duart0;
+	};
+
+		reg_1p8v: regulator_1p8v {
+		compatible = "regulator-fixed";
+		regulator-name = "1P8V";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		regulator-always-on;
+	};
+
+	reg_3p3v: regulator_3p3v {
+		compatible = "regulator-fixed";
+		regulator-name = "3P3V";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-always-on;
+	};
+};
+
+&duart0 {
+	status = "okay";
+};
+
+&esdhc0 {
+	sd-uhs-sdr104;
+	sd-uhs-sdr50;
+	sd-uhs-sdr25;
+	sd-uhs-sdr12;
+	mmc-hs200-1_8v;
+	status = "okay";
+};
+
+
+&pfe_mac0 {
+	compatible = "fsl,pfe-gemac-port";
+	#address-cells = <1>;
+	#size-cells = <0>;
+	reg = <0x0>;			/* GEM_ID */
+	fsl,gemac-bus-id = <0x0>;	/* BUS_ID */
+	fsl,gemac-phy-id = <0x9>;	/* PHY_ID */
+	fsl,mdio-mux-val = <0x0>;
+	phy-mode = "sgmii";
+	fsl,pfe-phy-if-flags = <0x0>;
+
+	mdio@0 {
+		reg = <0x1>; /* enabled/disabled */
+	};
+};
+
+&pfe_mac1 {
+	compatible = "fsl,pfe-gemac-port";
+	#address-cells = <1>;
+	#size-cells = <0>;
+	reg = <0x1>;			/* GEM_ID */
+	fsl,gemac-bus-id = <0x1>;	/* BUS_ID */
+	fsl,gemac-phy-id = <0x1>;	/* PHY_ID */
+	fsl,mdio-mux-val = <0x0>;
+	phy-mode = "rgmii";
+	fsl,pfe-phy-if-flags = <0x1>;
+};
+
+&sata {
+	status = "okay";
+};
