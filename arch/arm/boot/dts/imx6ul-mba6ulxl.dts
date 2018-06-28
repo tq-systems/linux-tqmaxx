@@ -242,16 +242,10 @@
 &i2c4 {
 	/* port expander */
 	expander: pca9554@22 {
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_expander>;
 		compatible = "nxp,pca9554";
 		reg = <0x22>;
 		gpio-controller;
 		#gpio-cells = <2>;
-		interrupts = <9 IRQ_TYPE_LEVEL_LOW>;
-		interrupt-parent = <&gpio1>;
-		interrupt-controller;
-		#interrupt-cells = <2>;
 		status = "okay";
 
 		boot_cfg_en {
@@ -337,12 +331,6 @@
 				/* mdio */
 				MX6UL_PAD_GPIO1_IO07__ENET2_MDC		0x1b0b0
 				MX6UL_PAD_GPIO1_IO06__ENET2_MDIO	0x1b0b0
-			>;
-		};
-
-		pinctrl_expander: expandergrp {
-			fsl,pins = <
-				MX6UL_PAD_GPIO1_IO09__GPIO1_IO09	0x1b0b1
 			>;
 		};
 
