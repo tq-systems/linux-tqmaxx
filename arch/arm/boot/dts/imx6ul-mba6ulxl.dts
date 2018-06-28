@@ -24,7 +24,7 @@
 	};
 
 	chosen {
-		stdout-path = &uart6;
+		stdout-path = &uart1;
 	};
 
 	regulators {
@@ -63,6 +63,8 @@
 		reg_otg2vbus_5v0: regulator@3 {
 			compatible = "regulator-fixed";
 			reg = <3>;
+			gpio = <&gpio3 21 GPIO_ACTIVE_HIGH>;
+			enable-active-high;
 			regulator-name = "otg2-vbus-supply-5v0";
 			regulator-min-microvolt = <5000000>;
 			regulator-max-microvolt = <5000000>;
@@ -94,9 +96,8 @@
 			compatible = "regulator-fixed";
 			regulator-name = "lcd-pwr";
 			pinctrl-names = "default";
-			pinctrl-0 = <&pinctrl_regdisp3v3>;
 			reg = <6>;
-			gpio = <&gpio1 2 GPIO_ACTIVE_HIGH>;
+			/* gpio = <&gpio1 2 GPIO_ACTIVE_HIGH>; */
 			enable-active-high;
 			/* always on -> VIO for STMPE, otherwise I2C stall */
 			regulator-always-on;
@@ -108,10 +109,9 @@
 		reg_mpcie: regulator@7 {
 			compatible = "regulator-fixed";
 			pinctrl-names = "default";
-			pinctrl-0 = <&pinctrl_regmpcie1v5>;
 			regulator-name = "mpcie-1v5";
 			reg = <7>;
-			gpio = <&gpio1 3 GPIO_ACTIVE_HIGH>;
+			/* gpio = <&gpio1 3 GPIO_ACTIVE_HIGH>; */
 			enable-active-high;
 			regulator-min-microvolt = <1500000>;
 			regulator-max-microvolt = <1500000>;
@@ -153,6 +153,8 @@
 	phy-mode = "rmii";
 	phy-handle = <&ethphy0>;
 	phy-supply = <&reg_fec_3v3>;
+	phy-reset-gpios = <&expander 0 GPIO_ACTIVE_LOW>;
+	phy-reset-duration = <26>;
 	status = "okay";
 };
 
@@ -162,6 +164,8 @@
 	phy-mode = "rmii";
 	phy-handle = <&ethphy1>;
 	phy-supply = <&reg_fec_3v3>;
+	phy-reset-gpios = <&expander 1 GPIO_ACTIVE_LOW>;
+	phy-reset-duration = <26>;
 	status = "okay";
 
 	mdio {
@@ -259,10 +263,12 @@
 	};
 
 	analog_touch: stmpe811@41 {
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_analog_touch>;
 		compatible = "st,stmpe811";
 		reg = <0x41>;
-		interrupts = <4 IRQ_TYPE_EDGE_FALLING>;
-		interrupt-parent = <&expander>;
+		interrupts = <3 IRQ_TYPE_EDGE_FALLING>;
+		interrupt-parent = <&gpio1>;
 		interrupt-controller;
 		status = "disabled";
 
@@ -290,6 +296,12 @@
 	pinctrl-0 = <&pinctrl_hog_mba6ulxl>;
 
 	imx6ul-mba6ulxl {
+		pinctrl_analog_touch: analogtouchgrp {
+			fsl,pins = <
+				MX6UL_PAD_GPIO1_IO03__GPIO1_IO03	0x4001b020
+			>;
+		};
+
 		pinctrl_ecspi2: ecspi2grp {
 			fsl,pins = <
 				MX6UL_PAD_UART4_TX_DATA__ECSPI2_SCLK	0x1b020
@@ -358,7 +370,6 @@
 				MX6UL_PAD_CSI_DATA05__GPIO4_IO26	0x4001b020
 				MX6UL_PAD_CSI_DATA06__GPIO4_IO27	0x4001b020
 				MX6UL_PAD_CSI_DATA07__GPIO4_IO28	0x4001b020
-
 			>;
 		};
 
@@ -376,17 +387,13 @@
 			>;
 		};
 
+/*
 		pinctrl_regdisp3v3: regdisp3v3grp {
 			fsl,pins = <
 				MX6UL_PAD_GPIO1_IO02__GPIO1_IO02	0x4001b020
 			>;
 		};
-
-		pinctrl_regmpcie1v5: regmpcie1v5grp {
-			fsl,pins = <
-				MX6UL_PAD_GPIO1_IO03__GPIO1_IO03	0x4001b020
-			>;
-		};
+*/
 
 		pinctrl_uart1: uart1grp {
 			fsl,pins = <
@@ -418,6 +425,13 @@
 			>;
 		};
 
+		pinctrl_usb_otg2: usbotg2grp {
+			fsl,pins = <
+				/* reset */
+				MX6UL_PAD_LCD_DATA16__GPIO3_IO21	0x0001b099
+			>;
+		};
+
 		pinctrl_usdhc1: usdhc1grp {
 			fsl,pins = <
 				MX6UL_PAD_SD1_CLK__USDHC1_CLK		0x00017069
@@ -427,7 +441,7 @@
 				MX6UL_PAD_SD1_DATA2__USDHC1_DATA2	0x00017059
 				MX6UL_PAD_SD1_DATA3__USDHC1_DATA3	0x00017059
 				/* CD */
-				MX6UL_PAD_UART1_CTS_B__GPIO1_IO18	0x0001b099
+				MX6UL_PAD_UART1_RTS_B__GPIO1_IO19		0x0001b099
 			>;
 		};
 
@@ -440,7 +454,7 @@
 				MX6UL_PAD_SD1_DATA2__USDHC1_DATA2	0x000170b9
 				MX6UL_PAD_SD1_DATA3__USDHC1_DATA3	0x000170b9
 				/* CD */
-				MX6UL_PAD_UART1_CTS_B__GPIO1_IO18	0x0001b099
+				MX6UL_PAD_UART1_RTS_B__GPIO1_IO19		0x0001b099
 			>;
 		};
 
@@ -453,7 +467,7 @@
 				MX6UL_PAD_SD1_DATA2__USDHC1_DATA2	0x000170f9
 				MX6UL_PAD_SD1_DATA3__USDHC1_DATA3	0x000170f9
 				/* CD */
-				MX6UL_PAD_UART1_CTS_B__GPIO1_IO18	0x0001b099
+				MX6UL_PAD_UART1_RTS_B__GPIO1_IO19		0x0001b099
 			>;
 		};
 
@@ -504,6 +518,8 @@
 /* 7-port usb hub */
 /* id, pwr, oc pins not connected */
 &usbotg2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usb_otg2>;
 	disable-over-current;
 	vbus-supply = <&reg_otg2vbus_5v0>;
 	dr_mode = "host";
@@ -513,7 +529,7 @@
 &usdhc1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usdhc1>;
-	cd-gpios = <&gpio1 18 GPIO_ACTIVE_LOW>;
+	cd-gpios = <&gpio1 19 GPIO_ACTIVE_LOW>;
 	disable-wp;
 	bus-width = <4>;
 	vmmc-supply = <&reg_mba6ul_3v3>;
