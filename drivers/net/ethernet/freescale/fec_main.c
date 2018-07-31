@@ -69,6 +69,7 @@
 
 static void set_multicast_list(struct net_device *ndev);
 static void fec_enet_itr_coal_init(struct net_device *ndev);
+static int fec_reset_phy(struct platform_device *pdev);
 
 #define DRIVER_NAME	"fec"
 
@@ -1883,6 +1884,8 @@ static int fec_enet_clk_enable(struct net_device *ndev, bool enable)
 			ret = clk_prepare_enable(fep->clk_enet_out);
 			if (ret)
 				goto failed_clk_enet_out;
+
+			fec_reset_phy(fep->pdev);
 		}
 		if (fep->clk_ptp) {
 			mutex_lock(&fep->ptp_clk_mutex);
@@ -3330,11 +3333,13 @@ static int fec_enet_init(struct net_device *ndev)
 #ifdef CONFIG_OF
 static int fec_reset_phy(struct platform_device *pdev)
 {
-	int err, phy_reset;
-	int msec = 1, phy_post_delay = 0;
+	int err;
+	struct net_device *ndev = platform_get_drvdata(pdev);
+	struct fec_enet_private *fep = netdev_priv(ndev);
 	struct device_node *np = pdev->dev.of_node;
+	int msec = 1, phy_post_delay = 0;
 
-	if (!np)
+	if (!gpio_is_valid(fep->phy_reset_gpio))
 		return 0;
 
 	err = of_property_read_u32(np, "phy-reset-duration", &msec);
@@ -3342,26 +3347,14 @@ static int fec_reset_phy(struct platform_device *pdev)
 	if (!err && msec > 1000)
 		msec = 1;
 
-	phy_reset = of_get_named_gpio(np, "phy-reset-gpios", 0);
-	if (phy_reset == -EPROBE_DEFER)
-		return phy_reset;
-	else if (!gpio_is_valid(phy_reset))
-		return 0;
-
 	err = of_property_read_u32(np, "phy-reset-post-delay", &phy_post_delay);
 	/* valid reset duration should be less than 1s */
 	if (!err && phy_post_delay > 1000)
 		return -EINVAL;
 
-	err = devm_gpio_request_one(&pdev->dev, phy_reset,
-				    GPIOF_OUT_INIT_LOW, "phy-reset");
-	if (err) {
-		dev_err(&pdev->dev, "failed to get phy-reset-gpios: %d\n", err);
-		return err;
-	}
+	gpio_set_value_cansleep(fep->phy_reset_gpio, 0);
 	msleep(msec);
-
-	gpio_set_value_cansleep(phy_reset, 1);
+	gpio_set_value_cansleep(fep->phy_reset_gpio, 1);
 
 	if (!phy_post_delay)
 		return 0;
@@ -3374,6 +3367,24 @@ static int fec_reset_phy(struct platform_device *pdev)
 
 	return 0;
 }
+
+static int fec_get_reset_gpio(struct platform_device *pdev)
+{
+	int err, phy_reset;
+	struct device_node *np = pdev->dev.of_node;
+
+	phy_reset = of_get_named_gpio(np, "phy-reset-gpios", 0);
+	if (!gpio_is_valid(phy_reset))
+		return phy_reset;
+
+	err = devm_gpio_request_one(&pdev->dev, phy_reset,
+				    GPIOF_OUT_INIT_LOW, "phy-reset");
+	if (err) {
+		dev_err(&pdev->dev, "failed to get phy-reset-gpios: %d\n", err);
+		return err;
+	}
+	return phy_reset;
+}
 #else /* CONFIG_OF */
 static int fec_reset_phy(struct platform_device *pdev)
 {
@@ -3382,6 +3393,11 @@ static int fec_reset_phy(struct platform_device *pdev)
 	 * by machine code.
 	 */
 	return 0;
+}
+
+static inline int fec_get_reset_gpio(struct platform_device *pdev)
+{
+	return -EINVAL;
 }
 #endif /* CONFIG_OF */
 
@@ -3512,6 +3528,12 @@ fec_probe(struct platform_device *pdev)
 	fep->dev_id = dev_id++;
 
 	platform_set_drvdata(pdev, ndev);
+
+	ret = fec_get_reset_gpio(pdev);
+	if (ret == -EPROBE_DEFER)
+		goto gpio_defer;
+	else
+		fep->phy_reset_gpio = ret;
 
 	fec_enet_of_parse_stop_mode(pdev);
 
@@ -3663,6 +3685,7 @@ failed_regulator:
 failed_clk:
 failed_phy:
 	of_node_put(phy_node);
+gpio_defer:
 failed_ioremap:
 	free_netdev(ndev);
 
