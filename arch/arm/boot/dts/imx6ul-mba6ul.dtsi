@@ -224,7 +224,7 @@
 
 &fec2 {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_enet2>;
+	pinctrl-0 = <&pinctrl_enet2>, <&pinctrl_enet2_mdc>;
 	phy-mode = "rmii";
 	phy-handle = <&ethphy1>;
 	phy-supply = <&reg_fec_3v3>;
@@ -430,6 +430,11 @@
 				MX6UL_PAD_ENET2_TX_DATA1__ENET2_TDATA01	0x1b0a0
 				MX6UL_PAD_ENET2_TX_EN__ENET2_TX_EN	0x1b0b0
 				MX6UL_PAD_ENET2_TX_CLK__ENET2_REF_CLK2	0x4001b0a8
+			>;
+		};
+
+		pinctrl_enet2_mdc: enet2mdcgrp {
+			fsl,pins = <
 				/* mdio */
 				MX6UL_PAD_GPIO1_IO07__ENET2_MDC		0x1b0b0
 				MX6UL_PAD_GPIO1_IO06__ENET2_MDIO	0x1b0b0
