@@ -17,5 +17,5 @@
 
 / {
 	model = "TQ Systems i.MX6 UltraLite Baseboard with TQMa6ULxL";
-	compatible = "tqc,imx6ul-mba6ulxl", "fsl,imx6ul";
+	compatible = "tqc,imx6ul-mba6ulx-lga", "tqc,imx6ul-mba6ul", "fsl,imx6ul";
 };
