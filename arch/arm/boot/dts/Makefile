@@ -471,7 +471,14 @@ dtb-$(CONFIG_SOC_IMX6ULL) += \
 	imx6ull-mba6ulx-glyn-etm0700g0dh6.dtb \
 	imx6ull-mba6ulx-glyn-etm0700g0edh6.dtb \
 	imx6ull-mba6ulx-lvds.dtb \
-	imx6ull-mba6ulx-otg.dtb
+	imx6ull-mba6ulx-otg.dtb \
+	imx6ull-mba6ulx-lga.dtb \
+	imx6ull-mba6ulx-lga-dmb-ct21.dtb \
+	imx6ull-mba6ulx-lga-dmb-ct44.dtb \
+	imx6ull-mba6ulx-lga-glyn-etm0700g0dh6.dtb \
+	imx6ull-mba6ulx-lga-glyn-etm0700g0edh6.dtb \
+	imx6ull-mba6ulx-lga-lvds.dtb \
+	imx6ull-mba6ulx-lga-otg.dtb
 dtb-$(CONFIG_SOC_IMX7D) += \
 	imx7d-12x12-lpddr3-arm2.dtb \
 	imx7d-12x12-lpddr3-arm2-m4.dtb \
