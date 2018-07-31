@@ -29,12 +29,19 @@ static void __init imx6ul_enet_clk_init(void)
 	struct regmap *gpr;
 
 	gpr = syscon_regmap_lookup_by_compatible("fsl,imx6ul-iomuxc-gpr");
-	if (!IS_ERR(gpr))
-		regmap_update_bits(gpr, IOMUXC_GPR1, IMX6UL_GPR1_ENET_CLK_DIR,
-				   IMX6UL_GPR1_ENET_CLK_OUTPUT);
-	else
+	if (!IS_ERR(gpr)) {
+		regmap_update_bits(gpr, IOMUXC_GPR1, IMX6UL_GPR1_ENET1_CLK_DIR,
+				   IMX6UL_GPR1_ENET1_CLK_OUTPUT);
+		regmap_update_bits(gpr, IOMUXC_GPR1, IMX6UL_GPR1_ENET1_CLK_SEL, 0);
+		if ((of_machine_is_compatible("tqc,imx6ul-mba6ul")) ||
+		    (of_machine_is_compatible("tqc,imx6ull-mba6ul"))) {
+			regmap_update_bits(gpr, IOMUXC_GPR1, IMX6UL_GPR1_ENET2_CLK_DIR,
+					   IMX6UL_GPR1_ENET2_CLK_OUTPUT);
+			regmap_update_bits(gpr, IOMUXC_GPR1, IMX6UL_GPR1_ENET2_CLK_SEL, 0);
+		    }
+	} else {
 		pr_err("failed to find fsl,imx6ul-iomux-gpr regmap\n");
-
+	};
 }
 
 static int ksz8081_phy_fixup(struct phy_device *dev)
