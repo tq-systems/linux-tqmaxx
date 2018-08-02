@@ -210,6 +210,20 @@
 	assigned-clock-rates = <768000000>;
 };
 
+&ecspi2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_ecspi2>;
+	fsl,spi-num-chipselects = <1>;
+	status = "okay";
+
+	spidev2_0: spidev2-0@0 {
+		compatible = "tq,testdev";
+		spi-max-frequency = <5000000>;
+		reg = <0>;
+		status = "okay";
+	};
+};
+
 &fec1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_enet1>;
@@ -404,6 +418,15 @@
 		pinctrl_buttons: buttonsgrp {
 			fsl,pins = <
 				MX6UL_PAD_GPIO1_IO03__GPIO1_IO03	0x100b0
+			>;
+		};
+
+		pinctrl_ecspi2: ecspi2grp {
+			fsl,pins = <
+				MX6UL_PAD_UART4_TX_DATA__ECSPI2_SCLK	0x1b020
+				MX6UL_PAD_UART5_RX_DATA__ECSPI2_MISO	0x1b020
+				MX6UL_PAD_UART5_TX_DATA__ECSPI2_MOSI	0x1b020
+				MX6UL_PAD_UART4_RX_DATA__ECSPI2_SS0	0x1b020
 			>;
 		};
 
