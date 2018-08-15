@@ -605,6 +605,7 @@
 
 &extcon_usb2 {
 	id-gpio = <&gpio1 3 GPIO_ACTIVE_HIGH>;
+	vbus-gpio = <&gpio3 23 GPIO_ACTIVE_HIGH>;
 	/* vbus-gpio: pad USB2_DRVVBUS, mode 0 */
 };
 
