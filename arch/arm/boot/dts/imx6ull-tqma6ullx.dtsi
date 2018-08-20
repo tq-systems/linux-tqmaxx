@@ -17,6 +17,10 @@
 	model = "TQMa6ULLx SOM";
 };
 
+&usdhc2 {
+	fsl,tuning-step= <6>;
+};
+
 &iomuxc {
 	imx6ul-tqma6ul {
 		pinctrl_usdhc2: usdhc2grp {
