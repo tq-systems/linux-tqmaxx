@@ -19,6 +19,10 @@
 
 &usdhc2 {
 	fsl,tuning-step= <6>;
+	max-frequency = <99000000>;
+	assigned-clocks = <&clks IMX6UL_CLK_USDHC2_SEL>, <&clks IMX6UL_CLK_USDHC2>;
+	assigned-clock-parents = <&clks IMX6UL_CLK_PLL2_PFD2>;
+	assigned-clock-rates = <0>, <198000000>;
 };
 
 &iomuxc {
