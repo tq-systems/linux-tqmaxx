@@ -95,6 +95,19 @@
 		regulator-boot-on;
 	};
 
+	vcc_5v_display: fixedregulator-vcc_5v_display {
+		/* filtered vcc_5v */
+		compatible = "regulator-fixed";
+		regulator-name = "VCC5V_DISPLAY";
+		vin-supply = <&vcc_5v>;
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		/* LCD_BLT_EN */
+		gpio = <&expander1 13 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		regulator-boot-on;
+	};
+
 	leds-iio {
 		status = "okay";
 		compatible = "gpio-leds";
@@ -186,6 +199,8 @@
 		backlight = <&lcd_bl>;
 		/* lcd power enable LCD_PWR_EN */
 		enable-gpios = <&expander1 12 GPIO_ACTIVE_HIGH>;
+		vcc-supply = <&vcc_3v3_display>;
+		status = "okay";
 
 		panel-timing {
 			clock-frequency = <33260000>;
@@ -203,43 +218,22 @@
 			pixelclk-active = <0>;
 		};
 
-		ports {
-			#address-cells = <1>;
-			#size-cells = <0>;
-
-			port@0 {
-				reg = <0>;
-				lcd_in: endpoint {
-					remote-endpoint = <&dpi_out>;
-					data-lines = <24>;
-				};
-			};
-
-			port@1 {
-				reg = <1>;
-				lcd_out: endpoint {
-					/*
-					 * lanes and remote-endpoint defined per
-					 * panel.
-					 */
-				};
+		port {
+			lcd_in: endpoint {
+				remote-endpoint = <&dpi_out>;
 			};
 		};
 	};
 
-	/* TODO: template from am57xx-evm-common.dtsi
-	 * check with actual TQ display
-	 */
 	lcd_bl: backlight {
 		compatible = "pwm-backlight";
-		pwms = <&ehrpwm1 0 50000 0>;
+		pwms = <&ehrpwm1 0 50000 1>;
 		/* Anything lower than 241 is no longer visible */
 		brightness-levels = <0 243 245 247 249 251 252 253 255>;
 		default-brightness-level = <8>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&backlight_pins_default>;
-		enable-gpios = <&expander1 13 GPIO_ACTIVE_HIGH>;
-		power-supply = <&vcc_5v>;
+		power-supply = <&vcc_5v_display>;
 	};
 
 	buzzer {
@@ -279,7 +273,7 @@
 
 	backlight_pins_default: backlight_pins_default {
 		pinctrl-single,pins = <
-			DRA7XX_CORE_IOPAD(0x3774, PIN_INPUT_PULLDOWN | MUX_MODE10) /* gpio6_10.ehrpwm2A */
+			DRA7XX_CORE_IOPAD(0x358C, PIN_INPUT_PULLDOWN | MUX_MODE10) /* vin2a_d10.ehrpwm2A */
 		>;
 	};
 
@@ -523,6 +517,10 @@
 };
 
 &ehrpwm1 {
+	status = "okay";
+};
+
+&epwmss1 {
 	status = "okay";
 };
 
