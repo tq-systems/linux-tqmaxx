@@ -384,7 +384,7 @@
 
 &qspi {
 	status = "okay";
-	spi-max-frequency = <15360000>;
+	spi-max-frequency = <76800000>;
 
 	m25p80@0 {
 		compatible = "n25q512a", "jedec,spi-nor";
@@ -393,7 +393,7 @@
 		spi-rx-bus-width = <4>;
 		#address-cells = <1>;
 		#size-cells = <1>;
-		spi-max-frequency = <15360000>;
+		spi-max-frequency = <166000000>;
 
 		/* MTD partition table.
 		 * The ROM checks the first four physical blocks
