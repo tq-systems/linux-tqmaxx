@@ -186,8 +186,6 @@
 	lcd: display {
 		compatible = "emerging,et0700g0dh6", "panel-dpi";
 		bits-per-pixel = <32>; /* 32: RGB888/666 mode */
-		/* change it to 18 for new hw rev. */
-		bus-width = <24>;
 		label = "lcd";
 		backlight = <&lcd_bl>;
 		/* lcd power enable LCD_PWR_EN */
@@ -498,7 +496,7 @@
 			reg = <0>;
 			dpi_out: endpoint {
 				remote-endpoint = <&lcd_in>;
-				data-lines = <24>;
+				data-lines = <18>;
 			};
 		};
 	};
