@@ -1539,9 +1539,14 @@ static int mx6s_vidioc_streamon(struct file *file, void *priv,
 		return -EINVAL;
 
 	ret = vb2_streamon(&csi_dev->vb2_vidq, i);
-	if (!ret)
-		v4l2_subdev_call(sd, video, s_stream, 1);
+	if (ret < 0)
+		goto out;
 
+	ret = v4l2_subdev_call(sd, video, s_stream, 1);
+	if (ret < 0)
+		vb2_streamoff(&csi_dev->vb2_vidq, i);
+
+out:
 	return ret;
 }
 
