@@ -1414,16 +1414,18 @@ static int mx6s_vidioc_enum_fmt_vid_cap(struct file *file, void  *priv,
 	return 0;
 }
 
-static int mx6s_vidioc_try_fmt_vid_cap(struct file *file, void *priv,
-				      struct v4l2_format *f)
+static int _mx6s_vidioc_try_fmt_vid_cap(struct file *file, void *priv,
+					struct v4l2_format *f,
+					unsigned int which)
 {
 	struct mx6s_csi_dev *csi_dev = video_drvdata(file);
 	struct v4l2_subdev *sd = csi_dev->sd;
 	struct v4l2_pix_format *pix = &f->fmt.pix;
 	struct v4l2_subdev_format format = {
-		.which = V4L2_SUBDEV_FORMAT_ACTIVE,
+		.which = which,
 	};
 	struct mx6s_fmt *fmt;
+	struct v4l2_subdev_pad_config cfg = {};
 	int ret;
 
 	fmt = format_by_fourcc(f->fmt.pix.pixelformat);
@@ -1440,7 +1442,7 @@ static int mx6s_vidioc_try_fmt_vid_cap(struct file *file, void *priv,
 	}
 
 	v4l2_fill_mbus_format(&format.format, pix, fmt->mbus_code);
-	ret = v4l2_subdev_call(sd, pad, set_fmt, NULL, &format);
+	ret = v4l2_subdev_call(sd, pad, set_fmt, &cfg, &format);
 	v4l2_fill_pix_format(pix, &format.format);
 
 	if (pix->field != V4L2_FIELD_INTERLACED)
@@ -1450,6 +1452,13 @@ static int mx6s_vidioc_try_fmt_vid_cap(struct file *file, void *priv,
 	pix->bytesperline = fmt->bpp * pix->width;
 
 	return ret;
+}
+
+static int mx6s_vidioc_try_fmt_vid_cap(struct file *file, void *priv,
+				       struct v4l2_format *f)
+{
+	return _mx6s_vidioc_try_fmt_vid_cap(file, priv, f,
+					    V4L2_SUBDEV_FORMAT_TRY);
 }
 
 /*
@@ -1462,7 +1471,8 @@ static int mx6s_vidioc_s_fmt_vid_cap(struct file *file, void *priv,
 	struct mx6s_csi_dev *csi_dev = video_drvdata(file);
 	int ret;
 
-	ret = mx6s_vidioc_try_fmt_vid_cap(file, csi_dev, f);
+	ret = _mx6s_vidioc_try_fmt_vid_cap(file, csi_dev, f,
+					   V4L2_SUBDEV_FORMAT_ACTIVE);
 	if (ret < 0)
 		return ret;
 
