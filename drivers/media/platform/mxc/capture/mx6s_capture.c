@@ -131,6 +131,7 @@
 #define BIT_CSI_ENABLE			(0x1 << 31)
 #define BIT_MIPI_DATA_FORMAT_RAW8		(0x2a << 25)
 #define BIT_MIPI_DATA_FORMAT_RAW10		(0x2b << 25)
+#define BIT_MIPI_DATA_FORMAT_RAW12		(0x2c << 25)
 #define BIT_MIPI_DATA_FORMAT_YUV422_8B	(0x1e << 25)
 #define BIT_MIPI_DATA_FORMAT_MASK	(0x3F << 25)
 #define BIT_MIPI_DATA_FORMAT_OFFSET	25
@@ -261,11 +262,95 @@ static struct mx6s_fmt formats[] = {
 		.mbus_code	= MEDIA_BUS_FMT_AYUV8_1X32,
 		.bpp		= 4,
 	}, {
-		.name		= "RAWRGB8 (SBGGR8)",
+		.name		= "SBGGR8",
 		.fourcc		= V4L2_PIX_FMT_SBGGR8,
 		.pixelformat	= V4L2_PIX_FMT_SBGGR8,
 		.mbus_code	= MEDIA_BUS_FMT_SBGGR8_1X8,
 		.bpp		= 1,
+	}, {
+		.name		= "SBGGR10",
+		.fourcc		= V4L2_PIX_FMT_SBGGR10,
+		.pixelformat	= V4L2_PIX_FMT_SBGGR10,
+		.mbus_code	= MEDIA_BUS_FMT_SBGGR10_1X10,
+		.bpp		= 2,
+	}, {
+		.name		= "SBGGR12",
+		.fourcc		= V4L2_PIX_FMT_SBGGR12,
+		.pixelformat	= V4L2_PIX_FMT_SBGGR12,
+		.mbus_code	= MEDIA_BUS_FMT_SBGGR12_1X12,
+		.bpp		= 2,
+	}, {
+		.name		= "SGRBG8",
+		.fourcc		= V4L2_PIX_FMT_SGRBG8,
+		.pixelformat	= V4L2_PIX_FMT_SGRBG8,
+		.mbus_code	= MEDIA_BUS_FMT_SGRBG8_1X8,
+		.bpp		= 1,
+	}, {
+		.name		= "SGRBG10",
+		.fourcc		= V4L2_PIX_FMT_SGRBG10,
+		.pixelformat	= V4L2_PIX_FMT_SGRBG10,
+		.mbus_code	= MEDIA_BUS_FMT_SGRBG10_1X10,
+		.bpp		= 2,
+	}, {
+		.name		= "SGRBG12",
+		.fourcc		= V4L2_PIX_FMT_SGRBG12,
+		.pixelformat	= V4L2_PIX_FMT_SGRBG12,
+		.mbus_code	= MEDIA_BUS_FMT_SGRBG12_1X12,
+		.bpp		= 2,
+	}, {
+		.name		= "SGBRG8",
+		.fourcc		= V4L2_PIX_FMT_SGBRG8,
+		.pixelformat	= V4L2_PIX_FMT_SGBRG8,
+		.mbus_code	= MEDIA_BUS_FMT_SGBRG8_1X8,
+		.bpp		= 1,
+	}, {
+		.name		= "SGBRG10",
+		.fourcc		= V4L2_PIX_FMT_SGBRG10,
+		.pixelformat	= V4L2_PIX_FMT_SGBRG10,
+		.mbus_code	= MEDIA_BUS_FMT_SGBRG10_1X10,
+		.bpp		= 2,
+	}, {
+		.name		= "SGBRG12",
+		.fourcc		= V4L2_PIX_FMT_SGBRG12,
+		.pixelformat	= V4L2_PIX_FMT_SGBRG12,
+		.mbus_code	= MEDIA_BUS_FMT_SGBRG12_1X12,
+		.bpp		= 2,
+	}, {
+		.name		= "SRGGB8",
+		.fourcc		= V4L2_PIX_FMT_SRGGB8,
+		.pixelformat	= V4L2_PIX_FMT_SRGGB8,
+		.mbus_code	= MEDIA_BUS_FMT_SRGGB8_1X8,
+		.bpp		= 1,
+	}, {
+		.name		= "SRGGB10",
+		.fourcc		= V4L2_PIX_FMT_SRGGB10,
+		.pixelformat	= V4L2_PIX_FMT_SRGGB10,
+		.mbus_code	= MEDIA_BUS_FMT_SRGGB10_1X10,
+		.bpp		= 2,
+	}, {
+		.name		= "SRGGB12",
+		.fourcc		= V4L2_PIX_FMT_SRGGB12,
+		.pixelformat	= V4L2_PIX_FMT_SRGGB12,
+		.mbus_code	= MEDIA_BUS_FMT_SRGGB12_1X12,
+		.bpp		= 2,
+	}, {
+		.name		= "Grey8 (Y8)",
+		.fourcc		= V4L2_PIX_FMT_GREY,
+		.pixelformat	= V4L2_PIX_FMT_GREY,
+		.mbus_code	= MEDIA_BUS_FMT_Y8_1X8,
+		.bpp		= 1,
+	}, {
+		.name		= "Grey10 (Y10)",
+		.fourcc		= V4L2_PIX_FMT_Y10,
+		.pixelformat	= V4L2_PIX_FMT_Y10,
+		.mbus_code	= MEDIA_BUS_FMT_Y10_1X10,
+		.bpp		= 2,
+	}, {
+		.name		= "Grey12 (Y12)",
+		.fourcc		= V4L2_PIX_FMT_Y12,
+		.pixelformat	= V4L2_PIX_FMT_Y12,
+		.mbus_code	= MEDIA_BUS_FMT_Y12_1X12,
+		.bpp		= 2,
 	}
 };
 
@@ -834,10 +919,32 @@ static int mx6s_configure_csi(struct mx6s_csi_dev *csi_dev)
 	}
 
 	switch (csi_dev->fmt->pixelformat) {
+	case V4L2_PIX_FMT_GREY:
 	case V4L2_PIX_FMT_YUV32:
 	case V4L2_PIX_FMT_SBGGR8:
+	case V4L2_PIX_FMT_SGRBG8:
+	case V4L2_PIX_FMT_SGBRG8:
+	case V4L2_PIX_FMT_SRGGB8:
 		width = pix->width;
 		break;
+
+	case V4L2_PIX_FMT_Y10:
+	case V4L2_PIX_FMT_Y12:
+	case V4L2_PIX_FMT_SBGGR10:
+	case V4L2_PIX_FMT_SGRBG10:
+	case V4L2_PIX_FMT_SGBRG10:
+	case V4L2_PIX_FMT_SRGGB10:
+	case V4L2_PIX_FMT_SBGGR12:
+	case V4L2_PIX_FMT_SGRBG12:
+	case V4L2_PIX_FMT_SGBRG12:
+	case V4L2_PIX_FMT_SRGGB12:
+		if (csi_dev->csi_mipi_mode == true)
+			width = pix->width;
+		else
+			/* For parallel 8-bit sensor input */
+			width = pix->width * 2;
+		break;
+
 	case V4L2_PIX_FMT_UYVY:
 	case V4L2_PIX_FMT_YUYV:
 		if (csi_dev->csi_mipi_mode == true)
@@ -855,7 +962,7 @@ static int mx6s_configure_csi(struct mx6s_csi_dev *csi_dev)
 	if (csi_dev->csi_mipi_mode == true) {
 		cr1 = csi_read(csi_dev, CSI_CSICR1);
 		cr1 &= ~BIT_GCLK_MODE;
-		csi_write(csi_dev, cr1, CSI_CSICR1);
+		cr1 &= ~BIT_PIXEL_BIT;
 
 		cr18 = csi_read(csi_dev, CSI_CSICR18);
 		cr18 &= ~BIT_MIPI_DATA_FORMAT_MASK;
@@ -867,13 +974,34 @@ static int mx6s_configure_csi(struct mx6s_csi_dev *csi_dev)
 			cr18 |= BIT_MIPI_DATA_FORMAT_YUV422_8B;
 			break;
 		case V4L2_PIX_FMT_SBGGR8:
+		case V4L2_PIX_FMT_SGRBG8:
+		case V4L2_PIX_FMT_SGBRG8:
+		case V4L2_PIX_FMT_SRGGB8:
+		case V4L2_PIX_FMT_GREY:
 			cr18 |= BIT_MIPI_DATA_FORMAT_RAW8;
+			break;
+		case V4L2_PIX_FMT_SBGGR10:
+		case V4L2_PIX_FMT_SGRBG10:
+		case V4L2_PIX_FMT_SGBRG10:
+		case V4L2_PIX_FMT_SRGGB10:
+		case V4L2_PIX_FMT_Y10:
+			cr18 |= BIT_MIPI_DATA_FORMAT_RAW10;
+			cr1  |= BIT_PIXEL_BIT;
+			break;
+		case V4L2_PIX_FMT_SBGGR12:
+		case V4L2_PIX_FMT_SGRBG12:
+		case V4L2_PIX_FMT_SGBRG12:
+		case V4L2_PIX_FMT_SRGGB12:
+		case V4L2_PIX_FMT_Y12:
+			cr18 |= BIT_MIPI_DATA_FORMAT_RAW12;
+			cr1  |= BIT_PIXEL_BIT;
 			break;
 		default:
 			pr_debug("   fmt not supported\n");
 			return -EINVAL;
 		}
 
+		csi_write(csi_dev, cr1, CSI_CSICR1);
 		csi_write(csi_dev, cr18, CSI_CSICR18);
 	}
 	return 0;
