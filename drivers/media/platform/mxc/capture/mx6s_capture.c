@@ -1579,25 +1579,40 @@ static int mx6s_vidioc_g_selection(struct file *file, void *priv,
 			     struct v4l2_selection *s)
 {
 	struct mx6s_csi_dev *csi_dev = video_drvdata(file);
+	struct v4l2_subdev *sd = csi_dev->sd;
+	struct v4l2_subdev_selection	sel = {
+		.which	= V4L2_SUBDEV_FORMAT_ACTIVE,
+		.pad	= 0,
+		.target	= s->target,
+		.flags	= s->flags,
+	};
+	int				rc;
 
-	if (s->type != V4L2_BUF_TYPE_VIDEO_CAPTURE)
-		return -EINVAL;
-	dev_dbg(csi_dev->dev, "VIDIOC_G_SELECTION not implemented\n");
+	rc = v4l2_subdev_call(sd, pad, get_selection, NULL, &sel);
+	if (rc < 0)
+		goto out;
 
-	return 0;
+	s->r     = sel.r;
+	s->flags = sel.flags;
+
+out:
+	return rc;
 }
 
 static int mx6s_vidioc_s_selection(struct file *file, void *priv,
 			     struct v4l2_selection *s)
 {
 	struct mx6s_csi_dev *csi_dev = video_drvdata(file);
+	struct v4l2_subdev *sd = csi_dev->sd;
+	struct v4l2_subdev_selection	sel = {
+		.which	= V4L2_SUBDEV_FORMAT_ACTIVE,
+		.pad	= 0,
+		.target	= s->target,
+		.flags	= s->flags,
+		.r	= s->r,
+	};
 
-	if (s->type != V4L2_BUF_TYPE_VIDEO_CAPTURE)
-		return -EINVAL;
-
-	dev_dbg(csi_dev->dev, "VIDIOC_S_SELECTION not implemented\n");
-
-	return 0;
+	return v4l2_subdev_call(sd, pad, set_selection, NULL, &sel);
 }
 
 static int mx6s_vidioc_g_parm(struct file *file, void *priv,
