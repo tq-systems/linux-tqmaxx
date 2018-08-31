@@ -1296,9 +1296,11 @@ static int mx6s_vidioc_enum_input(struct file *file, void *priv,
 	if (inp->index != 0)
 		return -EINVAL;
 
-	/* default is camera */
-	inp->type = V4L2_INPUT_TYPE_CAMERA;
-	strcpy(inp->name, "Camera");
+	*inp = (struct v4l2_input) {
+		.index	= inp->index,
+		.type	= V4L2_INPUT_TYPE_CAMERA,
+		.name	= "Camera",
+	};
 
 	return 0;
 }
