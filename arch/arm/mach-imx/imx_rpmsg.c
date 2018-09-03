@@ -273,7 +273,6 @@ static struct imx_rpmsg_vproc imx_rpmsg_vprocs[] = {
 static const struct of_device_id imx_rpmsg_dt_ids[] = {
 	{ .compatible = "fsl,imx6sx-rpmsg", },
 	{ .compatible = "fsl,imx7d-rpmsg", },
-	{ .compatible = "fsl,imx7s-rpmsg", },
 	{ /* sentinel */ }
 };
 MODULE_DEVICE_TABLE(of, imx_rpmsg_dt_ids);
@@ -282,6 +281,8 @@ static int imx_rpmsg_probe(struct platform_device *pdev)
 {
 	int i, ret = 0;
 	struct device_node *np = pdev->dev.of_node;
+	struct resource *res;
+	resource_size_t size;
 
 	for (i = 0; i < ARRAY_SIZE(imx_rpmsg_vprocs); i++) {
 		struct imx_rpmsg_vproc *rpdev = &imx_rpmsg_vprocs[i];
@@ -290,15 +291,21 @@ static int imx_rpmsg_probe(struct platform_device *pdev)
 			ret = of_device_is_compatible(np, "fsl,imx7d-rpmsg");
 			ret |= of_device_is_compatible(np, "fsl,imx6sx-rpmsg");
 			if (ret) {
-				/* hardcodes here now. */
-				rpdev->vring[0] = 0xBfff0000;
-				rpdev->vring[1] = 0xBfff8000;
-			}
-			ret = of_device_is_compatible(np, "fsl,imx7s-rpmsg");
-			if (ret) {
-				/*hardcodes here now. */
-				rpdev->vring[0] = 0x9FFF0000;
-				rpdev->vring[1] = 0x9FFF8000;
+				res = platform_get_resource(pdev,
+							    IORESOURCE_MEM, 0);
+				if (res) {
+					size = resource_size(res);
+					if (0x10000 > size) {
+						pr_err("Too small memory size %x!\n", size);
+						ret = -EINVAL;
+					}
+					rpdev->vring[0] = res->start;
+					rpdev->vring[1] = res->start + 0x8000;
+				} else {
+					/* hardcodes here now. */
+					rpdev->vring[0] = 0xBFFF0000;
+					rpdev->vring[1] = 0xBFFF8000;
+				}
 			}
 		} else {
 			pr_err("rpdev rproc name not matching");
