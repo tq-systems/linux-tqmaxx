@@ -23,7 +23,8 @@
 };
 
 &rpmsg{
-	compatible = "fsl,imx7s-rpmsg";
+	compatible = "fsl,imx7d-rpmsg";
+	reg = <0x9FFF0000 0x10000>;
 	status = "okay";
 };
 
