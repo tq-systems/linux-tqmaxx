@@ -1,0 +1,37 @@
+/*
+ * Copyright (C) 2015 Freescale Semiconductor, Inc.
+ * Copyright (C) 2018 TQ Systems GmbH
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+/ {
+	memory {
+		linux,usable-memory = <0x80000000 0x1ff00000>;
+	};
+
+	m4_tcm: tcml@007f8000 {
+		compatible = "fsl, m4_tcml";
+		reg = <0x007f8000 0x8000>;
+	};
+};
+
+&ocram {
+	reg = <0x00901000 0xf000>;
+};
+
+&rpmsg {
+	reg = <0x9ff00000 0x100000>;
+	vdev-nums = <1>;
+	status = "okay";
+};
+
+&uart3 {
+	status = "disabled";
+};
+
+&wdog3 {
+	status = "disabled";
+};
