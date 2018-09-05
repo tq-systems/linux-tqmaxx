@@ -503,6 +503,7 @@ dtb-$(CONFIG_SOC_IMX7D) += \
 	imx7d-mba7-glyn-etm0700g0edh6-r0100.dtb \
 	imx7d-mba7-lvds.dtb \
 	imx7d-mba7-lvds-r0100.dtb \
+	imx7d-mba7-m4.dtb \
 	imx7d-mba7-otg-r0100.dtb \
 	imx7d-mba7-otg.dtb \
 	imx7d-mba7-r0100.dtb \
@@ -531,6 +532,7 @@ dtb-$(CONFIG_SOC_IMX7D) += \
 	imx7s-mba7-glyn-etm0700g0edh6-r0100.dtb \
 	imx7s-mba7-lvds.dtb \
 	imx7s-mba7-lvds-r0100.dtb \
+	imx7s-mba7-m4.dtb \
 	imx7s-mba7-otg.dtb \
 	imx7s-mba7-otg-r0100.dtb \
 	imx7s-mba7-r0100.dtb
