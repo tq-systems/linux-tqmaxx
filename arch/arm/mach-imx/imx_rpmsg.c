@@ -273,6 +273,7 @@ static struct imx_rpmsg_vproc imx_rpmsg_vprocs[] = {
 static const struct of_device_id imx_rpmsg_dt_ids[] = {
 	{ .compatible = "fsl,imx6sx-rpmsg", },
 	{ .compatible = "fsl,imx7d-rpmsg", },
+	{ .compatible = "fsl,imx7s-rpmsg", },
 	{ /* sentinel */ }
 };
 MODULE_DEVICE_TABLE(of, imx_rpmsg_dt_ids);
@@ -290,10 +291,17 @@ static int imx_rpmsg_probe(struct platform_device *pdev)
 			ret |= of_device_is_compatible(np, "fsl,imx6sx-rpmsg");
 			if (ret) {
 				/* hardcodes here now. */
-				rpdev->vring[0] = 0xBFFF0000;
-				rpdev->vring[1] = 0xBFFF8000;
+				rpdev->vring[0] = 0xBfff0000;
+				rpdev->vring[1] = 0xBfff8000;
+			}
+			ret = of_device_is_compatible(np, "fsl,imx7s-rpmsg");
+			if (ret) {
+				/*hardcodes here now. */
+				rpdev->vring[0] = 0x9FFF0000;
+				rpdev->vring[1] = 0x9FFF8000;
 			}
 		} else {
+			pr_err("rpdev rproc name not matching");
 			break;
 		}
 
