@@ -129,6 +129,12 @@ config MDIO_MOXART
 	  This driver supports the MDIO interface found in the network
 	  interface units of the MOXA ART SoC
 
+config NO_DP83867_OF_INIT
+	tristate "No DP83867 _of_init"
+	depends on DP83867_PHY
+	---help---
+	  Ignore DP83867_of_init function
+
 config MDIO_OCTEON
 	tristate "Octeon and some ThunderX SOCs MDIO buses"
 	depends on 64BIT

@@ -149,6 +149,7 @@ static int dp83867_config_port_mirroring(struct phy_device *phydev)
 #ifdef CONFIG_OF_MDIO
 static int dp83867_of_init(struct phy_device *phydev)
 {
+	#ifndef CONFIG_NO_DP83867_OF_INIT
 	struct dp83867_private *dp83867 = phydev->priv;
 	struct device *dev = &phydev->mdio.dev;
 	struct device_node *of_node = dev->of_node;
@@ -190,6 +191,8 @@ static int dp83867_of_init(struct phy_device *phydev)
 
 	return of_property_read_u32(of_node, "ti,fifo-depth",
 				   &dp83867->fifo_depth);
+	#endif
+	return 0;
 }
 #else
 static int dp83867_of_init(struct phy_device *phydev)
