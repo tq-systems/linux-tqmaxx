@@ -495,6 +495,7 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6qp-mba6b-dmb-ct21.dtb \
 	imx6qp-mba6b-dmb-ct44.dtb \
 	imx6qp-mba6b-glyn-etm0700g0dh6.dtb \
+	imx6qp-mba6b-glyn-etm0700g0dh6-hdmi.dtb \
 	imx6qp-mba6b-glyn-etm0700g0edh6.dtb \
 	imx6qp-mba6b-hdmi.dtb \
 	imx6qp-mba6b-lvds.dtb \
