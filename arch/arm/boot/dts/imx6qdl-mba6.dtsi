@@ -25,6 +25,19 @@
 			regulator-max-microvolt = <3300000>;
 			regulator-always-on;
 		};
+
+		reg_otgvbus: regulator@2 {
+			compatible = "regulator-fixed";
+			reg = <2>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_reg_otgpwr>;
+			regulator-name = "otg-vbus-supply";
+			regulator-min-microvolt = <5000000>;
+			regulator-max-microvolt = <5000000>;
+			gpio = <&gpio3 22 GPIO_ACTIVE_HIGH>;
+			enable-active-high;
+			vin_supply = <&reg_3p3v>;
+		};
 	};
 };
 
@@ -151,6 +164,13 @@
 			>;
 		};
 
+		pinctrl_reg_otgpwr: regotgpwrgrp {
+			fsl,pins = <
+				/* OTG_PWR */
+				MX6QDL_PAD_EIM_D22__GPIO3_IO22 0x0001b099
+			>;
+		};
+
 		pinctrl_uart2: uart2grp {
 			fsl,pins = <
 				MX6QDL_PAD_SD4_DAT4__UART2_RX_DATA 0x1b099
@@ -200,6 +220,13 @@
 				MX6QDL_PAD_GPIO_2__GPIO1_IO02  0x0001b099 /* usdhc2 WP */
 			>;
 		};
+
+		pinctrl_usbotg: usbotggrp {
+			fsl,pins = <
+				MX6QDL_PAD_EIM_D21__USB_OTG_OC 0x0001b0b0
+				MX6QDL_PAD_GPIO_1__USB_OTG_ID  0x00017059
+			>;
+		};
 	};
 };
 
@@ -236,6 +263,20 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart5>;
 	fsl,uart-has-rtscts;
+	status = "okay";
+};
+
+&usbh1 {
+	disable-over-current;
+	status = "okay";
+};
+
+&usbotg {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usbotg>;
+	dr_mode = "host";
+	otg_id_pin_select_change;
+	vbus-supply = <&reg_otgvbus>;
 	status = "okay";
 };
 
