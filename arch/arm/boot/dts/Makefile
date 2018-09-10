@@ -385,6 +385,7 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6dl-mba6a-hdmi.dtb \
 	imx6dl-mba6a-lvds.dtb \
 	imx6dl-mba6a-multi.dtb \
+	imx6dl-mba6a-otg.dtb \
 	imx6dl-mba6b.dtb \
 	imx6dl-mba6b-dmb-ct21.dtb \
 	imx6dl-mba6b-dmb-ct44.dtb \
@@ -393,6 +394,7 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6dl-mba6b-hdmi.dtb \
 	imx6dl-mba6b-lvds.dtb \
 	imx6dl-mba6b-multi.dtb \
+	imx6dl-mba6b-otg.dtb \
 	imx6dl-nit6xlite.dtb \
 	imx6dl-nitrogen6x.dtb \
 	imx6dl-phytec-pbab01.dtb \
@@ -453,6 +455,7 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6q-mba6a-hdmi.dtb \
 	imx6q-mba6a-lvds.dtb \
 	imx6q-mba6a-multi.dtb \
+	imx6q-mba6a-otg.dtb \
 	imx6q-mba6b.dtb \
 	imx6q-mba6b-dmb-ct21.dtb \
 	imx6q-mba6b-dmb-ct44.dtb \
@@ -461,6 +464,7 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6q-mba6b-hdmi.dtb \
 	imx6q-mba6b-lvds.dtb \
 	imx6q-mba6b-multi.dtb \
+	imx6q-mba6b-otg.dtb \
 	imx6q-mccmon6.dtb \
 	imx6q-nitrogen6x.dtb \
 	imx6q-nitrogen6_max.dtb \
@@ -495,6 +499,7 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6qp-mba6b-hdmi.dtb \
 	imx6qp-mba6b-lvds.dtb \
 	imx6qp-mba6b-multi.dtb \
+	imx6qp-mba6b-otg.dtb \
 	imx6qp-nitrogen6_max.dtb \
 	imx6qp-nitrogen6_som2.dtb \
 	imx6qp-sabreauto.dtb \
