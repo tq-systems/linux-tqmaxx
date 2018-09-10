@@ -428,6 +428,24 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6dl-icore-mipi.dtb \
 	imx6dl-icore-rqs.dtb \
 	imx6dl-mamoj.dtb \
+	imx6dl-mba6a.dtb \
+	imx6dl-mba6a-dmb-ct21.dtb \
+	imx6dl-mba6a-dmb-ct44.dtb \
+	imx6dl-mba6a-glyn-etm0700g0edh6.dtb \
+	imx6dl-mba6a-hdmi.dtb \
+	imx6dl-mba6a-duallvds-tm070jvhg33.dtb \
+	imx6dl-mba6a-lvds-tm070jvhg33.dtb \
+	imx6dl-mba6a-multi.dtb \
+	imx6dl-mba6a-usb-peripheral.dtb \
+	imx6dl-mba6b.dtb \
+	imx6dl-mba6b-dmb-ct21.dtb \
+	imx6dl-mba6b-dmb-ct44.dtb \
+	imx6dl-mba6b-glyn-etm0700g0edh6.dtb \
+	imx6dl-mba6b-hdmi.dtb \
+	imx6dl-mba6b-duallvds-tm070jvhg33.dtb \
+	imx6dl-mba6b-lvds-tm070jvhg33.dtb \
+	imx6dl-mba6b-multi.dtb \
+	imx6dl-mba6b-usb-peripheral.dtb \
 	imx6dl-nit6xlite.dtb \
 	imx6dl-nitrogen6x.dtb \
 	imx6dl-phytec-mira-rdk-nand.dtb \
@@ -511,6 +529,24 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6q-icore-rqs.dtb \
 	imx6q-kp-tpc.dtb \
 	imx6q-marsboard.dtb \
+	imx6q-mba6a.dtb \
+	imx6q-mba6a-dmb-ct21.dtb \
+	imx6q-mba6a-dmb-ct44.dtb \
+	imx6q-mba6a-glyn-etm0700g0edh6.dtb \
+	imx6q-mba6a-hdmi.dtb \
+	imx6q-mba6a-duallvds-tm070jvhg33.dtb \
+	imx6q-mba6a-lvds-tm070jvhg33.dtb \
+	imx6q-mba6a-multi.dtb \
+	imx6q-mba6a-usb-peripheral.dtb \
+	imx6q-mba6b.dtb \
+	imx6q-mba6b-dmb-ct21.dtb \
+	imx6q-mba6b-dmb-ct44.dtb \
+	imx6q-mba6b-glyn-etm0700g0edh6.dtb \
+	imx6q-mba6b-hdmi.dtb \
+	imx6q-mba6b-duallvds-tm070jvhg33.dtb \
+	imx6q-mba6b-lvds-tm070jvhg33.dtb \
+	imx6q-mba6b-multi.dtb \
+	imx6q-mba6b-usb-peripheral.dtb \
 	imx6q-mccmon6.dtb \
 	imx6q-nitrogen6x.dtb \
 	imx6q-nitrogen6_max.dtb \
@@ -554,6 +590,16 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6q-wandboard-revb1.dtb \
 	imx6q-wandboard-revd1.dtb \
 	imx6q-zii-rdu2.dtb \
+	imx6qp-mba6b.dtb \
+	imx6qp-mba6b-dmb-ct21.dtb \
+	imx6qp-mba6b-dmb-ct44.dtb \
+	imx6qp-mba6b-glyn-etm0700g0edh6.dtb \
+	imx6qp-mba6b-glyn-etm0700g0edh6-hdmi.dtb \
+	imx6qp-mba6b-hdmi.dtb \
+	imx6qp-mba6b-duallvds-tm070jvhg33.dtb \
+	imx6qp-mba6b-lvds-tm070jvhg33.dtb \
+	imx6qp-mba6b-multi.dtb \
+	imx6qp-mba6b-usb-peripheral.dtb \
 	imx6qp-nitrogen6_max.dtb \
 	imx6qp-nitrogen6_som2.dtb \
 	imx6qp-phytec-mira-rdk-nand.dtb \
