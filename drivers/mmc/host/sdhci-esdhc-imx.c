@@ -1502,6 +1502,11 @@ static int sdhci_esdhc_imx_probe_nondt(struct platform_device *pdev,
 		break;
 	}
 
+	if (boarddata->dsr_req) {
+		host->mmc->dsr_req = 1;
+		host->mmc->dsr = boarddata->dsr;
+	}
+
 	return 0;
 }
 
