@@ -28,6 +28,8 @@ enum cd_types {
  *
  * @wp_type:	type of write_protect method (see wp_types enum above)
  * @cd_type:	type of card_detect method (see cd_types enum above)
+ * @dsr_req:	indicate DSR is requested
+ * @dsr:	requested driver stage setting
  */
 
 struct esdhc_platform_data {
@@ -38,5 +40,7 @@ struct esdhc_platform_data {
 	unsigned int tuning_step;       /* The delay cell steps in tuning procedure */
 	unsigned int tuning_start_tap;	/* The start delay cell point in tuning procedure */
 	unsigned int strobe_dll_delay_target;	/* The delay cell for strobe pad (read clock) */
+	bool dsr_req;
+	u16 dsr;
 };
 #endif /* __ASM_ARCH_IMX_ESDHC_H */
