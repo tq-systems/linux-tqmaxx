@@ -314,8 +314,6 @@
 
 		pinctrl_hog: hoggrp {
 			fsl,pins = <
-				MX6QDL_PAD_GPIO_16__GPIO7_IO11 0x0001b099 /* LCD.PWR_EN */
-				MX6QDL_PAD_GPIO_7__GPIO1_IO07 0x0001b099 /* LCD.RESET */
 				/* LCD.CONTRAST -> Rev 0100 only, not used on Rev.0200*/
 				MX6QDL_PAD_DI0_PIN4__GPIO4_IO20 0x0001b099
 

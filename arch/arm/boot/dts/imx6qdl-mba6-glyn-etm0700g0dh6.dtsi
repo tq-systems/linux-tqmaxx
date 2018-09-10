@@ -1,0 +1,47 @@
+/*
+ * Copyright 2018 Markus Niebel, TQ Systems GmbH
+ *
+ * The code contained herein is licensed under the GNU General Public
+ * License. You may obtain a copy of the GNU General Public License
+ * Version 2 or later at the following locations:
+ *
+ * http://www.opensource.org/licenses/gpl-license.html
+ * http://www.gnu.org/copyleft/gpl.html
+ */
+
+&backlight {
+	pwms = <&pwm1 0 5000000>;
+	brightness-levels = <255 228 196 160 128 96 64 32 16>;
+	default-brightness-level = <5>;
+
+	status = "okay";
+};
+
+&disp0 {
+	status = "okay";
+
+	/* ETM0700G0DH6  DS 2011/07/27, ver 2  */
+	display-timings {
+		native-mode = <&timing1>;
+		timing1: 800x480p62 {
+			clock-frequency = <33260000>;
+			hactive = <800>;
+			vactive = <480>;
+			hfront-porch = <40>;
+			hsync-len = <128>;
+			hback-porch = <88>;
+			vfront-porch = <10>;
+			vsync-len = <2>;
+			vback-porch = <33>;
+			hsync-active = <0>;
+			vsync-active = <0>;
+			de-active = <1>;
+			pixelclk-active = <1>;
+		};
+	};
+};
+
+&polytouch {
+	gain = <20>;
+	status = "okay";
+};
