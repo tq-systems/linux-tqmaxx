@@ -132,6 +132,33 @@
 			>;
 		};
 
+		pinctrl_uart3: uart3grp {
+			fsl,pins = <
+				MX6QDL_PAD_SD4_CLK__UART3_RX_DATA 0x1b0b1
+				MX6QDL_PAD_SD4_CMD__UART3_TX_DATA 0x1b0b1
+				MX6QDL_PAD_EIM_D30__UART3_CTS_B   0x1b0b1
+				MX6QDL_PAD_EIM_D31__UART3_RTS_B   0x1b0b1
+			>;
+		};
+
+		pinctrl_uart4: uart4grp {
+			fsl,pins = <
+				MX6QDL_PAD_CSI0_DAT12__UART4_TX_DATA 0x1b0b1
+				MX6QDL_PAD_CSI0_DAT13__UART4_RX_DATA 0x1b0b1
+				MX6QDL_PAD_CSI0_DAT16__UART4_RTS_B 0x1b0b1
+				MX6QDL_PAD_CSI0_DAT17__UART4_CTS_B 0x1b0b1
+			>;
+		};
+
+		pinctrl_uart5: uart5grp {
+			fsl,pins = <
+				MX6QDL_PAD_CSI0_DAT14__UART5_TX_DATA 0x1b0b1
+				MX6QDL_PAD_CSI0_DAT15__UART5_RX_DATA 0x1b0b1
+				MX6QDL_PAD_CSI0_DAT18__UART5_RTS_B 0x1b0b1
+				MX6QDL_PAD_CSI0_DAT19__UART5_CTS_B 0x1b0b1
+			>;
+		};
+
 		pinctrl_usdhc2: usdhc2grp {
 			fsl,pins = <
 				/* CLK: 47k Pup SPD_LOW DSE 40Ohm SRE_FAST HYS */
@@ -161,6 +188,28 @@
 &uart2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart2>;
+	status = "okay";
+};
+
+
+&uart3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart3>;
+	fsl,uart-has-rtscts;
+	status = "okay";
+};
+
+&uart4 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart4>;
+	fsl,uart-has-rtscts;
+	status = "okay";
+};
+
+&uart5 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart5>;
+	fsl,uart-has-rtscts;
 	status = "okay";
 };
 
