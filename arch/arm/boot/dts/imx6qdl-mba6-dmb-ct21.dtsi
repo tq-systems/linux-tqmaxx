@@ -1,0 +1,49 @@
+/*
+ * Copyright 2014 Markus Niebel, TQ Systems GmbH
+ *
+ * The code contained herein is licensed under the GNU General Public
+ * License. You may obtain a copy of the GNU General Public License
+ * Version 2 or later at the following locations:
+ *
+ * http://www.opensource.org/licenses/gpl-license.html
+ * http://www.gnu.org/copyleft/gpl.html
+ */
+
+&backlight {
+	brightness-levels = <0 2 4 8 16 32 64 128 255>;
+	default-brightness-level = <8>;
+	status = "okay";
+};
+
+&disp0 {
+	status = "okay";
+	display-timings {
+		/*
+		 * S070WS12H-O-CT21 rev. 2.0 2016/02/18
+		 * S070PWS19HP-FC21 ver 2.0 2017/2/21
+		 */
+		native-mode = <&timing0>;
+		timing0: timing0 {
+			clock-frequency = <45000000 51200000 57000000>;
+			hactive = <1024>;
+			vactive = <600>;
+			hfront-porch = <140 160 180>;
+			hsync-len = <20>;
+			hback-porch = <140>;
+			vfront-porch = <2 12 22>;
+			vsync-len = <3>;
+			vback-porch = <20>;
+			de-active = <1>;
+			pixelclk-active = <0>;
+		};
+	};
+};
+
+&polytouch {
+	gain = <20>;
+
+	touchscreen-size-x = <1024>;
+	touchscreen-size-y = <600>;
+
+	status = "okay";
+};
