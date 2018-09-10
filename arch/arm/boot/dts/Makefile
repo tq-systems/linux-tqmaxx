@@ -473,6 +473,7 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6q-zii-rdu2.dtb \
 	imx6qp-mba6b.dtb \
 	imx6qp-mba6b-hdmi.dtb \
+	imx6qp-mba6b-lvds.dtb \
 	imx6qp-mba6b-pd.dtb \
 	imx6qp-nitrogen6_max.dtb \
 	imx6qp-nitrogen6_som2.dtb \
