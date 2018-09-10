@@ -24,3 +24,7 @@
 	txc-skew-ps = <1860>;
 	rxc-skew-ps = <1860>;
 };
+
+&sata {
+	status = "okay";
+};
