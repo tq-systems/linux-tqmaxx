@@ -380,9 +380,11 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6dl-mba6a.dtb \
 	imx6dl-mba6a-hdmi.dtb \
 	imx6dl-mba6a-lvds.dtb \
+	imx6dl-mba6a-pd.dtb \
 	imx6dl-mba6b.dtb \
 	imx6dl-mba6b-hdmi.dtb \
 	imx6dl-mba6b-lvds.dtb \
+	imx6dl-mba6b-pd.dtb \
 	imx6dl-nit6xlite.dtb \
 	imx6dl-nitrogen6x.dtb \
 	imx6dl-phytec-pbab01.dtb \
@@ -438,9 +440,11 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6q-mba6a.dtb \
 	imx6q-mba6a-hdmi.dtb \
 	imx6q-mba6a-lvds.dtb \
+	imx6q-mba6a-pd.dtb \
 	imx6q-mba6b.dtb \
 	imx6q-mba6b-hdmi.dtb \
 	imx6q-mba6b-lvds.dtb \
+	imx6q-mba6b-pd.dtb \
 	imx6q-mccmon6.dtb \
 	imx6q-nitrogen6x.dtb \
 	imx6q-nitrogen6_max.dtb \
