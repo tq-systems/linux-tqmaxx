@@ -1,0 +1,9 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright 2016 TQ Systems GmbH
+ * Author: Marco Felsch
+ */
+
+#include "imx6dl-mba6a.dts"
+#include "imx6qdl-mba6-pd.dtsi"
+#include "imx6qdl-mba6-dmb-ct44.dtsi"

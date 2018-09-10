@@ -1,0 +1,9 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright 2014 TQ Systems GmbH
+ * Author: Markus Niebel <Markus.Niebel@tq-group.com>
+ */
+
+#include "imx6q-mba6a.dts"
+#include "imx6qdl-mba6-hdmi.dtsi"
+#include "imx6qdl-mba6-lvds-tm070jvhg33.dtsi"
