@@ -379,11 +379,13 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6dl-icore-rqs.dtb \
 	imx6dl-mba6a.dtb \
 	imx6dl-mba6a-glyn-etm0700g0dh6.dtb \
+	imx6dl-mba6a-glyn-etm0700g0edh6.dtb \
 	imx6dl-mba6a-hdmi.dtb \
 	imx6dl-mba6a-lvds.dtb \
 	imx6dl-mba6a-multi.dtb \
 	imx6dl-mba6b.dtb \
 	imx6dl-mba6b-glyn-etm0700g0dh6.dtb \
+	imx6dl-mba6b-glyn-etm0700g0edh6.dtb \
 	imx6dl-mba6b-hdmi.dtb \
 	imx6dl-mba6b-lvds.dtb \
 	imx6dl-mba6b-multi.dtb \
@@ -441,11 +443,13 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6q-marsboard.dtb \
 	imx6q-mba6a.dtb \
 	imx6q-mba6a-glyn-etm0700g0dh6.dtb \
+	imx6q-mba6a-glyn-etm0700g0edh6.dtb \
 	imx6q-mba6a-hdmi.dtb \
 	imx6q-mba6a-lvds.dtb \
 	imx6q-mba6a-multi.dtb \
 	imx6q-mba6b.dtb \
 	imx6q-mba6b-glyn-etm0700g0dh6.dtb \
+	imx6q-mba6b-glyn-etm0700g0edh6.dtb \
 	imx6q-mba6b-hdmi.dtb \
 	imx6q-mba6b-lvds.dtb \
 	imx6q-mba6b-multi.dtb \
@@ -477,6 +481,7 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6q-zii-rdu2.dtb \
 	imx6qp-mba6b.dtb \
 	imx6qp-mba6b-glyn-etm0700g0dh6.dtb \
+	imx6qp-mba6b-glyn-etm0700g0edh6.dtb \
 	imx6qp-mba6b-hdmi.dtb \
 	imx6qp-mba6b-lvds.dtb \
 	imx6qp-mba6b-multi.dtb \
