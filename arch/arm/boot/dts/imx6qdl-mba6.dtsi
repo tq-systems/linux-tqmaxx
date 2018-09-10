@@ -15,6 +15,11 @@
 #include <dt-bindings/sound/fsl-imx-audmux.h>
 
 / {
+	aliases {
+		mmc1 = &usdhc2;
+		mmc0 = &usdhc3;
+	};
+
 	chosen {
 		linux,stdout-path = &uart2;
 		stdout-path = &uart2;
