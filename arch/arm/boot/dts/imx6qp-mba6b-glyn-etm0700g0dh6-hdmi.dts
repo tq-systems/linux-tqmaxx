@@ -1,0 +1,16 @@
+/*
+ * Copyright 2017 Markus Niebel, TQ Systems GmbH
+ * Copyright 2018 Max Merchel, TQ Systems GmbH
+ *
+ * The code contained herein is licensed under the GNU General Public
+ * License. You may obtain a copy of the GNU General Public License
+ * Version 2 or later at the following locations:
+ *
+ * http://www.opensource.org/licenses/gpl-license.html
+ * http://www.gnu.org/copyleft/gpl.html
+ */
+
+#include "imx6qp-mba6b.dts"
+#include "imx6qdl-mba6-pd.dtsi"
+#include "imx6qdl-mba6-glyn-etm0700g0dh6.dtsi"
+#include "imx6qdl-mba6-hdmi.dtsi"
