@@ -34,7 +34,7 @@
 			vsync-len = <3>;
 			vback-porch = <20>;
 			de-active = <1>;
-			pixelclk-active = <0>;
+			pixelclk-active = <1>;
 		};
 	};
 };
