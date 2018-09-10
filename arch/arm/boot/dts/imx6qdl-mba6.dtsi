@@ -20,6 +20,14 @@
 		mmc0 = &usdhc3;
 	};
 
+	backlight: pwm_backlight {
+		compatible = "pwm-backlight";
+		pwms = <&pwm1 0 62500>;
+		power-supply = <&reg_mba6_3p3v>;
+		enable-gpios = <&gpio4 5 GPIO_ACTIVE_HIGH>;
+		status = "disabled";
+	};
+
 	chosen {
 		linux,stdout-path = &uart2;
 		stdout-path = &uart2;
@@ -236,6 +244,13 @@
 				MX6QDL_PAD_CSI0_DAT4__AUD3_TXC  0x1b0b0
 				MX6QDL_PAD_CSI0_DAT5__AUD3_TXD  0x1b0b0
 				MX6QDL_PAD_CSI0_DAT6__AUD3_TXFS 0x1b0b0
+			>;
+		};
+
+		pinctrl_backlight: backlightgrp {
+			fsl,pins = <
+				/* LCD.BLT_EN */
+				MX6QDL_PAD_GPIO_19__GPIO4_IO05 0x0001b099
 			>;
 		};
 
