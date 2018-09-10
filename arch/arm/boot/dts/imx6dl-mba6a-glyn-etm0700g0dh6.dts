@@ -11,3 +11,4 @@
 
 #include "imx6dl-mba6a.dts"
 #include "imx6qdl-mba6-pd.dtsi"
+#include "imx6qdl-mba6-glyn-etm0700g0dh6.dtsi"

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Marco Felsch, TQ Systems GmbH
+ * Copyright 2014 Markus Niebel, TQ Systems GmbH
  *
  * The code contained herein is licensed under the GNU General Public
  * License. You may obtain a copy of the GNU General Public License
@@ -11,3 +11,4 @@
 
 #include "imx6q-mba6b.dts"
 #include "imx6qdl-mba6-pd.dtsi"
+#include "imx6qdl-mba6-glyn-etm0700g0dh6.dtsi"

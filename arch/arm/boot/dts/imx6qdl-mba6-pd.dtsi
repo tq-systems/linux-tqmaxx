@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Marco Felsch, TQ Systems GmbH
+ * Copyright 2014 Markus Niebel, TQ Systems GmbH
  *
  * The code contained herein is licensed under the GNU General Public
  * License. You may obtain a copy of the GNU General Public License
@@ -10,28 +10,51 @@
  */
 
 / {
-	lcd {
-		compatible = "fsl,lcd";
-		ipu_id = <0>;
-		disp_id = <0>;
-		lcd-supply = <&reg_mba6_3p3v>;
-		default_ifmt = "RGB666";
+	backlight: pwm_backlight@1 {
+		compatible = "pwm-backlight";
+		pwms = <&pwm1 0 5000000>;
+		power-supply = <&reg_mba6_3p3v>;
+		enable-gpios = <&gpio4 5 GPIO_ACTIVE_HIGH>;
+		status = "disabled";
+	};
+
+	disp0: display0 {
+		compatible = "fsl,imx-parallel-display";
+		#address-cells = <1>;
+		#size-cells = <0>;
 		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_lcd0_ipu1>;
-		status = "okay";
+		pinctrl-0 = <&pinctrl_disp0_ipu1>;
+		interface-pix-fmt = "bgr666";
+		status = "disabled";
+
+		port@0 {
+			display0_in: endpoint {
+				remote-endpoint = <&ipu1_di0_disp0>;
+			};
+		};
 	};
 };
 
-&backlight {
-	status = "okay";
-	pwms = <&pwm1 0 5000000>;
-	brightness-levels = <255 128 64 32 16 8 4 1 0>;
-	default-brightness-level = <0>;
+&i2c1 {
+	polytouch: edt-ft5x06@38 {
+		compatible = "edt,edt-ft5406", "edt,edt-ft5x06";
+		reg = <0x38>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_ft5x06>;
+		interrupt-parent = <&gpio3>;
+		interrupts = <25 0x0>;
+		/* LCD.PWR_EN -> TSC /WAKE */
+		wake-gpios = <&gpio7 11 GPIO_ACTIVE_HIGH>;
+		/* LCD.RESET -> TSC /RST */
+		reset-gpios = <&gpio1 7 GPIO_ACTIVE_LOW>;
+
+		status = "disabled";
+	};
 };
 
 &iomuxc {
-	imx6qdl-mba6 {
-		pinctrl_lcd0_ipu1: lcd0grp-1 {
+	disp0 {
+		pinctrl_disp0_ipu1: disp0grp-1 {
 			fsl,pins = <
 				MX6QDL_PAD_DISP0_DAT0__IPU1_DISP0_DATA00	0x1b0b0
 				MX6QDL_PAD_DISP0_DAT1__IPU1_DISP0_DATA01	0x1b0b0
@@ -64,5 +87,22 @@
 			>;
 		};
 	};
+
+	tsc {
+		pinctrl_ft5x06: ft5x06grp {
+			fsl,pins = <
+				/* LCD.RESET -> TSC /RST */
+				MX6QDL_PAD_GPIO_7__GPIO1_IO07  0x00001090
+				/* LCD.PWR_EN -> TSC /WAKE */
+				MX6QDL_PAD_GPIO_16__GPIO7_IO11 0x00001090
+				/* TSC Interrupt line: HYS, PKE, SPEED MED, DSE 240 OHM */
+				MX6QDL_PAD_EIM_D25__GPIO3_IO25 0x00013088
+			>;
+		};
+	};
+};
+
+&ipu1_di0_disp0 {
+	remote-endpoint = <&display0_in>;
 };
 
