@@ -65,6 +65,12 @@
 };
 
 &i2c0 {
+	sensor1: lm75@48 {
+		compatible = "lm75";
+		reg = <0x48>;
+		status = "okay";
+	};
+
 	gpio_ext0: pca9555@20 {
 		compatible = "nxp,pca9555";
 		reg = <0x20>;
