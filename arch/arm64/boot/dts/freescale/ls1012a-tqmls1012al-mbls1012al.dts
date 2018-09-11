@@ -26,7 +26,15 @@
 		stdout-path = &duart0;
 	};
 
-		reg_1p8v: regulator_1p8v {
+	reg_1p5v: regulator_1p5v {
+		compatible = "regulator-fixed";
+		regulator-name = "1P5V";
+		regulator-min-microvolt = <1500000>;
+		regulator-max-microvolt = <1500000>;
+		regulator-always-on;
+	};
+
+	reg_1p8v: regulator_1p8v {
 		compatible = "regulator-fixed";
 		regulator-name = "1P8V";
 		regulator-min-microvolt = <1800000>;
