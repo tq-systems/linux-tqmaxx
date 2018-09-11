@@ -64,6 +64,24 @@
 	status = "okay";
 };
 
+&i2c0 {
+	gpio_ext0: pca9555@20 {
+		compatible = "nxp,pca9555";
+		reg = <0x20>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		vcc-supply = <&reg_3p3v>;
+	};
+
+	gpio_ext1: pca9538@70 {
+		compatible = "nxp,pca9538";
+		reg = <0x70>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		vcc-supply = <&reg_1p8v>;
+	};
+};
+
 &pcie {
 	status = "okay";
 };
