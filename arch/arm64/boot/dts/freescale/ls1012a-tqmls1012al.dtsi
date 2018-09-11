@@ -34,6 +34,11 @@
 		reg = <0x51>;
 	};
 
+	sensor0: se97@19 {
+		compatible = "nxp,se97", "jedec,jc-42.4-temp";
+		reg = <0x19>;
+	};
+
 	rtc: ds1339@68 {
 		compatible = "dallas,ds1339";
 		reg = <0x68>;
