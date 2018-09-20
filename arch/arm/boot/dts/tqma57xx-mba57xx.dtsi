@@ -263,7 +263,7 @@
 
 	backlight_pins_default: backlight_pins_default {
 		pinctrl-single,pins = <
-			DRA7XX_CORE_IOPAD(0x358C, PIN_INPUT_PULLDOWN | MUX_MODE10) /* vin2a_d10.ehrpwm2A */
+			DRA7XX_CORE_IOPAD(0x358C, PIN_INPUT_PULLDOWN | MUX_MODE10) /* vin2a_d9.ehrpwm2A */
 		>;
 	};
 
