@@ -219,8 +219,7 @@
 	lcd_bl: backlight {
 		compatible = "pwm-backlight";
 		pwms = <&ehrpwm1 0 50000 1>;
-		/* Anything lower than 241 is no longer visible */
-		brightness-levels = <0 243 245 247 249 251 252 253 255>;
+		brightness-levels = <0 69 96 123 149 170 202 228 255>;
 		default-brightness-level = <8>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&backlight_pins_default>;
