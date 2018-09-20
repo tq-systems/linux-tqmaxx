@@ -10,3 +10,9 @@ config MICROCHIP_KSZ_SPI_DRIVER
 	depends on MICROCHIP_KSZ && SPI
 	help
 	  Select to enable support for registering switches configured through SPI.
+
+config MICROCHIP_KSZ_I2C_DRIVER
+	tristate "KSZ series I2C connected switch driver"
+	depends on MICROCHIP_KSZ && I2C
+	help
+	  Select to enable support for registering switches configured through I2C.
