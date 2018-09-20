@@ -93,6 +93,13 @@
 			line-name = "PCIE_RST#";
 		};
 
+		eth_sw_rst {
+			gpio-hog;
+			gpios = <7 GPIO_ACTIVE_HIGH>;
+			output-high;
+			line-name = "ETH_SW_RST#";
+		};
+
 		pcie_dis {
 			gpio-hog;
 			gpios = <11 GPIO_ACTIVE_HIGH>;
@@ -128,6 +135,44 @@
 			gpios = <7 GPIO_ACTIVE_HIGH>;
 			output-high;
 			line-name = "VCC_PCIE_EN_1V5";
+		};
+	};
+
+	switch0: kzs9897@5f {
+		compatible = "microchip,ksz9897";
+		reg = <0x5f>;
+		vcc-supply = <&reg_1p8v>;
+		phy-mode = "rgmii";
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+				label = "swport0";
+			};
+
+			port@1 {
+				reg = <1>;
+				label = "swport1";
+			};
+
+			port@2 {
+				reg = <2>;
+				label = "swport2";
+			};
+
+			port@3 {
+				reg = <3>;
+				label = "swport3";
+			};
+
+			port@6 {
+				reg = <6>;
+				label = "cpu";
+				ethernet = <&pfe_mac1>;
+			};
 		};
 	};
 };
