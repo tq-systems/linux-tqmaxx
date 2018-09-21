@@ -37,22 +37,15 @@
 			regulator-always-on;
 		};
 
-		reg_lcd: regulator@2 {
-			compatible = "regulator-fixed";
-			reg = <2>;
-			regulator-name = "LCD_PWR_EN";
-			regulator-min-microvolt = <3300000>;
-			regulator-max-microvolt = <3300000>;
-			gpios = <&pca9554_1 4 GPIO_ACTIVE_HIGH>; /* LCD_PWR_EN */
-			enable-active-high;
-			regulator-always-on;
-		};
+		/* reg_lcd replaced by auto-generated dummy reg
+		 * Panel DMB DC44 has touch reset on the pin and
+		 * no other power enable input
+		 */
 	};
 
 	backlight_dcu: backlight@0 {
 		compatible = "gpio-backlight";
-		gpios = <&pca9530 0 GPIO_ACTIVE_HIGH>;
-		default-on;
+		gpios = <&pca9530 0 GPIO_ACTIVE_HIGH>; /* PWM_0 */
 		status = "okay";
 	};
 
@@ -67,13 +60,10 @@
 		};
 	};
 
-	etm0700: panel {
+	display: panel {
 		compatible = "edt,etm0700g0dh6";
-		/* BUGBUG: LCD_BLT_EN really is GPIO_ACTIVE_HIGH
-		 * but panel_simple_prepare() does not get called
-		 */
-		enable-gpios = <&pca9554_1 3 GPIO_ACTIVE_LOW>;
-		power-supply = <&reg_lcd>;
+		enable-gpios = <&pca9554_1 3 GPIO_ACTIVE_HIGH>; /* LCD_BLT_EN */
+		backlight = <&backlight_dcu>;
 
 		port {
 			panel_in: endpoint {
@@ -218,8 +208,8 @@
 		reg = <0x38>;
 		interrupt-parent = <&pca9554_0>;
 		interrupts = <6 IRQ_TYPE_EDGE_FALLING>;
-		/* STK_RST#: reset-gpios = <&gpio2 6 1>; */
-		wake-gpios = <&pca9554_1 4 0>;
+		/* LCD_PWR_EN -> TSC_RESET */
+		reset-gpios = <&pca9554_1 4 GPIO_ACTIVE_HIGH>;
 		status = "okay";
 	};
 
