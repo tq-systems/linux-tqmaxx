@@ -9,11 +9,13 @@
 #include <linux/interrupt.h>
 #include <linux/io.h>
 #include <linux/irq.h>
+#include <linux/debugfs.h>
 #include <linux/kernel.h>
 #include <linux/memory.h>
 #include <linux/mfd/syscon.h>
 #include <linux/module.h>
 #include <linux/of.h>
+#include <linux/of_irq.h>
 #include <linux/of_graph.h>
 #include <linux/platform_device.h>
 #include <linux/pm_runtime.h>
@@ -201,6 +203,10 @@ static void mxc_mipi_csi2_disable(struct mxc_mipi_csi2_dev *csi2dev)
 	writel(0xf, csi2dev->base_regs + CSI2RX_CFG_DISABLE_DATA_LANES);
 }
 
+/* count fifo_wr_ovfl by default */
+static unsigned int dbg_irq_msk = 0x1ff & ~BIT(9);
+module_param(dbg_irq_msk, uint, 0644);
+
 static void mxc_mipi_csi2_hc_config(struct mxc_mipi_csi2_dev *csi2dev)
 {
 	u32 val0, val1;
@@ -219,7 +225,7 @@ static void mxc_mipi_csi2_hc_config(struct mxc_mipi_csi2_dev *csi2dev)
 	writel(val1, csi2dev->base_regs + CSI2RX_CFG_DISABLE_DATA_LANES);
 
 	/* Mask interrupt */
-	writel(0x1FF, csi2dev->base_regs + CSI2RX_IRQ_MASK);
+	writel(dbg_irq_msk, csi2dev->base_regs + CSI2RX_IRQ_MASK);
 
 	writel(1, csi2dev->base_regs + 0x180);
 	/* vid_vc */
@@ -342,6 +348,9 @@ static int mipi_csi2_s_stream(struct v4l2_subdev *sd, int enable)
 			ret = -EPIPE;
 			goto out;
 		}
+
+		/* Mask interrupt */
+		writel(0x1ff, csi2dev->base_regs + 0x110);
 
 		ret = v4l2_subdev_call(sensor_sd, video, s_stream, false);
 
@@ -647,12 +656,58 @@ static int mipi_csis_subdev_host(struct mxc_mipi_csi2_dev *csi2dev)
 	return ret;
 }
 
+static irqreturn_t mxc_mipi_csi_irq(int irq, void *csi2dev_)
+{
+	struct mxc_mipi_csi2_dev *csi2dev = csi2dev_;
+	unsigned long		bit_err;
+	unsigned long		stat;
+
+	bit_err = readl(csi2dev->base_regs + 0x108);
+	stat    = readl(csi2dev->base_regs + 0x10c);
+	csi2dev->err.lane_hs |= readl(csi2dev->base_regs + 0x118);
+	csi2dev->err.lane_hs_sync |= readl(csi2dev->base_regs + 0x11c);
+	csi2dev->err.lane_esc |= readl(csi2dev->base_regs + 0x120);
+	csi2dev->err.lane_esc_sync |= readl(csi2dev->base_regs + 0x124);
+	csi2dev->err.lane_ctrl |= readl(csi2dev->base_regs + 0x128);
+
+	if (bit_err & BIT(0))
+		++csi2dev->err.ecc_two_bit;
+	if (bit_err & BIT(1))
+		++csi2dev->err.ecc_one_bit;
+	if (bit_err & BIT(7))
+		++csi2dev->err.crc;
+	if (bit_err & BIT(8))
+		++csi2dev->err.send_level;
+	if (bit_err & BIT(9))
+		++csi2dev->err.fifo_wr_ovfl;
+
+	if (stat & BIT(0))
+		++csi2dev->err.irq_crc;
+	if (stat & BIT(1))
+		++csi2dev->err.irq_ecc_one;
+	if (stat & BIT(2))
+		++csi2dev->err.irq_ecc_two;
+	if (stat & BIT(4))
+		++csi2dev->err.hs;
+	if (stat & BIT(5))
+		++csi2dev->err.hs_sync;
+	if (stat & BIT(6))
+		++csi2dev->err.esc;
+	if (stat & BIT(7))
+		++csi2dev->err.esc_sync;
+	if (stat & BIT(8))
+		++csi2dev->err.ctrl;
+
+	return IRQ_HANDLED;
+}
+
 static int mipi_csi2_probe(struct platform_device *pdev)
 {
 	struct device *dev = &pdev->dev;
 	struct resource *mem_res;
 	struct mxc_mipi_csi2_dev *csi2dev;
 	int ret = -ENOMEM;
+	int irq;
 
 	dev_info(&pdev->dev, "%s\n", __func__);
 	csi2dev = devm_kzalloc(dev, sizeof(*csi2dev), GFP_KERNEL);
@@ -675,6 +730,19 @@ static int mipi_csi2_probe(struct platform_device *pdev)
 	ret = mipi_csi2_clk_init(csi2dev);
 	if (ret < 0)
 		return -EINVAL;
+
+	/* mask out all irqs */
+	writel(0x1ff, csi2dev->base_regs + CSI2RX_IRQ_MASK);
+
+	irq = of_irq_get(dev->of_node, 0);
+	if (irq >= 0) {
+		dev_dbg(dev, "%s:%u\n", __func__, __LINE__);
+		ret = devm_request_irq(dev, irq, mxc_mipi_csi_irq,
+				       IRQF_SHARED, dev_name(dev),
+				       csi2dev);
+		if (ret < 0)
+			dev_warn(dev, "failed to request irq: %d\n", ret);
+	}
 
 	v4l2_subdev_init(&csi2dev->sd, &mipi_csi2_subdev_ops);
 
@@ -719,6 +787,50 @@ static int mipi_csi2_probe(struct platform_device *pdev)
 	csi2dev->flags = MXC_MIPI_CSI2_PM_POWERED;
 	pm_runtime_enable(&pdev->dev);
 	mipi_csi2_clk_disable(csi2dev);
+
+	csi2dev->debugfs = debugfs_create_dir(dev_name(dev), NULL);
+	if (!IS_ERR_OR_NULL(csi2dev->debugfs)) {
+		debugfs_create_ulong("err_ecc_two_bit", 0644, csi2dev->debugfs,
+				     &csi2dev->err.ecc_two_bit);
+		debugfs_create_ulong("err_ecc_one_bit", 0644, csi2dev->debugfs,
+				     &csi2dev->err.ecc_one_bit);
+		debugfs_create_ulong("err_crc", 0644, csi2dev->debugfs,
+				     &csi2dev->err.crc);
+		debugfs_create_ulong("send_level", 0644, csi2dev->debugfs,
+				     &csi2dev->err.send_level);
+		debugfs_create_ulong("fifo_wr_ovfl", 0644, csi2dev->debugfs,
+				     &csi2dev->err.fifo_wr_ovfl);
+
+		debugfs_create_ulong("irq_crc", 0644, csi2dev->debugfs,
+				     &csi2dev->err.irq_crc);
+		debugfs_create_ulong("irq_ecc_one", 0644, csi2dev->debugfs,
+				     &csi2dev->err.irq_ecc_one);
+		debugfs_create_ulong("irq_ecc_two", 0644, csi2dev->debugfs,
+				     &csi2dev->err.irq_ecc_two);
+
+		debugfs_create_ulong("err_hs", 0644, csi2dev->debugfs,
+				     &csi2dev->err.hs);
+		debugfs_create_ulong("err_hs_sync", 0644, csi2dev->debugfs,
+				     &csi2dev->err.hs_sync);
+		debugfs_create_x8("lane_hs", 0644, csi2dev->debugfs,
+				     &csi2dev->err.lane_hs);
+		debugfs_create_x8("lane_hs_sync", 0644, csi2dev->debugfs,
+				     &csi2dev->err.lane_hs_sync);
+
+		debugfs_create_ulong("err_esc", 0644, csi2dev->debugfs,
+				     &csi2dev->err.esc);
+		debugfs_create_ulong("err_esc_sync", 0644, csi2dev->debugfs,
+				     &csi2dev->err.esc_sync);
+		debugfs_create_x8("lane_esc", 0644, csi2dev->debugfs,
+				     &csi2dev->err.lane_esc);
+		debugfs_create_x8("lane_esc_sync", 0644, csi2dev->debugfs,
+				     &csi2dev->err.lane_esc_sync);
+
+		debugfs_create_ulong("err_ctrl", 0644, csi2dev->debugfs,
+				     &csi2dev->err.ctrl);
+		debugfs_create_x8("lane_ctrl", 0644, csi2dev->debugfs,
+				     &csi2dev->err.lane_ctrl);
+	}
 
 	return 0;
 
