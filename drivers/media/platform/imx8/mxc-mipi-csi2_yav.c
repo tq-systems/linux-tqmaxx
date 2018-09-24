@@ -517,8 +517,24 @@ static int subdev_notifier_bound(struct v4l2_async_notifier *notifier,
 	return 0;
 }
 
+static void subdev_notifier_unbind(struct v4l2_async_notifier *notifier,
+				   struct v4l2_subdev *subdev,
+				   struct v4l2_async_subdev *asd)
+{
+	struct mxc_mipi_csi2_dev *csi2dev = notifier_to_mipi_dev(notifier);
+
+	if (csi2dev->sensor_sd != subdev)
+		return;
+
+	csi2dev->sensor_sd = NULL;
+
+	v4l2_info(&csi2dev->v4l2_dev, "Unregistered sensor subdevice: %s\n",
+		  subdev->name);
+}
+
 static const struct v4l2_async_notifier_operations subdev_notifier_ops = {
 	.bound = subdev_notifier_bound,
+	.unbind = subdev_notifier_unbind,
 };
 
 static int mipi_csis_subdev_host(struct mxc_mipi_csi2_dev *csi2dev)
