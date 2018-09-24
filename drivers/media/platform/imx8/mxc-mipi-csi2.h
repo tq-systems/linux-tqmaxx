@@ -261,6 +261,34 @@ struct mxc_mipi_csi2_dev {
 	u8 data_lanes[4];
 	u8 vchannel;
 	u8 running;
+
+	struct {
+		unsigned long		ecc_two_bit;
+		unsigned long		ecc_one_bit;
+		unsigned long		crc;
+		unsigned long		send_level;
+		unsigned long		fifo_wr_ovfl;
+
+		unsigned long		irq_crc;
+		unsigned long		irq_ecc_one;
+		unsigned long		irq_ecc_two;
+
+		unsigned long		hs;
+		unsigned long		hs_sync;
+
+		unsigned long		esc;
+		unsigned long		esc_sync;
+
+		unsigned long		ctrl;
+
+		uint8_t			lane_hs;
+		uint8_t			lane_hs_sync;
+		uint8_t			lane_esc;
+		uint8_t			lane_esc_sync;
+		uint8_t			lane_ctrl;
+	}	err;
+
+	struct dentry			*debugfs;
 };
 
 enum mxc_mipi_csi2_pm_state {
