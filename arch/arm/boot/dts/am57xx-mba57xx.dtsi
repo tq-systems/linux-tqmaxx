@@ -18,7 +18,6 @@
 / {
 	aliases {
 		display0 = &hdmi0;
-		display1 = &lcd;
 		ethernet2 = &pruss2_emac0;
 		ethernet3 = &pruss2_emac1;
 	};
@@ -182,50 +181,6 @@
 		};
 	};
 
-	/* ET0700G0DH6 + ETM0700G0DH6 + ETM0700G0BDH6 + S070WV106H-CT44 */
-	lcd: display {
-		compatible = "emerging,et0700g0dh6", "panel-dpi";
-		bits-per-pixel = <32>; /* 32: RGB888/666 mode */
-		label = "lcd";
-		backlight = <&lcd_bl>;
-		/* lcd power enable LCD_PWR_EN */
-		enable-gpios = <&expander1 12 GPIO_ACTIVE_HIGH>;
-		vcc-supply = <&vcc_3v3_display>;
-		status = "okay";
-
-		panel-timing {
-			clock-frequency = <33260000>;
-			hactive = <800>;
-			vactive = <480>;
-			hback-porch = <216>;
-			hfront-porch = <40>;
-			vback-porch = <35>;
-			vfront-porch = <10>;
-			hsync-len = <128>;
-			vsync-len = <2>;
-			hsync-active = <0>;
-			vsync-active = <0>;
-			de-active = <1>;
-			pixelclk-active = <0>;
-		};
-
-		port {
-			lcd_in: endpoint {
-				remote-endpoint = <&dpi_out>;
-			};
-		};
-	};
-
-	lcd_bl: backlight {
-		compatible = "pwm-backlight";
-		pwms = <&ehrpwm1 0 50000 1>;
-		brightness-levels = <0 69 96 123 149 170 202 228 255>;
-		default-brightness-level = <8>;
-		pinctrl-names = "default";
-		pinctrl-0 = <&backlight_pins_default>;
-		power-supply = <&vcc_5v_display>;
-	};
-
 	buzzer {
 		compatible = "gpio-beeper";
 		gpios = <&gpio6 19 GPIO_ACTIVE_HIGH>;
@@ -258,12 +213,6 @@
 		pinctrl-single,pins = <
 			DRA7XX_CORE_IOPAD(0x3688, MUX_MODE15 | PULL_UP) /* dcan2_tx.off */
 			DRA7XX_CORE_IOPAD(0x368C, MUX_MODE15 | PULL_UP) /* dcan2_rx.off */
-		>;
-	};
-
-	backlight_pins_default: backlight_pins_default {
-		pinctrl-single,pins = <
-			DRA7XX_CORE_IOPAD(0x358C, PIN_INPUT_PULLDOWN | MUX_MODE10) /* vin2a_d9.ehrpwm2A */
 		>;
 	};
 
@@ -490,25 +439,6 @@
 	};
 };
 
-/* display subsystem */
-&dss {
-	status = "okay";
-	vdda_video-supply = <&ldoln_reg>;
-
-	ports {
-		#address-cells = <1>;
-		#size-cells = <0>;
-
-		port@0 {
-			reg = <0>;
-			dpi_out: endpoint {
-				remote-endpoint = <&lcd_in>;
-				data-lines = <18>;
-			};
-		};
-	};
-};
-
 &ehrpwm1 {
 	status = "okay";
 };
@@ -601,16 +531,6 @@
 
 /* PCIe lane 0 PCIe x4 connector */
 &pcie1_rc {
-	status = "okay";
-};
-
-/* PCIe lane 1 mPCIe connector */
-&pcie2_rc {
-	status = "okay";
-	/* PCIe reset R532 not placed */
-};
-
-&pcie2_phy {
 	status = "okay";
 };
 
