@@ -1,7 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Texas Instruments Incorporated - http://www.ti.com/
- *
- * Copyright (C) 2017 TQ Systems (ported AM57xx IDK to TQMa57xx)
+ * Copyright (C) 2017 TQ Systems
  *
  * Author: Stefan Lange <s.lange@gateware.de>
  *
@@ -10,8 +8,6 @@
  * published by the Free Software Foundation.
  */
 
-#include "dra74x.dtsi"
-#include "dra74x-mmc-iodelay.dtsi"
 #include "am57xx-industrial-grade.dtsi"
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/interrupt-controller/irq.h>
@@ -20,11 +16,6 @@
 	aliases {
 		rtc1 = &tps659038_rtc;
 		rtc0 = &ds1339_rtc;
-	};
-
-	memory@0 {
-		device_type = "memory";
-		reg = <0x0 0x80000000 0x0 0x80000000>;
 	};
 
 	reserved-memory {
@@ -49,13 +40,6 @@
 		ipu1_cma_pool: ipu1_cma@9d000000 {
 			compatible = "shared-dma-pool";
 			reg = <0x0 0x9d000000 0x0 0x2000000>;
-			reusable;
-			status = "okay";
-		};
-
-		dsp2_cma_pool: dsp2_cma@9f000000 {
-			compatible = "shared-dma-pool";
-			reg = <0x0 0x9f000000 0x0 0x800000>;
 			reusable;
 			status = "okay";
 		};
@@ -455,9 +439,6 @@
 	mbox_ipu2_ipc3x: mbox_ipu2_ipc3x {
 		status = "okay";
 	};
-	mbox_dsp2_ipc3x: mbox_dsp2_ipc3x {
-		status = "okay";
-	};
 };
 
 &mmu0_dsp1 {
@@ -465,14 +446,6 @@
 };
 
 &mmu1_dsp1 {
-	status = "okay";
-};
-
-&mmu0_dsp2 {
-	status = "okay";
-};
-
-&mmu1_dsp2 {
 	status = "okay";
 };
 
@@ -506,14 +479,6 @@
 	mboxes = <&mailbox5 &mbox_dsp1_ipc3x>;
 	timers = <&timer5>;
 	watchdog-timers = <&timer10>;
-};
-
-&dsp2 {
-	status = "okay";
-	memory-region = <&dsp2_cma_pool>;
-	mboxes = <&mailbox6 &mbox_dsp2_ipc3x>;
-	timers = <&timer6>;
-	watchdog-timers = <&timer13>;
 };
 
 &dra7_pmx_core {
