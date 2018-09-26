@@ -1237,6 +1237,60 @@ static const struct panel_desc dlc_dlc1010gig = {
 	.bus_format = MEDIA_BUS_FMT_RGB888_1X7X4_SPWG,
 };
 
+/* S070PWS19HP-FC21 2017/04/22 */
+static const struct drm_display_mode dmb_s070pws19hp_fc21_mode = {
+	.clock = 51200,
+	.hdisplay = 1024,
+	.hsync_start = 1024 + 160,
+	.hsync_end = 1024 + 160 + 20,
+	.htotal = 1024 + 160 + 20 + 140,
+	.vdisplay = 600,
+	.vsync_start = 600 + 12,
+	.vsync_end = 600 + 12 + 3,
+	.vtotal = 600 + 10 + 3 + 20,
+	.vrefresh = 60,
+	.flags = DRM_MODE_FLAG_NHSYNC | DRM_MODE_FLAG_NVSYNC,
+};
+
+static const struct panel_desc dmb_s070pws19hp_fc21 = {
+	.modes = &dmb_s070pws19hp_fc21_mode,
+	.num_modes = 1,
+	.bpc = 6,
+	.size = {
+		.width = 120,
+		.height = 86,
+	},
+	.bus_format = MEDIA_BUS_FMT_RGB666_1X18,
+	.bus_flags = DRM_BUS_FLAG_DE_HIGH | DRM_BUS_FLAG_PIXDATA_NEGEDGE,
+};
+
+/* S070SWV29HG-DC44 2017/09/21 */
+static const struct drm_display_mode dmb_s070swv29hg_dc44_mode = {
+	.clock = 33000,
+	.hdisplay = 800,
+	.hsync_start = 800 + 210,
+	.hsync_end = 800 + 210 + 2,
+	.htotal = 800 + 210 + 2 + 44,
+	.vdisplay = 480,
+	.vsync_start = 480 + 22,
+	.vsync_end = 480 + 22 + 2,
+	.vtotal = 480 + 22 + 2 + 21,
+	.vrefresh = 60,
+	.flags = DRM_MODE_FLAG_NHSYNC | DRM_MODE_FLAG_NVSYNC,
+};
+
+static const struct panel_desc dmb_s070swv29hg_dc44 = {
+	.modes = &dmb_s070swv29hg_dc44_mode,
+	.num_modes = 1,
+	.bpc = 6,
+	.size = {
+		.width = 154,
+		.height = 86,
+	},
+	.bus_format = MEDIA_BUS_FMT_RGB666_1X18,
+	.bus_flags = DRM_BUS_FLAG_DE_HIGH | DRM_BUS_FLAG_PIXDATA_NEGEDGE,
+};
+
 static const struct drm_display_mode edt_et035012dm6_mode = {
 	.clock = 6500,
 	.hdisplay = 320,
@@ -3232,6 +3286,12 @@ static const struct of_device_id platform_of_match[] = {
 	}, {
 		.compatible = "dlc,dlc1010gig",
 		.data = &dlc_dlc1010gig,
+	}, {
+		.compatible = "dmb,s070pws19hp_fc21",
+		.data = &dmb_s070pws19hp_fc21,
+	}, {
+		.compatible = "dmb,s070swv29hg_dc44",
+		.data = &dmb_s070swv29hg_dc44,
 	}, {
 		.compatible = "edt,et035012dm6",
 		.data = &edt_et035012dm6,
