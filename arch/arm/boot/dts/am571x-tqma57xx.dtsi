@@ -18,3 +18,7 @@
 		reg = <0x0 0x80000000 0x0 0x40000000>;
 	};
 };
+
+&mmc2 {
+	pinctrl-2 = <&mmc2_pins_ddr_rev20>;
+};
