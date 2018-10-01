@@ -76,6 +76,19 @@ unsigned int gemac_regs[] = {
 	0x01B0, /* Frame Truncation Length */
 };
 
+static struct platform_device pfe_port_device[] = {
+	{
+		.name	= "pfe_port",
+		.id	= 0,
+	}, {
+		.name	= "pfe_port",
+		.id	= 1,
+	}, {
+		.name	= "pfe_port",
+		.id	= 2,
+	},
+};
+
 /********************************************************************/
 /*                   SYSFS INTERFACE				    */
 /********************************************************************/
@@ -2311,7 +2324,9 @@ static int pfe_eth_init_one(struct pfe *pfe, int id)
 	priv->id = einfo[id].gem_id;
 	priv->pfe = pfe;
 
-	SET_NETDEV_DEV(priv->ndev, priv->pfe->dev);
+	platform_device_register(&pfe_port_device[id]);
+
+	SET_NETDEV_DEV(priv->ndev, &pfe_port_device[id].dev);
 
 	pfe->eth.eth_priv[id] = priv;
 
@@ -2458,6 +2473,8 @@ static void pfe_eth_exit_one(struct pfe_eth_priv_s *priv)
 
 	if (priv->mii_bus)
 		pfe_eth_mdio_exit(priv->mii_bus);
+
+	platform_device_unregister(priv->pdev);
 
 	free_netdev(priv->ndev);
 }

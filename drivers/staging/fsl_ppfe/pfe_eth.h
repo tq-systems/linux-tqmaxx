@@ -117,6 +117,7 @@ struct pfe_eth_fast_timer {
 };
 
 struct  pfe_eth_priv_s {
+	struct platform_device	*pdev;
 	struct pfe		*pfe;
 	struct hif_client_s	client;
 	struct napi_struct	lro_napi;
