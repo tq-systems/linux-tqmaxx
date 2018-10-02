@@ -2272,7 +2272,9 @@ static int pfe_eth_init_one(struct pfe *pfe, int id)
 	struct ls1012a_eth_platform_data *einfo;
 	struct ls1012a_mdio_platform_data *minfo;
 	struct ls1012a_pfe_platform_data *pfe_info;
+	struct device_node *child_np = NULL;
 	int err;
+	u32 reg;
 
 	/* Extract pltform data */
 	pfe_info = (struct ls1012a_pfe_platform_data *)
@@ -2324,9 +2326,28 @@ static int pfe_eth_init_one(struct pfe *pfe, int id)
 	priv->id = einfo[id].gem_id;
 	priv->pfe = pfe;
 
-	platform_device_register(&pfe_port_device[id]);
+	priv->pdev = platform_device_register_data(pfe->dev, "pfe-port",
+						   id, priv, sizeof(priv));
 
-	SET_NETDEV_DEV(priv->ndev, &pfe_port_device[id].dev);
+	do {
+		child_np = of_get_next_available_child(pfe->dev->of_node,
+						       child_np);
+		if (child_np) {
+			if (!of_property_read_u32(child_np, "reg", &reg))
+				if (reg == id)  {
+					priv->pdev->dev.of_node = child_np;
+					break;
+				}
+		}
+	} while (child_np);
+
+	if (!priv->pdev->dev.of_node) {
+		pr_err("%s: missing of_node\n", __func__);
+		err = -1;
+		goto err2;
+	}
+
+	SET_NETDEV_DEV(priv->ndev, &priv->pdev->dev);
 
 	pfe->eth.eth_priv[id] = priv;
 
