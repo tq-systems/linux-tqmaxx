@@ -379,7 +379,48 @@ static struct platform_driver pfe_platform_driver = {
 	},
 };
 
-module_platform_driver(pfe_platform_driver);
+static int pfe_port_platform_probe(struct platform_device *pdev)
+{
+	pr_info("%s\n", __func__);
+	return 0;
+}
+
+static int pfe_port_platform_remove(struct platform_device *pdev)
+{
+	pr_info("%s\n", __func__);
+	return 0;
+}
+
+static struct platform_driver pfe_port_platform_driver = {
+	.probe = pfe_port_platform_probe,
+	.remove = pfe_port_platform_remove,
+	.driver = {
+		.name = "pfe-port",
+	},
+	.prevent_deferred_probe = true,
+	.driver.probe_type = PROBE_FORCE_SYNCHRONOUS,
+};
+
+static struct platform_driver * const drivers[] = {
+	&pfe_port_platform_driver,
+	&pfe_platform_driver,
+};
+
+static int __init pfe_init(void)
+{
+	pr_info("%s\n", __func__);
+	return platform_register_drivers(drivers, ARRAY_SIZE(drivers));
+}
+module_init(pfe_init);
+
+static void __exit pfe_exit(void)
+{
+	pr_info("%s\n", __func__);
+	platform_unregister_drivers(drivers, ARRAY_SIZE(drivers));
+}
+module_exit(pfe_exit);
+
+// module_platform_driver(pfe_platform_driver);
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("PFE Ethernet driver");
 MODULE_AUTHOR("NXP DNCPE");
