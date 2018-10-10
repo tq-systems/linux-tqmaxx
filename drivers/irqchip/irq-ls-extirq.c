@@ -26,8 +26,8 @@ struct extirq_chip_data {
 static int
 ls_extirq_set_type(struct irq_data *data, unsigned int type)
 {
-	irq_hw_number_t hwirq = data->hwirq;
 	struct extirq_chip_data *chip_data = data->chip_data;
+	irq_hw_number_t hwirq = data->hwirq;
 	u32 value, mask;
 
 	if (chip_data->bit_reverse)
