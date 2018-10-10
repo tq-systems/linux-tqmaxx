@@ -231,8 +231,20 @@
 
 		scfg: scfg@1570000 {
 			compatible = "fsl,ls1046a-scfg", "syscon";
+			#address-cells = <1>;
+			#size-cells = <0>;
 			reg = <0x0 0x1570000 0x0 0x10000>;
 			big-endian;
+
+			extirq: interrupt-controller {
+				compatible = "fsl,ls1021a-extirq";
+				#interrupt-cells = <2>;
+				interrupt-controller;
+				interrupt-parent = <&gic>;
+				reg = <0x1AC>;
+				fsl,extirq-map = <131 132 133 135 136 137 145 146 147 149 150 151>;
+				fsl,bit-reverse;
+			};
 		};
 
 		crypto: crypto@1700000 {
