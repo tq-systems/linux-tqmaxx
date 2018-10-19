@@ -116,6 +116,13 @@
 			line-name = "PCIE_CLK_PD#";
 		};
 
+		eth_link_pwrdwn {
+			gpio-hog;
+			gpios = <3 GPIO_ACTIVE_HIGH>;
+			output-high;
+			line-name = "ETH_LINK_PWRDWN#";
+		};
+
 		vcc_pcie_en_1v5 {
 			gpio-hog;
 			gpios = <7 GPIO_ACTIVE_HIGH>;
