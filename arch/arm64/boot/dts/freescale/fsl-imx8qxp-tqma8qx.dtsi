@@ -22,6 +22,20 @@
 	model = "TQ Systems i.MX8QXP TQMa8xX";
 	compatible = "fsl,tqma8qx", "fsl,imx8qxp";
 
+	reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		linux,cma {
+			compatible = "shared-dma-pool";
+			reusable;
+			size = <0 0x10000000>;
+			alloc-ranges = <0 0x96000000 0 0x20000000>;
+			linux,cma-default;
+		};
+	};
+
 	regulators {
 		compatible = "simple-bus";
 		#address-cells = <1>;
