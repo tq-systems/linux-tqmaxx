@@ -231,12 +231,6 @@
 	};
 };
 
-&lpuart1 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_lpuart1>;
-	status = "okay";
-};
-
 &fec1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_fec1>;
@@ -287,6 +281,16 @@
 	local-mac-address = [ 00 00 00 00 00 00 ];
 
 	status = "okay";
+};
+
+&lpuart1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_lpuart1>;
+	status = "okay";
+};
+
+&pd_dma_lpuart1 {
+	debug_console;
 };
 
 &usbotg1 {
