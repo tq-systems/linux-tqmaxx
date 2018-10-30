@@ -60,14 +60,16 @@
 			enable-active-high;
 			startup-delay-us = <100>;
 			off-on-delay-us = <12000>;
+			status = "okay";
 		};
 
-		reg_mba8qx_v5v: mba8qx_v5v {
+		reg_mba8qx_5v: mba8qx_5v {
 			compatible = "regulator-fixed";
 			regulator-name = "MBA8QX_V5V";
 			regulator-min-microvolt = <5000000>;
 			regulator-max-microvolt = <5000000>;
 			regulator-always-on;
+			status = "okay";
 		};
 
 		reg_mba8qx_12v: mba8qx_12v {
@@ -77,6 +79,7 @@
 			regulator-max-microvolt = <12000000>;
 			gpio = <&expander 6 GPIO_ACTIVE_HIGH>;
 			enable-active-high;
+			status = "okay";
 		};
 	};
 };
@@ -296,7 +299,7 @@
 &usbotg1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usbotg1>;
-	vbus-supply = <&reg_mba8qx_v5v>;
+	vbus-supply = <&reg_mba8qx_5v>;
 	srp-disable;
 	hnp-disable;
 	adp-disable;
