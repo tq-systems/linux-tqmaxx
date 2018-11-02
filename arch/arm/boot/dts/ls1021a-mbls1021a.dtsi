@@ -1,0 +1,379 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR X11)
+/*
+ * Copyright 2013-2014 Freescale Semiconductor, Inc.
+ * Copyright 2018-2020 TQ Systems GmbH
+ */
+
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/leds/leds-pca9532.h>
+#include <dt-bindings/net/ti-dp83867.h>
+#include "ls1021a-tqmls1021a.dtsi"
+
+/ {
+	model = "TQMLS102xA SOM on MBLS102xA";
+	compatible = "tq,ls1021a-mbls102xa", "tq,ls1021a-tqmls1021a", "fsl,ls1021a";
+
+	aliases {
+		enet0_rgmii_phy = &rgmii_phy0c;
+		enet1_sgmii_phy = &sgmii_phy03;
+		enet2_rgmii_phy = &rgmii_phy04;
+	};
+
+	clocks {
+		audio_mclk: clock {
+			compatible = "fixed-clock";
+			#clock-cells = <0>;
+			clock-frequency = <25000000>;
+		};
+	};
+
+	reg_3p3v: regulator-3p3v {
+		compatible = "regulator-fixed";
+		regulator-name = "3P3V";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-always-on;
+	};
+
+	reg_vcc3v3_audio: regulator-vcc3v3-audio {
+		compatible = "regulator-fixed";
+		regulator-name = "vcc3v3-audio";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		vin_supply = <&reg_3p3v>;
+	};
+
+	backlight_dcu: backlight {
+		compatible = "gpio-backlight";
+		gpios = <&pca9530 0 GPIO_ACTIVE_LOW>; /* PWM_0 */
+		default-on;
+		status = "disabled";
+	};
+
+	hdmi_out: hdmi {
+		compatible = "hdmi-connector";
+		type = "a";
+		ddc-i2c-bus = <&i2c0>;
+
+		port {
+			hdmi_in: endpoint {
+				remote-endpoint = <&sii9022a_out>;
+			};
+		};
+	};
+
+	display: panel {
+		backlight = <&backlight_dcu>;
+		enable-gpios = <&pca9554_1 3 GPIO_ACTIVE_HIGH>; /* LCD_BLT_EN */
+
+		port {
+			panel_in: endpoint {};
+		};
+	};
+
+	sound {
+		compatible = "fsl,ls1021a-mbls1021a-tlv320aic32x4",
+			     "fsl,imx-audio-tlv320aic32x4";
+		model = "ls1021a-mbls1021a-tlv320aic32";
+		ssi-controller = <&sai1>;
+		audio-codec = <&tlv320aic32x4>;
+	};
+
+};
+
+&can0 {
+	status = "okay";
+	xceiver-supply = <&reg_3p3v>;
+};
+
+&can1 {
+	status = "okay";
+	xceiver-supply = <&reg_3p3v>;
+};
+
+&can2 {
+	status = "disabled";
+};
+
+&can3 {
+	status = "disabled";
+};
+
+/* Temperature trip point references:
+ * Values copied from ls1021a.dtsi.
+ * Please change according to any custom requirements.
+ */
+&cpu_alert {
+	temperature = <85000>;
+};
+
+&cpu_crit {
+	temperature = <95000>;
+};
+
+&dcu {
+	status = "okay";
+
+	port {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		dcu_out: endpoint@0 {
+			reg = <0>;
+			/* remote-endpoint set by top dt fragment */
+		};
+	};
+};
+
+&dspi0 {
+	bus-num = <0>;
+	status = "okay";
+};
+
+&enet0 {
+	phy-handle = <&rgmii_phy0c>;
+	phy-mode = "rgmii-id";
+	mac-address = [ 00 00 00 00 00 00 ];
+	status = "okay";
+};
+
+&enet1 {
+	tbi-handle = <&tbi1>;
+	phy-handle = <&sgmii_phy03>;
+	phy-mode = "sgmii";
+	mac-address = [ 00 00 00 00 00 00 ];
+	status = "okay";
+};
+
+&enet2 {
+	phy-handle = <&rgmii_phy04>;
+	phy-mode = "rgmii-id";
+	mac-address = [ 00 00 00 00 00 00 ];
+	status = "okay";
+};
+
+&i2c0 {
+	status = "okay";
+
+	tlv320aic32x4: codec@18 {
+		compatible = "ti,tlv320aic32x4";
+		reg = <0x18>;
+		clocks = <&audio_mclk>;
+		clock-names = "mclk";
+		ldoin-supply = <&reg_vcc3v3_audio>;
+		iov-supply = <&reg_3p3v>;
+	};
+
+	pca9554_0: gpio-expander@20 {
+		compatible = "nxp,pca9554";
+		reg = <0x20>;
+
+		interrupt-parent = <&gpio0>;
+		interrupts = <24 IRQ_TYPE_EDGE_FALLING>;
+
+		interrupt-controller;
+		#interrupt-cells = <2>;
+
+		gpio-controller;
+		#gpio-cells = <2>;
+
+		vcc-supply = <&reg_3p3v>;
+
+		status = "okay";
+	};
+
+	pca9554_1: gpio-expander@21 {
+		compatible = "nxp,pca9554";
+		reg = <0x21>;
+
+		interrupt-parent = <&gpio0>;
+		interrupts = <25 IRQ_TYPE_EDGE_FALLING>;
+
+		interrupt-controller;
+		#interrupt-cells = <2>;
+
+		gpio-controller;
+		#gpio-cells = <2>;
+
+		vcc-supply = <&reg_3p3v>;
+
+		status = "okay";
+	};
+
+	pca9554_2: gpio-expander@22 {
+		compatible = "nxp,pca9554";
+		reg = <0x22>;
+
+		gpio-controller;
+		#gpio-cells = <2>;
+
+		vcc-supply = <&reg_3p3v>;
+
+		status = "okay";
+	};
+
+	polytouch: touchscreen@38 {
+		compatible = "edt,edt-ft5406", "edt,edt-ft5x06";
+		reg = <0x38>;
+		interrupt-parent = <&pca9554_0>;
+		interrupts = <6 IRQ_TYPE_EDGE_FALLING>;
+		/* LCD_PWR_EN -> TSC_WAKE */
+		wake-gpios = <&pca9554_1 4 GPIO_ACTIVE_HIGH>;
+		status = "disabled";
+	};
+
+	sii9022a: hdmi-transmitter@3b {
+		compatible = "sil,sii9022";
+		reg = <0x3b>;
+		interrupts = <GIC_SPI 167 IRQ_TYPE_EDGE_RISING>;
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+				sii9022a_in: endpoint {
+				};
+			};
+
+			port@1 {
+				reg = <1>;
+				sii9022a_out: endpoint {
+					remote-endpoint = <&hdmi_in>;
+				};
+			};
+		};
+	};
+
+	stmpe811: touchscreen@41 {
+		compatible = "st,stmpe811";
+		reg = <0x41>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		interrupt-parent = <&gpio0>;
+		interrupts = <23 IRQ_TYPE_EDGE_FALLING>;
+
+		vcc-supply = <&reg_3p3v>;
+		vio-supply = <&reg_3p3v>;
+
+		status = "okay";
+
+		stmpe_gpio {
+			compatible = "stmpe,gpio";
+			gpio-controller;
+			#gpio-cells = <2>;
+			gpio,norequest-mask = <0xF0>;
+		};
+
+		stmpe_touchscreen {
+			compatible = "stmpe,ts";
+/*
+ * TODO:
+ * this has to be configured per panel
+ */
+			st,sample-time = <4>;
+			st,mod-12b = <1>;
+			st,ref-sel = <0>;
+			st,adc-freq = <1>;
+			st,ave-ctrl = <1>;
+			st,touch-det-delay = <3>;
+			st,settling = <4>;
+			st,fraction-z = <7>;
+			st,i-drive = <1>;
+		};
+	};
+
+	pca9530: gpio-expander@60 {
+		compatible = "nxp,pca9530";
+		reg = <0x60>;
+
+		gpio-controller;
+		#gpio-cells = <2>;
+
+		gpio_pwm_0 {
+			label = "pca9530:pwm0";
+			type = <PCA9532_TYPE_GPIO>;
+		};
+
+		gpio_pwm_1 {
+			label = "pca9530:pwm1";
+			type = <PCA9532_TYPE_GPIO>;
+		};
+	};
+
+};
+
+&i2c1 {
+	status = "okay";
+};
+
+&lpuart0 {
+	status = "okay";
+	linux,rs485-enabled-at-boot-time;
+};
+
+&mdio0 {
+	rgmii_phy0c: ethernet-phy@0c {
+		compatible = "ethernet-phy-id2000.a230",
+			"ethernet-phy-ieee802.3-c22";
+		reg = <0x0c>;
+		ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
+		ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
+		ti,led-function = <0x6b90>;
+		ti,led-ctrl = <0x0000>;
+		ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
+	};
+
+	sgmii_phy03: ethernet-phy@03 {
+		compatible = "ethernet-phy-id2000.a230",
+			"ethernet-phy-ieee802.3-c22";
+		reg = <0x03>;
+		ti,led-function = <0x6b90>;
+		ti,led-ctrl = <0x0000>;
+		ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
+		ti,clk-output-sel = <DP83867_CLK_O_SEL_OFF>;
+		ti,dp83867-rxctrl-strap-quirk;
+	};
+
+	rgmii_phy04: ethernet-phy@04 {
+		compatible = "ethernet-phy-id2000.a230",
+			"ethernet-phy-ieee802.3-c22";
+		reg = <0x04>;
+		ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
+		ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
+		ti,led-function = <0x6b90>;
+		ti,led-ctrl = <0x0000>;
+		ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
+	};
+};
+
+&pwm6 {
+	status = "okay";
+};
+
+&pwm7 {
+	status = "okay";
+};
+
+&sai1 {
+	status = "okay";
+};
+
+&sata {
+	/delete-property/ dma-coherent;
+	status = "okay";
+};
+
+&uart0 {
+	status = "okay";
+};
+
+&uart1 {
+	status = "okay";
+};
+
+&usb3 {
+	dr_mode = "otg";
+};
