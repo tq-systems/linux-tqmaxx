@@ -290,6 +290,7 @@
 
 &lpuart0 {
 	status = "okay";
+	linux,rs485-enabled-at-boot-time;
 };
 
 &mdio0 {
