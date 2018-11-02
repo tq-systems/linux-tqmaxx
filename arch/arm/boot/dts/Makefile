@@ -542,6 +542,7 @@ dtb-$(CONFIG_SOC_IMX7D) += \
 	imx7s-warp.dtb
 dtb-$(CONFIG_SOC_LS1021A) += \
 	ls1021a-qds.dtb \
+	ls1021a-mbls1021a.dtb \
 	ls1021a-twr.dtb
 dtb-$(CONFIG_SOC_VF610) += \
 	vf500-colibri-eval-v3.dtb \
