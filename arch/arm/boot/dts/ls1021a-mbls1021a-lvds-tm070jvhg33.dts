@@ -1,0 +1,25 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR X11)
+/*
+ * Copyright 2013-2014 Freescale Semiconductor, Inc.
+ * Copyright 2018-2020 TQ Systems GmbH
+ */
+
+/dts-v1/;
+#include "ls1021a-mbls1021a.dtsi"
+
+&backlight_dcu {
+	status = "okay";
+};
+
+&display {
+	compatible = "tianma,tm070jvhg33";
+	enable-gpios = <&pca9554_1 3 GPIO_ACTIVE_LOW>; /* LCD_BLT_EN */
+};
+
+&dcu_out {
+	remote-endpoint = <&panel_in>;
+};
+
+&panel_in {
+	remote-endpoint = <&dcu_out>;
+};
