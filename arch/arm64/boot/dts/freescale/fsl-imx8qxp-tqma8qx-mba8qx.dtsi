@@ -81,7 +81,31 @@
 			enable-active-high;
 			status = "okay";
 		};
+
+		reg_mba8qx_3v3: mba8qx_3v3 {
+			compatible = "regulator-fixed";
+			regulator-name = "MBA8QX_3V3";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			regulator-always-on;
+			status = "okay";
+		};
 	};
+};
+
+/* CPU device tree mixes up counting from 0 and counting from 1 */
+&flexcan1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_can0>;
+	xceiver-supply = <&reg_mba8qx_3v3>;
+	status = "okay";
+};
+
+&flexcan2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_can1>;
+	xceiver-supply = <&reg_mba8qx_3v3>;
+	status = "okay";
 };
 
 &i2c1 {
@@ -120,18 +144,24 @@
 &iomuxc {
 	pinctrl-names = "default";
 	tqma8qx-mba8qx {
-
-		pinctrl_lpuart0: lpuart0grp {
-			fsl,pins = <
-				SC_P_UART0_RX_ADMA_UART0_RX	0x06000020
-				SC_P_UART0_TX_ADMA_UART0_TX	0x06000020
-			>;
-		};
-
 		pinctrl_lpuart1: lpuart1grp {
 			fsl,pins = <
 				SC_P_UART1_RX_ADMA_UART1_RX	0x06000020
 				SC_P_UART1_TX_ADMA_UART1_TX	0x06000020
+			>;
+		};
+
+		pinctrl_can0: can0grp {
+			fsl,pins = <
+				SC_P_UART0_RX_ADMA_FLEXCAN0_RX	0x06000020
+				SC_P_UART0_TX_ADMA_FLEXCAN0_TX	0x06000020
+			>;
+		};
+
+		pinctrl_can1: can1grp {
+			fsl,pins = <
+				SC_P_UART2_RX_ADMA_FLEXCAN1_RX	0x06000020
+				SC_P_UART2_TX_ADMA_FLEXCAN1_TX	0x06000020
 			>;
 		};
 
