@@ -16,7 +16,7 @@
 
 / {
 	model = "TQ Systems i.MX8QXP TQMa8xX on MBa8xX";
-	compatible = "tqc,tqma8qx-mba8qx", "tqc,tqma8qx", "fsl,imx8qxp";
+	compatible = "tq,tqma8qx-mba8qx", "tq,tqma8qx", "fsl,imx8qxp";
 
 	chosen {
 		bootargs = "console=ttyLP1,115200 earlycon=lpuart32,0x5a070000,115200";
