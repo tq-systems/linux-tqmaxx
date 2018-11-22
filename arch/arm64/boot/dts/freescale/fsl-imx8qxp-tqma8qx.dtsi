@@ -193,14 +193,14 @@
 	};
 
 	eeprom0: m24c64@57 {
-		compatible = "st,24c64", "at24";
+		compatible = "st,24c64", "atmel,24c64", "at24";
 		reg = <0x57>;
 		pagesize = <32>;
 		status = "okay";
 	};
 
 	rtc1: ds1339@68 {
-		compatible = "ds1339";
+		compatible = "ds1339", "dallas,ds1339", "dallas,ds1337";
 		reg = <0x68>;
 	};
 };
