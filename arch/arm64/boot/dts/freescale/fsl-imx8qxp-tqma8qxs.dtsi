@@ -194,6 +194,13 @@
 			>;
 		};
 
+		pinctrl_usbotg1: usbotg1grp {
+			fsl,pins = <
+				SC_P_USB_SS3_TC0_CONN_USB_OTG1_PWR	0x06000020
+				SC_P_USB_SS3_TC2_CONN_USB_OTG1_OC	0x06000020
+			>;
+		};
+
 		pinctrl_usdhc1: usdhc1grp {
 			fsl,pins = <
 				SC_P_EMMC0_CLK_CONN_EMMC0_CLK		0x06000041
@@ -257,6 +264,15 @@
 };
 
 &gpio4 {
+	status = "okay";
+};
+
+&usbotg1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usbotg1>;
+/*	vbus-supply = <&reg_mba8qx_5v>; */
+	power-polarity-active-high;
+	dr_mode = "otg";
 	status = "okay";
 };
 
