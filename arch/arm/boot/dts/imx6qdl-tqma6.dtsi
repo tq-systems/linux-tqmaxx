@@ -36,7 +36,7 @@
 
 	flash: m25p80@0 {
 		status = "okay";
-		compatible = "micron,n25q128a13", "n25q128a13";
+		compatible = "jedec,spi-nor";
 		spi-max-frequency = <50000000>;
 		reg = <0>;
 		#address-cells = <1>;
