@@ -172,6 +172,10 @@
 				reg = <6>;
 				label = "cpu";
 				ethernet = <&pfe_mac1>;
+				fixed-link {
+					speed = <1000>;
+					full-duplex;
+				};
 			};
 		};
 	};
@@ -207,6 +211,11 @@
 	fsl,mdio-mux-val = <0x0>;
 	phy-mode = "rgmii";
 	fsl,pfe-phy-if-flags = <0x1>;
+
+	fixed-link {
+		speed = <1000>;
+		full-duplex;
+	};
 };
 
 &sata {
