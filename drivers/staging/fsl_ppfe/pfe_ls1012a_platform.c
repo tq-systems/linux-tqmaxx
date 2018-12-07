@@ -116,6 +116,9 @@ static int pfe_get_gemac_if_proprties(struct device_node *parent, int port, int
 				pr_err("broken fixed-link specification\n");
 				goto err;
 			}
+		} else {
+			pr_err("missing fixed-link specification\n");
+			goto err;
 		}
 		pdata->ls1012a_eth_pdata[port].phy_node = of_node_get(gem);
 		goto done;
