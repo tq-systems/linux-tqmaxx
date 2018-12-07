@@ -30,6 +30,7 @@
 #include <linux/netdevice.h>
 #include <linux/etherdevice.h>
 #include <linux/ethtool.h>
+#include <linux/of_mdio.h>
 #include <linux/mii.h>
 #include <linux/phy.h>
 #include <linux/timer.h>
@@ -1133,6 +1134,19 @@ static void pfe_eth_adjust_link(struct net_device *ndev)
 	spin_unlock_irqrestore(&priv->lock, flags);
 }
 
+/* pfe_fixed_link_exit
+ */
+static void pfe_fixed_link_exit(struct net_device *ndev)
+{
+	struct pfe_eth_priv_s *priv = netdev_priv(ndev);
+
+	netif_info(priv, drv, ndev, "%s\n", __func__);
+
+	phy_disconnect(priv->phydev);
+	priv->phydev = NULL;
+	of_node_put(priv->einfo->phy_node);
+}
+
 /* pfe_phy_exit
  */
 static void pfe_phy_exit(struct net_device *ndev)
@@ -1215,6 +1229,36 @@ static void ls1012a_configure_serdes(struct net_device *ndev)
 		pfe_eth_mdio_write(bus, 0, 0x13, 0x0);
 		pfe_eth_mdio_write(bus, 0, 0x0, 0x1140);
 	}
+}
+
+/*
+ * pfe_fixed_link_init
+ *
+ */
+static int pfe_fixed_link_init(struct net_device *ndev)
+{
+	struct pfe_eth_priv_s *priv = netdev_priv(ndev);
+	struct phy_device *phydev;
+	phy_interface_t interface;
+
+	priv->oldlink = 0;
+	priv->oldspeed = 0;
+	priv->oldduplex = -1;
+	interface = priv->einfo->mii_config;
+
+	phydev = of_phy_connect(ndev, priv->einfo->phy_node,
+				&pfe_eth_adjust_link, 0,
+				interface);
+
+	if (IS_ERR(phydev)) {
+		netdev_err(ndev, "of_phy_connect() failed\n");
+		return PTR_ERR(phydev);
+	}
+
+	priv->phydev = phydev;
+	phydev->irq = PHY_POLL;
+
+	return 0;
 }
 
 /*
@@ -2419,7 +2463,14 @@ static int pfe_eth_init_one(struct pfe *pfe, int id)
 	}
 	device_init_wakeup(&ndev->dev, WAKE_MAGIC);
 
-	if (!(priv->einfo->phy_flags & GEMAC_NO_PHY)) {
+	if (priv->einfo->phy_flags & GEMAC_FIXED_LINK) {
+		err = pfe_fixed_link_init(ndev);
+		if (err) {
+			netdev_err(ndev, "%s: pfe_phy_init() failed\n",
+				   __func__);
+			goto err4;
+		}
+	} else if (!(priv->einfo->phy_flags & GEMAC_NO_PHY)) {
 		err = pfe_phy_init(ndev);
 		if (err) {
 			netdev_err(ndev, "%s: pfe_phy_init() failed\n",
@@ -2489,7 +2540,9 @@ static void pfe_eth_exit_one(struct pfe_eth_priv_s *priv)
 
 	unregister_netdev(priv->ndev);
 
-	if (!(priv->einfo->phy_flags & GEMAC_NO_PHY))
+	if (!(priv->einfo->phy_flags & GEMAC_FIXED_LINK))
+		pfe_fixed_link_exit(priv->ndev);
+	else if (!(priv->einfo->phy_flags & GEMAC_NO_PHY))
 		pfe_phy_exit(priv->ndev);
 
 	if (priv->mii_bus)
