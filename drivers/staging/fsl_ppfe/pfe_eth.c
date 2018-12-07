@@ -1110,8 +1110,8 @@ static void pfe_eth_adjust_link(struct net_device *ndev)
 			new_state = 1;
 			gemac_set_speed(priv->EMAC_baseaddr,
 					pfe_get_phydev_speed(phydev));
-			if (priv->einfo->mii_config ==
-					PHY_INTERFACE_MODE_RGMII_TXID)
+			if ((priv->einfo->mii_config ==
+					PHY_INTERFACE_MODE_RGMII_TXID))
 				pfe_set_rgmii_speed(phydev);
 			priv->oldspeed = phydev->speed;
 		}
@@ -2463,14 +2463,14 @@ static int pfe_eth_init_one(struct pfe *pfe, int id)
 	}
 	device_init_wakeup(&ndev->dev, WAKE_MAGIC);
 
-	if (priv->einfo->phy_flags & GEMAC_FIXED_LINK) {
+	if (priv->einfo->phy_flags == GEMAC_FIXED_LINK) {
 		err = pfe_fixed_link_init(ndev);
 		if (err) {
 			netdev_err(ndev, "%s: pfe_phy_init() failed\n",
 				   __func__);
 			goto err4;
 		}
-	} else if (!(priv->einfo->phy_flags & GEMAC_NO_PHY)) {
+	} else if (!(priv->einfo->phy_flags == GEMAC_NO_PHY)) {
 		err = pfe_phy_init(ndev);
 		if (err) {
 			netdev_err(ndev, "%s: pfe_phy_init() failed\n",
@@ -2540,9 +2540,9 @@ static void pfe_eth_exit_one(struct pfe_eth_priv_s *priv)
 
 	unregister_netdev(priv->ndev);
 
-	if (!(priv->einfo->phy_flags & GEMAC_FIXED_LINK))
+	if (!(priv->einfo->phy_flags == GEMAC_FIXED_LINK))
 		pfe_fixed_link_exit(priv->ndev);
-	else if (!(priv->einfo->phy_flags & GEMAC_NO_PHY))
+	else if (!(priv->einfo->phy_flags == GEMAC_NO_PHY))
 		pfe_phy_exit(priv->ndev);
 
 	if (priv->mii_bus)
