@@ -149,6 +149,8 @@ PROPERTIES
 		Value type: <u32>
 		Definition: Must be present. Value should be 0 by default.
 		If there is not phy connected, this need to be 1.
+		If there is a fixed link phy connected, this need to be 2.
+		In this case the mdio node should be present and set to disabled.
 
 - mdio
 		optional subnode that specifies the mdio bus. This has reg

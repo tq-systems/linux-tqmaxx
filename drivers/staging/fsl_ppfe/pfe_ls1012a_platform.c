@@ -24,6 +24,7 @@
 #include <linux/slab.h>
 #include <linux/clk.h>
 #include <linux/mfd/syscon.h>
+#include <linux/of_mdio.h>
 #include <linux/regmap.h>
 
 #include "pfe_mod.h"
@@ -107,8 +108,21 @@ static int pfe_get_gemac_if_proprties(struct device_node *parent, int port, int
 		pdata->ls1012a_eth_pdata[port].phy_flags = be32_to_cpup(addr);
 
 	/* If PHY is enabled, read mdio properties */
-	if (pdata->ls1012a_eth_pdata[port].phy_flags & GEMAC_NO_PHY)
+	if (pdata->ls1012a_eth_pdata[port].phy_flags & GEMAC_FIXED_LINK) {
+		int ret;
+
+		if (of_phy_is_fixed_link(gem)) {
+			ret = of_phy_register_fixed_link(gem);
+			if (ret < 0) {
+				pr_err("broken fixed-link specification\n");
+				goto err;
+			}
+		}
+		pdata->ls1012a_eth_pdata[port].phy_node = of_node_get(gem);
 		goto done;
+	} else if (pdata->ls1012a_eth_pdata[port].phy_flags & GEMAC_NO_PHY) {
+		goto done;
+	}
 
 	phy = of_get_next_child(gem, NULL);
 

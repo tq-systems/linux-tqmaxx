@@ -47,6 +47,7 @@
 #define GEMAC_SW_SPEED_1G       (2 << 12)
 
 #define GEMAC_NO_PHY            BIT(0)
+#define GEMAC_FIXED_LINK        BIT(1)
 
 struct ls1012a_eth_platform_data {
 	/* device specific information */
@@ -56,6 +57,7 @@ struct ls1012a_eth_platform_data {
 	/* board specific information */
 	u32 mii_config;
 	u32 phy_flags;
+	struct device_node *phy_node;
 	u32 gem_id;
 	u32 bus_id;
 	u32 phy_id;
