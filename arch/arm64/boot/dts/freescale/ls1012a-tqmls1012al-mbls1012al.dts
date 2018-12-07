@@ -212,7 +212,11 @@
 	fsl,gemac-phy-id = <0x1>;	/* PHY_ID */
 	fsl,mdio-mux-val = <0x0>;
 	phy-mode = "rgmii";
-	fsl,pfe-phy-if-flags = <0x1>;
+	fsl,pfe-phy-if-flags = <0x2>;
+
+	mdio@0 {
+		reg = <0x0>; /* enabled/disabled */
+	};
 
 	fixed-link {
 		speed = <1000>;
