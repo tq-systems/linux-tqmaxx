@@ -641,33 +641,49 @@ static int esdhc_signal_voltage_switch(struct mmc_host *mmc,
 
 	switch (ios->signal_voltage) {
 	case MMC_SIGNAL_VOLTAGE_330:
-		val &= ~ESDHC_VOLT_SEL;
-		sdhci_writel(host, val, ESDHC_PROCTL);
-		return 0;
+		/*
+		 * Check if "operating status register" supports the voltage.
+		 * A check for host-> flags is not possible because
+		 * SDHCI_SIGNALING_330 is always set.
+		 */
+		if (host->ocr_mask & (MMC_VDD_27_28 | MMC_VDD_28_29 |
+		    MMC_VDD_29_30 | MMC_VDD_30_31 | MMC_VDD_31_32 |
+		    MMC_VDD_32_33 | MMC_VDD_33_34 | MMC_VDD_34_35 |
+		    MMC_VDD_35_36)) {
+			val &= ~ESDHC_VOLT_SEL;
+			sdhci_writel(host, val, ESDHC_PROCTL);
+			return 0;
+		} else
+			return -EINVAL;
 	case MMC_SIGNAL_VOLTAGE_180:
-		scfg_node = of_find_matching_node(NULL, scfg_device_ids);
-		if (scfg_node)
-			scfg_base = of_iomap(scfg_node, 0);
-		if (scfg_base) {
-			sdhciovselcr = SDHCIOVSELCR_TGLEN |
-				       SDHCIOVSELCR_VSELVAL;
-			iowrite32be(sdhciovselcr,
-				scfg_base + SCFG_SDHCIOVSELCR);
+		/* Check if "operating status register" supports the voltage.*/
+		if (host->ocr_mask & (MMC_VDD_165_195)) {
+			scfg_node = of_find_matching_node(NULL,
+							  scfg_device_ids);
+			if (scfg_node)
+				scfg_base = of_iomap(scfg_node, 0);
+			if (scfg_base) {
+				sdhciovselcr = SDHCIOVSELCR_TGLEN |
+					       SDHCIOVSELCR_VSELVAL;
+				iowrite32be(sdhciovselcr,
+					scfg_base + SCFG_SDHCIOVSELCR);
 
-			val |= ESDHC_VOLT_SEL;
-			sdhci_writel(host, val, ESDHC_PROCTL);
-			mdelay(5);
+				val |= ESDHC_VOLT_SEL;
+				sdhci_writel(host, val, ESDHC_PROCTL);
+				mdelay(5);
 
-			sdhciovselcr = SDHCIOVSELCR_TGLEN |
-				       SDHCIOVSELCR_SDHC_VS;
-			iowrite32be(sdhciovselcr,
-				scfg_base + SCFG_SDHCIOVSELCR);
-			iounmap(scfg_base);
-		} else {
-			val |= ESDHC_VOLT_SEL;
-			sdhci_writel(host, val, ESDHC_PROCTL);
-		}
-		return 0;
+				sdhciovselcr = SDHCIOVSELCR_TGLEN |
+					       SDHCIOVSELCR_SDHC_VS;
+				iowrite32be(sdhciovselcr,
+					scfg_base + SCFG_SDHCIOVSELCR);
+				iounmap(scfg_base);
+			} else {
+				val |= ESDHC_VOLT_SEL;
+				sdhci_writel(host, val, ESDHC_PROCTL);
+			}
+			return 0;
+		} else
+			return -EINVAL;
 	default:
 		return 0;
 	}
