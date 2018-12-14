@@ -11,6 +11,15 @@
 /dts-v1/;
 #include "ls1021a-mbls1021a.dtsi"
 
-&dcu {
-	status = "disabled";
+&backlight_dcu {
+	gpios = <&pca9530 0 GPIO_ACTIVE_LOW>; /* Backlight Enable inverted */
+	status = "okay";
+};
+
+&display {
+	compatible = "edt,etm0700g0dh6";
+};
+
+&dcu_out {
+	remote-endpoint = <&panel_in>;
 };

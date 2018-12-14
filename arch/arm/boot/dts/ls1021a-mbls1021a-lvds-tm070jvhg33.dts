@@ -11,6 +11,15 @@
 /dts-v1/;
 #include "ls1021a-mbls1021a.dtsi"
 
-&dcu {
-	status = "disabled";
+&backlight_dcu {
+	gpios = <&pca9530 0 GPIO_ACTIVE_HIGH>; /* PWM_0 */
+	status = "okay";
+};
+
+&display {
+	compatible = "tianma,tm070jvhg33", "tianma,tm070jdhg30";
+};
+
+&dcu_out {
+	remote-endpoint = <&panel_in>;
 };

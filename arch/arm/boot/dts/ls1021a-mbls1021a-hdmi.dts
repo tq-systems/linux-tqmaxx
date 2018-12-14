@@ -11,6 +11,6 @@
 /dts-v1/;
 #include "ls1021a-mbls1021a.dtsi"
 
-&dcu {
-	status = "disabled";
+&dcu_out {
+	remote-endpoint = <&sii9022a_in>;
 };

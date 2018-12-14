@@ -543,6 +543,11 @@ dtb-$(CONFIG_SOC_IMX7D) += \
 dtb-$(CONFIG_SOC_LS1021A) += \
 	ls1021a-qds.dtb \
 	ls1021a-mbls1021a.dtb \
+	ls1021a-mbls1021a-dmb-ct21.dtb \
+	ls1021a-mbls1021a-dmb-ct44.dtb \
+	ls1021a-mbls1021a-glyn-etm0700g0dh6.dtb \
+	ls1021a-mbls1021a-lvds-tm070jvhg33.dtb \
+	ls1021a-mbls1021a-hdmi.dtb \
 	ls1021a-twr.dtb
 dtb-$(CONFIG_SOC_VF610) += \
 	vf500-colibri-eval-v3.dtb \
