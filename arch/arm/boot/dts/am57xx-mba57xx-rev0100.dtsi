@@ -250,9 +250,9 @@
 		wakeup-source;
 	};
 
-	/* Output GPIO Port Expander 16 bit */
-	expander2: pca9555@21 {
-		compatible = "nxp,pca9555";
+	/* Output GPIO Port Expander 8 bit */
+	expander2: pca9554@21 {
+		compatible = "nxp,pca9554";
 		reg = <0x21>;
 		#gpio-cells = <2>;
 		gpio-controller;
@@ -357,14 +357,12 @@
 	phy_id = <&davinci_mdio>, <2>;
 	phy-mode = "rgmii-id";
 	dual_emac_res_vlan = <1>;
-	reset-gpio = <&expander2 10 GPIO_ACTIVE_LOW>;
 };
 
 &cpsw_emac1 {
 	phy_id = <&davinci_mdio>, <3>;
 	phy-mode = "rgmii-id";
 	dual_emac_res_vlan = <2>;
-	reset-gpio = <&expander2 11 GPIO_ACTIVE_LOW>;
 };
 
 &davinci_mdio {
@@ -534,7 +532,6 @@
 /* PCIe lane 0 PCIe x4 connector */
 &pcie1_rc {
 	status = "okay";
-	reset-gpio = <&expander2 14 GPIO_ACTIVE_LOW>;
 };
 
 &sata {
