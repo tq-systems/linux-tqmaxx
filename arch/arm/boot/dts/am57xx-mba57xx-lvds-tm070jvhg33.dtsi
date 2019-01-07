@@ -1,0 +1,94 @@
+/*
+ * Copyright (C) 2017 TQ Systems
+ *
+ * Author: Stefan Lange <s.lange@gateware.de>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+/ {
+	aliases {
+		display1 = &lvds;
+	};
+
+	/* TM070JVHG33 */
+	lvds: display {
+		compatible = "tianma,tm070jvhg33", "panel-dpi";
+		bits-per-pixel = <32>; /* 32: RGB888/666 mode */
+		label = "lcd";
+		backlight = <&lvds_bl>;
+		/* lcd power enable LCD_PWR_EN */
+		enable-gpios = <&expander1 12 GPIO_ACTIVE_HIGH>;
+		vcc-supply = <&vcc_3v3_display>;
+		status = "okay";
+
+		panel-timing {
+			/* note: display shows errors at higher display
+			 * clocks due to bad layout of the display pcb
+			 * itself. Keep display clock lower than
+			 * specified here to prevent this.
+			 */
+			clock-frequency = <33260000>;
+			hactive = <1280>;
+			vactive = <800>;
+			hback-porch = <216>;
+			hfront-porch = <40>;
+			vback-porch = <35>;
+			vfront-porch = <10>;
+			hsync-len = <128>;
+			vsync-len = <2>;
+			hsync-active = <0>;
+			vsync-active = <0>;
+			de-active = <1>;
+			pixelclk-active = <0>;
+		};
+
+		/* cpu parallel display interface attached to external
+		 * lvds display bridge
+		 */
+		port {
+			lcd_in: endpoint {
+				remote-endpoint = <&dpi_out>;
+			};
+		};
+	};
+
+	lvds_bl: backlight {
+		compatible = "pwm-backlight";
+		pwms = <&ehrpwm1 0 50000 0>;
+		brightness-levels = <0 16 32 64 96 128 160 192 224 255>;
+		default-brightness-level = <10>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&backlight_pins_default>;
+		power-supply = <&vcc_5v_display>;
+	};
+};
+
+&dra7_pmx_core {
+	backlight_pins_default: backlight_pins_default {
+		pinctrl-single,pins = <
+			DRA7XX_CORE_IOPAD(0x358C, PIN_INPUT_PULLDOWN | MUX_MODE10) /* vin2a_d9.ehrpwm2A */
+		>;
+	};
+};
+
+/* display subsystem */
+&dss {
+	status = "okay";
+	vdda_video-supply = <&ldoln_reg>;
+
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port@0 {
+			reg = <0>;
+			dpi_out: endpoint {
+				remote-endpoint = <&lcd_in>;
+				data-lines = <24>;
+			};
+		};
+	};
+};
