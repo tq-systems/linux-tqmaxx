@@ -385,14 +385,7 @@
 	};
 };
 
-&usb2_phy1 {
-	/* Reference usb hub supply here.
-	 * Otherwise if usb hub supply is referenced nowhere it is
-	 * disabled by the kernel.
-	 */
-	phy-supply = <&vcc_1v1>;
-};
-
+*/
 &usb1 {
 	dr_mode = "host";
 };
