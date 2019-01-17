@@ -28,20 +28,13 @@
 		stdout-path = &uart1;
 	};
 
-	regulators {
-		compatible = "simple-bus";
-		#address-cells = <1>;
-		#size-cells = <0>;
-
-		reg_usdhc2_vmmc: usdhc2_vmmc@0 {
-			compatible = "regulator-fixed";
-			regulator-name = "VSD_3V3";
-			reg = <0>;
-			regulator-min-microvolt = <3300000>;
-			regulator-max-microvolt = <3300000>;
-			gpio = <&gpio2 19 GPIO_ACTIVE_HIGH>;
-			enable-active-high;
-		};
+	reg_usdhc2_vmmc: usdhc2_vmmc {
+		compatible = "regulator-fixed";
+		regulator-name = "VSD_3V3";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		gpio = <&gpio2 19 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
 	};
 };
 
