@@ -29,6 +29,7 @@
 #include <linux/gpio/consumer.h>
 #include <linux/of.h>
 #include <linux/of_irq.h>
+#include <linux/pinctrl/consumer.h>
 #include <linux/spinlock.h>
 #include <dt-bindings/input/gpio-keys.h>
 
