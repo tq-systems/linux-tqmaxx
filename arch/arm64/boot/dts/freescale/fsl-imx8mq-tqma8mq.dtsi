@@ -278,6 +278,14 @@
 	status = "okay";
 };
 
+&vpu {
+	status = "okay";
+};
+
+&vpu_pd {
+	power-supply = <&sw1c_reg>;
+};
+
 /* TODO: wdog reset has issues */
 &wdog1 {
 	pinctrl-names = "default";
