@@ -696,6 +696,7 @@ dtb-$(CONFIG_SOC_IMX7D) += \
 	imx7d-cl-som-imx7.dtb \
 	imx7d-colibri-emmc-eval-v3.dtb \
 	imx7d-colibri-eval-v3.dtb \
+	imx7d-mba7.dtb \
 	imx7d-nitrogen7.dtb \
 	imx7d-pico-pi.dtb \
 	imx7d-sbc-imx7.dtb \
@@ -715,6 +716,7 @@ dtb-$(CONFIG_SOC_IMX7D) += \
 	imx7d-sdb-reva-touch.dtb \
 	imx7d-sdb-reva-wm8960.dtb \
 	imx7s-colibri-eval-v3.dtb \
+	imx7s-mba7.dtb \
 	imx7s-warp.dtb \
 	imx7d-12x12-ddr3-arm2.dtb \
 	imx7d-12x12-lpddr3-arm2.dtb \
