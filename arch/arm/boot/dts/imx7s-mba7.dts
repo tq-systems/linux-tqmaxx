@@ -1,0 +1,15 @@
+// SPDX-License-Identifier: GPL-2.0+ OR MIT
+/*
+ * Copyright (C) 2016 - 2019 TQ Systems GmbH
+ * Author: Markus Niebel <Markus.Niebel@tq-group.com>
+ */
+
+/dts-v1/;
+
+#include "imx7s-tqma7.dtsi"
+#include "imx7-mba7.dtsi"
+
+/ {
+	model = "TQ Systems i.MX7S TQMa7S Board on MBa7";
+	compatible = "tqc,imx7s-mba7", "tqc,imx7s-tqma7", "fsl,imx7s";
+};
