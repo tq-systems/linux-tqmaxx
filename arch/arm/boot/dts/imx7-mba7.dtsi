@@ -4,6 +4,8 @@
  * Author: Markus Niebel <Markus.Niebel@tq-group.com>
  */
 
+#include <dt-bindings/net/ti-dp83867.h>
+
 / {
 	aliases {
 		mmc0 = &usdhc3;
@@ -32,6 +34,28 @@
 			regulator-always-on;
 		};
 
+		reg_fec1_pwdn: regulator@1 {
+			compatible = "regulator-fixed";
+			reg = <1>;
+			regulator-name = "PWDN_FEC1";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			regulator-always-on;
+			gpio = <&gpio1 9 GPIO_ACTIVE_HIGH>;
+			enable-active-high;
+		};
+
+		reg_fec2_pwdn: regulator@2 {
+			compatible = "regulator-fixed";
+			reg = <2>;
+			regulator-name = "PWDN_FEC2";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			regulator-always-on;
+			gpio = <&gpio2 31 GPIO_ACTIVE_HIGH>;
+			enable-active-high;
+		};
+
 		reg_mba_12v0: regulator@7 {
 			compatible = "regulator-fixed";
 			reg = <7>;
@@ -50,6 +74,37 @@
 			regulator-max-microvolt = <1800000>;
 			regulator-always-on;
 			vin-supply = <&sw2_reg>;
+		};
+	};
+};
+
+&fec1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_enet1>;
+	phy-mode = "rgmii-id";
+	phy-reset-gpios = <&gpio7 15 GPIO_ACTIVE_LOW>;
+	phy-reset-duration = <1>;
+	phy-reset-delay = <1>;
+	phy-supply = <&reg_fec1_pwdn>;
+	phy-handle = <&ethphy1_0>;
+	mac-address = [00 00 00 00 00 00];
+	local-mac-address = [00 00 00 00 00 00];
+	fsl,magic-packet;
+	fsl,mii-exclusive;
+	status = "okay";
+
+	mdio {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		ethphy1_0: ethernet-phy1@0 {
+			compatible = "ethernet-phy-ieee802.3-c22";
+			reg = <0>;
+			ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
+			ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
+			ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
+			ti,led-cfg1 = <0x0db0>;	/* LED1: Link/Activity, LED2: error */
+			ti,led-cfg2 = <0x1001>;	/* active low, LED1/2 driven by phy */
 		};
 	};
 };
@@ -86,6 +141,32 @@
 	pinctrl-0 = <&pinctrl_hog_mba7_1>;
 
 	imx7-mba7 {
+		pinctrl_enet1: enet1grp {
+			fsl,pins = <
+				MX7D_PAD_GPIO1_IO10__ENET1_MDIO			0x02
+				MX7D_PAD_GPIO1_IO11__ENET1_MDC			0x00
+
+				MX7D_PAD_ENET1_RGMII_TXC__ENET1_RGMII_TXC	0x71
+				MX7D_PAD_ENET1_RGMII_TD0__ENET1_RGMII_TD0	0x71
+				MX7D_PAD_ENET1_RGMII_TD1__ENET1_RGMII_TD1	0x71
+				MX7D_PAD_ENET1_RGMII_TD2__ENET1_RGMII_TD2	0x71
+				MX7D_PAD_ENET1_RGMII_TD3__ENET1_RGMII_TD3	0x71
+				MX7D_PAD_ENET1_RGMII_TX_CTL__ENET1_RGMII_TX_CTL	0x71
+				MX7D_PAD_ENET1_RGMII_RXC__ENET1_RGMII_RXC	0x79
+				MX7D_PAD_ENET1_RGMII_RD0__ENET1_RGMII_RD0	0x79
+				MX7D_PAD_ENET1_RGMII_RD1__ENET1_RGMII_RD1	0x79
+				MX7D_PAD_ENET1_RGMII_RD2__ENET1_RGMII_RD2	0x79
+				MX7D_PAD_ENET1_RGMII_RD3__ENET1_RGMII_RD3	0x79
+				MX7D_PAD_ENET1_RGMII_RX_CTL__ENET1_RGMII_RX_CTL	0x79
+
+				/* Reset: SION, 100kPU, SRE_FAST, DSE_X1 */
+				MX7D_PAD_ENET1_COL__GPIO7_IO15			0x40000070
+
+				/* INT/PWDN: SION, 100kPU, HYS, SRE_FAST, DSE_X1 */
+				MX7D_PAD_GPIO1_IO09__GPIO1_IO9			0x40000078
+			>;
+		};
+
 		pinctrl_gpioexp: pca95550grp {
 			fsl,pins = <
 				MX7D_PAD_ENET1_TX_CLK__GPIO7_IO12	0x78
