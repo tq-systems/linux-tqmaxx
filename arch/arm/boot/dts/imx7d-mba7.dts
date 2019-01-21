@@ -8,6 +8,7 @@
 
 #include "imx7d-tqma7.dtsi"
 #include "imx7-mba7.dtsi"
+#include "imx7d-mba7.dtsi"
 
 / {
 	model = "TQ Systems i.MX7D TQMa7D Board on MBa7";
