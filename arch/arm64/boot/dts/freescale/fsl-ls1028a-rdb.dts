@@ -52,6 +52,10 @@
 	compatible = "fsl,ls1028a-rdb", "fsl,ls1028a";
 
 	aliases {
+		gpio0 = &gpio0;
+		gpio1 = &gpio1;
+		gpio2 = &gpio2;
+
 		crypto = &crypto;
 		serial0 = &duart0;
 		serial1 = &duart1;
@@ -167,6 +171,20 @@
 			rtc@51 {
 				compatible = "nxp,pcf2129";
 				reg = <0x51>;
+			};
+		};
+
+		i2c@6 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0x6>;
+
+				pn7120: pn7120 {
+				compatible = "nxp,pn7120", "nxp,pn544";
+				reg = <0x28>;
+				clock-frequency = <1000000>;
+				interrupt-parent = <&gpio1>;
+				interrupt-gpios = <&gpio1 25 0>; /*28*/
 			};
 		};
 	};
