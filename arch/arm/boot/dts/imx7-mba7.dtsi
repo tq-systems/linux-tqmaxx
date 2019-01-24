@@ -121,6 +121,14 @@
 	status = "okay";
 };
 
+&i2c1 {
+	sensor1: lm75@49 {
+		compatible = "national,lm75";
+		reg = <0x49>;
+		status = "okay";
+	};
+};
+
 &i2c2 {
 	clock-frequency = <100000>;
 	pinctrl-names = "default";
