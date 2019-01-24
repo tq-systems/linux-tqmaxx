@@ -64,5 +64,25 @@
 				MX7D_PAD_EPDC_PWR_STAT__GPIO2_IO31		0x40000078
 			>;
 		};
+
+		pinctrl_pcie: pciegrp {
+			fsl,pins = <
+				MX7D_PAD_EPDC_PWR_COM__GPIO2_IO30	0x70 /* #pcie_wake */
+				MX7D_PAD_SD2_CLK__GPIO5_IO12		0x70 /* #pcie_rst */
+				MX7D_PAD_EPDC_BDR1__GPIO2_IO29		0x70 /* #pcie_dis */
+			>;
+		};
 	};
+};
+
+&pcie {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pcie>;
+	/* 1.5V logically from 3.3V */
+	vpcie-supply = <&reg_mpcie_1v5>;
+	reset-gpio = <&gpio5 12 GPIO_ACTIVE_LOW>;
+	disable-gpio = <&gpio2 29 GPIO_ACTIVE_LOW>;
+	power-on-gpio = <&gpio2 30 GPIO_ACTIVE_LOW>;
+	ext_osc = <1>;
+	status = "okay";
 };
