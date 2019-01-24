@@ -126,6 +126,17 @@
 		pagesize = <16>;
 		status = "okay";
 	};
+
+	/*
+	 * NXP SE97BTP with temperature sensor + eeprom
+	 * ATTENTION: do not use correct dt compatible since this will conflict
+	 * with hwmon sysfs ABI and break device registration
+	 */
+	sensor0: jc42@1e {
+		compatible = "nxp,se97", "jedec,jc-42.4-temp";
+		reg = <0x1e>;
+		status = "okay";
+	};
 };
 
 &iomuxc {
