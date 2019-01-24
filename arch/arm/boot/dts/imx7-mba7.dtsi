@@ -175,6 +175,9 @@
 
 		pinctrl_hog_mba7_1: hogmba71grp {
 			fsl,pins = <
+				/* TODO: WDOG2_B / WDOG2_RESET not usable */
+				MX7D_PAD_ENET1_RX_CLK__GPIO7_IO13	0x4000007c
+				MX7D_PAD_ENET1_CRS__GPIO7_IO14		0x40000074
 				/* #BOOT_EN */
 				MX7D_PAD_UART2_TX_DATA__GPIO4_IO3	0x40000010
 			>;
@@ -246,6 +249,16 @@
 	};
 };
 
+&iomuxc_lpsr {
+	imx7-mba7 {
+		pinctrl_wdog1: wdog1grp {
+			fsl,pins = <
+				MX7D_PAD_LPSR_GPIO1_IO00__WDOG1_WDOG_B	0x30
+			>;
+		};
+	};
+};
+
 &uart6 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart6>;
@@ -269,4 +282,10 @@
 	bus-width = <4>;
 	no-1-8-v;
 	status = "okay";
+};
+
+&wdog1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_wdog1>;
+	fsl,wdog_b;
 };
