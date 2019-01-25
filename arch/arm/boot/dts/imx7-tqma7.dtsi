@@ -39,7 +39,7 @@
 };
 
 &iomuxc {
-	imx7d-tqma7 {
+	imx7-tqma7 {
 		pinctrl_i2c1: i2c1grp {
 			fsl,pins = <
 				MX7D_PAD_I2C1_SDA__I2C1_SDA	0x40000078
