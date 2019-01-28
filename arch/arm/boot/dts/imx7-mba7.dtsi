@@ -25,6 +25,33 @@
 		stdout-path = &uart6;
 	};
 
+	gpio_buttons: gpio_keys {
+		compatible = "gpio-keys";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		button@0 {
+			/* #SWITCH_A */
+			label = "S11";
+			linux,code = <KEY_1>;
+			gpios = <&gpioexp 13 GPIO_ACTIVE_LOW>;
+		};
+
+		button@1 {
+			/* #SWITCH_B */
+			label = "S12";
+			linux,code = <KEY_2>;
+			gpios = <&gpioexp 14 GPIO_ACTIVE_LOW>;
+		};
+
+		button@2 {
+			/* #SWITCH_C */
+			label = "S13";
+			linux,code = <KEY_3>;
+			gpios = <&gpioexp 15 GPIO_ACTIVE_LOW>;
+		};
+	};
+
 	gpio-leds {
 		compatible = "gpio-leds";
 		status = "okay";
