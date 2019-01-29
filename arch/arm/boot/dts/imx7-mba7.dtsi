@@ -457,6 +457,16 @@
 			>;
 		};
 
+		pinctrl_sim2_1: sim2grp-1 {
+			fsl,pins = <
+				MX7D_PAD_SD2_DATA1__SIM2_PORT1_RST_B	0x77
+				MX7D_PAD_SD2_DATA3__SIM2_PORT1_PD	0x77
+				MX7D_PAD_SD2_DATA2__SIM2_PORT1_SVEN	0x77
+				MX7D_PAD_SD2_DATA0__SIM2_PORT1_CLK	0x73
+				MX7D_PAD_SD2_CMD__SIM2_PORT1_TRXD	0x73
+			>;
+		};
+
 		pinctrl_uart3: uart3grp {
 			fsl,pins = <
 				MX7D_PAD_UART3_RX_DATA__UART3_DCE_RX	0x7e
@@ -580,6 +590,17 @@
 			  <&clks IMX7D_SAI1_ROOT_CLK>;
 	assigned-clock-parents = <&clks IMX7D_PLL_AUDIO_POST_DIV>;
 	assigned-clock-rates = <0>, <36864000>;
+	status = "okay";
+};
+
+&sim2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_sim2_1>;
+	clocks = <&clks IMX7D_SIM2_ROOT_CLK>;
+	clock-names = "sim";
+	assigned-clocks = <&clks IMX7D_SIM2_ROOT_CLK>;
+	assigned-clock-rates = <67500000>;
+	port = <0>;
 	status = "okay";
 };
 
