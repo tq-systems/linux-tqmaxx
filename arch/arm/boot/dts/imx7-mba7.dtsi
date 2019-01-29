@@ -14,6 +14,11 @@
 		mmc2 = &usdhc2;
 	};
 
+	beeper {
+		compatible = "gpio-beeper";
+		gpios = <&gpioexp 0 GPIO_ACTIVE_HIGH>;
+	};
+
 	chosen {
 		bootargs="ttymxc5,115200";
 		linux,stdout-path = &uart6;
