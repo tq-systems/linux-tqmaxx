@@ -19,3 +19,13 @@ TQMa6-MBa6q variant b
 
 TQMa6-MBa6qp
 	compatible = "tq,mba6b", "tq,tqma6qp", "fsl,imx6qp";
+
+------------
+TQMa7 module
+------------
+
+TQMa7-MBa7d
+	compatible = "tqc,imx7d-mba7", "tqc,imx7d-tqma7", "fsl,imx7d";
+
+TQMa7-MBa7s
+	compatible = "tqc,imx7s-mba7", "tqc,imx7s-tqma7", "fsl,imx7s";
