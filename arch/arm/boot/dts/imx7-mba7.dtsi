@@ -74,6 +74,15 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 
+		reg_audio_3v3: regulator@a {
+			compatible = "regulator-fixed";
+			reg = <0xa>;
+			regulator-name = "VCC3V3_AUDIO";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			regulator-always-on;
+		};
+
 		reg_sd1_vmmc: regulator@0 {
 			compatible = "regulator-fixed";
 			reg = <0>;
@@ -166,6 +175,13 @@
 			regulator-always-on;
 			vin-supply = <&sw2_reg>;
 		};
+	};
+
+	sound {
+		compatible = "fsl,imx-audio-tlv320aic32x4";
+		model = "imx7-mba7-tlv320aic32";
+		ssi-controller = <&sai1>;
+		audio-codec = <&codec>;
 	};
 };
 
@@ -280,6 +296,15 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_i2c2>;
 	status = "okay";
+
+	codec: tlv320aic32x4@18 {
+		compatible = "ti,tlv320aic32x4";
+		reg = <0x18>;
+		clocks = <&clks IMX7D_AUDIO_MCLK_ROOT_CLK>;
+		clock-names = "mclk";
+		ldoin-supply = <&reg_audio_3v3>;
+		iov-supply = <&reg_audio_3v3>;
+	};
 
 	gpioexp: pca9555@20 {
 		compatible = "nxp,pca9555";
