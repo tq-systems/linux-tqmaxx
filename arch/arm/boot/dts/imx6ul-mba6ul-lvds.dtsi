@@ -1,0 +1,32 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright 2018 TQ Systems GmbH
+ * Author: Markus Niebel <Markus.Niebel@tq-group.com>
+ */
+
+&backlight {
+	pwms = <&pwm2 0 62500>;
+	brightness-levels = <0 16 32 64 96 128 160 192 224 255>;
+	default-brightness-level = <5>;
+	status = "okay";
+};
+
+/* for lcd reset != #stkrst */
+/* place r2021, resolder r2022 and iomux following: */
+/* MX6UL_PAD_LCD_RESET__GPIO3_IO04	0x79 */
+&lcdif {
+	lcd-supply = <&reg_lcd_pwr>;
+	status = "okay";
+};
+
+&panel {
+	compatible = "tianma,tm070jvhg33";
+};
+
+&reg_lcd_pwr {
+	status = "okay";
+};
+
+&reg_lvds_transmitter {
+	status = "okay";
+};
