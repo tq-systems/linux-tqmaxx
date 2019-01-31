@@ -1,0 +1,32 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright 2018 TQ Systems GmbH
+ * Author: Markus Niebel <Markus.Niebel@tq-group.com>
+ */
+
+&backlight {
+	/* 50000 ... 1000 nsec -> 20 ... 1000 kHz */
+	pwms = <&pwm2 0 20000>;
+	brightness-levels = <0 2 4 8 16 32 64 128 255>;
+	default-brightness-level = <8>;
+	status = "okay";
+};
+
+&lcdif {
+	status = "okay";
+};
+
+&panel {
+	compatible = "dmb,s070pws19hp_fc21_24bit";
+};
+
+&polytouch {
+	wake-gpios = <&expander_out0 1 GPIO_ACTIVE_HIGH>;
+	/* reset-gpios is controlled by stk reset */
+	gain = <20>;
+
+	touchscreen-size-x = <1024>;
+	touchscreen-size-y = <600>;
+
+	status = "okay";
+};
