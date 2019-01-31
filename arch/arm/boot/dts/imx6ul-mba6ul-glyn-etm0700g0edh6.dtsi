@@ -1,0 +1,35 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright 2018 TQ Systems GmbH
+ * Author: Markus Niebel <Markus.Niebel@tq-group.com>
+ */
+
+&backlight {
+	/* 1 kHz as stated by GLYN FAE */
+	pwms = <&pwm2 0 1000000>;
+	brightness-levels = <255 200 180 160 128 96 64 32 16>;
+	default-brightness-level = <5>;
+	status = "okay";
+};
+
+&lcdif {
+	status = "okay";
+};
+
+&panel {
+	compatible = "edt,etm0700g0edh6_24bit";
+};
+
+&polytouch {
+	/* reset-gpios is controlled by stk reset */
+	gain = <1>;
+	offset = <0>;
+	threshold = <0x0f>;
+
+	/*
+	 * do not use size settings, display touch reads
+	 * out and uses 1792 x 1024 (tested with ETM0700G0EDH6)
+	 */
+
+	status = "okay";
+};
