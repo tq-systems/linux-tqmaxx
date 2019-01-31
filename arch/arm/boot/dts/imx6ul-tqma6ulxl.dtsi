@@ -1,0 +1,81 @@
+/*
+ * Copyright 2018 Markus Niebel, TQ Systems GmbH
+ *
+ * The code contained herein is licensed under the GNU General Public
+ * License. You may obtain a copy of the GNU General Public License
+ * Version 2 or later at the following locations:
+ *
+ * http://www.opensource.org/licenses/gpl-license.html
+ * http://www.gnu.org/copyleft/gpl.html
+ */
+
+#include "imx6ul.dtsi"
+#include "tqma6ul-common.dtsi"
+#include "tqma6ulxl-common.dtsi"
+
+/ {
+	model = "TQMa6ULxL SOM";
+};
+
+&iomuxc {
+	imx6ul-tqma6ul {
+		pinctrl_usdhc2: usdhc2grp {
+			fsl,pins = <
+				MX6UL_PAD_NAND_RE_B__USDHC2_CLK		0x00017051
+				MX6UL_PAD_NAND_WE_B__USDHC2_CMD		0x00017051
+				MX6UL_PAD_NAND_DATA00__USDHC2_DATA0	0x00017051
+				MX6UL_PAD_NAND_DATA01__USDHC2_DATA1	0x00017051
+				MX6UL_PAD_NAND_DATA02__USDHC2_DATA2	0x00017051
+				MX6UL_PAD_NAND_DATA03__USDHC2_DATA3	0x00017051
+				MX6UL_PAD_NAND_DATA04__USDHC2_DATA4	0x00017051
+				MX6UL_PAD_NAND_DATA05__USDHC2_DATA5	0x00017051
+				MX6UL_PAD_NAND_DATA06__USDHC2_DATA6	0x00017051
+				MX6UL_PAD_NAND_DATA07__USDHC2_DATA7	0x00017051
+				/* rst */
+				MX6UL_PAD_NAND_ALE__GPIO4_IO10		0x0001b051
+			>;
+		};
+
+		pinctrl_usdhc2_100mhz: usdhc2grp_100mhz {
+			fsl,pins = <
+				MX6UL_PAD_NAND_RE_B__USDHC2_CLK		0x000170e1
+				MX6UL_PAD_NAND_WE_B__USDHC2_CMD		0x000170f1
+				MX6UL_PAD_NAND_DATA00__USDHC2_DATA0	0x000170f1
+				MX6UL_PAD_NAND_DATA01__USDHC2_DATA1	0x000170f1
+				MX6UL_PAD_NAND_DATA02__USDHC2_DATA2	0x000170f1
+				MX6UL_PAD_NAND_DATA03__USDHC2_DATA3	0x000170f1
+				MX6UL_PAD_NAND_DATA04__USDHC2_DATA4	0x000170f1
+				MX6UL_PAD_NAND_DATA05__USDHC2_DATA5	0x000170f1
+				MX6UL_PAD_NAND_DATA06__USDHC2_DATA6	0x000170f1
+				MX6UL_PAD_NAND_DATA07__USDHC2_DATA7	0x000170f1
+				/* rst */
+				MX6UL_PAD_NAND_ALE__GPIO4_IO10		0x0001b051
+			>;
+		};
+
+		pinctrl_usdhc2_200mhz: usdhc2grp_200mhz {
+			fsl,pins = <
+				MX6UL_PAD_NAND_RE_B__USDHC2_CLK		0x000170f9
+				MX6UL_PAD_NAND_WE_B__USDHC2_CMD		0x000170f1
+				MX6UL_PAD_NAND_DATA00__USDHC2_DATA0	0x000170f1
+				MX6UL_PAD_NAND_DATA01__USDHC2_DATA1	0x000170f1
+				MX6UL_PAD_NAND_DATA02__USDHC2_DATA2	0x000170f1
+				MX6UL_PAD_NAND_DATA03__USDHC2_DATA3	0x000170f1
+				MX6UL_PAD_NAND_DATA04__USDHC2_DATA4	0x000170f1
+				MX6UL_PAD_NAND_DATA05__USDHC2_DATA5	0x000170f1
+				MX6UL_PAD_NAND_DATA06__USDHC2_DATA6	0x000170f1
+				MX6UL_PAD_NAND_DATA07__USDHC2_DATA7	0x000170f1
+				/* rst */
+				MX6UL_PAD_NAND_ALE__GPIO4_IO10		0x0001b051
+			>;
+		};
+	};
+};
+
+&usdhc2 {
+	fsl,tuning-step= <6>;
+	max-frequency = <99000000>;
+	assigned-clocks = <&clks IMX6UL_CLK_USDHC2_SEL>, <&clks IMX6UL_CLK_USDHC2>;
+	assigned-clock-parents = <&clks IMX6UL_CLK_PLL2_PFD2>;
+	assigned-clock-rates = <0>, <198000000>;
+};
