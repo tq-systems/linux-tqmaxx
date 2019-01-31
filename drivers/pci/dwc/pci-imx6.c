@@ -1303,8 +1303,16 @@ static void imx_pcie_init_phy(struct imx_pcie *imx_pcie)
 				"failed to enable pcie regulator\n");
 
 		/* pcie phy ref clock select; 1? internal pll : external osc */
-		regmap_update_bits(imx_pcie->iomuxc_gpr, IOMUXC_GPR12,
-				   IMX7D_GPR12_PCIE_PHY_REFCLK_SEL, 0);
+		if (imx_pcie->ext_osc) { /* external oscillator */
+			regmap_update_bits(imx_pcie->iomuxc_gpr,
+				IOMUXC_GPR12,
+				IMX7D_GPR12_PCIE_PHY_REFCLK_SEL, 0);
+		} else { /* internel oscillator */
+			regmap_update_bits(imx_pcie->iomuxc_gpr,
+				IOMUXC_GPR12,
+				IMX7D_GPR12_PCIE_PHY_REFCLK_SEL,
+				IMX7D_GPR12_PCIE_PHY_REFCLK_SEL);
+		}
 	} else if (imx_pcie->variant == IMX6SX) {
 		/* Force PCIe PHY reset */
 		regmap_update_bits(imx_pcie->iomuxc_gpr, IOMUXC_GPR5,
