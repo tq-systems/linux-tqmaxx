@@ -37,6 +37,12 @@
 		};
 	};
 
+	soc {
+		usb3@3100000 {
+			dr_mode = "otg";
+		};
+	};
+
 	backlight_dcu: backlight@0 {
 		compatible = "gpio-backlight";
 		status = "disabled";
