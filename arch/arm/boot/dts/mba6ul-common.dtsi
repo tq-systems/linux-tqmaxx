@@ -305,6 +305,13 @@
 	};
 };
 
+/* Linux rel_imx-4.14.78_1.0.0_ga / rel_imx-4.19.35_1.0.0 by NXP defines the
+ * flexcan controller instances on CPUs i.MX6UL and i.MX6ULL
+ * at their respective addresses 02090000 and 02094000
+ * on two different paths. This forbids a common reference.
+ * Moved CAN nodes to imx6ull-mba6ulx.dts / imx6ul-mba6ulx.dts.
+ */
+
 &i2c4 {
 	codec: tlv320aic32x4@18 {
 		compatible = "ti,tlv320aic32x4";
