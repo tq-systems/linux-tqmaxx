@@ -1,0 +1,60 @@
+/*
+ * Copyright 2016 Marco Felsch, TQ Systems GmbH
+ *
+ * The code contained herein is licensed under the GNU General Public
+ * License. You may obtain a copy of the GNU General Public License
+ * Version 2 or later at the following locations:
+ *
+ * http://www.opensource.org/licenses/gpl-license.html
+ * http://www.gnu.org/copyleft/gpl.html
+ */
+
+/ {
+	display_lvds: display {
+		bits-per-pixel = <32>; /* 32: RGB888/666 mode */
+		bus-width = <24>;
+
+		display-timings {
+			native-mode = <&timing0>;
+			timing0: chimei-g104-x1 {
+				clock-frequency = <65000000>;
+				hactive = <1024>;
+				vactive = <768>;
+				hfront-porch = <75>;
+				hback-porch = <10>;
+				hsync-len = <255>; /* FIXME: typ < 256!*/
+				vback-porch = <100>;
+				vfront-porch = <10>;
+				vsync-len = <38>;
+				de-active = <1>;
+				hsync-active = <0>;
+				vsync-active = <0>;
+				pixelclk-active = <0>;
+			};
+		};
+	};
+};
+
+&backlight {
+	pwms = <&pwm2 0 62500>;
+	brightness-levels = <0 16 32 64 96 128 160 192 224 255>;
+	default-brightness-level = <5>;
+	status = "okay";
+};
+
+/* for lcd reset != #stkrst */
+/* place r2021, resolder r2022 and iomux following: */
+/* MX6UL_PAD_LCD_RESET__GPIO3_IO04	0x79 */
+&lcdif {
+	display = <&display_lvds>;
+	lcd-supply = <&reg_lcd_pwr>;
+	status = "okay";
+};
+
+&reg_lcd_pwr {
+	status = "okay";
+};
+
+&reg_lvds_transmitter {
+	status = "okay";
+};

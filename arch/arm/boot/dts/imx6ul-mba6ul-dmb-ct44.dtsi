@@ -1,0 +1,66 @@
+/*
+ * Copyright 2016 Marco Felsch, TQ Systems GmbH
+ *
+ * The code contained herein is licensed under the GNU General Public
+ * License. You may obtain a copy of the GNU General Public License
+ * Version 2 or later at the following locations:
+ *
+ * http://www.opensource.org/licenses/gpl-license.html
+ * http://www.gnu.org/copyleft/gpl.html
+ */
+
+/ {
+	/* compatible:
+	 * S070WV106H-CT44 v1.0 2017/02/21
+	 * S070SWV29HG-DC44 v 3.0 2017/02/21
+	 * Truecolor FB needed - pin config on display adapter
+	 */
+	display_ct44: display {
+		bits-per-pixel = <32>; /* 32: RGB888/666 mode */
+		bus-width = <24>;
+
+		display-timings {
+			native-mode = <&timing1>;
+			timing1: 800x480p62 {
+				clock-frequency = <26300000 33300000 46800000>;
+				hactive = <800>;
+				vactive = <480>;
+				hfront-porch = <210>;
+				hsync-len = <2>;
+				hback-porch = <44>;
+				vfront-porch = <22>;
+				vsync-len = <2>;
+				vback-porch = <21>;
+				hsync-active = <0>;
+				vsync-active = <0>;
+				de-active = <1>;
+				pixelclk-active = <0>;
+			};
+		};
+	};
+};
+
+&backlight {
+	/* 50000 ... 1000 nsec -> 20 ... 1000 kHz */
+	pwms = <&pwm2 0 20000>;
+	brightness-levels = <0 1 4 8 16 32 64 128 255>;
+	default-brightness-level = <8>;
+	status = "okay";
+};
+
+&lcdif {
+	display = <&display_ct44>;
+	status = "okay";
+};
+
+&polytouch {
+	wake-gpios = <&expander_out0 1 GPIO_ACTIVE_HIGH>;
+	/* reset-gpios is controlled by stk reset */
+	gain = <20>;
+
+	touchscreen-size-x = <800>;
+	touchscreen-size-y = <480>;
+
+	status = "okay";
+};
+
