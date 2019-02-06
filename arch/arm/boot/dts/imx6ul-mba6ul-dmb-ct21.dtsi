@@ -1,0 +1,64 @@
+/*
+ * Copyright 2016 Marco Felsch, TQ Systems GmbH
+ * Copyright 2017 Markus Niebel, TQ Systems GmbH
+ *
+ * The code contained herein is licensed under the GNU General Public
+ * License. You may obtain a copy of the GNU General Public License
+ * Version 2 or later at the following locations:
+ *
+ * http://www.opensource.org/licenses/gpl-license.html
+ * http://www.gnu.org/copyleft/gpl.html
+ */
+
+/ {
+	/* S070WV106H-CT21 */
+	display_ct21: display {
+		bits-per-pixel = <32>; /* 32: RGB888/666 mode */
+		bus-width = <24>;
+
+		display-timings {
+			native-mode = <&timing1>;
+			/* S070WS12H-O-CT21 rev. 2.0 2016/02/18
+			 * S070PWS19HP-FC21 ver 2.0 2017/2/21
+			 * Truecolor FB needed - pin config on display adapter
+			 */
+			timing1: 1024x600p62 {
+				clock-frequency = <45000000 51200000 57000000>;
+				hactive = <1024>;
+				vactive = <600>;
+				hfront-porch = <140 160 180>;
+				hsync-len = <20>;
+				hback-porch = <140>;
+				vfront-porch = <2 12 22>;
+				vsync-len = <3>;
+				vback-porch = <20>;
+				de-active = <1>;
+				pixelclk-active = <0>;
+			};
+		};
+	};
+};
+
+&backlight {
+	/* 50000 ... 1000 nsec -> 20 ... 1000 kHz */
+	pwms = <&pwm2 0 20000>;
+	brightness-levels = <0 2 4 8 16 32 64 128 255>;
+	default-brightness-level = <8>;
+	status = "okay";
+};
+
+&lcdif {
+	display = <&display_ct21>;
+	status = "okay";
+};
+
+&polytouch {
+	wake-gpios = <&expander_out0 1 GPIO_ACTIVE_HIGH>;
+	/* reset-gpios is controlled by stk reset */
+	gain = <20>;
+
+	touchscreen-size-x = <1024>;
+	touchscreen-size-y = <600>;
+
+	status = "okay";
+};
