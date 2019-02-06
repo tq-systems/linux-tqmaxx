@@ -289,8 +289,8 @@
 		ethphy0: ethernet-phy@0 {
 			compatible = "ethernet-phy-ieee802.3-c22";
 			reg = <0>;
-			ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
-			ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
+			ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_25_NS>;
+			ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_25_NS>;
 			ti,dp83867-rxctrl-strap-quirk;
 			ti,led-cfg1 = <0xc100>; /* LED1: Link, LED2: activity */
 			ti,led-cfg2 = <0x1001>; /* active low, LED1/2 driven by phy */
@@ -299,8 +299,8 @@
 		ethphy3: ethernet-phy@3 {
 			compatible = "ethernet-phy-ieee802.3-c22";
 			reg = <3>;
-			ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
-			ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
+			ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_25_NS>;
+			ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_25_NS>;
 			ti,dp83867-rxctrl-strap-quirk;
 			ti,led-cfg1 = <0xc100>; /* LED1: Link, LED2: activity */
 			ti,led-cfg2 = <0x1001>; /* active low, LED1/2 driven by phy */
