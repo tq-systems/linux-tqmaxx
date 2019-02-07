@@ -55,7 +55,6 @@
 	};
 
 	display: panel {
-		enable-gpios = <&pca9554_1 3 GPIO_ACTIVE_HIGH>; /* LCD_BLT_EN */
 		backlight = <&backlight_dcu>;
 
 		port {
@@ -198,7 +197,7 @@
 		interrupts = <6 IRQ_TYPE_EDGE_FALLING>;
 		/* LCD_PWR_EN -> TSC_RESET */
 		reset-gpios = <&pca9554_1 4 GPIO_ACTIVE_HIGH>;
-		status = "okay";
+		status = "disabled";
 	};
 
 	sii9022a: hdmi@3b {

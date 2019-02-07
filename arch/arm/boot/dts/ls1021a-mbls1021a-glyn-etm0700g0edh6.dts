@@ -18,8 +18,13 @@
 
 &display {
 	compatible = "edt,etm0700g0dh6";
+	enable-gpios = <&pca9554_1 3 GPIO_ACTIVE_LOW>; /* LCD_BLT_EN */
 };
 
 &dcu_out {
 	remote-endpoint = <&panel_in>;
+};
+
+&polytouch {
+	status = "okay";
 };
