@@ -181,6 +181,7 @@
 &qspi {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_qspi>;
+	fsl,qspi-no-dtr-modes;
 	status = "okay";
 
 	flash0: spinor@0 {
