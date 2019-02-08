@@ -38,7 +38,7 @@
 		regulators {
 			reg_sw1a: sw1a {
 				regulator-min-microvolt = <700000>;
-				regulator-max-microvolt = <1475000>;
+				regulator-max-microvolt = <3300000>;
 				regulator-boot-on;
 				regulator-ramp-delay = <6250>;
 				/* not used */
