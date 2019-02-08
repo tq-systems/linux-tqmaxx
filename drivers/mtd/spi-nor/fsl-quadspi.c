@@ -1101,7 +1101,7 @@ static void fsl_qspi_unprep(struct spi_nor *nor, enum spi_nor_ops ops)
 
 static int fsl_qspi_probe(struct platform_device *pdev)
 {
-	const struct spi_nor_hwcaps hwcaps = {
+	struct spi_nor_hwcaps hwcaps = {
 		.mask = SNOR_HWCAPS_READ_1_1_4 |
 			SNOR_HWCAPS_READ_1_4_4_DTR |
 			SNOR_HWCAPS_PP,
@@ -1202,6 +1202,12 @@ static int fsl_qspi_probe(struct platform_device *pdev)
 
 	if (of_get_property(np, "fsl,qspi-has-second-chip", NULL))
 		q->has_second_chip = true;
+
+	if (of_get_property(np, "fsl,qspi-no-dtr-modes", NULL))
+		hwcaps.mask &= ~(SNOR_HWCAPS_READ_1_1_1_DTR |
+				 SNOR_HWCAPS_READ_1_2_2_DTR |
+				 SNOR_HWCAPS_READ_1_4_4_DTR |
+				 SNOR_HWCAPS_READ_1_8_8_DTR);
 
 	mutex_init(&q->lock);
 
