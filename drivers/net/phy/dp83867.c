@@ -467,8 +467,13 @@ static int dp83867_config_init(struct phy_device *phydev)
 static int dp83867_phy_reset(struct phy_device *phydev)
 {
 	int err;
+	int reset = DP83867_SW_RESET;
+	struct device_node *of_node = phydev->mdio.dev.of_node;
 
-	err = phy_write(phydev, DP83867_CTRL, DP83867_SW_RESET);
+	if (of_property_read_bool(of_node, "ti,use-sw-restart"))
+		reset = DP83867_SW_RESTART;
+
+	err = phy_write(phydev, DP83867_CTRL, reset);
 	if (err < 0)
 		return err;
 
