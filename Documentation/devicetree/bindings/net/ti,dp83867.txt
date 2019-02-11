@@ -41,6 +41,8 @@ Optional property:
 				    SGMII configuration is used (4 or 6-wire modes).
 				    Some MACs work with differential SGMII clock.
 				    See data manual for details.
+	- ti,use-sw-restart	  - phy_reset function sets bit SW_RESTART
+				    instead of SW_RESET to keep register values
 
 Note: ti,min-output-impedance and ti,max-output-impedance are mutually
       exclusive. When both properties are present ti,max-output-impedance
