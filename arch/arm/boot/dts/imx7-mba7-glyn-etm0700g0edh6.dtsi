@@ -5,33 +5,6 @@
  * Author: Markus Niebel <Markus.Niebel@tq-group.com>
  */
 
-/ {
-	/* ETM0700G0EDH6, DS 2016/04/06, ver 3 */
-	display_etm0700: display {
-		bits-per-pixel = <32>; /* 32: RGB8880 */
-		bus-width = <18>;
-
-		display-timings {
-			native-mode = <&timing1>;
-			timing1: 800x480p62 {
-				clock-frequency = <33260000>;
-				hactive = <800>;
-				vactive = <480>;
-				hfront-porch = <40>;
-				hsync-len = <128>;
-				hback-porch = <88>;
-				vfront-porch = <10>;
-				vsync-len = <2>;
-				vback-porch = <33>;
-				hsync-active = <0>;
-				vsync-active = <0>;
-				de-active = <1>;
-				pixelclk-active = <0>;
-			};
-		};
-	};
-};
-
 &backlight {
 	/* 1 kHz as stated by GLYN FAE */
 	pwms = <&pwm1 0 1000000 1>;
@@ -41,8 +14,11 @@
 };
 
 &lcdif {
-	display = <&display_etm0700>;
 	status = "okay";
+};
+
+&panel {
+	compatible = "edt,etm0700g0edh6";
 };
 
 &polytouch {
