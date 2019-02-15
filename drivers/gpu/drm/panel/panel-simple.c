@@ -1247,7 +1247,7 @@ static const struct drm_display_mode dmb_s070pws19hp_fc21_mode = {
 	.vdisplay = 600,
 	.vsync_start = 600 + 12,
 	.vsync_end = 600 + 12 + 3,
-	.vtotal = 600 + 10 + 3 + 20,
+	.vtotal = 600 + 12 + 3 + 20,
 	.vrefresh = 60,
 	.flags = DRM_MODE_FLAG_NHSYNC | DRM_MODE_FLAG_NVSYNC,
 };
