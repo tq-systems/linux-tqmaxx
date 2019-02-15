@@ -1257,7 +1257,7 @@ static const struct panel_desc dmb_s070pws19hp_fc21 = {
 	.num_modes = 1,
 	.bpc = 6,
 	.size = {
-		.width = 120,
+		.width = 154,
 		.height = 86,
 	},
 	.bus_format = MEDIA_BUS_FMT_RGB666_1X18,
