@@ -1266,7 +1266,7 @@ static const struct panel_desc dmb_s070pws19hp_fc21 = {
 
 /* S070SWV29HG-DC44 2017/09/21 */
 static const struct drm_display_mode dmb_s070swv29hg_dc44_mode = {
-	.clock = 33000,
+	.clock = 33300,
 	.hdisplay = 800,
 	.hsync_start = 800 + 210,
 	.hsync_end = 800 + 210 + 2,
