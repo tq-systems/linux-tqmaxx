@@ -1,0 +1,126 @@
+/*
+ * Copyright 2018 TQ Systems GmbH
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/dts-v1/;
+
+#include <dt-bindings/net/ti-dp83867.h>
+#include "fsl-imx8qxp-tqma8qxs.dtsi"
+
+/ {
+	model = "TQ Systems i.MX8QXP TQMa8xXS on MB-SMARC-2";
+	compatible = "tq,tqma8qxs-mb-smarc-2", "tq,tqma8qxs", "fsl,imx8qxp";
+
+	chosen {
+		bootargs = "console=ttyLP0,115200 earlycon=lpuart32,0x5a060000,115200";
+		stdout-path = &lpuart0;
+	};
+
+	regulators {
+		compatible = "simple-bus";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		reg_usdhc2_vmmc: usdhc2_vmmc {
+			compatible = "regulator-fixed";
+			regulator-name = "SD1_VMMC";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			gpio = <&gpio4 19 GPIO_ACTIVE_LOW>;
+/*
+			startup-delay-us = <100>;
+			off-on-delay-us = <12000>;
+*/
+			regulator-always-on;
+			regulator-boot-on;
+		};
+	};
+};
+
+&iomuxc {
+	tqma8qxs-mb-smarc-2 {
+		pinctrl_lpuart0: lpuart0grp {
+			fsl,pins = <
+				SC_P_UART0_RX_ADMA_UART0_RX	0x06000020
+				SC_P_UART0_TX_ADMA_UART0_TX	0x06000020
+			>;
+		};
+
+		pinctrl_usdhc2_gpio: usdhc2gpiogrp {
+			fsl,pins = <
+				SC_P_USDHC1_RESET_B_LSIO_GPIO4_IO19	0x06000021
+				SC_P_USDHC1_WP_LSIO_GPIO4_IO21		0x06000021
+				SC_P_USDHC1_CD_B_LSIO_GPIO4_IO22	0x06000021
+			>;
+		};
+
+		pinctrl_usdhc2: usdhc2grp {
+			fsl,pins = <
+				SC_P_USDHC1_CLK_CONN_USDHC1_CLK		0x06000041
+				SC_P_USDHC1_CMD_CONN_USDHC1_CMD		0x06000021
+				SC_P_USDHC1_DATA0_CONN_USDHC1_DATA0	0x06000021
+				SC_P_USDHC1_DATA1_CONN_USDHC1_DATA1	0x06000021
+				SC_P_USDHC1_DATA2_CONN_USDHC1_DATA2	0x06000021
+				SC_P_USDHC1_DATA3_CONN_USDHC1_DATA3	0x06000021
+				SC_P_USDHC1_VSELECT_CONN_USDHC1_VSELECT	0x06000021
+			>;
+		};
+
+		pinctrl_usdhc2_100mhz: usdhc2grp100mhz {
+			fsl,pins = <
+				SC_P_USDHC1_CLK_CONN_USDHC1_CLK		0x06000040
+				SC_P_USDHC1_CMD_CONN_USDHC1_CMD		0x06000020
+				SC_P_USDHC1_DATA0_CONN_USDHC1_DATA0	0x06000020
+				SC_P_USDHC1_DATA1_CONN_USDHC1_DATA1	0x06000020
+				SC_P_USDHC1_DATA2_CONN_USDHC1_DATA2	0x06000020
+				SC_P_USDHC1_DATA3_CONN_USDHC1_DATA3	0x06000020
+				SC_P_USDHC1_VSELECT_CONN_USDHC1_VSELECT	0x06000020
+			>;
+		};
+
+		pinctrl_usdhc2_200mhz: usdhc2grp200mhz {
+			fsl,pins = <
+				SC_P_USDHC1_CLK_CONN_USDHC1_CLK		0x06000040
+				SC_P_USDHC1_CMD_CONN_USDHC1_CMD		0x06000020
+				SC_P_USDHC1_DATA0_CONN_USDHC1_DATA0	0x06000020
+				SC_P_USDHC1_DATA1_CONN_USDHC1_DATA1	0x06000020
+				SC_P_USDHC1_DATA2_CONN_USDHC1_DATA2	0x06000020
+				SC_P_USDHC1_DATA3_CONN_USDHC1_DATA3	0x06000020
+				SC_P_USDHC1_VSELECT_CONN_USDHC1_VSELECT	0x06000020
+			>;
+		};
+	};
+};
+
+&lpuart0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_lpuart0>;
+	status = "okay";
+};
+
+&pd_dma_lpuart0 {
+	debug_console;
+};
+
+&usdhc2 {
+	pinctrl-names = "default", "state_100mhz", "state_200mhz";
+	pinctrl-0 = <&pinctrl_usdhc2>, <&pinctrl_usdhc2_gpio>;
+	pinctrl-1 = <&pinctrl_usdhc2_100mhz>, <&pinctrl_usdhc2_gpio>;
+	pinctrl-2 = <&pinctrl_usdhc2_200mhz>, <&pinctrl_usdhc2_gpio>;
+	bus-width = <4>;
+	cd-gpios = <&gpio4 22 GPIO_ACTIVE_LOW>;
+	wp-gpios = <&gpio4 21 GPIO_ACTIVE_HIGH>;
+	vmmc-supply = <&reg_usdhc2_vmmc>;
+	no-1-8-v;
+	status = "okay";
+};
