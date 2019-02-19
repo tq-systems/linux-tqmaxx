@@ -196,18 +196,24 @@ static int dp83867_of_init(struct phy_device *phydev)
 
 	ret = of_property_read_u32(of_node, "ti,led-cfg1",
 				&dp83867->led_cfg1);
-	if (ret)
+	if (ret) {
 		dev_dbg(dev, "could not find ti,led-cfg1\n");
+		dp83867->led_cfg2 = 0x6150;
+	}
 
 	ret = of_property_read_u32(of_node, "ti,led-cfg2",
 				&dp83867->led_cfg2);
-	if (ret)
+	if (ret) {
 		dev_dbg(dev, "could not find ti,led-cfg2\n");
+		dp83867->led_cfg2 = 0x2222;
+	}
 
 	ret = of_property_read_u32(of_node, "ti,led-cfg3",
 				&dp83867->led_cfg3);
-	if (ret)
+	if (ret) {
 		dev_dbg(dev, "could not find ti,led-cfg3\n");
+		dp83867->led_cfg3 = 0x02;
+	}
 
 	ret = of_property_read_u32(of_node, "ti,fifo-depth",
 				   &dp83867->fifo_depth);
