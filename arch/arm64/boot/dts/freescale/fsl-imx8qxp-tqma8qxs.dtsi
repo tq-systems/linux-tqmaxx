@@ -28,6 +28,7 @@
 			regulator-name = "MMC0_3V3";
 			regulator-min-microvolt = <3300000>;
 			regulator-max-microvolt = <3300000>;
+			regulator-always-on;
 		};
 
 		reg_usdhc1_vqmmc: usdhc1_vqmmc {
@@ -35,6 +36,7 @@
 			regulator-name = "MMC0_1V8";
 			regulator-min-microvolt = <1800000>;
 			regulator-max-microvolt = <1800000>;
+			regulator-always-on;
 		};
 	};
 
