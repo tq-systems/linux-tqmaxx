@@ -20,7 +20,7 @@
 
 / {
 	model = "TQ Systems i.MX8QXP TQMa8xX";
-	compatible = "fsl,tqma8qx", "fsl,imx8qxp";
+	compatible = "tq,tqma8qx", "fsl,imx8qxp";
 
 	reserved-memory {
 		#address-cells = <2>;
