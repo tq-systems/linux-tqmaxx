@@ -722,11 +722,16 @@ static int fsl_flexspi_get_seqid(struct fsl_flexspi *flex, u8 cmd)
 	case SPINOR_OP_RDSR:
 		return SEQID_RDSR;
 	case SPINOR_OP_BE_4K:
+	case SPINOR_OP_BE_4K_4B:
 	case SPINOR_OP_SE:
+	case SPINOR_OP_SE_4B:
 		return SEQID_SE;
 	case SPINOR_OP_CHIP_ERASE:
 		return SEQID_CHIP_ERASE;
 	case SPINOR_OP_PP:
+	case SPINOR_OP_PP_4B:
+	case SPINOR_OP_PP_1_1_4:
+	case SPINOR_OP_PP_1_1_4_4B:
 		return SEQID_PP;
 	case SPINOR_OP_RDID:
 		return SEQID_RDID;
