@@ -1302,7 +1302,7 @@ MODULE_DEVICE_TABLE(of, fsl_flexspi_dt_ids);
 static int fsl_flexspi_probe(struct platform_device *pdev)
 {
 	struct spi_nor_hwcaps hwcaps = {
-		.mask = SNOR_HWCAPS_PP,
+		.mask = SNOR_HWCAPS_PP | SNOR_HWCAPS_READ,
 	};
 	struct device_node *np = pdev->dev.of_node;
 	struct device *dev = &pdev->dev;
@@ -1437,12 +1437,15 @@ static int fsl_flexspi_probe(struct platform_device *pdev)
 		/* Can we enable the DDR Quad Read? */
 		ret = of_property_read_u32(np, "spi-nor,ddr-quad-read-dummy",
 					&dummy);
-		if (!ret && dummy > 0)
-			hwcaps.mask |= fsl_flexspi_quad_only(flex) ?
-				    SNOR_HWCAPS_READ_1_4_4_DTR : SNOR_HWCAPS_READ_1_8_8_DTR;
-		else
+		if (!ret && dummy > 0) {
+			hwcaps.mask |= SNOR_HWCAPS_READ_1_1_4 |
+				       SNOR_HWCAPS_READ_1_4_4_DTR |
+				       SNOR_HWCAPS_PP_1_1_4;
+			if (!fsl_flexspi_quad_only(flex))
+				hwcaps.mask |= SNOR_HWCAPS_READ_1_8_8_DTR;
+		} else {
 			hwcaps.mask |= SNOR_HWCAPS_READ;
-
+		}
 		/* set the chip address for READID */
 		fsl_flexspi_set_base_addr(flex, nor);
 
