@@ -26,5 +26,8 @@
 };
 
 &polytouch {
+	gain = <20>;
+	touchscreen-size-x = <800>;
+	touchscreen-size-y = <480>;
 	status = "okay";
 };
