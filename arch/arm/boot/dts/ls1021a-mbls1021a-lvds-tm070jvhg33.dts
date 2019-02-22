@@ -17,7 +17,7 @@
 };
 
 &display {
-	compatible = "tianma,tm070jvhg33", "tianma,tm070jdhg30";
+	compatible = "tianma,tm070jvhg33";
 	enable-gpios = <&pca9554_1 3 GPIO_ACTIVE_LOW>; /* LCD_BLT_EN */
 };
 
