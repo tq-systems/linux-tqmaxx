@@ -113,8 +113,11 @@
 	status = "okay";
 
 	lvds-channel@0 {
+/* TODO: optional if using simple panel */
+/*
 		fsl,data-mapping = "spwg";
 		fsl,data-width = <24>;
+*/
 		status = "okay";
 
 		port@1 {
