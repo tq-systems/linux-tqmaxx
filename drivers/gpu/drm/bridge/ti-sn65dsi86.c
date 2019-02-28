@@ -130,7 +130,8 @@ static int __maybe_unused ti_sn_bridge_resume(struct device *dev)
 		return ret;
 	}
 
-	gpiod_set_value(pdata->enable_gpio, 1);
+	if (pdata->enable_gpio)
+		gpiod_set_value(pdata->enable_gpio, 1);
 
 	return ret;
 }
@@ -140,7 +141,8 @@ static int __maybe_unused ti_sn_bridge_suspend(struct device *dev)
 	struct ti_sn_bridge *pdata = dev_get_drvdata(dev);
 	int ret;
 
-	gpiod_set_value(pdata->enable_gpio, 0);
+	if (pdata->enable_gpio)
+		gpiod_set_value(pdata->enable_gpio, 0);
 
 	ret = regulator_bulk_disable(SN_REGULATOR_SUPPLY_NUM, pdata->supplies);
 	if (ret)
@@ -707,13 +709,18 @@ static int ti_sn_bridge_probe(struct i2c_client *client,
 #endif
 	dev_set_drvdata(&client->dev, pdata);
 
-	pdata->enable_gpio = devm_gpiod_get(pdata->dev, "enable",
-					    GPIOD_OUT_LOW);
+	DRM_ERROR("%s parse gpio\n", __func__);
+
+	pdata->enable_gpio = devm_gpiod_get_optional(pdata->dev, "enable",
+						     GPIOD_OUT_LOW);
 	if (IS_ERR(pdata->enable_gpio)) {
-		DRM_ERROR("failed to get enable gpio from DT\n");
 		ret = PTR_ERR(pdata->enable_gpio);
+		if (ret != -EPROBE_DEFER)
+			DRM_ERROR("failed to get enable gpio from DT\n");
 		return ret;
 	}
+
+	DRM_ERROR("%s parse regulator\n", __func__);
 
 	ret = ti_sn_bridge_parse_regulators(pdata);
 	if (ret) {
