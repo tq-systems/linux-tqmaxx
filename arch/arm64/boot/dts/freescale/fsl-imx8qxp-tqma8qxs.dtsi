@@ -12,10 +12,6 @@
  * GNU General Public License for more details.
  */
 
-/* First 128KB is for PSCI ATF. */
-/* Last 127M is for M4/RPMSG */
-/memreserve/ 0x80000000 0x08000000;
-
 #include "fsl-imx8qxp.dtsi"
 
 / {
@@ -48,8 +44,8 @@
 		linux,cma {
 			compatible = "shared-dma-pool";
 			reusable;
-			size = <0 0x10000000>;
-			alloc-ranges = <0 0x96000000 0 0x20000000>;
+			size = <0 0x20000000>;
+			alloc-ranges = <0 0x96000000 0 0x30000000>;
 			linux,cma-default;
 		};
 	};
