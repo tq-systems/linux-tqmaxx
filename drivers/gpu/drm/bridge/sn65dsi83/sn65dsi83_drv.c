@@ -139,7 +139,6 @@ int drm_helper_probe_single_connector_modes(struct drm_connector *connector,
 					    uint32_t maxX, uint32_t maxY);
 
 static struct drm_connector_funcs sn65dsi83_connector_funcs = {
-	.dpms = drm_helper_connector_dpms,
 	.fill_modes = drm_helper_probe_single_connector_modes,
 	.detect = sn65dsi83_connector_detect,
 	.destroy = drm_connector_cleanup,
