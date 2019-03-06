@@ -20,6 +20,7 @@
 #include <drm/drm_crtc_helper.h>
 #include <video/mipi_display.h>
 #include <video/of_videomode.h>
+#include <drm/drm_panel.h>
 #include <video/videomode.h>
 
 #include "sn65dsi83_timing.h"
@@ -35,6 +36,7 @@ struct sn65dsi83 {
 	struct device_node *host_node;
 	struct mipi_dsi_device *dsi;
 	struct sn65dsi83_brg *brg;
+	struct drm_panel *panel;
 };
 
 static int sn65dsi83_attach_dsi(struct sn65dsi83 *sn65dsi83);
@@ -58,6 +60,11 @@ static int sn65dsi83_connector_get_modes(struct drm_connector *connector)
 	int ret;
 
 	dev_dbg(dev, "%s\n", __func__);
+
+	if (sn65dsi83->panel) {
+		return drm_panel_get_modes(sn65dsi83->panel);
+	}
+
 	mode = drm_mode_create(connector->dev);
 	if (!mode) {
 		DRM_DEV_ERROR(dev, "Failed to create display mode!\n");
@@ -147,6 +154,16 @@ static struct sn65dsi83 *bridge_to_sn65dsi83(struct drm_bridge *bridge)
 	return container_of(bridge, struct sn65dsi83, bridge);
 }
 
+static void sn65dsi83_bridge_pre_enable(struct drm_bridge *bridge)
+{
+	struct sn65dsi83 *sn65dsi83 = bridge_to_sn65dsi83(bridge);
+
+	DRM_INFO("%s +++\n", __func__);
+
+	if (sn65dsi83->panel)
+		drm_panel_prepare(sn65dsi83->panel);
+}
+
 static void sn65dsi83_bridge_enable(struct drm_bridge *bridge)
 {
 	struct sn65dsi83 *sn65dsi83 = bridge_to_sn65dsi83(bridge);
@@ -154,6 +171,9 @@ static void sn65dsi83_bridge_enable(struct drm_bridge *bridge)
 	dev_dbg(DRM_DEVICE(bridge), "%s\n", __func__);
 	sn65dsi83->brg->funcs->setup(sn65dsi83->brg);
 	sn65dsi83->brg->funcs->start_stream(sn65dsi83->brg);
+
+	if (sn65dsi83->panel)
+		drm_panel_enable(sn65dsi83->panel);
 }
 
 static void sn65dsi83_bridge_disable(struct drm_bridge *bridge)
@@ -161,8 +181,15 @@ static void sn65dsi83_bridge_disable(struct drm_bridge *bridge)
 	struct sn65dsi83 *sn65dsi83 = bridge_to_sn65dsi83(bridge);
 
 	dev_dbg(DRM_DEVICE(bridge), "%s\n", __func__);
+
+	if (sn65dsi83->panel)
+		drm_panel_disable(sn65dsi83->panel);
+
 	sn65dsi83->brg->funcs->stop_stream(sn65dsi83->brg);
 	sn65dsi83->brg->funcs->power_off(sn65dsi83->brg);
+
+	if (sn65dsi83->panel)
+		drm_panel_unprepare(sn65dsi83->panel);
 }
 
 static void sn65dsi83_bridge_mode_set(struct drm_bridge *bridge,
@@ -173,7 +200,9 @@ static void sn65dsi83_bridge_mode_set(struct drm_bridge *bridge,
 
 	dev_dbg(DRM_DEVICE(bridge), "%s: mode: %d*%d@%d\n", __func__,
 		mode->hdisplay, mode->vdisplay, mode->clock);
-	drm_mode_copy(&sn65dsi83->curr_mode, adj_mode);
+
+	if (sn65dsi83->panel)
+		drm_display_mode_to_videomode(adj_mode, &sn65dsi83->brg->vm);
 }
 
 static int sn65dsi83_bridge_attach(struct drm_bridge *bridge)
@@ -202,15 +231,42 @@ static int sn65dsi83_bridge_attach(struct drm_bridge *bridge)
 
 	ret = sn65dsi83_attach_dsi(sn65dsi83);
 
-	return ret;
+	if (ret)
+		return ret;
+
+	/* attach panel to bridge */
+	if (sn65dsi83->panel)
+		drm_panel_attach(sn65dsi83->panel, &sn65dsi83->connector);
+
+	return 0;
 }
 
 static struct drm_bridge_funcs sn65dsi83_bridge_funcs = {
+	.pre_enable = sn65dsi83_bridge_pre_enable,
 	.enable = sn65dsi83_bridge_enable,
 	.disable = sn65dsi83_bridge_disable,
 	.mode_set = sn65dsi83_bridge_mode_set,
 	.attach = sn65dsi83_bridge_attach,
 };
+
+static int sn65dsi83_parse_dsi_host(struct sn65dsi83 *sn65dsi83, struct device_node *np)
+{
+	struct device_node *ep;
+
+	/* port@0 is the output port */
+	ep = of_graph_get_endpoint_by_regs(np, 0, -1);
+	if (ep) {
+		sn65dsi83->host_node = of_graph_get_remote_port_parent(ep);
+		of_node_put(ep);
+
+		if (!sn65dsi83->host_node) {
+			DRM_ERROR("remote dsi host node not found\n");
+			return -ENODEV;
+		}
+	}
+
+	return 0;
+}
 
 static int sn65dsi83_parse_dt(struct device_node *np,
 			      struct sn65dsi83 *sn65dsi83)
@@ -220,22 +276,52 @@ static int sn65dsi83_parse_dt(struct device_node *np,
 	struct device_node *endpoint;
 	int ret;
 
-	endpoint = of_graph_get_next_endpoint(np, NULL);
-	if (!endpoint)
-		return -ENODEV;
+	ret = sn65dsi83_parse_dsi_host(sn65dsi83, np);
+	if (ret)
+		return ret;
 
-	sn65dsi83->host_node = of_graph_get_remote_port_parent(endpoint);
-	if (!sn65dsi83->host_node) {
+	DRM_INFO("%s parse panel\n", __func__);
+	/* port@1 is the output port */
+	endpoint = of_graph_get_endpoint_by_regs(np, 1, -1);
+	if (endpoint) {
+		struct device_node *remote;
+
+		DRM_INFO("%s of_graph_get_remote_port_parent for panel\n", __func__);
+
+		remote = of_graph_get_remote_port_parent(endpoint);
 		of_node_put(endpoint);
-		return -ENODEV;
+		if (remote) {
+			sn65dsi83->panel = of_drm_find_panel(remote);
+		} else {
+			DRM_ERROR("%s: output ep parent not found\n", __func__);
+			return -EPROBE_DEFER;
+		}
+		of_node_put(remote);
+
+		if (!sn65dsi83->panel) {
+			DRM_ERROR("panel not found: %s\n", remote->full_name);
+			return -EPROBE_DEFER;
+		}
+	} else {
+		sn65dsi83->panel = NULL;
+
+		of_property_read_u32(np, "ti,lvds-format", &format);
+		of_property_read_u32(np, "ti,lvds-bpp", &bpp);
+		of_property_read_u32(np, "ti,width-mm", &width);
+		of_property_read_u32(np, "ti,height-mm", &height);
+
+		sn65dsi83->brg->format = format;
+		sn65dsi83->brg->bpp = bpp;
+
+		sn65dsi83->brg->width_mm = width;
+		sn65dsi83->brg->height_mm = height;
+
+		/* Read default timing if there is not device tree node for */
+		if ((of_get_videomode(np, &sn65dsi83->brg->vm, 0)) < 0)
+			videomode_from_timing(&panel_default_timing, &sn65dsi83->brg->vm);
 	}
 
 	of_property_read_u32(np, "ti,dsi-lanes", &num_lanes);
-	of_property_read_u32(np, "ti,lvds-format", &format);
-	of_property_read_u32(np, "ti,lvds-bpp", &bpp);
-	of_property_read_u32(np, "ti,width-mm", &width);
-	of_property_read_u32(np, "ti,height-mm", &height);
-
 	if (num_lanes < 1 || num_lanes > 4) {
 		dev_err(dev, "Invalid dsi-lanes: %d\n", num_lanes);
 		return -EINVAL;
@@ -251,18 +337,6 @@ static int sn65dsi83_parse_dt(struct device_node *np,
 		return ret;
 	}
 
-	sn65dsi83->brg->format = format;
-	sn65dsi83->brg->bpp = bpp;
-
-	sn65dsi83->brg->width_mm = width;
-	sn65dsi83->brg->height_mm = height;
-
-	/* Read default timing if there is not device tree node for */
-	if ((of_get_videomode(np, &sn65dsi83->brg->vm, 0)) < 0)
-		videomode_from_timing(&panel_default_timing,
-				      &sn65dsi83->brg->vm);
-
-	of_node_put(endpoint);
 	of_node_put(sn65dsi83->host_node);
 
 	return 0;
