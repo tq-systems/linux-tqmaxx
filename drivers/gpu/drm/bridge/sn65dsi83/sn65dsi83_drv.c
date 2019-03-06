@@ -216,7 +216,7 @@ static int sn65dsi83_bridge_attach(struct drm_bridge *bridge)
 
     ret = drm_connector_init(bridge->dev, &sn65dsi83->connector,
                  &sn65dsi83_connector_funcs,
-                 DRM_MODE_CONNECTOR_DSI);
+                 DRM_MODE_CONNECTOR_LVDS);
     if (ret) {
         DRM_ERROR("Failed to initialize connector with drm\n");
         return ret;
