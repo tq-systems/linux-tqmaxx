@@ -15,6 +15,26 @@
 #include "fsl-imx8mq-tqma8mq-mba8mx.dts"
 
 / {
+	backlight_lvds0: backlight-lvds0 {
+		compatible = "pwm-backlight";
+		/* TODO: not enable yet */
+		pwms = <&pwm4 0 5000000>;
+		brightness-levels = <0 4 8 16 32 64 128 255>;
+		default-brightness-level = <7>;
+		power-supply = <&reg_mba8mq_12v>;
+		status = "disabled";
+	};
+
+	/* TODO: use pwm backlight */
+	backlight_gpio0: backlight-gpio0 {
+		compatible = "gpio-backlight";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpiobl>;
+		gpios = <&gpio5 12 GPIO_ACTIVE_HIGH>;
+		default-on;
+		status = "okay";
+	};
+
 	display-subsystem {
 		status = "disabled";
 	};
@@ -22,14 +42,37 @@
 	sound-hdmi {
 		status = "disabled";
 	};
+
+	reg_mba8mq_12v: mba8mq_12v {
+		compatible = "regulator-fixed";
+		regulator-name = "MBA8MQ_12V";
+		regulator-min-microvolt = <12000000>;
+		regulator-max-microvolt = <12000000>;
+		regulator-always-on;
+		status = "okay";
+	};
 };
 
 &dcss {
 	status = "disabled";
 };
 
+&ecspi2 {
+	status = "disabled";
+};
+
 &hdmi {
 	status = "disabled";
+};
+
+&iomuxc {
+	imx8mq-mba8mx {
+		pinctrl_gpiobl: gpioblgrp {
+			fsl,pins = <
+				MX8MQ_IOMUXC_ECSPI2_MISO_GPIO5_IO12	0x16
+			>;
+		};
+	};
 };
 
 &i2c3 {
