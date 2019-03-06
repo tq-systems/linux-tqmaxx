@@ -211,8 +211,8 @@ static int sn65dsi83_bridge_attach(struct drm_bridge *bridge)
         DRM_ERROR("Parent encoder object not found");
         return -ENODEV;
     }
-
-    sn65dsi83->connector.polled = DRM_CONNECTOR_POLL_CONNECT;
+	/* TODO: is this correct? */
+	/* sn65dsi83->connector.polled = DRM_CONNECTOR_POLL_CONNECT; */
 
     ret = drm_connector_init(bridge->dev, &sn65dsi83->connector,
                  &sn65dsi83_connector_funcs,
