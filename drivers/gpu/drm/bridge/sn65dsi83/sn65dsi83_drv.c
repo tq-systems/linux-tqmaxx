@@ -234,9 +234,9 @@ static int sn65dsi83_bridge_attach(struct drm_bridge *bridge)
 
 	/* attach panel to bridge */
 	if (sn65dsi83->panel)
-		drm_panel_attach(sn65dsi83->panel, &sn65dsi83->connector);
+		ret = drm_panel_attach(sn65dsi83->panel, &sn65dsi83->connector);
 
-	return 0;
+	return ret;
 }
 
 static struct drm_bridge_funcs sn65dsi83_bridge_funcs = {
