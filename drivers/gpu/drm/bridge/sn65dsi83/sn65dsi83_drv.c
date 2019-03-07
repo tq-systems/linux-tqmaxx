@@ -62,7 +62,22 @@ static int sn65dsi83_connector_get_modes(struct drm_connector *connector)
 	dev_dbg(dev, "%s\n", __func__);
 
 	if (sn65dsi83->panel) {
-		return drm_panel_get_modes(sn65dsi83->panel);
+		ret = drm_panel_get_modes(sn65dsi83->panel);
+
+		/*
+		 * The panel will populate the connector display_info properties with
+		 * fixed numbers, but we need to change them according to our
+		 * configuration.
+		 * TODO:
+		 * when the panel has bpc=6 we need to change the DSI_FOMAT, too
+		 * need dsi_detach and attach again
+		 *
+		 */
+		connector->display_info.bpc = 8;
+		drm_display_info_set_bus_formats(&connector->display_info,
+						 &bus_format, 1);
+
+		return ret;
 	}
 
 	mode = drm_mode_create(connector->dev);
