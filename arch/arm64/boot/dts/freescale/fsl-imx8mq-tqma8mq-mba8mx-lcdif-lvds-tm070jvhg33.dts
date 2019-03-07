@@ -101,24 +101,6 @@
 		ti,height-mm = <95>;
 		status = "okay";
 
-		display-timings {
-			lvds {
-				clock-frequency = <68000000>;
-				hactive = <1280>;
-				vactive = <800>;
-				hback-porch = <88>;
-				hfront-porch = <40>;
-				vback-porch = <33>;
-				vfront-porch = <10>;
-				hsync-len = <128>;
-				vsync-len = <2>;
-				hsync-active = <0>;
-				vsync-active = <0>;
-				de-active = <1>;
-				pixelclk-active = <0>;
-			};
-		};
-
 		ports {
 			#address-cells = <1>;
 			#size-cells = <0>;

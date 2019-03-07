@@ -127,6 +127,7 @@ dtb-$(CONFIG_ARCH_FSL_IMX8MQ) += fsl-imx8mq-ddr3l-arm2.dtb \
 				 fsl-imx8mq-tqma8mq-mba8mx.dtb \
 				 fsl-imx8mq-tqma8mq-mba8mx-hdmi.dtb \
 				 fsl-imx8mq-tqma8mq-mba8mx-lcdif-lvds-tm070jvhg33.dtb \
+				 fsl-imx8mq-tqma8mq-mba8mx-lcdif-lvds-tm070jvhg33-nopanel.dtb \
 				 fsl-imx8mq-tqma8mq-mba8mx-sd-hs104.dtb
 dtb-$(CONFIG_ARCH_FSL_IMX8MM) += fsl-imx8mm-evk.dtb \
 				 fsl-imx8mm-evk-ak4497.dtb \
