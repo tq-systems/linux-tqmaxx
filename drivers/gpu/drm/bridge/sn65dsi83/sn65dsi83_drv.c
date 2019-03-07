@@ -183,8 +183,16 @@ static void sn65dsi83_bridge_pre_enable(struct drm_bridge *bridge)
 static void sn65dsi83_bridge_enable(struct drm_bridge *bridge)
 {
 	struct sn65dsi83 *sn65dsi83 = bridge_to_sn65dsi83(bridge);
+	struct drm_display_mode *mode =
+		&bridge->encoder->crtc->state->adjusted_mode;
 
 	dev_dbg(DRM_DEVICE(bridge), "%s\n", __func__);
+
+	if (sn65dsi83->panel) {
+		drm_display_mode_to_videomode(mode, &sn65dsi83->brg->vm);
+		sn65dsi83->brg->bpp = sn65dsi83->connector.display_info.bpc * 3;
+	}
+
 	sn65dsi83->brg->funcs->setup(sn65dsi83->brg);
 	sn65dsi83->brg->funcs->start_stream(sn65dsi83->brg);
 
@@ -212,13 +220,8 @@ static void sn65dsi83_bridge_mode_set(struct drm_bridge *bridge,
 				      const struct drm_display_mode *mode,
 				      const struct drm_display_mode *adj_mode)
 {
-	struct sn65dsi83 *sn65dsi83 = bridge_to_sn65dsi83(bridge);
-
 	dev_dbg(DRM_DEVICE(bridge), "%s: mode: %d*%d@%d\n", __func__,
 		mode->hdisplay, mode->vdisplay, mode->clock);
-
-	if (sn65dsi83->panel)
-		drm_display_mode_to_videomode(adj_mode, &sn65dsi83->brg->vm);
 }
 
 static int sn65dsi83_bridge_attach(struct drm_bridge *bridge)
