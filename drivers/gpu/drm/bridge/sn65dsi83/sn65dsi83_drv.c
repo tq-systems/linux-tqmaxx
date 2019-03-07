@@ -121,8 +121,10 @@ sn65dsi83_connector_mode_valid(struct drm_connector *connector,
 	struct sn65dsi83 *sn65dsi83 = connector_to_sn65dsi83(connector);
 	struct device *dev = connector->dev->dev;
 
-	if (mode->clock > ( sn65dsi83->brg->vm.pixelclock / 1000 ))
+	if (mode->clock > 154000)
 		return MODE_CLOCK_HIGH;
+	if (mode->clock < 25000)
+		return MODE_CLOCK_LOW;
 
 	dev_info(dev, "%s: mode: %d*%d@%d is valid\n", __func__,
 		 mode->hdisplay, mode->vdisplay, mode->clock);
