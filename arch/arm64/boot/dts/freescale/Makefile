@@ -92,7 +92,9 @@ dtb-$(CONFIG_ARCH_FSL_IMX8QXP) += fsl-imx8qxp-lpddr4-arm2.dtb \
 				  fsl-imx8qxp-ddr3l-val.dtb \
 				  fsl-imx8dx-17x17-val.dtb \
 				  fsl-imx8dx-lpddr4-arm2.dtb \
+				  fsl-imx8dx-tqma8dx-mba8xx.dtb \
 				  fsl-imx8dxp-lpddr4-arm2.dtb \
+				  fsl-imx8dxp-tqma8dxp-mba8xx.dtb \
 				  fsl-imx8qxp-tqma8qx-mba8qx.dtb \
 				  fsl-imx8qxp-tqma8qx-mba8qx-lvds-tm070jvhg33.dtb \
 				  fsl-imx8qxp-tqma8qxs-mb-smarc-2.dtb
