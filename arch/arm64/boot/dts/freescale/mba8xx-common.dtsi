@@ -84,6 +84,15 @@
 			status = "okay";
 		};
 
+		reg_mba8qx_1v8: mba8qx_1v8 {
+			compatible = "regulator-fixed";
+			regulator-name = "MBA8QX_1V8";
+			regulator-min-microvolt = <1800000>;
+			regulator-max-microvolt = <1800000>;
+			regulator-always-on;
+			status = "okay";
+		};
+
 		reg_pcie_1v5: mba8qx-pcie-1v5 {
 			compatible = "regulator-fixed";
 			regulator-name = "MBA8QX_PCIE_1V5";
@@ -110,6 +119,13 @@
 			status = "okay";
 		};
 	};
+
+	sound {
+		compatible = "fsl,imx-audio-tlv320aic32x4";
+		model = "imx8qxp-mba8xx-tlv320aic32";
+		ssi-controller = <&sai1>;
+		audio-codec = <&codec>;
+	};
 };
 
 /* CPU device tree mixes up counting from 0 and counting from 1 */
@@ -128,6 +144,23 @@
 };
 
 &i2c1 {
+	codec: tlv320aic32x4@18 {
+		compatible = "ti,tlv320aic32x4";
+		reg = <0x18>;
+		clocks = <&clk IMX8QXP_AUD_MCLKOUT0>;
+		clock-names = "mclk";
+
+		power-domains = <&pd_mclk_out0>;
+		assigned-clocks = <&clk IMX8QXP_AUD_PLL0_DIV>,
+				<&clk IMX8QXP_AUD_ACM_AUD_PLL_CLK0_DIV>,
+				<&clk IMX8QXP_AUD_ACM_AUD_REC_CLK0_DIV>,
+				<&clk IMX8QXP_AUD_MCLKOUT0>;
+		assigned-clock-rates = <786432000>, <49152000>, <12288000>, <12288000>;
+
+		ldoin-supply = <&reg_mba8qx_3v3>;
+		iov-supply = <&reg_mba8qx_1v8>;
+	};
+
 	/*
 	 * NXP SE97BTP with temperature sensor + eeprom
 	 * ATTENTION: do not use correct dt compatible since this will conflict
@@ -260,6 +293,17 @@
 			>;
 		};
 
+		pinctrl_sai1: sai1grp {
+			fsl,pins = <
+				SC_P_FLEXCAN0_RX_ADMA_SAI1_TXC		0x06000040
+				SC_P_FLEXCAN0_TX_ADMA_SAI1_TXFS		0x06000040
+				SC_P_FLEXCAN1_RX_ADMA_SAI1_TXD		0x06000040
+				SC_P_FLEXCAN1_TX_ADMA_SAI1_RXD		0x06000040
+				SC_P_FLEXCAN2_RX_ADMA_SAI1_RXFS		0x06000040
+				SC_P_FLEXCAN2_TX_ADMA_SAI1_RXC		0x06000040
+			>;
+		};
+
 		pinctrl_usbotg1: usbotg1grp {
 			fsl,pins = <
 				SC_P_USB_SS3_TC0_CONN_USB_OTG1_PWR	0x06000020
@@ -385,6 +429,17 @@
 	reset-gpio = <&gpio4 0 GPIO_ACTIVE_LOW>;
 	epdev_on-supply = <&reg_pcie_3v3>;
 	vpcie-supply = <&reg_pcie_1v5>;
+	status = "okay";
+};
+
+&sai1 {
+	assigned-clocks = <&clk IMX8QXP_AUD_PLL0_DIV>,
+			<&clk IMX8QXP_AUD_ACM_AUD_PLL_CLK0_DIV>,
+			<&clk IMX8QXP_AUD_ACM_AUD_REC_CLK0_DIV>,
+			<&clk IMX8QXP_AUD_SAI_1_MCLK>;
+	assigned-clock-rates = <786432000>, <49152000>, <12288000>, <49152000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_sai1>;
 	status = "okay";
 };
 
