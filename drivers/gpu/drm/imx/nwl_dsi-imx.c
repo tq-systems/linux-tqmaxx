@@ -856,8 +856,11 @@ static int imx_nwl_dsi_bind(struct device *dev,
 	dsi->next_bridge->encoder = &dsi->encoder;
 	dsi->encoder.bridge = dsi->next_bridge;
 	ret = drm_bridge_attach(&dsi->encoder, dsi->next_bridge, NULL);
-	if (ret)
+	if (ret) {
+		DRM_DEV_ERROR(dev, "failed drm_bridge_attach (%d)\n", ret);
+		dsi->encoder.bridge = NULL;
 		drm_encoder_cleanup(&dsi->encoder);
+	}
 
 	return ret;
 }
