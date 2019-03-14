@@ -1164,8 +1164,14 @@ static int nwl_dsi_bridge_attach(struct drm_bridge *bridge)
 	 */
 	if (dsi->panel)
 		ret = nwl_dsi_create_connector(encoder->dev, dsi);
+	/*
+	 * Normally, if there is no panel we should a bridge. This bridge can be
+	 * disabled if the connector fails to find a physical device. In this
+	 * case, we should continue and do nothing, so that DRM master can bind
+	 * all the components. We will be probed later again ...
+	 */
 	else if (!dsi->next_bridge)
-		ret = -ENODEV;
+		ret = -EPROBE_DEFER;
 
 	return ret;
 }
