@@ -700,17 +700,13 @@ static int aic32x4_set_dai_fmt(struct snd_soc_dai *codec_dai, unsigned int fmt)
 	return 0;
 }
 
-static int aic32x4_hw_params(struct snd_pcm_substream *substream,
-			     struct snd_pcm_hw_params *params,
-			     struct snd_soc_dai *dai)
+static int aic32x4_setup_clocks(struct snd_soc_codec *codec,
+				unsigned int sample_rate,
+				unsigned int parent_rate)
 {
-	struct snd_soc_codec *codec = dai->codec;
-	struct aic32x4_priv *aic32x4 = snd_soc_codec_get_drvdata(codec);
-	u8 iface1_reg = 0;
-	u8 dacsetup_reg = 0;
 	int i;
 
-	i = aic32x4_get_divs(aic32x4->sysclk, params_rate(params));
+	i = aic32x4_get_divs(parent_rate, sample_rate);
 	if (i < 0) {
 		printk(KERN_ERR "aic32x4: sampling rate not supported\n");
 		return i;
@@ -766,6 +762,20 @@ static int aic32x4_hw_params(struct snd_pcm_substream *substream,
 	/* BCLK N divider */
 	snd_soc_update_bits(codec, AIC32X4_BCLKN,
 			    AIC32X4_BCLK_MASK, aic32x4_divs[i].blck_N);
+
+	return 0;
+}
+
+static int aic32x4_hw_params(struct snd_pcm_substream *substream,
+			     struct snd_pcm_hw_params *params,
+			     struct snd_soc_dai *dai)
+{
+	struct snd_soc_codec *codec = dai->codec;
+	struct aic32x4_priv *aic32x4 = snd_soc_codec_get_drvdata(codec);
+	u8 iface1_reg = 0;
+	u8 dacsetup_reg = 0;
+
+	aic32x4_setup_clocks(codec, params_rate(params), aic32x4->sysclk);
 
 	switch (params_width(params)) {
 	case 16:
