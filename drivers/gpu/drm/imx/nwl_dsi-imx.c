@@ -592,7 +592,7 @@ static int imx_nwl_try_phy_speed(struct imx_mipi_dsi *dsi,
 		ret = mixel_phy_mipi_set_phy_speed(dsi->phy,
 			bit_clk,
 			dsi->phyref_rate,
-			true);
+			false);
 		/* Pick the first non-failing rate */
 		if (!ret)
 			break;
