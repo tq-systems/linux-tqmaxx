@@ -299,12 +299,9 @@
 	pinctrl-2 = <&pinctrl_usdhc1_200mhz>;
 	bus-width = <8>;
 	non-removable;
-/*
- * TODO: HS200 / HS400 / HS400ES not working now
-/*
 	vmmc-supply = <&reg_tqma8mx_vcc3v3>;
 	vqmmc-supply = <&nvcc_1v8_reg>;
-*/
+
 	status = "okay";
 };
 
