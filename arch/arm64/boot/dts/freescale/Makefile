@@ -121,10 +121,12 @@ dtb-$(CONFIG_ARCH_FSL_IMX8MQ) += fsl-imx8mq-ddr3l-arm2.dtb \
 				 fsl-imx8mq-evk-audio-tdm.dtb \
 				 fsl-imx8mq-evk-drm.dtb \
 				 fsl-imx8mq-evk-root.dtb \
+				 fsl-imx8mq-evk-restrict.dtb \
 				 fsl-imx8mq-evk-inmate.dtb \
 				 fsl-imx8mq-evk-dp.dtb \
 				 fsl-imx8mq-evk-edp.dtb \
 				 fsl-imx8mq-tqma8mq-mba8mx.dtb \
+				 fsl-imx8mq-tqma8mq-mba8mx-cma.dtb \
 				 fsl-imx8mq-tqma8mq-mba8mx-hdmi.dtb \
 				 fsl-imx8mq-tqma8mq-mba8mx-lcdif-lvds-tm070jvhg33.dtb \
 				 fsl-imx8mq-tqma8mq-mba8mx-lcdif-lvds-tm070jvhg33-nopanel.dtb \
