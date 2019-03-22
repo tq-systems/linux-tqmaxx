@@ -227,7 +227,10 @@ static int sn65dsi83_brg_configure(struct sn65dsi83_brg *brg)
 	int regval = 0;
 	struct i2c_client *client = I2C_CLIENT(brg);
 	struct videomode *vm = VM(brg);
-
+	/*
+	 * MIPI is a DDR protocol, so the real clk is bit clock resulting from
+	 * pix clock an pixel format divided by lanes and 2 for DDR
+	 */
 	u32 dsi_clk = (((PIXCLK * BPP(brg)) / DSI_LANES(brg)) >> 1);
 
 	dev_info(&client->dev, "DSI clock [ %u ] Hz\n", dsi_clk);
