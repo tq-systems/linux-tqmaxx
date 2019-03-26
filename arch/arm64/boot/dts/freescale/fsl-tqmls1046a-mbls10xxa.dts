@@ -139,49 +139,57 @@
 &fman0 {
 	status = "okay";
 
-	ethernet@e0000 {
+	ethernet@e0000 { /* EMAC.1 */
 		status = "disabled";
 	};
 
-	ethernet@e2000 {
+	ethernet@e2000 { /* EMAC.2 */
 		phy-handle = <&qsgmii1_phy2>;
 		phy-connection-type = "sgmii";
 	};
 
-	ethernet@e4000 {
+	ethernet@e4000 { /* EMAC.3 */
 		phy-handle = <&rgmii_phy1>;
 		phy-connection-type = "rgmii";
 		phy-mode = "rgmii-id";
 	};
 
-	ethernet@e6000 {
+	ethernet@e6000 { /* EMAC.4 */
 		phy-handle = <&rgmii_phy2>;
 		phy-connection-type = "rgmii";
 		phy-mode = "rgmii-id";
 	};
 
-	ethernet@e8000 {
-		status = "disabled";
-	};
-
-	ethernet@ea000 {
-		phy-handle = <&qsgmii2_phy2>;
+	ethernet@e8000 { /* EMAC.5 */
+		phy-handle = <&qsgmii2_phy1>;
 		phy-connection-type = "sgmii";
 	};
 
-	ethernet@f0000 {
+	ethernet@ea000 { /* EMAC.6 */
 		phy-handle = <&qsgmii1_phy1>;
 		phy-connection-type = "sgmii";
 	};
 
-	ethernet@f2000 {
-		phy-handle = <&qsgmii2_phy1>;
+	ethernet@f0000 { /* EMAC.9 */
+		phy-handle = <&qsgmii2_phy2>;
 		phy-connection-type = "sgmii";
+	};
+
+	ethernet@f2000 { /* EMAC.10 */
+		fixed-link = <0 1 1000 0 0>;
+		phy-connection-type = "xgmii";
 	};
 
 	mdio@fc000 {
 		rgmii_phy1: ethernet-phy@0e {
 			reg = <0x0e>;
+			ti,rx-internal-delay = <DP83867_RGMIIDCTL_1_50_NS>;
+			ti,tx-internal-delay = <DP83867_RGMIIDCTL_1_50_NS>;
+			ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_8_B_NIB>;
+		};
+
+		rgmii_phy2: ethernet-phy@0c {
+			reg = <0x0c>;
 			ti,rx-internal-delay = <DP83867_RGMIIDCTL_1_50_NS>;
 			ti,tx-internal-delay = <DP83867_RGMIIDCTL_1_50_NS>;
 			ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_8_B_NIB>;
@@ -193,15 +201,6 @@
 
 		qsgmii1_phy2: ethernet-phy@1d {
 			reg = <0x1d>;
-		};
-	};
-
-	mdio@fd000 {
-		rgmii_phy2: ethernet-phy@0c {
-			reg = <0x0c>;
-			ti,rx-internal-delay = <DP83867_RGMIIDCTL_1_50_NS>;
-			ti,tx-internal-delay = <DP83867_RGMIIDCTL_1_50_NS>;
-			ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_8_B_NIB>;
 		};
 
 		qsgmii2_phy1: ethernet-phy@00 {
