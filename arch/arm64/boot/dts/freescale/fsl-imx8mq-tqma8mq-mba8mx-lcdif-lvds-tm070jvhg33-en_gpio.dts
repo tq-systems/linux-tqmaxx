@@ -1,0 +1,35 @@
+/*
+ * Copyright 2019 TQ Systems GmbH
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+#include "fsl-imx8mq-tqma8mq-mba8mx-lcdif-lvds-tm070jvhg33.dts"
+
+&ecspi2 {
+	status = "disabled";
+};
+
+&iomuxc {
+	imx8mq-mba8mx {
+		pinctrl_sn65dsi84: sn65dsi84grp {
+			fsl,pins = <
+				MX8MQ_IOMUXC_ECSPI2_SS0_GPIO5_IO13	0x16
+			>;
+		};
+	};
+};
+
+&dsi_lvds_bridge {
+	enable-gpios = <&gpio5 13 GPIO_ACTIVE_HIGH>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_sn65dsi84>;
+};
