@@ -36,6 +36,20 @@
 	};
 };
 
+&ecspi1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_ecspi1>;
+	num-cs = <1>;
+	status = "okay";
+
+	spidev1_0: spidev1@0 {
+		reg = <0>;
+		compatible = "tq,testdev";
+		spi-max-frequency = <5000000>;
+		status = "okay";
+	};
+};
+
 &fec1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_fec1>;
@@ -82,6 +96,15 @@
 				MX8MQ_IOMUXC_ENET_RXC_ENET1_RGMII_RXC	0x91
 				MX8MQ_IOMUXC_ENET_RX_CTL_ENET1_RGMII_RX_CTL	0x91
 				MX8MQ_IOMUXC_ENET_TX_CTL_ENET1_RGMII_TX_CTL	0x1f
+			>;
+		};
+
+		pinctrl_ecspi1: ecspi1grp {
+			fsl,pins = <
+				MX8MQ_IOMUXC_ECSPI1_SCLK_ECSPI1_SCLK		0x00000079
+				MX8MQ_IOMUXC_ECSPI1_MOSI_ECSPI1_MOSI		0x00000079
+				MX8MQ_IOMUXC_ECSPI1_MISO_ECSPI1_MISO		0x00000079
+				MX8MQ_IOMUXC_ECSPI1_SS0_ECSPI1_SS0		0x00000079
 			>;
 		};
 
