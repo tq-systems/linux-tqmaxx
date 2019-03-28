@@ -361,6 +361,8 @@ static int sn65dsi83_parse_dt(struct device_node *np,
 		return ret;
 	}
 
+	DRM_INFO("gpio_enable: %s\n", (sn65dsi83->brg->gpio_enable == NULL) ? "NO" : "YES");
+
 	of_node_put(sn65dsi83->host_node);
 
 	return 0;
