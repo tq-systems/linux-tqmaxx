@@ -1,0 +1,184 @@
+/*
+ * Copyright 2019 TQ Systems GmbH
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+#include "fsl-imx8mq-tqma8mq-mba8mx.dts"
+
+/ {
+	backlight_lvds0: backlight-lvds0 {
+		compatible = "pwm-backlight";
+		/* TODO: not enable yet */
+		pwms = <&pwm4 0 5000000>;
+		brightness-levels = <0 4 8 16 32 64 128 255>;
+		default-brightness-level = <7>;
+		power-supply = <&reg_mba8mq_12v>;
+		status = "disabled";
+	};
+
+	/* TODO: use pwm backlight */
+	backlight_gpio0: backlight-gpio0 {
+		compatible = "gpio-backlight";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpiobl>;
+		gpios = <&gpio5 12 GPIO_ACTIVE_HIGH>;
+		default-on;
+		status = "okay";
+	};
+
+	display-subsystem {
+		status = "okay";
+	};
+
+	sound-hdmi {
+		status = "disabled";
+	};
+
+	panel-lvds0 {
+		compatible = "tianma,tm070jvhg33";
+		enable-gpios = <&expander2 2 GPIO_ACTIVE_HIGH>;
+/*		backlight = <&backlight_lvds0>; */
+		backlight = <&backlight_gpio0>;
+		power-supply = <&reg_mba8mq_12v>;
+		status = "okay";
+
+		port {
+			panel_in_lvds0: endpoint {
+				remote-endpoint = <&lvds_bridge_out>;
+			};
+		};
+	};
+
+	reg_mba8mq_12v: mba8mq_12v {
+		compatible = "regulator-fixed";
+		regulator-name = "MBA8MQ_12V";
+		regulator-min-microvolt = <12000000>;
+		regulator-max-microvolt = <12000000>;
+		regulator-always-on;
+		status = "okay";
+	};
+};
+
+&dcss {
+	status = "okay";
+	disp-dev = "mipi_disp";
+
+	clocks = <&clk IMX8MQ_CLK_DISP_APB_ROOT>,
+		 <&clk IMX8MQ_CLK_DISP_AXI_ROOT>,
+		 <&clk IMX8MQ_CLK_DISP_RTRM_ROOT>,
+		 <&clk IMX8MQ_CLK_DC_PIXEL>,
+		 <&clk IMX8MQ_CLK_DUMMY>,
+		 <&clk IMX8MQ_CLK_DISP_DTRC>;
+	clock-names = "apb", "axi", "rtrm", "pix_div", "pix_out", "dtrc";
+	assigned-clocks = <&clk IMX8MQ_CLK_DC_PIXEL>,
+			  <&clk IMX8MQ_CLK_DISP_AXI>,
+			  <&clk IMX8MQ_CLK_DISP_RTRM>;
+	assigned-clock-parents = <&clk IMX8MQ_VIDEO_PLL1_OUT>,
+				 <&clk IMX8MQ_SYS1_PLL_800M>,
+				 <&clk IMX8MQ_SYS1_PLL_800M>;
+	assigned-clock-rates = <594000000>,
+			       <800000000>,
+			       <400000000>;
+
+	dcss_disp0: port@0 {
+		reg = <0>;
+
+		dcss_disp0_mipi_dsi: mipi_dsi {
+			remote-endpoint = <&mipi_dsi_in>;
+		};
+	};
+};
+
+&ecspi2 {
+	status = "disabled";
+};
+
+&hdmi {
+	status = "disabled";
+};
+
+&iomuxc {
+	imx8mq-mba8mx {
+		pinctrl_gpiobl: gpioblgrp {
+			fsl,pins = <
+				MX8MQ_IOMUXC_ECSPI2_MISO_GPIO5_IO12	0x16
+			>;
+		};
+	};
+};
+
+&i2c3 {
+	dsi_lvds_bridge: sn65dsi84@2d {
+		compatible = "ti,sn65dsi83";
+		reg = <0x2d>;
+		ti,dsi-lanes = <4>;
+		ti,lvds-format = <1>;
+		ti,lvds-bpp = <24>;
+		ti,width-mm = <151>;
+		ti,height-mm = <95>;
+		status = "okay";
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+
+				lvds_bridge_in: endpoint {
+					remote-endpoint = <&mipi_dsi_bridge_out>;
+				};
+			};
+
+			port@1 {
+				reg = <1>;
+
+				lvds_bridge_out: endpoint {
+					remote-endpoint = <&panel_in_lvds0>;
+				};
+			};
+		};
+	};
+};
+
+&irqsteer_dcss {
+	status = "okay";
+};
+
+&lcdif {
+	status = "disabled";
+};
+
+&mipi_dsi {
+	status = "okay";
+
+	port@1 {
+		mipi_dsi_in: endpoint {
+			remote-endpoint = <&dcss_disp0_mipi_dsi>;
+		};
+	};
+
+};
+
+&mipi_dsi_bridge {
+	status = "okay";
+
+	port@1 {
+		mipi_dsi_bridge_out: endpoint {
+			remote-endpoint = <&lvds_bridge_in>;
+		};
+	};
+};
+
+&mipi_dsi_phy {
+	status = "okay";
+};
