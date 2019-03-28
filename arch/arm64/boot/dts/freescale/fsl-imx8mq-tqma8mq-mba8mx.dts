@@ -145,6 +145,12 @@
 			>;
 		};
 
+		pinctrl_pwm4: pwm4grp {
+			fsl,pins = <
+				MX8MQ_IOMUXC_GPIO1_IO15_PWM4_OUT		0x16
+			>;
+		};
+
 		pinctrl_uart1: uart1grp {
 			fsl,pins = <
 				MX8MQ_IOMUXC_UART1_RXD_UART1_DCE_RX		0x79
@@ -236,6 +242,12 @@
 	disable-gpio = <&expander2 13 GPIO_ACTIVE_LOW>;
 	reset-gpio = <&expander2 14 GPIO_ACTIVE_LOW>;
 	ext_osc = <1>;
+	status = "okay";
+};
+
+&pwm4 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm4>;
 	status = "okay";
 };
 
