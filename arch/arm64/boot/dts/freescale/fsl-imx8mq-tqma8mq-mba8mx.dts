@@ -23,6 +23,13 @@
 	model = "TQ Systems GmbH i.MX8MQ TQMa8MQ on MBa8MX";
 	compatible = "tq,imx8mq-tqma8mq-mba8mx", "tq,imx8mq-tqma8mq", "fsl,imx8mq";
 
+	beeper {
+		compatible = "pwm-beeper";
+		pwms = <&pwm4 0 250000 0>;
+		beeper-hz = <4000>;
+		status = "okay";
+	};
+
 	chosen {
 		bootargs = "console=ttymxc0,115200 earlycon=ec_imx6q,0x30860000,115200";
 		stdout-path = &uart1;
