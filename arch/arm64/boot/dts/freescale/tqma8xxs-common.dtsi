@@ -57,7 +57,8 @@
 	fsl,magic-packet;
 	mac-address = [ 00 00 00 00 00 00 ];
 	local-mac-address = [ 00 00 00 00 00 00 ];
-	status = "disabled";
+
+	status = "okay";
 
 	mdio {
 		#address-cells = <1>;
@@ -96,7 +97,7 @@
 	mac-address = [ 00 00 00 00 00 00 ];
 	local-mac-address = [ 00 00 00 00 00 00 ];
 
-	status = "disabled";
+	status = "okay";
 };
 
 &flexspi0 {
@@ -151,6 +152,48 @@
 		compatible = "ds1339", "dallas,ds1339", "dallas,ds1337";
 		reg = <0x68>;
 	};
+};
+
+&fec1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_fec1>;
+	phy-mode = "rgmii-id";
+	phy-handle = <&ethphy0>;
+	phy-reset-gpios = <&gpio3 2 GPIO_ACTIVE_LOW>;
+	phy-reset-duration = <500>;
+	fsl,magic-packet;
+	status = "okay";
+
+	mdio {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		ethphy0: ethernet-phy@0 {
+			compatible = "ethernet-phy-ieee802.3-c22";
+			reg = <0>;
+			ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
+			ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
+		};
+
+		ethphy3: ethernet-phy@3 {
+			compatible = "ethernet-phy-ieee802.3-c22";
+			reg = <3>;
+			ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
+			ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
+		};
+	};
+};
+
+&fec2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_fec2>;
+	phy-mode = "rgmii-id";
+	phy-handle = <&ethphy3>;
+	fsl,magic-packet;
+	phy-reset-gpios = <&gpio3 3 GPIO_ACTIVE_LOW>;
+	phy-reset-duration = <500>;
+
+	status = "okay";
 };
 
 &iomuxc {
