@@ -31,6 +31,18 @@
 	};
 };
 
+&esdhc {
+	non-removable;
+	disable-wp;
+
+	mmc-hs200-1_8v;
+	sd-uhs-sdr104;
+	sd-uhs-sdr50;
+	sd-uhs-sdr25;
+	sd-uhs-sdr12;
+
+};
+
 &qspi {
 	num-cs = <2>;
 	bus-num = <0>;
