@@ -35,6 +35,7 @@
 	num-cs = <2>;
 	bus-num = <0>;
 	status = "okay";
+	fsl,qspi-has-second-chip;
 
 	qflash0: mx66u51235f@0 {
 		#address-cells = <1>;
