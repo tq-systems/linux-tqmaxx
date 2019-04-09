@@ -33,6 +33,7 @@
 		button@0 {
 			/* #SWITCH_A */
 			label = "S11";
+			reg = <0x0>;
 			linux,code = <KEY_1>;
 			gpios = <&gpioexp 13 GPIO_ACTIVE_LOW>;
 		};
@@ -40,6 +41,7 @@
 		button@1 {
 			/* #SWITCH_B */
 			label = "S12";
+			reg = <0x1>;
 			linux,code = <KEY_2>;
 			gpios = <&gpioexp 14 GPIO_ACTIVE_LOW>;
 		};
@@ -47,6 +49,7 @@
 		button@2 {
 			/* #SWITCH_C */
 			label = "S13";
+			reg = <0x2>;
 			linux,code = <KEY_3>;
 			gpios = <&gpioexp 15 GPIO_ACTIVE_LOW>;
 		};
