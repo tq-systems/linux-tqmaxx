@@ -20,7 +20,7 @@
 	clock-frequency = <100000>;
 	status = "okay";
 
-	pmic: pfuze3000@08 {
+	pmic: pfuze3000@8 {
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_pmic1>;
 		compatible = "fsl,pfuze3000";
