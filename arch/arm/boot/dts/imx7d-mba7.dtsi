@@ -98,7 +98,7 @@
 	 * external oscillator.
 	 */
 	ext_osc = <0>;
-	status = "okay";
+	status = "disabled";
 };
 
 &usbotg2 {
