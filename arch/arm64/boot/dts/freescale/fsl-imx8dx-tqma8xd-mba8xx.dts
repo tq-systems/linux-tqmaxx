@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 TQ Systems GmbH
+ * Copyright 2019 TQ Systems GmbH
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -12,14 +12,12 @@
  * GNU General Public License for more details.
  */
 
-/* First 128KB is for PSCI ATF. */
-/* Last 127M is for M4/RPMSG */
-/memreserve/ 0x80000000 0x08000000;
+/dts-v1/;
 
-#include "fsl-imx8qxp.dtsi"
-#include "tqma8xx-common.dtsi"
+#include "fsl-imx8dx-tqma8xd.dtsi"
+#include "mba8xx-common.dtsi"
 
 / {
-	model = "TQ Systems i.MX8QXP TQMa8QXP";
-	compatible = "tq,tqma8qxp", "fsl,imx8qxp";
+	model = "TQ Systems i.MX8DX TQMa8XD on MBa8Xx";
+	compatible = "tq,tqma8xd-mba8xx", "tq,tqma8xd", "fsl,imx8dx";
 };

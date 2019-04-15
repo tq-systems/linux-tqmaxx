@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 TQ Systems GmbH
+ * Copyright 2019 TQ Systems GmbH
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -14,7 +14,10 @@
 
 /dts-v1/;
 
-#include "fsl-imx8qxp-tqma8qxp.dtsi"
+#include "fsl-imx8dxp-tqma8xdp.dtsi"
 #include "mba8xx-common.dtsi"
-#include "mba8xx-common-dsi-lvds.dtsi"
 
+/ {
+	model = "TQ Systems i.MX8DXP TQMa8XDP on MBa8Xx";
+	compatible = "tq,tqma8xdp-mba8xx", "tq,tqma8xdp", "fsl,imx8dxp";
+};
