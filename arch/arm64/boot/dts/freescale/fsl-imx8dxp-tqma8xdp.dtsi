@@ -12,12 +12,10 @@
  * GNU General Public License for more details.
  */
 
-/dts-v1/;
-
-#include "fsl-imx8dxp-tqma8dxp.dtsi"
-#include "mba8xx-common.dtsi"
+#include "fsl-imx8dxp.dtsi"
+#include "tqma8xx-common.dtsi"
 
 / {
-	model = "TQ Systems i.MX8DXP TQMa8DXP on MBa8xX";
-	compatible = "tq,tqma8dxp-mba8xx", "tq,tqma8dxp", "fsl,imx8dxp";
+	model = "TQ Systems i.MX8DXP TQMa8XDP";
+	compatible = "tq,tqma8xdp", "fsl,imx8dxp";
 };
