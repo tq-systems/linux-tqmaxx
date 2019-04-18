@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 -2019 TQ Systems GmbH
+ * Copyright 2019 TQ Systems GmbH
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,10 +15,10 @@
 /dts-v1/;
 
 #include <dt-bindings/net/ti-dp83867.h>
-#include "fsl-imx8dx-tqma8dxs.dtsi"
+#include "fsl-imx8dx-tqma8xds.dtsi"
 #include "mb-smarc-2-common.dtsi"
 
 / {
-	model = "TQ Systems i.MX8DX TQMa8DXS on MB-SMARC-2";
-	compatible = "tq,tqma8dxs-mb-smarc-2", "tq,tqma8dxs", "fsl,imx8dx";
+	model = "TQ Systems i.MX8DXP TQMa8XDPS on MB-SMARC-2";
+	compatible = "tq,tqma8xdps-mb-smarc-2", "tq,tqma8xdps", "fsl,imx8dxp";
 };
