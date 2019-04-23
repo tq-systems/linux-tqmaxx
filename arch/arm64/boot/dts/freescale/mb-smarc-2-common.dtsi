@@ -31,6 +31,22 @@
 		regulator-always-on;
 		regulator-boot-on;
 	};
+
+	reg_1v5_vstby: 1v5_vstby {
+		compatible = "regulator-fixed";
+		regulator-name = "1V5_VSTBY";
+		regulator-min-microvolt = <1500000>;
+		regulator-max-microvolt = <1500000>;
+		regulator-always-on;
+	};
+
+	reg_3v3_vstby: 3v3_vstby {
+		compatible = "regulator-fixed";
+		regulator-name = "3V3_VSTBY";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-always-on;
+	};
 };
 
 &iomuxc {
