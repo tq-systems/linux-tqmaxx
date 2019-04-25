@@ -4,7 +4,6 @@
  * Author: Markus Niebel <Markus.Niebel@tq-group.com>
  */
 
-#include <dt-bindings/net/ti-dp83867.h>
 
 &fec2 {
 	pinctrl-names = "default";
