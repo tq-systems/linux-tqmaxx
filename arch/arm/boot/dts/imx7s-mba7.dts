@@ -11,5 +11,5 @@
 
 / {
 	model = "TQ Systems i.MX7S TQMa7S Board on MBa7";
-	compatible = "tqc,imx7s-mba7", "tqc,imx7s-tqma7", "fsl,imx7s";
+	compatible = "tqc,imx7s-mba7", "tqc,imx7s-tqma7", "fsl,imx7d";
 };
