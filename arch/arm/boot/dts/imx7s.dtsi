@@ -1243,6 +1243,7 @@
 				compatible = "usb-nop-xceiv";
 				clocks = <&clks IMX7D_USB_HSIC_ROOT_CLK>;
 				clock-names = "main_clk";
+				vcc-supply = <&reg_1p2>;
 			};
 
 			usdhc1: usdhc@30b40000 {
