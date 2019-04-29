@@ -95,6 +95,7 @@
 		clocks = <&clks IMX7D_USB_HSIC_ROOT_CLK>;
 		clock-names = "main_clk";
 		#phy-cells = <0>;
+		vcc-supply = <&reg_1p2>;
 	};
 
 	pmu {
