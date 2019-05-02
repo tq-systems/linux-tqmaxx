@@ -12,8 +12,5 @@
  * GNU General Public License for more details.
  */
 
-/dts-v1/;
-
-#include "fsl-imx8qxp-tqma8xqp.dtsi"
-#include "mba8xx-common.dtsi"
+#include "fsl-imx8qxp-tqma8xqp-mba8xx.dts"
 #include "mba8xx-common-dsi-lvds.dtsi"
