@@ -499,7 +499,7 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usb_otg1>;
 	vbus-supply = <&reg_otg1vbus_5v0>;
-	dr_mode = "host";
+	dr_mode = "otg";
 	status = "okay";
 };
 
