@@ -197,7 +197,7 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_hog>;
 
-	tqma8qx-mba8qx {
+	tqma8xx-mba8xx {
 		pinctrl_lpuart1: lpuart1grp {
 			fsl,pins = <
 				SC_P_UART1_RX_ADMA_UART1_RX	0x06000020

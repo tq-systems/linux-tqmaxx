@@ -31,7 +31,7 @@
 
 &iomuxc {
 	pinctrl-names = "default";
-	imx8qxp-tqma8xx {
+	tqma8xx {
 		pinctrl_lpi2c1: lpi2c1grp {
 			fsl,pins = <
 				SC_P_MIPI_DSI0_GPIO0_00_ADMA_I2C1_SCL	0x06000020
