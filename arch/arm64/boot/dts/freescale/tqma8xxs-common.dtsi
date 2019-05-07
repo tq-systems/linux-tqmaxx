@@ -197,9 +197,6 @@
 };
 
 &iomuxc {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_hog>;
-
 	tqma8xxs {
 		pinctrl_fec1: fec1grp {
 			fsl,pins = <
