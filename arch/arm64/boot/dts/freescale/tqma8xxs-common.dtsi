@@ -197,7 +197,10 @@
 };
 
 &iomuxc {
-	imx8qxp-tqma8qxs {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_hog>;
+
+	tqma8xxs {
 		pinctrl_fec1: fec1grp {
 			fsl,pins = <
 				SC_P_ENET0_MDC_CONN_ENET0_MDC			0x06000048
