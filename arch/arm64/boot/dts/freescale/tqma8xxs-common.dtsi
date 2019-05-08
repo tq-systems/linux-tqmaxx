@@ -201,6 +201,9 @@
 };
 
 &iomuxc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_hog>;
+
 	tqma8xxs {
 		pinctrl_fec1: fec1grp {
 			fsl,pins = <
@@ -260,6 +263,12 @@
 				SC_P_QSPI0B_DQS_LSIO_QSPI0B_DQS		0x0600004c
 				SC_P_QSPI0B_SS0_B_LSIO_QSPI0B_SS0_B	0x0600004c
 				SC_P_QSPI0B_SS1_B_LSIO_QSPI0B_SS1_B	0x0600004c
+			>;
+		};
+
+		pinctrl_hog: mba8xxhoggrp {
+			fsl,pins = <
+				SC_P_MCLK_OUT0_ADMA_ACM_MCLK_OUT0	0x0600004c
 			>;
 		};
 
