@@ -141,9 +141,9 @@
 		status = "okay";
 	};
 
-	eeprom0: m24c64@57 {
+	eeprom0: m24c64@50 {
 		compatible = "st,24c64", "atmel,24c64", "at24";
-		reg = <0x57>;
+		reg = <0x50>;
 		pagesize = <32>;
 		status = "okay";
 	};
