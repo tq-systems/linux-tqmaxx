@@ -279,6 +279,17 @@
 			>;
 		};
 
+		pinctrl_sai1: sai1grp {
+			fsl,pins = <
+				SC_P_FLEXCAN0_RX_ADMA_SAI1_TXC		0x06000040
+				SC_P_FLEXCAN0_TX_ADMA_SAI1_TXFS		0x06000040
+				SC_P_FLEXCAN1_RX_ADMA_SAI1_TXD		0x06000040
+				SC_P_FLEXCAN1_TX_ADMA_SAI1_RXD		0x06000040
+				SC_P_FLEXCAN2_RX_ADMA_SAI1_RXFS		0x06000040
+				SC_P_FLEXCAN2_TX_ADMA_SAI1_RXC		0x06000040
+			>;
+		};
+
 		pinctrl_usbotg1: usbotg1grp {
 			fsl,pins = <
 				SC_P_USB_SS3_TC0_CONN_USB_OTG1_PWR	0x06000020
@@ -349,6 +360,17 @@
 };
 
 &gpio4 {
+	status = "okay";
+};
+
+&sai1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_sai1>;
+	assigned-clocks = <&clk IMX8QXP_AUD_PLL0_DIV>,
+			<&clk IMX8QXP_AUD_ACM_AUD_PLL_CLK0_DIV>,
+			<&clk IMX8QXP_AUD_ACM_AUD_REC_CLK0_DIV>,
+			<&clk IMX8QXP_AUD_SAI_1_MCLK>;
+	assigned-clock-rates = <786432000>, <49152000>, <12288000>, <49152000>;
 	status = "okay";
 };
 
