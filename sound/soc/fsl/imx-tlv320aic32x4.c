@@ -29,6 +29,28 @@ struct imx_tlv320aic_data {
 	unsigned int clk_frequency;
 };
 
+static const struct snd_soc_dapm_widget imx_tlv320aic_dapm_widgets[] = {
+	SND_SOC_DAPM_MIC("Mic Jack", NULL),
+	SND_SOC_DAPM_LINE("Line In Jack", NULL),
+	SND_SOC_DAPM_HP("Headphone Jack", NULL),
+	SND_SOC_DAPM_SPK("Line Out Jack", NULL),
+};
+
+static const struct snd_soc_dapm_route imx_tlv320aic_dapm_routes[] = {
+	{"IN1_R", NULL, "Line In Jack"},
+	{"IN1_L", NULL, "Line In Jack"},
+
+	{"IN3_L", NULL, "Mic Jack"},
+/*
+	{"IN3_L", NULL, "Mic Bias"},
+	{"Mic Bias", NULL, "Mic Jack"},
+*/
+	{"Headphone Jack", NULL, "HPL"},
+	{"Headphone Jack", NULL, "HPR"},
+	{"Line In Jack", NULL, "LOL"},
+	{"Line In Jack", NULL, "LOR"},
+};
+
 static int imx_tlv320aic_dai_init(struct snd_soc_pcm_runtime *rtd)
 {
 	struct imx_tlv320aic_data *data = container_of(rtd->card,
@@ -103,8 +125,12 @@ static int imx_tlv320aic_probe(struct platform_device *pdev)
 	data->dai.init = &imx_tlv320aic_dai_init;
 	data->dai.dai_fmt = SND_SOC_DAIFMT_I2S | SND_SOC_DAIFMT_NB_NF |
 			    SND_SOC_DAIFMT_CBM_CFM;
-
+	data->card.dapm_widgets = imx_tlv320aic_dapm_widgets;
+	data->card.num_dapm_widgets = ARRAY_SIZE(imx_tlv320aic_dapm_widgets);
+	data->card.dapm_routes	= imx_tlv320aic_dapm_routes,
+	data->card.num_dapm_routes = ARRAY_SIZE(imx_tlv320aic_dapm_routes),
 	data->card.dev = &pdev->dev;
+
 	ret = snd_soc_of_parse_card_name(&data->card, "model");
 	if (ret)
 		goto fail;
