@@ -108,6 +108,7 @@ dtb-$(CONFIG_ARCH_FSL_IMX8QXP) += fsl-imx8qxp-lpddr4-arm2.dtb \
 				  fsl-imx8qxp-tqma8xqp-mba8xx-no-pcie.dtb \
 				  fsl-imx8qxp-tqma8xqp-mba8xx-pcie-gen1.dtb \
 				  fsl-imx8qxp-tqma8xqp-mba8xx-dsilvds.dts \
+				  fsl-imx8qxp-tqma8xqp-mbpa8xx.dtb \
 				  fsl-imx8qxp-tqma8xqps-mb-smarc-2.dtb
 dtb-$(CONFIG_ARCH_FSL_IMX8MQ) += fsl-imx8mq-ddr3l-arm2.dtb \
 				 fsl-imx8mq-ddr4-arm2.dtb \
