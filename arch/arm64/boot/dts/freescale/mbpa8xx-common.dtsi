@@ -61,6 +61,14 @@
 	};
 };
 
+/* CPU device tree mixes up counting from 0 and counting from 1 */
+&flexcan1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_can0>;
+	xceiver-supply = <&reg_mbpa8xx_3v3>;
+	status = "okay";
+};
+
 &iomuxc {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_hog>;
@@ -84,6 +92,13 @@
 				SC_P_ENET0_RGMII_RXD3_CONN_ENET0_RGMII_RXD3	0x06000048
 
 				SC_P_CSI_EN_LSIO_GPIO3_IO02			0x06000048
+			>;
+		};
+
+		pinctrl_can0: can0grp {
+			fsl,pins = <
+				SC_P_FLEXCAN0_RX_ADMA_FLEXCAN0_RX		0x06000020
+				SC_P_FLEXCAN0_TX_ADMA_FLEXCAN0_TX		0x06000020
 			>;
 		};
 
