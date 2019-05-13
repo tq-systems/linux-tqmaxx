@@ -30,7 +30,6 @@
 };
 
 &iomuxc {
-	pinctrl-names = "default";
 	tqma8xx {
 		pinctrl_lpi2c1: lpi2c1grp {
 			fsl,pins = <
