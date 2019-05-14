@@ -157,6 +157,13 @@
 			>;
 		};
 
+		pinctrl_usbotg2: usbotg2grp {
+			fsl,pins = <
+				SC_P_USB_SS3_TC1_CONN_USB_OTG2_PWR	0x06000020
+				SC_P_USB_SS3_TC3_CONN_USB_OTG2_OC	0x06000020
+			>;
+		};
+
 		pinctrl_usdhc2_gpio: usdhc2gpiogrp {
 			fsl,pins = <
 				SC_P_USDHC1_RESET_B_LSIO_GPIO4_IO19	0x06000021
@@ -266,6 +273,13 @@
 &lpuart3 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpuart3>;
+	status = "okay";
+};
+
+&usbotg3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usbotg2>;
+	dr_mode = "host";
 	status = "okay";
 };
 
