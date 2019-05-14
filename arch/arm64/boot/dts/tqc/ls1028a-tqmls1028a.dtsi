@@ -1,9 +1,7 @@
 /*
- * Device Tree Include file for NXP Layerscape-1028A family SoC.
+ * Device Tree file for TQMLS1028A module
  *
- * Copyright 2018-2019 NXP
- *
- * Harninder Rai <harninder.rai@nxp.com>
+ * Copyright 2019 Michael Krummsdorf <michael.krummsdorf@tq-group.com>
  *
  * This file is dual-licensed: you can use it either under the terms
  * of the GPLv2 or the X11 license, at your option. Note that this dual
@@ -72,17 +70,11 @@
 	};
 };
 
-&esdhc {
-	status = "okay";
-	sd-uhs-sdr104;
-	sd-uhs-sdr50;
-	sd-uhs-sdr25;
-	sd-uhs-sdr12;
-};
-
 &esdhc1 {
 	status = "okay";
 	mmc-hs200-1_8v;
+	mmc-ddr-1_8v;
+	bus-width = <8>;
 };
 
 &i2c0 {
