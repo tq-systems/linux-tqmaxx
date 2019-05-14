@@ -1,9 +1,7 @@
 /*
- * Device Tree Include file for NXP Layerscape-1028A family SoC.
+ * Device Tree file for MBLS1028A starterkit
  *
- * Copyright 2018-2019 NXP
- *
- * Harninder Rai <harninder.rai@nxp.com>
+ * Copyright 2019 Michael Krummsdorf <michael.krummsdorf@tq-group.com>
  *
  * This file is dual-licensed: you can use it either under the terms
  * of the GPLv2 or the X11 license, at your option. Note that this dual
@@ -45,6 +43,7 @@
  */
 
 /dts-v1/;
+#include <dt-bindings/clock/clk-si5338.h>
 #include "ls1028a-tqmls1028a.dtsi"
 
 / {
@@ -64,49 +63,6 @@
 	chosen {
 		stdout-path = "serial0:115200n8";
 	};
-
-	sys_mclk: clock-mclk {
-		compatible = "fixed-clock";
-		#clock-cells = <0>;
-		clock-frequency = <25000000>;
-	};
-
-	reg_1p8v: regulator-1p8v {
-		compatible = "regulator-fixed";
-		regulator-name = "1P8V";
-		regulator-min-microvolt = <1800000>;
-		regulator-max-microvolt = <1800000>;
-		regulator-always-on;
-	};
-
-	sound {
-		compatible = "simple-audio-card";
-		simple-audio-card,format = "i2s";
-		simple-audio-card,widgets =
-			"Microphone", "Microphone Jack",
-			"Headphone", "Headphone Jack",
-			"Speaker", "Speaker Ext",
-			"Line", "Line In Jack";
-		simple-audio-card,routing =
-			"MIC_IN", "Microphone Jack",
-			"Microphone Jack", "Mic Bias",
-			"LINE_IN", "Line In Jack",
-			"Headphone Jack", "HP_OUT",
-			"Speaker Ext", "LINE_OUT";
-
-		simple-audio-card,cpu {
-			sound-dai = <&sai4>;
-			frame-master;
-			bitclock-master;
-		};
-
-		simple-audio-card,codec {
-			sound-dai = <&codec>;
-			frame-master;
-			bitclock-master;
-			system-clock-frequency = <25000000>;
-		};
-	};
 };
 
 &esdhc {
@@ -117,97 +73,90 @@
 	sd-uhs-sdr12;
 };
 
-&esdhc1 {
-	status = "okay";
-	mmc-hs200-1_8v;
-};
-
 /* When switched to baseboard-internal i2c bus,
  * IIC5 has access to the following devices.
  */
 &i2c4 {
 	status = "okay";
 
-	pca9547@77 {
-		compatible = "nxp,pca9547";
-		reg = <0x77>;
+	usbhub@44 {
+		compatible = "ti,tusb8041";
+		reg = <0x44>;
+		status = "okay";
+	};
+
+	clockgen@70 {
+		compatible = "silabs,si5338";
+		reg = <0x70>;
+		status = "okay";
 		#address-cells = <1>;
 		#size-cells = <0>;
+		#clock-cells = <1>;
+		/* connected xtal to 25MHz */
+		clocks = <&sys_mclk>, <0>, <0>, <0>, <0>;
+		clock-names = "xtal", "in12", "in3", "in4", "in56";
+		silab,ref-source = <SI5338_REF_SRC_XTAL>;
+		silab,fb-source = <SI5338_FB_SRC_NOCLK>;
+		silab,pll-source = <SI5338_PFD_IN_REF_XOCLK>;
+		silab,pll-master = <0>;
 
-		i2c@1 {
-			#address-cells = <1>;
-			#size-cells = <0>;
-			reg = <0x1>;
-
-			codec: sgtl5000@a {
-				#sound-dai-cells = <0>;
-				compatible = "fsl,sgtl5000";
-				reg = <0xa>;
-				VDDA-supply = <&reg_1p8v>;
-				VDDIO-supply = <&reg_1p8v>;
-				clocks = <&sys_mclk>;
-				sclk-strength = <3>;
-			};
+		/* SerDes PLL1 */
+		clkout0 {
+			reg = <0>;
+			silabs,drive-config = "1V8_HCSL";
+			silabs,clock-source = <SI5338_OUT_MUX_MS0>;
+			silabs,disable-state = <SI5338_OUT_DIS_HIZ>;
+			clock-frequency = <100000000>;
 		};
-
-		i2c@2 {
-			#address-cells = <1>;
-			#size-cells = <0>;
-			reg = <0x02>;
-
-			ina220@40 {
-				compatible = "ti,ina220";
-				reg = <0x40>;
-				shunt-resistor = <500>;
-			};
+		/* SerDes PLL2 */
+		clkout1 {
+			reg = <1>;
+			silabs,drive-config = "1V8_HCSL";
+			silabs,clock-source = <SI5338_OUT_MUX_MSN>;
+			silabs,disable-state = <SI5338_OUT_DIS_HIZ>;
+			clock-frequency = <100000000>;
 		};
-
-		i2c@3 {
-			#address-cells = <1>;
-			#size-cells = <0>;
-			reg = <0x3>;
-
-			sa56004@4c {
-				compatible = "nxp,sa56004";
-				reg = <0x4c>;
-			};
-
-			rtc@51 {
-				compatible = "nxp,pcf2129";
-				reg = <0x51>;
-			};
+		/* MPCIE */
+		clkout2 {
+			reg = <2>;
+			silabs,drive-config = "1V8_HCSL";
+			silabs,clock-source = <SI5338_OUT_MUX_MSN>;
+			silabs,disable-state = <SI5338_OUT_DIS_HIZ>;
+			clock-frequency = <100000000>;
 		};
+		/* QSGMII */
+		clkout3 {
+			reg = <3>;
+			silabs,drive-config = "1V8_LVDS";
+			silabs,clock-source = <SI5338_OUT_MUX_MSN>;
+			silabs,disable-state = <SI5338_OUT_DIS_HIZ>;
+			clock-frequency = <125000000>;
+		};
+	};
+};
 
-		i2c@6 {
-			#address-cells = <1>;
-			#size-cells = <0>;
-			reg = <0x6>;
+&i2c5 {
+	status = "okay";
 
-				pn7120: pn7120 {
-				compatible = "nxp,pn7120", "nxp,pn544";
-				reg = <0x28>;
-				clock-frequency = <1000000>;
-				interrupt-parent = <&gpio1>;
-				interrupt-gpios = <&gpio1 25 0>; /*28*/
-			};
+	pca9555_25: pca9555@25 {
+		compatible = "nxp,pca9555";
+		reg = <0x25>;
+		status = "okay";
+		gpio-controller;
+		#gpio-cells = <2>;
+
+		pin_01 {
+			gpio-hog;
+			gpios = <1 0>;
+			output-high;
+			line-name = "usb_rstn";
 		};
 	};
 
-
-};
-
-&fspi {
-	status = "okay";
-	flash0: mt35xu02g@0 {
-		#address-cells = <1>;
-		#size-cells = <1>;
-		compatible = "micron,m25p80";
-		m25p,fast-read;
-		spi-max-frequency = <20000000>;
-		reg = <0>;
-		/* The following setting enables 1-1-8 (CMD-ADDR-DATA) mode */
-		spi-rx-bus-width = <8>; /* 8 SPI Rx lines */
-		spi-tx-bus-width = <1>; /* 1 SPI Tx line */
+	pca9538@70 {
+		compatible = "nxp,pca9538";
+		reg = <0x70>;
+		status = "okay";
 	};
 };
 
@@ -278,40 +227,56 @@
 };
 
 &mdio0 {
-	qsgmii_phy1: ethernet-phy@4 {
-		reg = <0x10>;
+	mdio0_rgmii_phy00: ethernet-phy@00 {
+		compatible = "ethernet-phy-id2000.a230",
+			"ethernet-phy-ieee802.3-c22";
+		reg = <0x00>;
+		ti,rx-internal-delay = <0x9>;
+		ti,tx-internal-delay = <0x7>;
+		ti,led-cfg1 = <0x6b90>;
+		ti,led-cfg2 = <0x0000>;
+		ti,led-cfg3 = <0x0001>;
+		ti,fifo-depth = <0x01>;
 	};
 
-	qsgmii_phy2: ethernet-phy@5 {
-		reg = <0x11>;
+	mdio0_sgmii_phy03: ethernet-phy@03 {
+		compatible = "ethernet-phy-id2000.a230",
+			"ethernet-phy-ieee802.3-c22";
+		reg = <0x03>;
+		ti,led-cfg1 = <0x6b90>;
+		ti,led-cfg2 = <0x0000>;
+		ti,led-cfg3 = <0x0001>;
+		ti,fifo-depth = <0x01>;
+		ti,dp83867-rxctrl-strap-quirk;
 	};
 
-	qsgmii_phy3: ethernet-phy@6 {
-		reg = <0x12>;
+	qsgmii_phy1: ethernet-phy@1c {
+		reg = <0x1c>;
 	};
 
-	qsgmii_phy4: ethernet-phy@7 {
-		reg = <0x13>;
+	qsgmii_phy2: ethernet-phy@1d {
+		reg = <0x1d>;
+	};
+
+	qsgmii_phy3: ethernet-phy@1e {
+		reg = <0x1e>;
+	};
+
+	qsgmii_phy4: ethernet-phy@1f {
+		reg = <0x1f>;
 	};
 };
 
 &enetc_port0 {
-	phy-handle = <&sgmii_phy0>;
+	phy-handle = <&mdio0_sgmii_phy03>;
 	phy-connection-type = "sgmii";
-
-	mdio {
-		#address-cells = <1>;
-		#size-cells = <0>;
-		sgmii_phy0: ethernet-phy@2 {
-			reg = <0x2>;
-			// Atheros PHY on RDB seems to cause traffic loss @ 1Gbps w EEE
-			eee-broken-1000t;
-		};
-	};
+	status = "okay";
 };
 
 &enetc_port1 {
-	status = "disabled";
+	phy-handle = <&mdio0_rgmii_phy00>;
+	phy-connection-type = "rgmii-id";
+	status = "okay";
 };
 
 /* l2switch ports */
