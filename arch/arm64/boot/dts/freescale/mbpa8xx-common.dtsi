@@ -225,8 +225,10 @@
 			ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_25_NS>;
 			ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_25_NS>;
 			ti,dp83867-rxctrl-strap-quirk;
-			ti,led-cfg1 = <0xc100>; /* LED1: Link, LED2: activity */
-			ti,led-cfg2 = <0x1001>; /* active low, LED1/2 driven by phy */
+			/* LED1: Link / activity, LED2: GiGe */
+			ti,led-cfg1 = <0x05b0>;
+			/* 0/3: low, LED1/2 inverted, driven by phy */
+			ti,led-cfg2 = <0x1001>;
 		};
 	};
 };
