@@ -71,7 +71,7 @@
 			ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
 			ti,dp83867-rxctrl-strap-quirk;
 			ti,led-cfg1 = <0xc100>; /* LED1: Link, LED2: activity */
-			ti,led-cfg2 = <0x1001>; /* active low, LED1/2 driven by phy */
+			ti,led-cfg2 = <0x1441>; /* active high, LED1/2 driven by phy */
 		};
 
 		ethphy3: ethernet-phy@3 {
@@ -81,7 +81,7 @@
 			ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
 			ti,dp83867-rxctrl-strap-quirk;
 			ti,led-cfg1 = <0xc100>; /* LED1: Link, LED2: activity */
-			ti,led-cfg2 = <0x1001>; /* active low, LED1/2 driven by phy */
+			ti,led-cfg2 = <0x1441>; /* active high, LED1/2 driven by phy */
 		};
 	};
 };
@@ -173,6 +173,8 @@
 			reg = <0>;
 			ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
 			ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
+			ti,led-cfg1 = <0x0100>; /* LED1: Link, LED2: activity */
+			ti,led-cfg2 = <0x1001>; /* active low, LED1/2 driven by phy */
 		};
 
 		ethphy3: ethernet-phy@3 {
@@ -180,6 +182,8 @@
 			reg = <3>;
 			ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
 			ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
+			ti,led-cfg1 = <0x0100>; /* LED1: Link, LED2: activity */
+			ti,led-cfg2 = <0x1001>; /* active low, LED1/2 driven by phy */
 		};
 	};
 };
