@@ -20,5 +20,5 @@
 
 / {
 	model = "TQ Systems i.MX8DX TQMa8XDS on MB-SMARC-2";
-	compatible = "tq,tqma8xds-mb-smarc-2", "tq,tqma8xds", "fsl,imx8dx";
+	compatible = "tq,tqma8xds-mb-smarc-2", "tq,tqma8xds", "fsl,imx8dx", "fsl,imx8qxp";
 };
