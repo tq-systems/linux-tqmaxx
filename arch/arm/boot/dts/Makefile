@@ -456,6 +456,11 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6q-mba6a.dtb \
 	imx6q-mba6b.dtb \
 	imx6q-mccmon6.dtb \
+	imx6q-nav.dtb \
+	imx6q-nav-hdcp.dtb \
+	imx6q-nav-hdmi.dtb \
+	imx6q-navb.dtb \
+	imx6q-navb-hdmi.dtb \
 	imx6q-nitrogen6x.dtb \
 	imx6q-nitrogen6_max.dtb \
 	imx6q-nitrogen6_som2.dtb \
