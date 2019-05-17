@@ -125,17 +125,8 @@
 	flash@0 {
 		#address-cells = <1>;
 		#size-cells = <1>;
-		compatible = "n25q128a13", "jedec,spi-nor";  /* 16MB */
+		compatible = "n25q512a", "jedec,spi-nor";  /* 64MB */
 		reg = <0>;
 		spi-max-frequency = <1000000>; /* input clock */
 	};
-
-	flash@1 {
-		#address-cells = <1>;
-		#size-cells = <1>;
-		compatible = "n25q128a13", "jedec,spi-nor";  /* 16MB */
-		reg = <1>;
-		spi-max-frequency = <1000000>; /* input clock */
-	};
-
 };
