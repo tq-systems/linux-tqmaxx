@@ -536,11 +536,13 @@ static void nxp_fspi_init_lut(struct nxp_fspi *fspi)
 		if ((op == SPINOR_OP_READ4_FAST) ||
 		     (op == SPINOR_OP_READ_FAST) ||
 		     (op == SPINOR_OP_READ) ||
+		     (op == SPINOR_OP_READ_1_1_4) ||
+		     (op == SPINOR_OP_READ_1_1_4_4B) ||
 		     (op == SPINOR_OP_READ_4B)) {
 			dm = 8;
 			writel(LUT0(CMD, PAD1, op) | LUT1(ADDR, PAD1, addrlen),
 					base + FSPI_LUT(lut_base));
-			writel(LUT0(DUMMY, PAD1, dm) | LUT1(NXP_READ, PAD1, 0),
+			writel(LUT0(DUMMY, PAD4, dm) | LUT1(NXP_READ, PAD4, 0),
 					base + FSPI_LUT(lut_base + 1));
 		} else if (nor->read_proto == SNOR_PROTO_1_4_4) {
 			dev_dbg(nor->dev, "Unsupported opcode : 0x%.2x\n", op);
@@ -1169,8 +1171,9 @@ MODULE_DEVICE_TABLE(of, nxp_fspi_dt_ids);
 static int nxp_fspi_probe(struct platform_device *pdev)
 {
 	struct spi_nor_hwcaps hwcaps = {
-		.mask = SPINOR_OP_READ_FAST_4B |
-			SPINOR_OP_READ_4B |
+		.mask = SNOR_HWCAPS_READ |
+			SNOR_HWCAPS_READ_FAST |
+			SNOR_HWCAPS_READ_1_1_4 |
 			SNOR_HWCAPS_PP
 	};
 	struct device_node *np = pdev->dev.of_node;
