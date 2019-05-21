@@ -239,10 +239,10 @@ static int clk_gate2_scu_enable(struct clk_hw *hw)
 
 	if (!ccm_ipc_handle)
 		return -1;
-
+/*
 	if (gate->pd == NULL && gate->pd_name)
 		populate_gate_pd(gate);
-
+*/
 	if (IS_ERR_OR_NULL(gate->pd))
 		return -1;
 
@@ -348,6 +348,9 @@ struct clk *clk_register_gate2_scu(struct device *dev, const char *name,
 	init.num_parents = parent_name ? 1 : 0;
 
 	gate->hw.init = &init;
+
+	if (gate->pd_name)
+		populate_gate_pd(gate);
 
 	clk = clk_register(dev, &gate->hw);
 	if (IS_ERR(clk)) {
