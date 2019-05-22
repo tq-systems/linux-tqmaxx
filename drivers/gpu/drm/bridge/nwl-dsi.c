@@ -1170,8 +1170,10 @@ static int nwl_dsi_bridge_attach(struct drm_bridge *bridge)
 	 * case, we should continue and do nothing, so that DRM master can bind
 	 * all the components. We will be probed later again ...
 	 */
-	else if (!dsi->next_bridge)
+	else if (!dsi->next_bridge) {
+		mipi_dsi_host_unregister(&dsi->host);
 		ret = -EPROBE_DEFER;
+	}
 
 	return ret;
 }
