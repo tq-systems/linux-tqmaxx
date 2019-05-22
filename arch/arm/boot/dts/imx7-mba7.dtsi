@@ -243,6 +243,7 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_ecspi2>;
 	fsl,spi-num-chipselects = <1>;
+	cs-gpios = <0>;
 	status = "okay";
 
 	spidev1_0: spidev1-0@0 {
