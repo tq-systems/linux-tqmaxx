@@ -969,7 +969,7 @@ static int aic32x4_codec_probe(struct snd_soc_codec *codec)
 
 	if (gpio_is_valid(aic32x4->rstn_gpio)) {
 		ndelay(10);
-		gpio_set_value(aic32x4->rstn_gpio, 1);
+		gpio_set_value_cansleep(aic32x4->rstn_gpio, 1);
 		mdelay(1);
 	}
 
