@@ -1007,16 +1007,38 @@ static int mx6s_configure_csi(struct mx6s_csi_dev *csi_dev)
 	return 0;
 }
 
+static void mx6s_release_bufs(struct list_head *bufs,
+			      enum vb2_buffer_state state)
+{
+	while (!list_empty(bufs)) {
+		struct mx6s_buffer *buf = list_first_entry(bufs,
+							   struct mx6s_buffer,
+							   internal.queue);
+
+		list_del_init(&buf->internal.queue);
+		vb2_buffer_done(&buf->vb.vb2_buf, state);
+	}
+}
+
 static int mx6s_start_streaming(struct vb2_queue *vq, unsigned int count)
 {
 	struct mx6s_csi_dev *csi_dev = vb2_get_drv_priv(vq);
+	struct v4l2_subdev *sd = csi_dev->sd;
 	struct vb2_buffer *vb;
 	struct mx6s_buffer *buf;
 	unsigned long phys;
 	unsigned long flags;
+	int rc;
+
+	if (WARN_ON(csi_dev->discard_buffer))
+		return -EINVAL;
 
 	if (count < 2)
 		return -ENOBUFS;
+
+	rc = v4l2_subdev_call(sd, video, s_stream, 1);
+	if (rc < 0)
+		goto clean_up;
 
 	/*
 	 * I didn't manage to properly enable/disable
@@ -1030,8 +1052,10 @@ static int mx6s_start_streaming(struct vb2_queue *vq, unsigned int count)
 					PAGE_ALIGN(csi_dev->discard_size),
 					&csi_dev->discard_buffer_dma,
 					GFP_DMA | GFP_KERNEL);
-	if (!csi_dev->discard_buffer)
-		return -ENOMEM;
+	if (!csi_dev->discard_buffer) {
+		rc = -ENOMEM;
+		goto err;
+	}
 
 	spin_lock_irqsave(&csi_dev->slock, flags);
 
@@ -1070,7 +1094,36 @@ static int mx6s_start_streaming(struct vb2_queue *vq, unsigned int count)
 
 	spin_unlock_irqrestore(&csi_dev->slock, flags);
 
-	return mx6s_csi_enable(csi_dev);
+	rc = mx6s_csi_enable(csi_dev);
+	if (rc < 0)
+		goto err;
+
+	rc = 0;
+
+out:
+	return rc;
+
+err:
+	v4l2_subdev_call(sd, video, s_stream, 0);
+
+clean_up:
+	spin_lock_irqsave(&csi_dev->slock, flags);
+
+	if (csi_dev->discard_buffer) {
+		dma_free_coherent(csi_dev->v4l2_dev.dev,
+				  csi_dev->discard_size,
+				  csi_dev->discard_buffer,
+				  csi_dev->discard_buffer_dma);
+
+		csi_dev->discard_buffer = NULL;
+	}
+
+	mx6s_release_bufs(&csi_dev->active_bufs, VB2_BUF_STATE_QUEUED);
+	mx6s_release_bufs(&csi_dev->capture, VB2_BUF_STATE_QUEUED);
+
+	spin_unlock_irqrestore(&csi_dev->slock, flags);
+
+	goto out;
 }
 
 static void mx6s_stop_streaming(struct vb2_queue *vq)
