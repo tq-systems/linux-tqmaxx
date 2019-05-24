@@ -1189,7 +1189,13 @@ static int _mx6s_csi_open_init(struct mx6s_csi_dev *csi_dev)
 
 	request_bus_freq(BUS_FREQ_HIGH);
 
-	v4l2_subdev_call(sd, core, s_power, 1);
+	ret = v4l2_subdev_call(sd, core, s_power, 1);
+	if (ret < 0 && ret != -ENOIOCTLCMD) {
+		v4l2_err(sd, "failed to power on device: %d\n", ret);
+		vb2_queue_release(&csi_dev->vb2_vidq);
+		goto out;
+	}
+
 	mx6s_csi_init(csi_dev);
 
 	ret = 0;
