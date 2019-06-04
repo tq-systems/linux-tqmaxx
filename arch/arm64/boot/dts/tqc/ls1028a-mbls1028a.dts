@@ -183,6 +183,8 @@
 		compatible = "nxp,pca9538";
 		reg = <0x70>;
 		status = "okay";
+		gpio-controller;
+		#gpio-cells = <2>;
 
 		pin_01 {
 			gpio-hog;
