@@ -69,6 +69,22 @@
 		#clock-cells = <0>;
 		clock-frequency = <25000000>;
 	};
+
+	soc {
+		pcie@3400000 {
+			status = "okay";
+		};
+
+		pcie@3500000 {
+			status = "okay";
+		};
+
+		pcie@1f0000000 {
+			clocks = <&clockgen 2 4>;
+			clock-names = "hwa4csr";
+			status = "okay";
+		};
+	};
 };
 
 &esdhc {
@@ -167,6 +183,27 @@
 		compatible = "nxp,pca9538";
 		reg = <0x70>;
 		status = "okay";
+
+		pin_01 {
+			gpio-hog;
+			gpios = <1 0>;
+			output-high;
+			line-name = "ec1_rstn";
+		};
+
+		pin_03 {
+			gpio-hog;
+			gpios = <3 0>;
+			output-high;
+			line-name = "sgmii_rstn";
+		};
+
+		pin_05 {
+			gpio-hog;
+			gpios = <5 0>;
+			output-high;
+			line-name = "qsgmii_rstn";
+		};
 	};
 };
 
