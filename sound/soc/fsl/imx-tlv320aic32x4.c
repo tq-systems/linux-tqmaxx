@@ -29,6 +29,10 @@ struct imx_tlv320aic_data {
 	unsigned int clk_frequency;
 };
 
+static const struct snd_kcontrol_new imx_tlv320aic_controls[] = {
+	SOC_DAPM_PIN_SWITCH("Mic Det"),
+};
+
 static const struct snd_soc_dapm_widget imx_tlv320aic_dapm_widgets[] = {
 	SND_SOC_DAPM_MIC("Mic Jack", NULL),
 	SND_SOC_DAPM_LINE("Line In Jack", NULL),
@@ -125,6 +129,8 @@ static int imx_tlv320aic_probe(struct platform_device *pdev)
 	data->dai.init = &imx_tlv320aic_dai_init;
 	data->dai.dai_fmt = SND_SOC_DAIFMT_I2S | SND_SOC_DAIFMT_NB_NF |
 			    SND_SOC_DAIFMT_CBM_CFM;
+	data->card.controls	= imx_tlv320aic_controls,
+	data->card.num_controls	= ARRAY_SIZE(imx_tlv320aic_controls),
 	data->card.dapm_widgets = imx_tlv320aic_dapm_widgets;
 	data->card.num_dapm_widgets = ARRAY_SIZE(imx_tlv320aic_dapm_widgets);
 	data->card.dapm_routes	= imx_tlv320aic_dapm_routes,
