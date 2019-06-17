@@ -22,6 +22,14 @@
 		enet2_rgmii_phy = &rgmii_phy04;
 	};
 
+	clocks {
+		audio_mclk: clock {
+			compatible = "fixed-clock";
+			#clock-cells = <0>;
+			clock-frequency = <25000000>;
+		};
+	};
+
 	regulators {
 		compatible = "simple-bus";
 		#address-cells = <1>;
@@ -34,6 +42,15 @@
 			regulator-min-microvolt = <3300000>;
 			regulator-max-microvolt = <3300000>;
 			regulator-always-on;
+		};
+
+		reg_audio: regulator@2 {
+			compatible = "regulator-fixed";
+			reg = <2>;
+			regulator-name = "vcc3v3-audio";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			vin_supply = <&reg_3p3v>;
 		};
 	};
 
@@ -69,6 +86,15 @@
 			};
 		};
 	};
+
+	sound {
+		compatible = "fsl,ls1021a-mbls1021a-tlv320aic32x4",
+			     "fsl,imx-audio-tlv320aic32x4";
+		model = "ls1021a-mbls1021a-tlv320aic32";
+		ssi-controller = <&sai1>;
+		audio-codec = <&codec>;
+	};
+
 };
 
 &can0 {
@@ -147,6 +173,15 @@
 
 &i2c0 {
 	status = "okay";
+
+	codec: tlv320aic32x4@18 {
+		compatible = "ti,tlv320aic32x4";
+		reg = <0x18>;
+		clocks = <&audio_mclk>;
+		clock-names = "mclk";
+		ldoin-supply = <&reg_audio>;
+		iov-supply = <&reg_3p3v>;
+	};
 
 	pca9554_0: pca9554@20 {
 		compatible = "nxp,pca9554";

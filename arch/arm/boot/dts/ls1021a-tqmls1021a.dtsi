@@ -12,14 +12,6 @@
 / {
 	model = "TQMLS102xA SOM";
 
-	clocks {
-		sys_mclk: clock {
-			compatible = "fixed-clock";
-			#clock-cells = <0>;
-			clock-frequency = <24576000>;
-		};
-	};
-
 	soc {
 		qspi: quadspi@1550000 {
 			compatible = "fsl,ls1021a-qspi";
