@@ -106,6 +106,6 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usbotg2>;
 	power-polarity-active-high;
-	dr_mode = "otg";
+	dr_mode = "host";
 	status = "okay";
 };
