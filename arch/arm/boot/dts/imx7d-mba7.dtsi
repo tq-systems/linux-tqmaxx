@@ -108,6 +108,6 @@
 	srp-disable;
 	hnp-disable;
 	adp-disable;
-	dr_mode = "otg";
+	dr_mode = "host";
 	status = "okay";
 };
