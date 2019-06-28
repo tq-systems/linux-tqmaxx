@@ -38,9 +38,6 @@ struct sn65dsi83_brg *sn65dsi83_brg_get(void);
 #define I2C_DEVICE(A) &(A)->client->dev
 #define I2C_CLIENT(A) (A)->client
 #define VM(A) &(A)->vm
-#define BPP(A) (A)->bpp
-#define FORMAT(A) (A)->format
-#define DSI_LANES(A) (A)->num_dsi_lanes
 
 /* The caller has to have a vm structure defined */
 #define PIXCLK vm->pixelclock
