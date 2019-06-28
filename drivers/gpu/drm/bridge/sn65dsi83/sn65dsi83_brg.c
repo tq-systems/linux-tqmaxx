@@ -234,7 +234,7 @@ static int sn65dsi83_brg_configure(struct sn65dsi83_brg *brg)
 	 * MIPI is a DDR protocol, so the real clk is bit clock resulting from
 	 * pix clock an pixel format divided by lanes and 2 for DDR
 	 */
-	u32 dsi_clk = (((PIXCLK * BPP(brg)) / DSI_LANES(brg)) >> 1);
+	u32 dsi_clk = (((PIXCLK * brg->bpp) / brg->num_dsi_lanes) >> 1);
 
 	dev_info(&client->dev, "DSI clock [ %u ] Hz\n", dsi_clk);
 	dev_info(&client->dev, "GeoMetry [ %d x %d ] Hz\n", HACTIVE, VACTIVE);
@@ -281,7 +281,7 @@ static int sn65dsi83_brg_configure(struct sn65dsi83_brg *brg)
 	/* Configure DSI_LANES  */
 	regval = SN65DSI83_READ(SN65DSI83_DSI_CFG);
 	regval &= ~(3 << CHA_DSI_LANES_SHIFT);
-	regval |= ((4 - DSI_LANES(brg)) << CHA_DSI_LANES_SHIFT);
+	regval |= ((4 - brg->num_dsi_lanes) << CHA_DSI_LANES_SHIFT);
 	SN65DSI83_WRITE(SN65DSI83_DSI_CFG, regval);
 
 	/* CHA_DSI_DATA_EQ - No Equalization */
@@ -299,10 +299,10 @@ static int sn65dsi83_brg_configure(struct sn65dsi83_brg *brg)
 	if (FLAGS & DISPLAY_FLAGS_DE_LOW)
 		regval |= (1 << DE_NEG_POLARITY_SHIFT);
 
-	if (BPP(brg) == 24)
+	if (brg->bpp == 24)
 		regval |= (1 << CHA_24BPP_MODE_SHIFT);
 
-	if (FORMAT(brg) == 1)
+	if (brg->format == 1)
 		regval |= (1 << CHA_24BPP_FMT1_SHIFT);
 
 	regval |= (1 << LVDS_LINK_CFG_SHIFT);
