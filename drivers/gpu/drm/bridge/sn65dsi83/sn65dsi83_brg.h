@@ -28,7 +28,8 @@ struct sn65dsi83_brg {
 	u32 width_mm;
 	u32 height_mm;
 	u32 format;
-	u32 bpp;
+	u32 mipi_bpp;
+	u32 lvds_bpp;
 
 	u8 num_dsi_lanes;
 	struct sn65dsi83_brg_funcs *funcs;
