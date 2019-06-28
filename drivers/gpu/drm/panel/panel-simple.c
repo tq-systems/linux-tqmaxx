@@ -1831,6 +1831,23 @@ static const struct panel_desc innolux_g150xne_l01 = {
 		.unprepare = 200,
 		.disable = 400,
 	},
+	.bus_format = MEDIA_BUS_FMT_RGB888_1X7X4_SPWG,
+};
+
+static const struct panel_desc innolux_g150xne_l01_6bpc = {
+	.modes = &innolux_g150xne_l01_mode,
+	.num_modes = 1,
+	.bpc = 6,
+	.size = {
+		.width = 305,
+		.height = 229,
+	},
+	.delay = {
+		.enable = 200,
+		.unprepare = 200,
+		.disable = 400,
+	},
+	.bus_format = MEDIA_BUS_FMT_RGB666_1X7X3_SPWG,
 };
 
 static const struct drm_display_mode innolux_n156bge_l21_mode = {
@@ -3411,6 +3428,9 @@ static const struct of_device_id platform_of_match[] = {
 	}, {
 		.compatible = "innolux,g150xne-l01",
 		.data = &innolux_g150xne_l01,
+	}, {
+		.compatible = "innolux,g150xne-l01-6bpc",
+		.data = &innolux_g150xne_l01_6bpc,
 	}, {
 		.compatible = "innolux,n116bge",
 		.data = &innolux_n116bge,
