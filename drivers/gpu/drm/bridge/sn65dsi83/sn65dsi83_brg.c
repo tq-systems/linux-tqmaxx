@@ -234,10 +234,15 @@ static int sn65dsi83_brg_configure(struct sn65dsi83_brg *brg)
 	 * MIPI is a DDR protocol, so the real clk is bit clock resulting from
 	 * pix clock an pixel format divided by lanes and 2 for DDR
 	 */
-	u32 dsi_clk = (((PIXCLK * brg->bpp) / brg->num_dsi_lanes) >> 1);
+	u32 dsi_clk = (((PIXCLK * brg->mipi_bpp) / brg->num_dsi_lanes) >> 1);
 
 	dev_info(&client->dev, "DSI clock [ %u ] Hz\n", dsi_clk);
 	dev_info(&client->dev, "GeoMetry [ %d x %d ] Hz\n", HACTIVE, VACTIVE);
+
+	if ((brg->mipi_bpp == 18) && (brg->lvds_bpp == 24)) {
+		dev_err(&client->dev, "MIPI / LVDS format mismatch");
+		return -EINVAL;
+	}
 
 	/* Reset PLL_EN and SOFT_RESET registers */
 	SN65DSI83_WRITE(SN65DSI83_SOFT_RESET, 0x00);
@@ -299,11 +304,14 @@ static int sn65dsi83_brg_configure(struct sn65dsi83_brg *brg)
 	if (FLAGS & DISPLAY_FLAGS_DE_LOW)
 		regval |= (1 << DE_NEG_POLARITY_SHIFT);
 
-	if (brg->bpp == 24)
+	if ((brg->mipi_bpp == 24) && (brg->lvds_bpp == 24))
 		regval |= (1 << CHA_24BPP_MODE_SHIFT);
-
-	if (brg->format == 1)
+	else if ((brg->mipi_bpp == 18) && (brg->lvds_bpp == 18))
+		regval |= 0x0;
+	else if ((brg->mipi_bpp == 24) && (brg->lvds_bpp == 18))
 		regval |= (1 << CHA_24BPP_FMT1_SHIFT);
+	else
+		return -EINVAL;
 
 	regval |= (1 << LVDS_LINK_CFG_SHIFT);
 	SN65DSI83_WRITE(SN65DSI83_LVDS_MODE, regval);

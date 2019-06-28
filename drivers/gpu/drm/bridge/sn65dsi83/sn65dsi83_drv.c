@@ -63,20 +63,6 @@ static int sn65dsi83_connector_get_modes(struct drm_connector *connector)
 
 	if (sn65dsi83->panel) {
 		ret = drm_panel_get_modes(sn65dsi83->panel);
-
-		/*
-		 * The panel will populate the connector display_info properties with
-		 * fixed numbers, but we need to change them according to our
-		 * configuration.
-		 * TODO:
-		 * when the panel has bpc=6 we need to change the DSI_FOMAT, too
-		 * need dsi_detach and attach again
-		 *
-		 */
-		connector->display_info.bpc = 8;
-		drm_display_info_set_bus_formats(&connector->display_info,
-						 &bus_format, 1);
-
 		return ret;
 	}
 
@@ -185,13 +171,19 @@ static void sn65dsi83_bridge_enable(struct drm_bridge *bridge)
 	struct sn65dsi83 *sn65dsi83 = bridge_to_sn65dsi83(bridge);
 	struct drm_display_mode *mode =
 		&bridge->encoder->crtc->state->adjusted_mode;
+	struct mipi_dsi_device *dsi = sn65dsi83->dsi;
 
 	dev_dbg(DRM_DEVICE(bridge), "%s\n", __func__);
 
 	if (sn65dsi83->panel) {
+		DRM_INFO("%s: bus format[0]: %x bpc %d\n", __func__, 
+			 sn65dsi83->connector.display_info.bus_formats[0],
+			 sn65dsi83->connector.display_info.bpc);
 		drm_display_mode_to_videomode(mode, &sn65dsi83->brg->vm);
-		sn65dsi83->brg->bpp = sn65dsi83->connector.display_info.bpc * 3;
+		sn65dsi83->brg->lvds_bpp = sn65dsi83->connector.display_info.bpc * 3;
 	}
+
+	sn65dsi83->brg->mipi_bpp = mipi_dsi_pixel_format_to_bpp(dsi->format);
 
 	sn65dsi83->brg->funcs->setup(sn65dsi83->brg);
 	sn65dsi83->brg->funcs->start_stream(sn65dsi83->brg);
@@ -335,7 +327,7 @@ static int sn65dsi83_parse_dt(struct device_node *np,
 		of_property_read_u32(np, "ti,height-mm", &height);
 
 		sn65dsi83->brg->format = format;
-		sn65dsi83->brg->bpp = bpp;
+		sn65dsi83->brg->lvds_bpp = bpp;
 
 		sn65dsi83->brg->width_mm = width;
 		sn65dsi83->brg->height_mm = height;
