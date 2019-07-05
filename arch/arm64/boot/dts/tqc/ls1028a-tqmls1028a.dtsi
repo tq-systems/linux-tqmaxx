@@ -128,6 +128,46 @@
 		compatible = "n25q512a", "jedec,spi-nor";  /* 64MB */
 		reg = <0>;
 		spi-max-frequency = <1000000>; /* input clock */
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			rcw@0 {
+				label = "RCW";
+				reg = <0x0 0x80000>;
+			};
+
+			ppa@80000 {
+				label = "PPA";
+				reg = <0x80000 0x80000>;
+			};
+
+			uboot@100000 {
+				label = "U-Boot-PBL";
+				reg = <0x100000 0x300000>;
+			};
+
+			dtb@100000 {
+				label = "DTB";
+				reg = <0x400000 0x10000>;
+			};
+
+			hdp@100000 {
+				label = "HDP";
+				reg = <0x480000 0x80000>;
+			};
+
+			linux@100000 {
+				label = "Linux";
+				reg = <0x500000 0xA00000>;
+			};
+
+			rootfs@800000 {
+				label = "RootFS";
+				reg = <0xF00000 0x2000000>;
+			};
+		};
 	};
 };
 
