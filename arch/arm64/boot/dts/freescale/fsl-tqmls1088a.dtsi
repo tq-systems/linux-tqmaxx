@@ -1,0 +1,84 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Device Tree Include file for LS1046A based SoM of TQ
+ *
+ * Copyright 2019 TQ-Systems GmbH
+ */
+
+#include "fsl-ls1088a.dtsi"
+#include "fsl-tqmls10xxa.dtsi"
+
+&qspi {
+	num-cs = <2>;
+	bus-num = <0>;
+	status = "okay";
+	fsl,qspi-has-second-chip;
+
+	qflash0: mx66u51235f@0 {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "jedec,spi-nor";
+		spi-max-frequency = <62500000>;
+		reg = <0>;
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			rcwpbi@0 {
+				label = "RCW/PBI";
+				reg = <0x0 0x10000>;
+			};
+
+			uboot@10000 {
+				label = "U-Boot";
+				reg = <0x10000 0xc0000>;
+			};
+
+			env@d0000 {
+				label = "U-Boot Environment";
+				reg = <0xd0000 0x10000>;
+			};
+
+			dpaadpl@e0000 {
+				label = "DPAA2 DPL";
+				reg = <0xe0000 0x10000>;
+			};
+
+			dpaadpc@f0000 {
+				label = "DPAA2 DPC";
+				reg = <0xf0000 0x10000>;
+			};
+
+			mcfw@100000 {
+				label = "DPAA2 MC Firmware";
+				reg = <0x100000 0x1f0000>;
+			};
+
+			dtb@2f0000 {
+				label = "DTB";
+				reg = <0x2f0000 0x10000>;
+			};
+
+			linux@300000 {
+				label = "Linux";
+				reg = <0x300000 0x1500000>;
+			};
+
+			rootfs@1800000 {
+				label = "RootFS";
+				reg = <0x1800000 0x2800000>;
+			};
+		};
+	};
+
+	qflash1: mx66u51235f@1 {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "jedec,spi-nor";
+		spi-max-frequency = <62500000>;
+		reg = <1>;
+	};
+};
+
