@@ -1,0 +1,7 @@
+Emerging Display Technology Corp. ET1010G0DSA 10.1" WXGA TFT LVDS display panel
+
+Required properties:
+- compatible: should be "edt,et1010g0dsa"
+
+This binding is compatible with the simple-panel binding, which is specified
+in simple-panel.txt in this directory.
