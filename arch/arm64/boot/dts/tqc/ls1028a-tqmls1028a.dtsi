@@ -72,7 +72,6 @@
 
 &esdhc1 {
 	status = "okay";
-	mmc-hs400-1_8v;
 	mmc-hs200-1_8v;
 	mmc-ddr-1_8v;
 	bus-width = <8>;
