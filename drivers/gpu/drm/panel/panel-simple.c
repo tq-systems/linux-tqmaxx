@@ -941,30 +941,28 @@ static const struct panel_desc edt_etm0700g0dh6 = {
 	.bus_flags = DRM_BUS_FLAG_DE_HIGH | DRM_BUS_FLAG_PIXDATA_POSEDGE,
 };
 
-static const struct drm_display_mode edt_et1010g0dsa_mode = {
-	.clock = 71100,
-	.hdisplay = 1280,
-	.hsync_start = 1280 + 25,
-	.hsync_end = 1280 + 25 + 80,
-	.htotal = 1280 + 25 + 80 + 55,
-	.vdisplay = 800,
-	.vsync_start = 800 + 5,
-	.vsync_end = 800 + 5 + 2,
-	.vtotal = 800 + 5 + 2 + 16,
-	.vrefresh = 60,
-	.flags = DRM_MODE_FLAG_NHSYNC | DRM_MODE_FLAG_NVSYNC,
+static const struct display_timing edt_et1010g0dsa_timing = {
+	.pixelclock = { 68900000, 71100000, 73400000 },
+	.hactive = { 1280, 1280, 1280 },
+	.hfront_porch = { 25, 25, 25 },
+	.hback_porch = { 55, 55, 55 },
+	.hsync_len = { 80, 80, 80 },
+	.vactive = { 800, 800, 800 },
+	.vfront_porch = { 5, 5, 5 },
+	.vback_porch = { 16, 16, 16 },
+	.vsync_len = { 2, 2, 2 },
+	.flags = DISPLAY_FLAGS_DE_HIGH,
 };
 
 static const struct panel_desc edt_et1010g0dsa = {
-	.modes = &edt_et1010g0dsa_mode,
-	.num_modes = 1,
+	.timings = &edt_et1010g0dsa_timing,
+	.num_timings = 1,
 	.bpc = 8,
 	.size = {
 		.width = 217,
 		.height = 136,
 	},
 	.bus_format = MEDIA_BUS_FMT_RGB888_1X7X4_SPWG,
-	.bus_flags = DRM_BUS_FLAG_DE_HIGH | DRM_BUS_FLAG_PIXDATA_NEGEDGE,
 };
 
 static const struct drm_display_mode foxlink_fl500wvr00_a0t_mode = {
