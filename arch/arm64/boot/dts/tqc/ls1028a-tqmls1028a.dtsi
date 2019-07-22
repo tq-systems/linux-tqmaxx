@@ -127,7 +127,7 @@
 		#size-cells = <1>;
 		compatible = "jedec,spi-nor";  /* 64MB */
 		reg = <0>;
-		spi-max-frequency = <1000000>; /* input clock */
+		spi-max-frequency = <100000000>; /* input clock */
 		partitions {
 			compatible = "fixed-partitions";
 			#address-cells = <1>;
