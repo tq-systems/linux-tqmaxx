@@ -11,9 +11,9 @@
 
 / {
 	backlight_ldb: backlight@0 {
+		compatible = "pwm-backlight";
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_backlight>;
-		compatible = "pwm-backlight";
 		pwms = <&pwm1 0 62500>;
 		brightness-levels = <0 16 32 64 96 128 160 192 224 255>;
 		default-brightness-level = <5>;
