@@ -23,7 +23,7 @@
 	};
 
 	panel-lvds0 {
-		compatible = "tianma,tm070jvhg33", "tianma,tm070jdhg30";
+		compatible = "tianma,tm070jvhg33";
 		backlight = <&backlight_ldb>;
 		power-supply = <&reg_mba6_3p3v>;
 		status = "okay";
