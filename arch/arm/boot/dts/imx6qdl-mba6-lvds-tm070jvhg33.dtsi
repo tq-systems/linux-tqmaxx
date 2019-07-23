@@ -33,7 +33,8 @@
 				remote-endpoint = <&lvds0_out>;
 			};
 		};
-	};};
+	};
+};
 
 &ldb {
 	status = "okay";
@@ -43,8 +44,8 @@
 		fsl,data-width = <24>;
 		status = "okay";
 
-		port@1 {
-			reg = <1>;
+		port@4 {
+			reg = <4>;
 
 			lvds0_out: endpoint {
 				remote-endpoint = <&panel_in_lvds0>;
