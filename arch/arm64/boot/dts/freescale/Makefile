@@ -93,12 +93,14 @@ dtb-$(CONFIG_ARCH_FSL_IMX8QXP) += fsl-imx8qxp-lpddr4-arm2.dtb \
 				  fsl-imx8dx-17x17-val.dtb \
 				  fsl-imx8dx-lpddr4-arm2.dtb \
 				  fsl-imx8dx-tqma8xd-mba8xx.dtb \
+				  fsl-imx8dx-tqma8xd-mba8xx-lvds-etml1010g0dka.dtb \
 				  fsl-imx8dx-tqma8xd-mba8xx-lvds-tm070jvhg33.dtb \
 				  fsl-imx8dx-tqma8xd-mba8xx-no-pcie.dtb \
 				  fsl-imx8dx-tqma8xd-mba8xx-pcie-gen1.dtb \
 				  fsl-imx8dx-tqma8xds-mb-smarc-2.dtb \
 				  fsl-imx8dxp-lpddr4-arm2.dtb \
 				  fsl-imx8dxp-tqma8xdp-mba8xx.dtb \
+				  fsl-imx8dxp-tqma8xdp-mba8xx-lvds-etml1010g0dka.dtb \
 				  fsl-imx8dxp-tqma8xdp-mba8xx-lvds-tm070jvhg33.dtb \
 				  fsl-imx8dxp-tqma8xdp-mba8xx-no-pcie.dtb \
 				  fsl-imx8dxp-tqma8xdp-mba8xx-pcie-gen1.dtb \
