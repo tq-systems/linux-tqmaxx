@@ -15,7 +15,56 @@
 #include "fsl-imx8dx.dtsi"
 #include "tqma8xx-common.dtsi"
 
+/*
+ * delete hifi dsp and vpu, we have only 512 MiB of RAM
+ */
+/delete-node/ &decoder_boot;
+/delete-node/ &encoder_boot;
+/delete-node/ &dsp_reserved;
+/delete-node/ &rpmsg_reserved;
+/delete-node/ &decoder_rpc;
+/delete-node/ &encoder_rpc;
+
+/delete-node/ &dsp;
+/delete-node/ &vpu_encoder;
+/delete-node/ &vpu_decoder;
+
 / {
 	model = "TQ Systems i.MX8DX TQMa8XD";
 	compatible = "tq,tqma8xd", "fsl,imx8dx", "fsl,imx8qxp";
+
+	reserved-memory {
+		/*
+		 * reserved-memory layout
+		 * 0x8800_0000 ~ 0x8FFF_FFFF is reserved for M4
+		 * Shouldn't be used at A core and Linux side.
+		 *
+		 */
+		/*
+		 * move rpmsg_reserved to have mode RAM available
+		 */
+		rpmsg_reserved: rpmsg@0x84000000 {
+			no-map;
+			reg = <0 0x84000000 0 0x00400000>;
+		};
+
+		/*
+		 * decrease CMA size, needs alo changes for GPU
+		 */
+		linux,cma {
+			compatible = "shared-dma-pool";
+			reusable;
+			size = <0 0x0a000000>;
+			alloc-ranges = <0 0x90000000 0 0x10000000>;
+			linux,cma-default;
+		};
+	};
+};
+
+&imx8_gpu_ss {
+		/*
+		 * decrease CMA size
+		 */
+		reg = <0x0 0x80000000 0x0 0x80000000>, <0x0 0x0 0x0 0x08000000>;
+		reg-names = "phys_baseaddr", "contiguous_mem";
 };
