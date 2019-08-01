@@ -12,63 +12,11 @@
  * GNU General Public License for more details.
  */
 
-/delete-node/ &decoder_boot;
-/delete-node/ &encoder_boot;
-/delete-node/ &decoder_rpc;
-/delete-node/ &encoder_rpc;
-/delete-node/ &dsp_reserved;
-/delete-node/ &rpmsg_reserved;
-
 / {
 	memory@80000000 {
 		device_type = "memory";
-		/* DRAM base addr, size : 512 MiB DRAM */
+		/* DRAM base addr, size : 512 MiB DRAM - corrected by bootloader */
 		reg = <0x00000000 0x80000000 0 0x20000000>;
-	};
-
-	reserved-memory {
-		#address-cells = <2>;
-		#size-cells = <2>;
-		ranges;
-
-		/*
-		 * reserved-memory layout
-		 * 0x8800_0000 ~ 0x8FFF_FFFF is reserved for M4
-		 * Shouldn't be used at A core and Linux side.
-		 *
-		 */
-		decoder_boot: decoder_boot@0x84000000 {
-			no-map;
-			reg = <0 0x84000000 0 0x02000000>;
-		};
-		encoder_boot: encoder_boot@0x86000000 {
-			no-map;
-			reg = <0 0x86000000 0 0x0200000>;
-		};
-		rpmsg_reserved: rpmsg@0x90000000 {
-			no-map;
-			reg = <0 0x90000000 0 0x00400000>;
-		};
-		decoder_rpc: decoder_rpc@0x90400000 {
-			no-map;
-			reg = <0 0x90400000 0 0x00200000>;
-		};
-		encoder_rpc: encoder_rpc@0x90600000 {
-			no-map;
-			reg = <0 0x90600000 0 0x00100000>;
-		};
-		dsp_reserved: dsp@0x92400000 {
-			no-map;
-			reg = <0 0x92400000 0 0x02000000>;
-		};
-
-		linux,cma {
-			compatible = "shared-dma-pool";
-			reusable;
-			size = <0 0x04000000>;
-			alloc-ranges = <0 0x96000000 0 0x08000000>;
-			linux,cma-default;
-		};
 	};
 };
 
