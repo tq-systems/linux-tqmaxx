@@ -12,10 +12,6 @@
  * GNU General Public License for more details.
  */
 
-/* First 128KB is for PSCI ATF. */
-/* Last 127M is for M4/RPMSG */
-/memreserve/ 0x80000000 0x08000000;
-
 #include "fsl-imx8qxp.dtsi"
 #include "tqma8xx-common.dtsi"
 
