@@ -13,4 +13,5 @@
  */
 
 #include "fsl-imx8dx-tqma8xd-mba8xx.dts"
+#include "mba8xx-common-lvds0.dtsi"
 #include "mba8xx-common-lvds-etml1010g0dka.dtsi"
