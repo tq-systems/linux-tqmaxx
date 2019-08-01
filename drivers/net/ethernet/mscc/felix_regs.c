@@ -587,6 +587,8 @@ void felix_port_adjust_link(struct net_device *dev)
 int felix_chip_init(struct ocelot *ocelot)
 {
 	int ret;
+	struct device_node *np = ocelot->dev->of_node;
+	struct device_node *portnp;
 
 	ocelot->map = felix_regmap;
 	ocelot->stats_layout = felix_stats_layout;
@@ -600,8 +602,25 @@ int felix_chip_init(struct ocelot *ocelot)
 		return ret;
 	}
 
-	eth_random_addr(ocelot->base_mac);
-	ocelot->base_mac[5] &= 0xf0;
+	portnp = of_find_node_with_property(np, "mac-address");
+	if (portnp &&
+	    !of_property_read_u8_array(portnp, "mac-address", ocelot->base_mac, ETH_ALEN) &&
+	    is_valid_ether_addr(ocelot->base_mac)) {
+		dev_dbg(ocelot->dev, "found valid mac-address \
+			%02x:%02x:%02x:%02x:%02x:%02x\n", ocelot->base_mac[0],
+			ocelot->base_mac[1], ocelot->base_mac[2],
+			ocelot->base_mac[3], ocelot->base_mac[4],
+			ocelot->base_mac[5]);
+	} else {
+		dev_info(ocelot->dev, "no valid mac-address found using random address\n");
+		eth_random_addr(ocelot->base_mac);
+		ocelot->base_mac[5] &= 0xf0;
+	}
+
+	dev_info(ocelot->dev, "switch mac-addr: %x:%x:%x:%x:%x:%x\n",
+		 ocelot->base_mac[0], ocelot->base_mac[1], ocelot->base_mac[2],
+		 ocelot->base_mac[3], ocelot->base_mac[4], ocelot->base_mac[5]);
+
 	return 0;
 }
 EXPORT_SYMBOL(felix_chip_init);

@@ -1669,6 +1669,7 @@ int ocelot_probe_port(struct ocelot *ocelot, u8 port,
 	struct ocelot_port *ocelot_port;
 	struct net_device *dev;
 	int err;
+	u32 addr;
 
 	dev = alloc_etherdev(sizeof(struct ocelot_port));
 	if (!dev)
@@ -1690,8 +1691,14 @@ int ocelot_probe_port(struct ocelot *ocelot, u8 port,
 	dev->hw_features |= NETIF_F_HW_VLAN_CTAG_FILTER;
 	dev->features |= NETIF_F_HW_VLAN_CTAG_FILTER;
 
+	addr = ocelot->base_mac[3] << 16 | ocelot->base_mac[4] << 8 |
+	       ocelot->base_mac[5];
+	addr += port;
 	memcpy(dev->dev_addr, ocelot->base_mac, ETH_ALEN);
-	dev->dev_addr[ETH_ALEN - 1] += port;
+	dev->dev_addr[3] = (addr >> 16) & 0xff;
+	dev->dev_addr[4] = (addr >> 8) & 0xff;
+	dev->dev_addr[5] = (addr) & 0xff;
+
 	ocelot_mact_learn(ocelot, PGID_CPU, dev->dev_addr, ocelot_port->pvid,
 			  ENTRYTYPE_LOCKED);
 	dev->needed_headroom = XFH_LONG_PREFIX_LEN;
