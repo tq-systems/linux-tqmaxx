@@ -293,6 +293,22 @@ static int mipi_csi2_open(struct v4l2_subdev *sd, struct v4l2_subdev_fh *fh)
 	return 0;
 }
 
+static int mipi_csi2_registered(struct v4l2_subdev *sd)
+{
+	struct mxc_mipi_csi2_dev *csi2dev = sd_to_mxc_mipi_csi2_dev(sd);
+
+	return v4l2_ctrl_add_handler(sd->v4l2_dev->ctrl_handler,
+				     &csi2dev->ctrl_handler, NULL, true);
+}
+
+static void mipi_csi2_unregistered(struct v4l2_subdev *sd)
+{
+	struct mxc_mipi_csi2_dev *csi2dev = sd_to_mxc_mipi_csi2_dev(sd);
+
+	v4l2_ctrl_handler_free(&csi2dev->ctrl_handler);
+	v4l2_ctrl_handler_init(&csi2dev->ctrl_handler, 0);
+}
+
 /*
  * V4L2 subdev operations
  */
@@ -470,6 +486,8 @@ static int mipi_csis_g_parm(struct v4l2_subdev *sd, struct v4l2_streamparm *a)
 
 static const struct v4l2_subdev_internal_ops mipi_csi2_sd_internal_ops = {
 	.open = mipi_csi2_open,
+	.registered = mipi_csi2_registered,
+	.unregistered = mipi_csi2_unregistered,
 };
 
 static struct v4l2_subdev_pad_ops mipi_csi2_pad_ops = {
@@ -568,6 +586,30 @@ out:
 	return rc;
 }
 
+static int subdev_notifier_complete(struct v4l2_async_notifier *notifier)
+{
+	struct mxc_mipi_csi2_dev *csi2dev = notifier_to_mipi_dev(notifier);
+	int ret;
+
+	if (csi2dev->sd.v4l2_dev) {
+		ret = v4l2_ctrl_add_handler(csi2dev->sd.v4l2_dev->ctrl_handler,
+					    &csi2dev->ctrl_handler, NULL, true);
+		if (ret < 0) {
+			v4l2_err(&csi2dev->v4l2_dev,
+				 "failed to add control handlers: %d\n", ret);
+			goto out;
+		}
+
+		dev_dbg(csi2dev->v4l2_dev.dev, "added local controls to %s\n",
+			csi2dev->sd.v4l2_dev->name);
+	}
+
+	ret = 0;
+
+out:
+	return ret;
+}
+
 static void subdev_notifier_unbind(struct v4l2_async_notifier *notifier,
 				   struct v4l2_subdev *subdev,
 				   struct v4l2_async_subdev *asd)
@@ -595,6 +637,7 @@ static void subdev_notifier_unbind(struct v4l2_async_notifier *notifier,
 static const struct v4l2_async_notifier_operations subdev_notifier_ops = {
 	.bound = subdev_notifier_bound,
 	.unbind = subdev_notifier_unbind,
+	.complete = subdev_notifier_complete,
 };
 
 static int mipi_csis_subdev_host(struct mxc_mipi_csi2_dev *csi2dev)
@@ -746,12 +789,15 @@ static int mipi_csi2_probe(struct platform_device *pdev)
 
 	v4l2_subdev_init(&csi2dev->sd, &mipi_csi2_subdev_ops);
 
+	v4l2_ctrl_handler_init(&csi2dev->ctrl_handler, 0);
+
 	csi2dev->sd.owner = THIS_MODULE;
 	snprintf(csi2dev->sd.name, sizeof(csi2dev->sd.name), "%s.%d",
 		 MXC_MIPI_CSI2_YAV_SUBDEV_NAME, csi2dev->id);
 
 	csi2dev->sd.flags |= V4L2_SUBDEV_FL_HAS_DEVNODE;
 	csi2dev->sd.dev = &pdev->dev;
+	csi2dev->v4l2_dev.ctrl_handler = &csi2dev->ctrl_handler;
 
 	/* This allows to retrieve the platform device id by the host driver */
 	v4l2_set_subdevdata(&csi2dev->sd, pdev);
