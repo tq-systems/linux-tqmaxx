@@ -2123,6 +2123,9 @@ static int mx6s_csi_probe(struct platform_device *pdev)
 	snprintf(csi_dev->v4l2_dev.name,
 		 sizeof(csi_dev->v4l2_dev.name), "CSI");
 
+	v4l2_ctrl_handler_init(&csi_dev->ctrl_handler, 0);
+	csi_dev->v4l2_dev.ctrl_handler = &csi_dev->ctrl_handler;
+
 	ret = v4l2_device_register(dev, &csi_dev->v4l2_dev);
 	if (ret < 0) {
 		dev_err(dev, "v4l2_device_register() failed: %d\n", ret);
