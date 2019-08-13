@@ -27,6 +27,7 @@
 		compatible = "pwm-beeper";
 		pwms = <&pwm4 0 250000 0>;
 		beeper-hz = <4000>;
+		amp-supply = <&reg_vcc_3v3>;
 		status = "okay";
 	};
 
@@ -95,6 +96,7 @@
 	pinctrl-0 = <&pinctrl_fec1>;
 	phy-mode = "rgmii-id";
 	phy-handle = <&ethphy0>;
+	phy-supply = <&reg_vcc_3v3>;
 	fsl,magic-packet;
 	phy-reset-gpios = <&expander2 7 GPIO_ACTIVE_LOW>;
 	phy-reset-duration = <500>;
@@ -251,6 +253,7 @@
 		reg = <0x24>;
 		gpio-controller;
 		#gpio-cells = <2>;
+		vcc-supply = <&reg_vcc_3v3>;
 	};
 
 	expander2: pca9555@25 {
@@ -258,6 +261,7 @@
 		reg = <0x25>;
 		gpio-controller;
 		#gpio-cells = <2>;
+		vcc-supply = <&reg_vcc_3v3>;
 	};
 };
 
@@ -315,6 +319,7 @@
 &pcie0{
 	ext_osc = <1>;
 	hard-wired = <1>;
+	epdev_on-supply = <&reg_vcc_3v3>;
 	status = "okay";
 };
 
@@ -322,6 +327,7 @@
 	disable-gpio = <&expander2 13 GPIO_ACTIVE_LOW>;
 	reset-gpio = <&expander2 14 GPIO_ACTIVE_LOW>;
 	ext_osc = <1>;
+	epdev_on-supply = <&reg_vcc_3v3>;
 	status = "okay";
 };
 
