@@ -145,7 +145,12 @@
 
 			uboot@100000 {
 				label = "U-Boot-PBL";
-				reg = <0x100000 0x300000>;
+				reg = <0x100000 0x280000>;
+			};
+
+			ubootenv@380000 {
+				label = "U-Boot-ENV";
+				reg = <0x380000 0x80000>;
 			};
 
 			dtb@400000 {
