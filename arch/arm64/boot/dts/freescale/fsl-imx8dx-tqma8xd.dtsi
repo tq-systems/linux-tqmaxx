@@ -38,10 +38,9 @@
 		 * reserved-memory layout
 		 * 0x8800_0000 ~ 0x8FFF_FFFF is reserved for M4
 		 * Shouldn't be used at A core and Linux side.
-		 *
 		 */
 		/*
-		 * move rpmsg_reserved to have mode RAM available
+		 * move rpmsg_reserved to have more RAM available
 		 */
 		rpmsg_reserved: rpmsg@0x84000000 {
 			no-map;
