@@ -616,7 +616,7 @@ static struct clockdomain l4per_7xx_clkdm = {
 	.cm_inst	  = DRA7XX_CM_CORE_L4PER_INST,
 	.clkdm_offs	  = DRA7XX_CM_CORE_L4PER_L4PER_CDOFFS,
 	.dep_bit	  = DRA7XX_L4PER_STATDEP_SHIFT,
-	.flags		  = CLKDM_CAN_HWSUP_SWSUP,
+	.flags		  = CLKDM_CAN_SWSUP,
 };
 
 static struct clockdomain gpu_7xx_clkdm = {
