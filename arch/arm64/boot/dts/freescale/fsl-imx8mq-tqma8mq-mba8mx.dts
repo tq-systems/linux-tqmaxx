@@ -168,6 +168,7 @@
 	bus-width = <4>;
 	cd-gpios = <&gpio2 12 GPIO_ACTIVE_LOW>;
 	disable-wp;
+	no-1-8-v;
 	vmmc-supply = <&reg_usdhc2_vmmc>;
 	status = "okay";
 };
