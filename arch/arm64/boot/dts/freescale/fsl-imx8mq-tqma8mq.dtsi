@@ -199,6 +199,20 @@
 			};
 		};
 	};
+
+	eeprom1: 24c02@51 {
+		compatible = "atmel,24c02";
+		reg = <0x51>;
+		pagesize = <16>;
+		status = "okay";
+	};
+
+	eeprom0: m24c64@57 {
+		compatible = "st,24c64", "atmel,24c64", "at24";
+		reg = <0x57>;
+		pagesize = <32>;
+		status = "okay";
+	};
 };
 
 /* TODO: not working */
