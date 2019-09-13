@@ -101,7 +101,8 @@ static int sn65dsi83_brg_power_on(struct sn65dsi83_brg *brg)
 	if (brg->gpio_enable) {
 		gpiod_set_value_cansleep(brg->gpio_enable, 1);
 		/* Wait for 1ms for the internal voltage regulator to stabilize */
-		msleep(1);
+		/* capacitor on EN pin of adaptor needs longer time */
+		msleep(500);
 	}
 
     return 0;
