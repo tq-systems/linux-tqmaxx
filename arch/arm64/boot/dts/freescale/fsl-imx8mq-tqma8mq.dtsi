@@ -59,6 +59,12 @@
 		/* disable until we fix it */
 		/delete-node/ rpmsg@0x78000000;
 	};
+
+	thermal-zones {
+		cpu-thermal {
+			thermal-sensors = <&tmu 0>;
+		};
+	};
 };
 
 &gpu {
@@ -306,6 +312,10 @@
 
 &rpmsg{
 	status = "disabled";
+};
+
+&tmu {
+	#thermal-sensor-cells =  <1>;
 };
 
 &usdhc1 {
