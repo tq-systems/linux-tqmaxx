@@ -50,6 +50,14 @@
 	};
 };
 
+&gpu {
+	status = "okay";
+};
+
+&gpu_pd {
+	power-supply = <&sw1a_reg>;
+};
+
 &iomuxc {
 	pinctrl-names = "default";
 
