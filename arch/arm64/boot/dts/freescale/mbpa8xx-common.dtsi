@@ -62,6 +62,9 @@
 };
 
 &iomuxc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_hog>;
+
 	tqma8xx-mbpa8xx {
 		pinctrl_fec1: fec1grp {
 			fsl,pins = <
@@ -81,6 +84,15 @@
 				SC_P_ENET0_RGMII_RXD3_CONN_ENET0_RGMII_RXD3	0x06000048
 
 				SC_P_CSI_EN_LSIO_GPIO3_IO02			0x06000048
+			>;
+		};
+
+		pinctrl_hog: hoggrp {
+			fsl,pins = <
+				/* Rev detect */
+				SC_P_SPI2_CS0_LSIO_GPIO1_IO00			0x06000021
+				SC_P_SPI2_SDO_LSIO_GPIO1_IO01			0x06000021
+				SC_P_SPI2_SDI_LSIO_GPIO1_IO02			0x06000021
 			>;
 		};
 
