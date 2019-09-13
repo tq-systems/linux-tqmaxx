@@ -40,6 +40,14 @@
 		regulator-always-on;
 	};
 
+	reg_1v8: 1v8_mb_smarc_2 {
+		compatible = "regulator-fixed";
+		regulator-name = "3V3_VSTBY";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-always-on;
+	};
+
 	reg_3v3_vstby: 3v3_vstby {
 		compatible = "regulator-fixed";
 		regulator-name = "3V3_VSTBY";
@@ -50,6 +58,23 @@
 };
 
 &i2c1 {
+	codec: tlv320aic32x4@18 {
+		compatible = "ti,tlv320aic32x4";
+		reg = <0x18>;
+		clocks = <&clk IMX8QXP_AUD_MCLKOUT0>;
+		clock-names = "mclk";
+
+		power-domains = <&pd_mclk_out0>;
+		assigned-clocks = <&clk IMX8QXP_AUD_PLL0_DIV>,
+				<&clk IMX8QXP_AUD_ACM_AUD_PLL_CLK0_DIV>,
+				<&clk IMX8QXP_AUD_ACM_AUD_REC_CLK0_DIV>,
+				<&clk IMX8QXP_AUD_MCLKOUT0>;
+		assigned-clock-rates = <786432000>, <49152000>, <12288000>, <12288000>;
+
+		ldoin-supply = <&reg_3v3_vstby>;
+		iov-supply = <&reg_1v8>;
+	};
+
 	eeprom2: at24c32@57 {
 		compatible = "st,24c32", "atmel,24c32", "at24";
 		reg = <0x57>;
