@@ -61,9 +61,16 @@
 			};
 		};
 
-		port {
-			lvds_bridge_in: endpoint {
-				remote-endpoint = <&mipi_dsi_bridge_out>;
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+
+				lvds_bridge_in: endpoint {
+					remote-endpoint = <&mipi_dsi_bridge_out>;
+				};
 			};
 		};
 	};
