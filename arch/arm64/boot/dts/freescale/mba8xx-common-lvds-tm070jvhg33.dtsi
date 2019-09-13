@@ -15,8 +15,10 @@
 / {
 	backlight_lvds0: backlight-lvds0 {
 		compatible = "pwm-backlight";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_pwmbl>;
 		/* TODO: not enable yet */
-		/* pwms = <&pwm4 0 5000000>; */
+		pwms = <&pwm_mipi_lvds0 0 5000000>;
 		brightness-levels = <0 4 8 16 32 64 128 255>;
 		default-brightness-level = <7>;
 		power-supply = <&reg_mba8qx_12v>;
@@ -37,6 +39,7 @@
 		compatible = "tianma,tm070jvhg33", "tianma,tm070jdhg30";
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_lbdpanel>;
+/*		backlight = <&backlight_lvds0>; */
 		backlight = <&backlight_gpio0>;
 		power-supply = <&reg_mba8qx_12v>;
 		enable-gpios = <&gpio1 30 0>;
@@ -102,6 +105,13 @@
 				SC_P_MIPI_DSI1_I2C0_SDA_LSIO_GPIO1_IO30	0x06000021
 			>;
 		};
+
+		pinctrl_pwmbl: pwmblgrp {
+			fsl,pins = <
+				/* TODO: LCD_CONTRAST -> DSI PMW */
+				SC_P_SPI0_CS1_ADMA_LCD_PWM0_OUT		0x06000021
+			>;
+		};
 	};
 };
 
@@ -163,5 +173,9 @@
 };
 
 &prg9 {
+	status = "okay";
+};
+
+&pwm_mipi_lvds0 {
 	status = "okay";
 };
