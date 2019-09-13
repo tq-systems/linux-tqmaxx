@@ -1,0 +1,45 @@
+/*
+ * Copyright (C) 2016 Freescale Semiconductor, Inc.
+ * Copyright 2017 NXP
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+
+#include "fsl-imx8mq-evk.dts"
+
+/ {
+	memory@40000000 {
+		device_type = "memory";
+		/*  our minimum RAM config will be 512 MiB, 1 GiB for test */
+		reg = <0x00000000 0x40000000 0 0x40000000>;
+	};
+
+	reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		/* global autoconfigured region for contiguous allocations */
+		linux,cma {
+			compatible = "shared-dma-pool";
+			reusable;
+			/* 256 + 128 MiB = 384 */
+			size = <0 0x18000000>;
+			/*  512 - 64 MiB, our minimum RAM config will be 512 MiB */
+			alloc-ranges = <0 0x40000000 0 0x1C000000>;
+			linux,cma-default;
+		};
+
+		/* disable until we fix it */
+		/delete-node/ rpmsg@0x78000000;
+	};
+};
