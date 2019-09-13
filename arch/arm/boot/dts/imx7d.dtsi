@@ -422,19 +422,6 @@
 		status = "disabled";
 	};
 
-	qspi1: qspi@30bb0000 {
-		#address-cells = <1>;
-		#size-cells = <0>;
-		compatible = "fsl,imx7d-qspi";
-		reg = <0x30bb0000 0x10000>, <0x60000000 0x10000000>;
-		reg-names = "QuadSPI", "QuadSPI-memory";
-		interrupts = <GIC_SPI 107 IRQ_TYPE_LEVEL_HIGH>;
-		clocks = <&clks IMX7D_QSPI_ROOT_CLK>,
-			<&clks IMX7D_QSPI_ROOT_CLK>;
-		clock-names = "qspi_en", "qspi";
-		status = "disabled";
-	};
-
 	weim: weim@30bc0000 {
 		compatible = "fsl,imx7d-weim", "fsl,imx6sx-weim", "fsl,imx6q-weim";
 		reg = <0x30bc0000 0x10000>;
