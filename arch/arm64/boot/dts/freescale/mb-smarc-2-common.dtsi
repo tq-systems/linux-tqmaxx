@@ -49,6 +49,15 @@
 	};
 };
 
+&i2c1 {
+	eeprom2: at24c32@57 {
+		compatible = "st,24c32", "atmel,24c32", "at24";
+		reg = <0x57>;
+		pagesize = <32>;
+		status = "okay";
+	};
+};
+
 &iomuxc {
 	tqma8xxs-mb-smarc-2 {
 		pinctrl_lpuart0: lpuart0grp {
