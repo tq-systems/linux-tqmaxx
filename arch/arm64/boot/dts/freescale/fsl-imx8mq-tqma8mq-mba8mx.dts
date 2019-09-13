@@ -63,9 +63,9 @@
 };
 
 &iomuxc {
-	pinctrl-names = "default";
+	/* pinctrl-names = "default"; */
 
-	imx8mq-evk {
+	imx8mq-mba8mx {
 		pinctrl_fec1: fec1grp {
 			fsl,pins = <
 				MX8MQ_IOMUXC_ENET_MDC_ENET1_MDC		0x3
