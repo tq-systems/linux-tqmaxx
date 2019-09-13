@@ -210,6 +210,11 @@
 };
 
 &i2c1 {
+	systemcontroller: syscon@11 {
+		reg = <0x11>;
+		status = "disabled";
+	};
+
 	expander1: pca9555@24 {
 		compatible = "nxp,pca9555";
 		reg = <0x24>;
