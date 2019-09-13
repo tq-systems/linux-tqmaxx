@@ -18,24 +18,18 @@
 		stdout-path = &lpuart0;
 	};
 
-	regulators {
-		compatible = "simple-bus";
-		#address-cells = <1>;
-		#size-cells = <0>;
-
-		reg_usdhc2_vmmc: usdhc2_vmmc {
-			compatible = "regulator-fixed";
-			regulator-name = "SD1_VMMC";
-			regulator-min-microvolt = <3300000>;
-			regulator-max-microvolt = <3300000>;
-			gpio = <&gpio4 19 GPIO_ACTIVE_LOW>;
+	reg_usdhc2_vmmc: usdhc2_vmmc {
+		compatible = "regulator-fixed";
+		regulator-name = "SD1_VMMC";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		gpio = <&gpio4 19 GPIO_ACTIVE_LOW>;
 /*
-			startup-delay-us = <100>;
-			off-on-delay-us = <12000>;
+		startup-delay-us = <100>;
+		off-on-delay-us = <12000>;
 */
-			regulator-always-on;
-			regulator-boot-on;
-		};
+		regulator-always-on;
+		regulator-boot-on;
 	};
 };
 
