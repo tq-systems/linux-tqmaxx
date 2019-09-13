@@ -152,6 +152,19 @@
 	};
 };
 
+&pcie0{
+	ext_osc = <1>;
+	hard-wired = <1>;
+	status = "okay";
+};
+
+&pcie1{
+	disable-gpio = <&expander2 13 GPIO_ACTIVE_LOW>;
+	reset-gpio = <&expander2 14 GPIO_ACTIVE_LOW>;
+	ext_osc = <1>;
+	status = "okay";
+};
+
 &uart1 { /* console */
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart1>;
