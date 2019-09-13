@@ -23,6 +23,29 @@
 		stdout-path = &lpuart1;
 	};
 
+	beeper: gpio-beeper {
+		compatible = "gpio-beeper";
+		gpios = <&expander 0 GPIO_ACTIVE_HIGH>;
+		status = "okay";
+	};
+
+	gpio-leds {
+		compatible = "gpio-leds";
+		status = "okay";
+
+		led1 {
+			label = "leda";
+			gpios = <&expander 1 GPIO_ACTIVE_LOW>;
+			linux,default-trigger = "default-on";
+		};
+
+		led2 {
+			label = "ledb";
+			gpios = <&expander 2 GPIO_ACTIVE_LOW>;
+			linux,default-trigger = "heartbeat";
+		};
+	};
+
 	regulators {
 		compatible = "simple-bus";
 		#address-cells = <1>;
@@ -73,8 +96,12 @@
 		reg = <0x70>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_pca9538>;
+		gpio-controller;
+		#gpio-cells = <2>;
+/*
 		interrupt-parent = <&gpio3>;
 		interrupts = <8 IRQ_TYPE_LEVEL_LOW>;
+*/
 	};
 };
 
