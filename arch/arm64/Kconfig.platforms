@@ -314,6 +314,8 @@ config ARCH_ZYNQMP
 
 config ARCH_FSL_IMX8QM
 	bool "Freescale i.MX8QM SOC"
+	select CLKSRC_MMIO
+	select RESET_CONTROLLER
 	select PINCTRL
 	select PINCTRL_IMX
 	select PINCTRL_IMX8QM
@@ -330,6 +332,8 @@ config ARCH_FSL_IMX8QM
 
 config ARCH_FSL_IMX8QXP
 	bool "Freescale i.MX8QXP SOC"
+	select CLKSRC_MMIO
+	select RESET_CONTROLLER
 	select PINCTRL
 	select PINCTRL_IMX
 	select PINCTRL_IMX8QXP
@@ -354,6 +358,8 @@ config HAVE_IMX_BUSFREQ
 config ARCH_FSL_IMX8MQ
 	bool "Freescale i.MX8MQ SOC"
 	select SERIAL_IMX
+	select CLKSRC_MMIO
+	select RESET_CONTROLLER
 	select PINCTRL
 	select PINCTRL_IMX
 	select PINCTRL_IMX8MQ
@@ -372,6 +378,8 @@ config ARCH_FSL_IMX8MQ
 config ARCH_FSL_IMX8MM
 	bool "Freescale i.MX8MM SOC"
 	select SERIAL_IMX
+	select CLKSRC_MMIO
+	select RESET_CONTROLLER
 	select PINCTRL
 	select PINCTRL_IMX
 	select PINCTRL_IMX8MM
