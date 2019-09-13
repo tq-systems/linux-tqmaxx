@@ -259,8 +259,10 @@
 			>;
 		};
 
-		pinctrl_hog: mba8qxhoggrp {
+		pinctrl_hog: mba8xxhoggrp {
 			fsl,pins = <
+				SC_P_MCLK_OUT0_ADMA_ACM_MCLK_OUT0		0x0600004c
+
 				SC_P_MIPI_CSI0_I2C0_SCL_LSIO_GPIO3_IO05		0x06000048
 				SC_P_MIPI_CSI0_I2C0_SDA_LSIO_GPIO3_IO06		0x06000048
 				SC_P_MIPI_CSI0_GPIO0_01_LSIO_GPIO3_IO07		0x06000048
