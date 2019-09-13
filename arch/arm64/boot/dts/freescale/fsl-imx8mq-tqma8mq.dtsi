@@ -91,6 +91,12 @@
 			>;
 		};
 
+		pinctrl_rtc: rtcgrp {
+			fsl,pins = <
+				MX8MQ_IOMUXC_GPIO1_IO01_GPIO1_IO1		0x41
+			>;
+		};
+
 		pinctrl_usdhc1: usdhc1grp {
 			fsl,pins = <
 				MX8MQ_IOMUXC_SD1_CLK_USDHC1_CLK			0x83
@@ -250,6 +256,16 @@
 	sensor0: jc42@1b {
 		compatible = "nxp,se97", "jedec,jc-42.4-temp";
 		reg = <0x1b>;
+		status = "okay";
+	};
+
+	rtc1: pcf85063@51 {
+		compatible = "nxp,pcf85063";
+		reg = <0x51>;
+		/* TODO: wakeup / alarm not implemented yet */
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_rtc>;
+		/* TODO: capacity and offset prop needed for improved accuracy */
 		status = "okay";
 	};
 
