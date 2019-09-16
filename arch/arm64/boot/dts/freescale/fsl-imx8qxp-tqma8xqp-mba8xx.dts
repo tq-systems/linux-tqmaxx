@@ -15,7 +15,7 @@
 /dts-v1/;
 
 #include "fsl-imx8qxp-tqma8xqp.dtsi"
-#include "fsl-imx8qxp-tqma8xqp-mba8xx.dtsi"
+#include "mba8xx-common.dtsi"
 
 / {
 	model = "TQ Systems i.MX8QXP TQMa8XQP on MBa8Xx";

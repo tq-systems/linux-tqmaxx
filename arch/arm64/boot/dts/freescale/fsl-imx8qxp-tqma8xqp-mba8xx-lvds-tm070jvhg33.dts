@@ -15,5 +15,5 @@
 /dts-v1/;
 
 #include "fsl-imx8qxp-tqma8xqp.dtsi"
-#include "fsl-imx8qxp-tqma8xqp-mba8xx.dtsi"
-#include "fsl-imx8qxp-tqma8xqp-mba8xx-lvds-tm070jvhg33.dtsi"
+#include "mba8xx-common.dtsi"
+#include "mba8xx-common-lvds-tm070jvhg33.dtsi"
