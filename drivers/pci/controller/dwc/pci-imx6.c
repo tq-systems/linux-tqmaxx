@@ -1957,6 +1957,20 @@ static void imx_pcie_setup_ep(struct dw_pcie *pci)
 	writel(0, pci->dbi_base + (1 << 12) + PCI_BASE_ADDRESS_5);
 }
 
+static void pci_imx_set_msi_en(struct pcie_port *pp)
+{
+	u16 val;
+	struct dw_pcie *pci = to_dw_pcie_from_pp(pp);
+
+	if (pci_msi_enabled()) {
+		val = dw_pcie_readw_dbi(pci, PCIE_RC_IMX6_MSI_CAP +
+					PCI_MSI_FLAGS);
+		val |= PCI_MSI_FLAGS_ENABLE;
+		dw_pcie_writew_dbi(pci, PCIE_RC_IMX6_MSI_CAP + PCI_MSI_FLAGS,
+				   val);
+	}
+}
+
 #ifdef CONFIG_PM_SLEEP
 /* PM_TURN_OFF */
 static void pci_imx_pm_turn_off(struct imx_pcie *imx_pcie)
@@ -2108,20 +2122,6 @@ static void pci_imx_ltssm_disable(struct device *dev)
 	}
 }
 
-static void pci_imx_set_msi_en(struct pcie_port *pp)
-{
-	u16 val;
-	struct dw_pcie *pci = to_dw_pcie_from_pp(pp);
-
-	if (pci_msi_enabled()) {
-		val = dw_pcie_readw_dbi(pci, PCIE_RC_IMX6_MSI_CAP +
-					PCI_MSI_FLAGS);
-		val |= PCI_MSI_FLAGS_ENABLE;
-		dw_pcie_writew_dbi(pci, PCIE_RC_IMX6_MSI_CAP + PCI_MSI_FLAGS,
-				   val);
-	}
-}
-
 static int pci_imx_resume_noirq(struct device *dev)
 {
 	int ret = 0;
@@ -2174,6 +2174,13 @@ static const struct dev_pm_ops pci_imx_pm_ops = {
 	.poweroff_noirq = pci_imx_suspend_noirq,
 	.restore_noirq = pci_imx_resume_noirq,
 };
+
+#define PCI_IMX_PM_OPS	(&pci_imx_pm_ops)
+
+#else
+
+#define PCI_IMX_PM_OPS	NULL
+
 #endif
 
 static irqreturn_t imx_pcie_dma_isr(int irq, void *param)
@@ -2862,7 +2869,7 @@ static struct platform_driver imx_pcie_driver = {
 		.name	= "imx6q-pcie",
 		.of_match_table = imx_pcie_of_match,
 		.suppress_bind_attrs = true,
-		.pm = &pci_imx_pm_ops,
+		.pm = PCI_IMX_PM_OPS,
 	},
 	.probe    = imx_pcie_probe,
 	.shutdown = imx_pcie_shutdown,
