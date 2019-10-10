@@ -65,8 +65,8 @@
 			ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_25_NS>;
 			ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_25_NS>;
 			ti,dp83867-rxctrl-strap-quirk;
-			ti,led-cfg1 = <0x0100>; /* LED1: Link, LED2: activity */
-			ti,led-cfg2 = <0x1001>; /* active low, LED1/2 driven by phy */
+			ti,led-cfg1 = <0x0100>; /* LED0: Link, LED2: activity */
+			ti,led-cfg2 = <0x1414>; /* active low, LED0/2 driven by phy */
 		};
 	};
 };
@@ -95,8 +95,8 @@
 			ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_25_NS>;
 			ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_25_NS>;
 			ti,dp83867-rxctrl-strap-quirk;
-			ti,led-cfg1 = <0x0100>; /* LED1: Link, LED2: activity */
-			ti,led-cfg2 = <0x1001>; /* active low, LED1/2 driven by phy */
+			ti,led-cfg1 = <0x0100>; /* LED0: Link, LED2: activity */
+			ti,led-cfg2 = <0x1414>; /* active low, LED0/2 driven by phy */
 		};
 	};
 };
