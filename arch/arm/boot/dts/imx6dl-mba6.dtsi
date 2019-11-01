@@ -1,0 +1,26 @@
+/*
+ * Copyright 2013 Sascha Hauer, Pengutronix
+ * Copyright 2013-2017 Markus Niebel <Markus.Niebel@tq-group.com>
+ *
+ * The code contained herein is licensed under the GNU General Public
+ * License. You may obtain a copy of the GNU General Public License
+ * Version 2 or later at the following locations:
+ *
+ * http://www.opensource.org/licenses/gpl-license.html
+ * http://www.gnu.org/copyleft/gpl.html
+ */
+
+&ethphy {
+	rxdv-skew-ps = <180>;
+	txen-skew-ps = <0>;
+	rxd3-skew-ps = <180>;
+	rxd2-skew-ps = <180>;
+	rxd1-skew-ps = <180>;
+	rxd0-skew-ps = <180>;
+	txd3-skew-ps = <120>;
+	txd2-skew-ps = <0>;
+	txd1-skew-ps = <300>;
+	txd0-skew-ps = <120>;
+	txc-skew-ps = <1860>;
+	rxc-skew-ps = <1860>;
+};
