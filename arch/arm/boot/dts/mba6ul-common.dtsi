@@ -611,10 +611,11 @@
 &uart6 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart6>;
-	fsl,uart-has-rtscts;
 	/* for DTE mode, add below change */
 	/* fsl,dte-mode; */
 	/* pinctrl-0 = <&pinctrl_uart6dte>; */
+	linux,rs485-enabled-at-boot-time;
+	rs485-rx-during-tx;
 	status = "okay";
 };
 
