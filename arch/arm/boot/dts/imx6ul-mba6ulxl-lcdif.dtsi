@@ -13,15 +13,8 @@
 / {
 	backlight0: pwm_backlight {
 		compatible = "pwm-backlight";
-		power-supply = <&reg_mba6ul_3v3>;
-		gpios = <&expander 5 GPIO_ACTIVE_HIGH>;
-		status = "disabled";
-	};
-
-	backlight1: gpio_backlight {
-		compatible = "gpio-backlight";
-		power-supply = <&reg_mba6ul_3v3>;
-		gpios = <&expander 5 GPIO_ACTIVE_HIGH>;
+		power-supply = <&reg_lcd_pwr>;
+		enable-gpios = <&expander 5 GPIO_ACTIVE_HIGH>;
 		status = "disabled";
 	};
 
@@ -93,5 +86,9 @@
 };
 
 &pxp {
+	status = "okay";
+};
+
+&pwm4 {
 	status = "okay";
 };

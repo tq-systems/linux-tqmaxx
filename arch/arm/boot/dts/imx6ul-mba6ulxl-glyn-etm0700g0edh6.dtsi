@@ -42,11 +42,6 @@
 	pwms = <&pwm4 0 1000000>;
 	brightness-levels = <255 200 180 160 128 96 64 32 16>;
 	default-brightness-level = <5>;
-	status = "disabled";
-};
-
-&backlight1 {
-	default-on;
 	status = "okay";
 };
 

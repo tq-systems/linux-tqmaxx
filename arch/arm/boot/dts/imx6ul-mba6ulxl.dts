@@ -215,6 +215,7 @@
 		interrupts = <9 IRQ_TYPE_LEVEL_LOW>;
 		interrupt-parent = <&gpio1>;
 		interrupt-controller;
+		#interrupt-cells = <2>;
 		status = "okay";
 /* TODO: hog port 2 as output high (boot cfg en#) */
 	};
