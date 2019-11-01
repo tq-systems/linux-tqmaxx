@@ -143,6 +143,8 @@
 
 &iomuxc {
 	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_hog>;
+
 	tqma8qx-mba8qx {
 		pinctrl_lpuart1: lpuart1grp {
 			fsl,pins = <
@@ -202,6 +204,14 @@
 				SC_P_ESAI0_TX1_CONN_ENET1_RGMII_RXD3		0x06000048
 
 				SC_P_CSI_RESET_LSIO_GPIO3_IO03			0x06000048
+			>;
+		};
+
+		pinctrl_hog: mba8qxhoggrp {
+			fsl,pins = <
+				SC_P_MIPI_CSI0_I2C0_SCL_LSIO_GPIO3_IO05		0x06000048
+				SC_P_MIPI_CSI0_I2C0_SDA_LSIO_GPIO3_IO06		0x06000048
+				SC_P_MIPI_CSI0_GPIO0_01_LSIO_GPIO3_IO07		0x06000048
 			>;
 		};
 
