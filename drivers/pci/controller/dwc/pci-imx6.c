@@ -1647,8 +1647,18 @@ static void imx6_pcie_init_phy(struct imx6_pcie *imx6_pcie)
 		break;
 	case IMX7D:
 	case IMX7D_EP:
-		regmap_update_bits(imx6_pcie->iomuxc_gpr, IOMUXC_GPR12,
-				   IMX7D_GPR12_PCIE_PHY_REFCLK_SEL, 0);
+		if (imx6_pcie->ext_osc) {
+			/* external oscillator */
+			regmap_update_bits(imx6_pcie->iomuxc_gpr,
+				IOMUXC_GPR12,
+				IMX7D_GPR12_PCIE_PHY_REFCLK_SEL, 0);
+		} else {
+			/* internal oscillator */
+			regmap_update_bits(imx6_pcie->iomuxc_gpr,
+				IOMUXC_GPR12,
+				IMX7D_GPR12_PCIE_PHY_REFCLK_SEL,
+				IMX7D_GPR12_PCIE_PHY_REFCLK_SEL);
+		}
 		break;
 	case IMX6SX:
 	case IMX6SX_EP:
