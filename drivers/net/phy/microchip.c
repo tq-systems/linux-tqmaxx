@@ -31,6 +31,42 @@ static int lan88xx_write_page(struct phy_device *phydev, int page)
 	return __phy_write(phydev, LAN88XX_EXT_PAGE_ACCESS, page);
 }
 
+static int lan8820_config_init(struct phy_device *phydev)
+{
+	int temp;
+	int err;
+
+	if (phy_interface_is_rgmii(phydev)) {
+		temp = phy_read(phydev, LAN8820_PHY_CSIR);
+		if (temp < 0)
+			return temp;
+
+		switch (phydev->interface) {
+		case PHY_INTERFACE_MODE_RGMII_ID:
+			temp |= (LAN8820_PHY_CSIR_TXDELAY |
+				 LAN8820_PHY_CSIR_RXDELAY);
+			break;
+		case PHY_INTERFACE_MODE_RGMII_RXID:
+			temp &= ~LAN8820_PHY_CSIR_TXDELAY;
+			temp |= LAN8820_PHY_CSIR_RXDELAY;
+			break;
+		case PHY_INTERFACE_MODE_RGMII_TXID:
+			temp &= ~LAN8820_PHY_CSIR_RXDELAY;
+			temp |= LAN8820_PHY_CSIR_TXDELAY;
+			break;
+		default:
+			temp &= ~(LAN8820_PHY_CSIR_RXDELAY |
+				  LAN8820_PHY_CSIR_RXDELAY);
+		};
+
+		err = phy_write(phydev, LAN8820_PHY_CSIR, temp);
+		if (err < 0)
+			return err;
+	}
+
+	return 0;
+}
+
 static int lan88xx_phy_config_intr(struct phy_device *phydev)
 {
 	int rc;
@@ -328,6 +364,25 @@ static int lan88xx_config_aneg(struct phy_device *phydev)
 
 static struct phy_driver microchip_phy_driver[] = {
 {
+	.phy_id		= 0x0007c0e0,
+	.phy_id_mask	= 0xfffffff0,
+	.name		= "Microchip LAN8820",
+
+	/* PHY_GBIT_FEATURES */
+
+	.flags		= 0,
+
+	.probe		= lan88xx_probe,
+	.remove		= lan88xx_remove,
+
+	.config_init	= lan8820_config_init,
+	.config_aneg	= genphy_config_aneg,
+	.read_status	= genphy_read_status,
+
+	.suspend	= lan88xx_suspend,
+	.resume		= genphy_resume,
+	.set_wol	= lan88xx_set_wol,
+},{
 	.phy_id		= 0x0007c130,
 	.phy_id_mask	= 0xfffffff0,
 	.name		= "Microchip LAN88xx",
@@ -353,6 +408,7 @@ static struct phy_driver microchip_phy_driver[] = {
 module_phy_driver(microchip_phy_driver);
 
 static struct mdio_device_id __maybe_unused microchip_tbl[] = {
+	{ 0x0007c0e0, 0xfffffff0 },
 	{ 0x0007c130, 0xfffffff0 },
 	{ }
 };
