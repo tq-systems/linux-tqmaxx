@@ -30,10 +30,12 @@
 
 &i2c4 {
 	polytouch: edt-ft5x04@38 {
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_polytouch>;
 		compatible = "edt,edt-ft5406", "edt,edt-ft5x06";
 		reg = <0x38>;
-		interrupt-parent = <&expander>;
-		interrupts = <4 IRQ_TYPE_EDGE_FALLING>;
+		interrupts = <3 IRQ_TYPE_EDGE_FALLING>;
+		interrupt-parent = <&gpio1>;
 		status = "disabled";
 	};
 };
@@ -58,6 +60,7 @@
 				MX6UL_PAD_LCD_DATA13__LCDIF_DATA13	0x79
 				MX6UL_PAD_LCD_DATA14__LCDIF_DATA14	0x79
 				MX6UL_PAD_LCD_DATA15__LCDIF_DATA15	0x79
+/*
 				MX6UL_PAD_LCD_DATA16__LCDIF_DATA16	0x79
 				MX6UL_PAD_LCD_DATA17__LCDIF_DATA17	0x79
 				MX6UL_PAD_LCD_DATA18__LCDIF_DATA18	0x79
@@ -66,14 +69,22 @@
 				MX6UL_PAD_LCD_DATA21__LCDIF_DATA21	0x79
 				MX6UL_PAD_LCD_DATA22__LCDIF_DATA22	0x79
 				MX6UL_PAD_LCD_DATA23__LCDIF_DATA23	0x79
+*/
 			>;
 		};
+
 		pinctrl_lcdifctrl: lcdifctrlgrp {
 			fsl,pins = <
 				MX6UL_PAD_LCD_CLK__LCDIF_CLK		0x79
 				MX6UL_PAD_LCD_ENABLE__LCDIF_ENABLE	0x79
 				MX6UL_PAD_LCD_HSYNC__LCDIF_HSYNC	0x79
 				MX6UL_PAD_LCD_VSYNC__LCDIF_VSYNC	0x79
+			>;
+		};
+
+		pinctrl_polytouch: polytouchgrp {
+			fsl,pins = <
+				MX6UL_PAD_GPIO1_IO03__GPIO1_IO03	0x4001b020
 			>;
 		};
 	};
