@@ -28,6 +28,18 @@
 	};
 };
 
+&can1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_can1>;
+	status = "okay";
+};
+
+&can2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_can2>;
+	status = "okay";
+};
+
 &fec {
 	phy-mode = "rgmii-id";
 	phy-reset-gpios = <&gpio1 25 GPIO_ACTIVE_LOW>;
@@ -58,6 +70,20 @@
 	pinctrl-0 = <&pinctrl_hog>;
 
 	mba6 {
+		pinctrl_can1: can1grp {
+			fsl,pins = <
+				MX6QDL_PAD_KEY_COL2__FLEXCAN1_TX 0xb099
+				MX6QDL_PAD_KEY_ROW2__FLEXCAN1_RX 0xb099
+			>;
+		};
+
+		pinctrl_can2: can2grp {
+			fsl,pins = <
+				MX6QDL_PAD_KEY_COL4__FLEXCAN2_TX 0xb099
+				MX6QDL_PAD_KEY_ROW4__FLEXCAN2_RX 0xb099
+			>;
+		};
+
 		pinctrl_enet: enetgrp {
 			fsl,pins = <
 				/* FEC phy IRQ */
