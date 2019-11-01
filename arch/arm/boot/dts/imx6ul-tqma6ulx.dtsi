@@ -17,6 +17,12 @@
 	model = "TQMa6ULx SOM";
 };
 
+&cpu0 {
+	cooling-min-level = <0>;
+	cooling-max-level = <3>;
+	#cooling-cells = <2>;
+};
+
 &iomuxc {
 	imx6ul-tqma6ul {
 		pinctrl_usdhc2: usdhc2grp {
