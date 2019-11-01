@@ -20,5 +20,5 @@
 
 / {
 	model = "TQ TQMa6Q on MBa6x";
-	compatible = "tq,mba6b", "fsl,imx6q";
+	compatible = "tq,mba6b", "tq,tqma6q", "fsl,imx6q";
 };
