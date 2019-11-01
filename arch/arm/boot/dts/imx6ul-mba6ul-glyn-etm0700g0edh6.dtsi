@@ -1,0 +1,64 @@
+/*
+ * Copyright 2016 Marco Felsch, TQ Systems GmbH
+ *
+ * The code contained herein is licensed under the GNU General Public
+ * License. You may obtain a copy of the GNU General Public License
+ * Version 2 or later at the following locations:
+ *
+ * http://www.opensource.org/licenses/gpl-license.html
+ * http://www.gnu.org/copyleft/gpl.html
+ */
+
+/ {
+	/* ETM0700G0EDH6, DS 2016/04/06, ver 3 */
+	display_etm0700: display {
+		bits-per-pixel = <32>; /* 32: RGB8880 */
+		bus-width = <24>; 
+
+		display-timings {
+			native-mode = <&timing1>;
+			timing1: 800x480p62 {
+				clock-frequency = <33260000>;
+				hactive = <800>;
+				vactive = <480>;
+				hfront-porch = <40>;
+				hsync-len = <128>;
+				hback-porch = <88>;
+				vfront-porch = <10>;
+				vsync-len = <2>;
+				vback-porch = <33>;
+				hsync-active = <0>;
+				vsync-active = <0>;
+				de-active = <1>;
+				pixelclk-active = <0>;
+			};
+		};
+	};
+};
+
+&backlight {
+	/* 1 kHz as stated by GLYN FAE */
+	pwms = <&pwm2 0 1000000>;
+	brightness-levels = <255 200 180 160 128 96 64 32 16>;
+	default-brightness-level = <5>;
+	status = "okay";
+};
+
+&lcdif {
+	display = <&display_etm0700>;
+	status = "okay";
+};
+
+&polytouch {
+	/* reset-gpios is controlled by stk reset */
+	gain = <1>;
+	offset = <0>;
+	threshold = <0x0f>;
+
+	/*
+	 * do not use size settings, display touch reads
+	 * out and uses 1792 x 1024 (tested with ETM0700G0EDH6)
+	 */
+
+	status = "okay";
+};
