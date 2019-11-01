@@ -308,9 +308,6 @@ static int dp83867_config_init(struct phy_device *phydev)
 			phy_write_mmd(phydev, DP83867_DEVADDR,
 				      DP83867_IO_MUX_CFG, val);
 		}
-
-		phy_write(phydev, DP83867_LEDCR1, dp83867->led_cfg1);
-		phy_write(phydev, DP83867_LEDCR2, dp83867->led_cfg2);
 	}
 
 	/* Enable Interrupt output INT_OE in CFG3 register */
