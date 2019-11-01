@@ -966,6 +966,11 @@ patternProperties:
     description: Toshiba Corporation
   "^toumaz,.*":
     description: Toumaz
+  "^tq,.*":
+    description: TQ Systems GmbH
+  "^tqc,.*":
+    description: TQ Components (deprecated, use tq)
+    deprecated: true
   "^tpk,.*":
     description: TPK U.S.A. LLC
   "^tplink,.*":
