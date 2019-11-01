@@ -12,12 +12,8 @@
  * GNU General Public License for more details.
  */
 
-#include "fsl-imx8qxp-tqma8qx.dts"
+/dts-v1/;
 
-&vpu_encoder {
-	status = "disabled";
-};
+#include "fsl-imx8qxp-tqma8qx.dtsi"
+#include "fsl-imx8qxp-tqma8qx-mba8qx.dtsi"
 
-&vpu_decoder {
-	status = "disabled";
-};
