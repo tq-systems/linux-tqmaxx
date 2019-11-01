@@ -4,6 +4,7 @@
  */
 
 #include <dt-bindings/net/ti-dp83867.h>
+#include <dt-bindings/input/input.h>
 
 / {
 	model = "TQ Systems i.MX8QXP TQMa8XQP on MBa8Xx";
@@ -12,6 +13,27 @@
 	chosen {
 		bootargs = "console=ttyLP1,115200 earlycon";
 		stdout-path = &lpuart1;
+	};
+
+	gpio-keys {
+		compatible = "gpio-keys";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpiobuttons>;
+		autorepeat;
+
+		switcha {
+			label = "switcha";
+			linux,code = <BTN_0>;
+			gpios = <&lsio_gpio1 13 GPIO_ACTIVE_LOW>;
+			wakeup-source;
+		};
+
+		switchb {
+			label = "switchb";
+			linux,code = <BTN_1>;
+			gpios = <&lsio_gpio1 14 GPIO_ACTIVE_LOW>;
+			wakeup-source;
+		};
 	};
 
 	gpio-leds {
@@ -117,6 +139,12 @@
 	status = "okay";
 };
 
+&lsio_gpio1 {
+	/* enable wakeup for gpio-key for gpio1 line 13 + 14 (SWITCH_A/B)*/
+	pad-wakeup-num = <2>;
+	pad-wakeup = <IMX8QXP_ADC_IN5 4 13 IMX8QXP_ADC_IN4 4 14>;
+};
+
 &i2c1 {
 	/* NXP SE97BTP with temperature sensor + eeprom */
 	se97b_1c: temperature-sensor-eeprom@1c {
@@ -147,6 +175,9 @@
 };
 
 &iomuxc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_hog>;
+
 	pinctrl_fec1: fec1grp {
 		fsl,pins = <
 			IMX8QXP_ENET0_MDC_CONN_ENET0_MDC		0x06000048
@@ -191,6 +222,22 @@
 		>;
 	};
 
+	pinctrl_gpiobuttons: gpiobuttonsgrp {
+		fsl,pins = <
+			/* gpio keys */
+			IMX8QXP_ADC_IN5_LSIO_GPIO1_IO13			0x00000020
+			IMX8QXP_ADC_IN4_LSIO_GPIO1_IO14			0x00000020
+		>;
+	};
+
+	pinctrl_hog: mba8xxhoggrp {
+		fsl,pins = <
+			/* GPIO */
+			IMX8QXP_MIPI_DSI0_I2C0_SDA_LSIO_GPIO1_IO26	0x00000048
+			IMX8QXP_USDHC1_RESET_B_LSIO_GPIO4_IO19		0x00000048
+		>;
+	};
+
 	pinctrl_lpuart1: lpuart1grp {
 		fsl,pins = <
 			IMX8QXP_UART1_RX_ADMA_UART1_RX			0x06000020
@@ -218,7 +265,6 @@
 
 	pinctrl_usdhc2_gpio: usdhc2gpiogrp {
 		fsl,pins = <
-			IMX8QXP_USDHC1_RESET_B_LSIO_GPIO4_IO19		0x00000021
 			IMX8QXP_USDHC1_WP_LSIO_GPIO4_IO21		0x00000021
 			IMX8QXP_USDHC1_CD_B_LSIO_GPIO4_IO22		0x00000021
 		>;
