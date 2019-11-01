@@ -112,6 +112,20 @@
 			};
 		};
 	};
+
+	eeprom0: m24c64@50 {
+		compatible = "st,24c64", "at24";
+		reg = <0x50>;
+		pagesize = <32>;
+		status = "okay";
+	};
+
+	eeprom1: 24c02@56 {
+		compatible = "atmel,24c02";
+		reg = <0x56>;
+		pagesize = <16>;
+		status = "okay";
+	};
 };
 
 &iomuxc {
