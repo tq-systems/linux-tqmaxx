@@ -6,6 +6,14 @@
 #ifndef _MICROCHIPPHY_H
 #define _MICROCHIPPHY_H
 
+/* LAN8820 control / status indications reg */
+#define LAN8820_PHY_CSIR		0x1b
+#define LAN8820_PHY_CSIR_TXDELAY	0x0200
+#define LAN8820_PHY_CSIR_RXDELAY	0x0100
+
+#define LAN8820_INT_MASK		(0x1e)
+#define LAN8820_INT_STS			(0x1d)
+
 #define LAN88XX_INT_MASK			(0x19)
 #define LAN88XX_INT_MASK_MDINTPIN_EN_		(0x8000)
 #define LAN88XX_INT_MASK_SPEED_CHANGE_		(0x4000)
