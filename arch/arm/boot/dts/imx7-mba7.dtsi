@@ -114,6 +114,16 @@
 			enable-active-high;
 		};
 
+		reg_lvds_transmitter: regulator@8 {
+			compatible = "regulator-fixed";
+			reg = <8>;
+			regulator-name = "#SHTDN_LVDS";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			gpio = <&gpioexp 1 GPIO_ACTIVE_HIGH>;
+			enable-active-high;
+		};
+
 		reg_mba_12v0: regulator@7 {
 			compatible = "regulator-fixed";
 			reg = <7>;
