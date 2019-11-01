@@ -156,27 +156,6 @@
 			regulator-always-on;
 		};
 
-		reg_usb_otg1_vbus: regulator@3 {
-			compatible = "regulator-fixed";
-			reg = <3>;
-			regulator-name = "VBUS_USBOTG1";
-			regulator-min-microvolt = <5000000>;
-			regulator-max-microvolt = <5000000>;
-			gpio = <&gpio1 5 GPIO_ACTIVE_HIGH>;
-			enable-active-high;
-			status = "disabled";
-		};
-
-		reg_usb_otg2_vbus: regulator@4 {
-			compatible = "regulator-fixed";
-			reg = <4>;
-			regulator-name = "VBUS_USBOTG2";
-			regulator-min-microvolt = <5000000>;
-			regulator-max-microvolt = <5000000>;
-			gpio = <&gpio1 7 GPIO_ACTIVE_HIGH>;
-			enable-active-high;
-		};
-
 		reg_vref_1v8: regulator@9 {
 			compatible = "regulator-fixed";
 			reg = <9>;
