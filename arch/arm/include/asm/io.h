@@ -431,6 +431,10 @@ void *arch_memremap_wb(phys_addr_t phys_addr, size_t size);
 
 #define iowrite16be(v,p)	({ __iowmb(); __raw_writew((__force __u16)cpu_to_be16(v), p); })
 #define iowrite32be(v,p)	({ __iowmb(); __raw_writel((__force __u32)cpu_to_be32(v), p); })
+#define clrsetbits_be32(addr, clear, set) iowrite32be((ioread32be((addr)) & ~(clear)) | (set), (addr))
+#define clrbits32(_addr, _v)	iowrite32be(ioread32be(_addr) & ~(_v), (_addr))
+#define mfspr(x)		0
+#define SPRN_SVR		0
 
 #ifndef ioport_map
 #define ioport_map ioport_map
