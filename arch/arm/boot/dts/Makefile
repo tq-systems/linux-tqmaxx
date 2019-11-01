@@ -580,6 +580,7 @@ dtb-$(CONFIG_SOC_IMX6UL) += \
 	imx6ul-mba6ulx-lga-glyn-etm0700g0edh6.dtb \
 	imx6ul-mba6ulx-lga-lvds.dtb \
 	imx6ul-mba6ulxl.dtb \
+	imx6ul-mba6ulxl-glyn-etm0700g0edh6.dtb \
 	imx6ul-mba6ulx.dtb \
 	imx6ul-mba6ulx-con.dtb \
 	imx6ul-mba6ulx-dmb-ct21.dtb \
