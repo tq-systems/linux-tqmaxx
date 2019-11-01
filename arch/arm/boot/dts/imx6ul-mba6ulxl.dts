@@ -93,17 +93,26 @@
 		reg_lcd_pwr: regulator@6 {
 			compatible = "regulator-fixed";
 			regulator-name = "lcd-pwr";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_regdisp3v3>;
 			reg = <6>;
-			status = "disabled";
-		};
-
-		reg_mpcie: regulator@8 {
-			compatible = "regulator-fixed";
-			regulator-name = "mpcie-3v3";
-			reg = <8>;
+			gpio = <&gpio1 2 GPIO_ACTIVE_HIGH>;
+			enable-active-high;
 			regulator-min-microvolt = <3300000>;
 			regulator-max-microvolt = <3300000>;
-			regulator-always-on;
+			vin_supply = <&reg_mba6ul_3v3>;
+		};
+
+		reg_mpcie: regulator@7 {
+			compatible = "regulator-fixed";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_regmpcie1v5>;
+			regulator-name = "mpcie-1v5";
+			reg = <7>;
+			gpio = <&gpio1 3 GPIO_ACTIVE_HIGH>;
+			enable-active-high;
+			regulator-min-microvolt = <1500000>;
+			regulator-max-microvolt = <1500000>;
 			vin_supply = <&reg_mba6ul_3v3>;
 		};
 	};
@@ -347,6 +356,18 @@
 			fsl,pins = <
 				/* 100 k PD, DSE 120 OHM, SPPEED LO */
 				MX6UL_PAD_GPIO1_IO05__PWM4_OUT		0x00003050
+			>;
+		};
+
+		pinctrl_regdisp3v3: regdisp3v3grp {
+			fsl,pins = <
+				MX6UL_PAD_GPIO1_IO02__GPIO1_IO02	0x4001b020
+			>;
+		};
+
+		pinctrl_regmpcie1v5: regmpcie1v5grp {
+			fsl,pins = <
+				MX6UL_PAD_GPIO1_IO03__GPIO1_IO03	0x4001b020
 			>;
 		};
 
