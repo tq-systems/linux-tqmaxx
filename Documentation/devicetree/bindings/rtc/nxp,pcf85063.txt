@@ -1,0 +1,16 @@
+* NXP PCF85063		Tiny Real-Time Clock
+
+Required properties:
+- compatible: Should contain "nxp,pcf85063".
+- reg: I2C address for chip
+
+Optional properties:
+- nxp,quartz_load : Internal oscillator capacity for quartz crystals
+	Values usable for pcf85063 load capacitance are 7pF, 12.5pF
+
+Example:
+	pcf85063: rtc@51 {
+		compatible = "nxp,pcf85063";
+		nxp,quartz_load = "12.5pF";
+		reg = <0x51>;
+	};
