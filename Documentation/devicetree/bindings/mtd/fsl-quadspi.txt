@@ -29,6 +29,7 @@ Optional properties:
 			      bus, you should enable this property.
 			      (Please check the board's schematic.)
   - big-endian : That means the IP register is big endian
+  - fsl,qspi-no-dtr-modes : Masks out Double Transfer Rate modes from HWCAPS
 
 Part II - The DT nodes for each SPI NOR flash
 ------------------------------
