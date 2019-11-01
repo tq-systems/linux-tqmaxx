@@ -104,6 +104,13 @@
 	reset-gpio = <&gpio5 12 GPIO_ACTIVE_LOW>;
 	disable-gpio = <&gpio2 29 GPIO_ACTIVE_LOW>;
 	power-on-gpio = <&gpio2 30 GPIO_ACTIVE_LOW>;
+	/*
+	 * ext_osc (external oscillator) is an u32 property and not a
+	 * boolean property. 0 represents the internal oscillator and > 0 an
+	 * external oscillator.
+	 */
+	ext_osc = <0>;
+
 	status = "okay";
 };
 
