@@ -109,6 +109,18 @@
 	};
 };
 
+&flexcan1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_flexcan1>;
+	status = "okay";
+};
+
+&flexcan2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_flexcan2>;
+	status = "okay";
+};
+
 &i2c2 {
 	clock-frequency = <100000>;
 	pinctrl-names = "default";
@@ -164,6 +176,20 @@
 
 				/* INT/PWDN: SION, 100kPU, HYS, SRE_FAST, DSE_X1 */
 				MX7D_PAD_GPIO1_IO09__GPIO1_IO9			0x40000078
+			>;
+		};
+
+		pinctrl_flexcan1: flexcan1grp {
+			fsl,pins = <
+				MX7D_PAD_GPIO1_IO12__FLEXCAN1_RX	0x5a
+				MX7D_PAD_GPIO1_IO13__FLEXCAN1_TX	0x52
+			>;
+		};
+
+		pinctrl_flexcan2: flexcan2grp {
+			fsl,pins = <
+				MX7D_PAD_GPIO1_IO14__FLEXCAN2_RX	0x5a
+				MX7D_PAD_GPIO1_IO15__FLEXCAN2_TX	0x52
 			>;
 		};
 
