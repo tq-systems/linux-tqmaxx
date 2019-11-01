@@ -192,12 +192,12 @@ static int dp83867_of_init(struct phy_device *phydev)
 	if (of_property_read_bool(of_node, "enet-phy-lane-no-swap"))
 		dp83867->port_mirroring = DP83867_PORT_MIRROING_DIS;
 
-	ret = of_property_read_u32(of_node, "led-cfg1",
+	ret = of_property_read_u32(of_node, "ti,led-cfg1",
 				&dp83867->led_cfg1);
 	if (ret)
 		return ret;
 
-	ret = of_property_read_u32(of_node, "led-cfg2",
+	ret = of_property_read_u32(of_node, "ti,led-cfg2",
 				&dp83867->led_cfg2);
 	if (ret)
 		return ret;
@@ -311,6 +311,9 @@ static int dp83867_config_init(struct phy_device *phydev)
 
 	if (dp83867->port_mirroring != DP83867_PORT_MIRROING_KEEP)
 		dp83867_config_port_mirroring(phydev);
+
+	phy_write(phydev, DP83867_LEDCR1, dp83867->led_cfg1);
+	phy_write(phydev, DP83867_LEDCR2, dp83867->led_cfg2);
 
 	return 0;
 }
