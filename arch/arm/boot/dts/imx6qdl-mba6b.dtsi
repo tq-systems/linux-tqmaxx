@@ -29,7 +29,7 @@
 	};
 
 	eeprom1: m24c64@57 {
-		compatible = "st,24c64", "at24";
+		compatible = "st,24c64", "atmel,24c64";
 		reg = <0x57>;
 		pagesize = <32>;
 	};
