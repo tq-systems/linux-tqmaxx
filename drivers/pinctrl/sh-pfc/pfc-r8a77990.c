@@ -2821,6 +2821,20 @@ static const unsigned int tpu0_to1_pins[] = {
 static const unsigned int tpu0_to1_mux[] = {
 	TPU0TO1_MARK,
 };
+static const unsigned int tpu0_to2_pins[] = {
+	/* TPU0TO2 */
+	RCAR_GP_PIN(6, 15),
+};
+static const unsigned int tpu0_to2_mux[] = {
+	TPU0TO2_MARK,
+};
+static const unsigned int tpu0_to3_pins[] = {
+	/* TPU0TO3 */
+	RCAR_GP_PIN(6, 16),
+};
+static const unsigned int tpu0_to3_mux[] = {
+	TPU0TO3_MARK,
+};
 
 /* - SCIF0 ------------------------------------------------------------------ */
 static const unsigned int scif0_data_a_pins[] = {
@@ -3774,7 +3788,7 @@ static const unsigned int vin5_clk_b_mux[] = {
 };
 
 static const struct {
-	struct sh_pfc_pin_group common[249];
+	struct sh_pfc_pin_group common[251];
 	struct sh_pfc_pin_group automotive[21];
 } pinmux_groups = {
 	.common = {
@@ -3922,6 +3936,8 @@ static const struct {
 		SH_PFC_PIN_GROUP(pwm6_b),
 		SH_PFC_PIN_GROUP(tpu0_to0),
 		SH_PFC_PIN_GROUP(tpu0_to1),
+		SH_PFC_PIN_GROUP(tpu0_to2),
+		SH_PFC_PIN_GROUP(tpu0_to3),
 		SH_PFC_PIN_GROUP(scif0_data_a),
 		SH_PFC_PIN_GROUP(scif0_clk_a),
 		SH_PFC_PIN_GROUP(scif0_ctrl_a),
@@ -4324,6 +4340,8 @@ static const char * const pwm6_groups[] = {
 static const char * const tpu0_groups[] = {
 	"tpu0_to0",
 	"tpu0_to1",
+	"tpu0_to2",
+	"tpu0_to3",
 };
 
 static const char * const scif0_groups[] = {
