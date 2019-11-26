@@ -560,7 +560,7 @@
 &usbotg {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usbotg>;
-	dr_mode = "host";
+	dr_mode = "otg";
 	otg_id_pin_select_change;
 	vbus-supply = <&reg_otgvbus>;
 	status = "okay";
