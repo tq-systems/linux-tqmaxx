@@ -126,7 +126,7 @@
 		reg = <0x51>;
 		/* TODO: wakeup / alarm not implemented yet */
 		/* TODO: capacity and offset prop needed for improved accuracy */
-		quartz-load-femtofarads = "12500";
+		quartz-load-femtofarads = <12500>;
 		status = "okay";
 	};
 
