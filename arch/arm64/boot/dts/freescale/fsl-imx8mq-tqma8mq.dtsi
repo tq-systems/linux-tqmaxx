@@ -292,13 +292,14 @@
 		status = "okay";
 	};
 
-	rtc1: pcf85063@51 {
+	rtc1: rtc@51 {
 		compatible = "nxp,pcf85063";
 		reg = <0x51>;
 		/* TODO: wakeup / alarm not implemented yet */
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_rtc>;
-		/* TODO: capacity and offset prop needed for improved accuracy */
+		/* TODO: offset prop needed for improved accuracy */
+		quartz-load-femtofarads = <7000>;
 		status = "okay";
 	};
 
