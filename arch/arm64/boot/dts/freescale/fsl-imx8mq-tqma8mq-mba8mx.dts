@@ -308,6 +308,13 @@
 		status = "okay";
 	};
 
+	usbhub0: usbhub@44 {
+		compatible = "ti,tusb8041", "ti,tusb80xx";
+		reg = <0x44>;
+		reset-gpios = <&expander0 13 GPIO_ACTIVE_LOW>;
+		status = "okay";
+	};
+
 	eeprom3: 24c02@57 {
 		compatible = "atmel,24c02";
 		reg = <0x57>;
