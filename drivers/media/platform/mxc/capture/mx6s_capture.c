@@ -1129,6 +1129,7 @@ clean_up:
 static void mx6s_stop_streaming(struct vb2_queue *vq)
 {
 	struct mx6s_csi_dev *csi_dev = vb2_get_drv_priv(vq);
+	struct v4l2_subdev *sd = csi_dev->sd;
 	unsigned long flags;
 	struct mx6s_buffer *buf, *tmp;
 	void *b;
@@ -1163,6 +1164,8 @@ static void mx6s_stop_streaming(struct vb2_queue *vq)
 	dma_free_coherent(csi_dev->v4l2_dev.dev,
 				csi_dev->discard_size, b,
 				csi_dev->discard_buffer_dma);
+
+	v4l2_subdev_call(sd, video, s_stream, 0);
 }
 
 static struct vb2_ops mx6s_videobuf_ops = {
@@ -1431,7 +1434,6 @@ static int mx6s_csi_close(struct file *file)
 	rc = _vb2_fop_release(file, NULL);
 
 	if (do_release) {
-		v4l2_subdev_call(sd, video, s_stream, 0);
 		vb2_queue_release(&csi_dev->vb2_vidq);
 		mx6s_csi_deinit(csi_dev);
 		v4l2_subdev_call(sd, core, s_power, 0);
@@ -1714,34 +1716,17 @@ static int mx6s_vidioc_streamon(struct file *file, void *priv,
 			       enum v4l2_buf_type i)
 {
 	struct mx6s_csi_dev *csi_dev = video_drvdata(file);
-	struct v4l2_subdev *sd = csi_dev->sd;
-	int ret;
 
 	if (i != V4L2_BUF_TYPE_VIDEO_CAPTURE)
 		return -EINVAL;
 
-	ret = v4l2_subdev_call(sd, video, s_stream, 1);
-	if (ret < 0)
-		goto out;
-
-	ret = vb2_streamon(&csi_dev->vb2_vidq, i);
-	if (ret < 0) {
-		v4l2_subdev_call(sd, video, s_stream, 0);
-		goto out;
-	}
-
-	ret = 0;
-
-out:
-	return ret;
+	return vb2_streamon(&csi_dev->vb2_vidq, i);
 }
 
 static int mx6s_vidioc_streamoff(struct file *file, void *priv,
 				enum v4l2_buf_type i)
 {
 	struct mx6s_csi_dev *csi_dev = video_drvdata(file);
-	struct v4l2_subdev *sd = csi_dev->sd;
-	int rc;
 
 	if (i != V4L2_BUF_TYPE_VIDEO_CAPTURE)
 		return -EINVAL;
@@ -1750,16 +1735,7 @@ static int mx6s_vidioc_streamoff(struct file *file, void *priv,
 	 * This calls buf_release from host driver's videobuf_queue_ops for all
 	 * remaining buffers. When the last buffer is freed, stop capture
 	 */
-	rc = vb2_streamoff(&csi_dev->vb2_vidq, i);
-	if (rc < 0)
-		goto out;
-
-	v4l2_subdev_call(sd, video, s_stream, 0);
-
-	rc = 0;
-
-out:
-	return rc;
+	return vb2_streamoff(&csi_dev->vb2_vidq, i);
 }
 
 static int mx6s_vidioc_g_pixelaspect(struct file *file, void *fh,
