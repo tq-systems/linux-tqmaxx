@@ -1,0 +1,17 @@
+TI USB 3.0 Hub Controller
+
+The device node for the configuration of a TI TUSB80xx USB 3.0
+Controller.
+
+Required properties :
+ - compatible : Should be "ti,tusb80xx" or one of the specific types:
+	"ti,tusb8020b", "ti,tusb8041", "ti,tusb8042", "ti,tusb8043"
+ - reset-gpios : Should specify the gpio for hub reset
+ - reg : I2C address on the selected bus (default is <0x44>)
+
+Examples:
+	tusb80xx@84 {
+		compatible = "ti,tusb80xx";
+		reg = <0x44>;
+		reset-gpios = <&gpio1 4 GPIO_ACTIVE_LOW>;
+	};
