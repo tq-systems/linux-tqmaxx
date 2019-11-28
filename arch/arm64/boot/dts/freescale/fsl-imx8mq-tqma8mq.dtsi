@@ -293,12 +293,14 @@
 	};
 
 	rtc1: rtc@51 {
-		compatible = "nxp,pcf85063";
+		compatible = "nxp,pcf85063a";
 		reg = <0x51>;
 		/* TODO: wakeup / alarm not implemented yet */
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_rtc>;
-		/* TODO: offset prop needed for improved accuracy */
+		interrupt-names = "irq";
+		interrupt-parent = <&gpio1>;
+		interrupts = <1 IRQ_TYPE_EDGE_FALLING>;
 		quartz-load-femtofarads = <7000>;
 		status = "okay";
 	};
