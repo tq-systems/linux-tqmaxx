@@ -1353,21 +1353,7 @@ static irqreturn_t mx6s_csi_irq_handler(int irq, void *data)
 static int _mx6s_csi_open_init(struct mx6s_csi_dev *csi_dev)
 {
 	struct v4l2_subdev *sd = csi_dev->sd;
-	struct vb2_queue *q = &csi_dev->vb2_vidq;
 	int ret;
-
-	q->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-	q->io_modes = VB2_MMAP | VB2_USERPTR;
-	q->drv_priv = csi_dev;
-	q->ops = &mx6s_videobuf_ops;
-	q->mem_ops = &vb2_dma_contig_memops;
-	q->buf_struct_size = sizeof(struct mx6s_buffer);
-	q->timestamp_flags = V4L2_BUF_FLAG_TIMESTAMP_MONOTONIC;
-	q->lock = &csi_dev->lock;
-
-	ret = vb2_queue_init(q);
-	if (ret < 0)
-		goto out;
 
 	pm_runtime_get_sync(csi_dev->dev);
 
@@ -1376,7 +1362,6 @@ static int _mx6s_csi_open_init(struct mx6s_csi_dev *csi_dev)
 	ret = v4l2_subdev_call(sd, core, s_power, 1);
 	if (ret < 0 && ret != -ENOIOCTLCMD) {
 		v4l2_err(sd, "failed to power on device: %d\n", ret);
-		vb2_queue_release(&csi_dev->vb2_vidq);
 		pm_runtime_put(csi_dev->dev);
 		goto out;
 	}
@@ -1434,7 +1419,6 @@ static int mx6s_csi_close(struct file *file)
 	rc = _vb2_fop_release(file, NULL);
 
 	if (do_release) {
-		vb2_queue_release(&csi_dev->vb2_vidq);
 		mx6s_csi_deinit(csi_dev);
 		v4l2_subdev_call(sd, core, s_power, 0);
 		release_bus_freq(BUS_FREQ_HIGH);
@@ -2040,6 +2024,7 @@ static int mx6s_csi_probe(struct platform_device *pdev)
 	struct mx6s_csi_dev *csi_dev;
 	struct video_device *vdev;
 	struct resource *res;
+	struct vb2_queue *q;
 	int ret = 0;
 
 	dev_info(dev, "initialising\n");
@@ -2135,6 +2120,20 @@ static int mx6s_csi_probe(struct platform_device *pdev)
 
 	video_set_drvdata(csi_dev->vdev, csi_dev);
 	mutex_lock(&csi_dev->lock);
+
+	q = &csi_dev->vb2_vidq;
+	q->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+	q->io_modes = VB2_MMAP | VB2_USERPTR;
+	q->drv_priv = csi_dev;
+	q->ops = &mx6s_videobuf_ops;
+	q->mem_ops = &vb2_dma_contig_memops;
+	q->buf_struct_size = sizeof(struct mx6s_buffer);
+	q->timestamp_flags = V4L2_BUF_FLAG_TIMESTAMP_MONOTONIC;
+	q->lock = &csi_dev->lock;
+
+	ret = vb2_queue_init(q);
+	if (ret < 0)
+		goto err_vdev;
 
 	ret = video_register_device(csi_dev->vdev, VFL_TYPE_GRABBER, -1);
 	if (ret < 0) {
