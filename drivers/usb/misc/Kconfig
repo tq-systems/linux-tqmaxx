@@ -232,6 +232,16 @@ config USB_HUB_USB251XB
 	  parameters may be set in devicetree or platform data.
 	  Say Y or M here if you need to configure such a device via SMBus.
 
+config USB_HUB_TUSB80XX
+	tristate "TUSB80XX Hub Controller Configuration Driver"
+	depends on I2C
+	help
+	  This option enables support for TI TUSB80xx series of
+	  USB 3.0 Hub Controller series.
+	  Configuration parameters may be set via devicetree.
+	  SMBus / I2C support currently not implemented
+	  Say Y or M here if you need to configure such a device.
+
 config USB_HSIC_USB3503
        tristate "USB3503 HSIC to USB20 Driver"
        depends on I2C
