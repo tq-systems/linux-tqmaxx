@@ -1512,14 +1512,6 @@ static int mx6s_vidioc_g_std(struct file *file, void *priv, v4l2_std_id *a)
 	return v4l2_subdev_call(sd, video, g_std, a);
 }
 
-static int mx6s_vidioc_reqbufs(struct file *file, void *priv,
-			      struct v4l2_requestbuffers *p)
-{
-	struct mx6s_csi_dev *csi_dev = video_drvdata(file);
-
-	return vb2_reqbufs(&csi_dev->vb2_vidq, p);
-}
-
 static int mx6s_vidioc_querybuf(struct file *file, void *priv,
 			       struct v4l2_buffer *p)
 {
@@ -1535,22 +1527,6 @@ static int mx6s_vidioc_querybuf(struct file *file, void *priv,
 			p->m.offset = vb2_dma_contig_plane_dma_addr(vb, 0);
 	}
 	return ret;
-}
-
-static int mx6s_vidioc_qbuf(struct file *file, void *priv,
-			   struct v4l2_buffer *p)
-{
-	struct mx6s_csi_dev *csi_dev = video_drvdata(file);
-
-	return vb2_qbuf(&csi_dev->vb2_vidq, NULL, p);
-}
-
-static int mx6s_vidioc_dqbuf(struct file *file, void *priv,
-			    struct v4l2_buffer *p)
-{
-	struct mx6s_csi_dev *csi_dev = video_drvdata(file);
-
-	return vb2_dqbuf(&csi_dev->vb2_vidq, p, file->f_flags & O_NONBLOCK);
 }
 
 static int mx6s_vidioc_enum_fmt_vid_cap(struct file *file, void  *priv,
@@ -1868,10 +1844,11 @@ static const struct v4l2_ioctl_ops mx6s_csi_ioctl_ops = {
 	.vidioc_g_pixelaspect     = mx6s_vidioc_g_pixelaspect,
 	.vidioc_s_selection   = mx6s_vidioc_s_selection,
 	.vidioc_g_selection   = mx6s_vidioc_g_selection,
-	.vidioc_reqbufs       = mx6s_vidioc_reqbufs,
+	.vidioc_reqbufs       = vb2_ioctl_reqbufs,
+	.vidioc_create_bufs   = vb2_ioctl_create_bufs,
+	.vidioc_qbuf          = vb2_ioctl_qbuf,
+	.vidioc_dqbuf         = vb2_ioctl_dqbuf,
 	.vidioc_querybuf      = mx6s_vidioc_querybuf,
-	.vidioc_qbuf          = mx6s_vidioc_qbuf,
-	.vidioc_dqbuf         = mx6s_vidioc_dqbuf,
 	.vidioc_g_std         = mx6s_vidioc_g_std,
 	.vidioc_s_std         = mx6s_vidioc_s_std,
 	.vidioc_querystd      = mx6s_vidioc_querystd,
