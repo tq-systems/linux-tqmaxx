@@ -1374,6 +1374,7 @@ static int _mx6s_csi_open_init(struct mx6s_csi_dev *csi_dev)
 	if (ret < 0 && ret != -ENOIOCTLCMD) {
 		v4l2_err(sd, "failed to power on device: %d\n", ret);
 		vb2_queue_release(&csi_dev->vb2_vidq);
+		pm_runtime_put(csi_dev->dev);
 		goto out;
 	}
 
