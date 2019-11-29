@@ -22,7 +22,7 @@
 	};
 
 	sensor0: lm75@48 {
-		compatible = "lm75";
+		compatible = "national,lm75";
 		reg = <0x48>;
 	};
 
