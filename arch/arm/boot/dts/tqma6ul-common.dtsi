@@ -150,7 +150,7 @@
 	};
 
 	rtc1: ds1339@68 {
-		compatible = "ds1339";
+		compatible = "dallas,ds1339";
 		reg = <0x68>;
 		status = "okay";
 	};
