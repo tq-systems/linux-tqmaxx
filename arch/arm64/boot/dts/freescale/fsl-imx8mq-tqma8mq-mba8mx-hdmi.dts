@@ -48,6 +48,15 @@
 	disp-dev = "hdmi_disp";
 };
 
+&expander0 {
+	hdmi_term {
+		gpio-hog;
+		gpios = <9 0>;
+		output-high;
+		line-name = "EN_HDMI_TERM";
+	};
+};
+
 &hdmi {
 	status = "okay";
 };
