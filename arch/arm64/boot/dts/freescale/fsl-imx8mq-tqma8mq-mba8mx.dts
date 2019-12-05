@@ -43,6 +43,29 @@
 		id-gpio = <&gpio1 10 GPIO_ACTIVE_HIGH>;
 	};
 
+	gpio-keys {
+		compatible = "gpio-keys";
+		autorepeat;
+
+		switch1 {
+			label = "switch1";
+			linux,code = <BTN_0>;
+			gpios = <&gpio1 5 GPIO_ACTIVE_LOW>;
+		};
+
+		switch2 {
+			label = "switch2";
+			linux,code = <BTN_1>;
+			gpios = <&gpio3 17 GPIO_ACTIVE_LOW>;
+		};
+
+		switch3 {
+			label = "switch3";
+			linux,code = <BTN_2>;
+			gpios = <&gpio1 7 GPIO_ACTIVE_LOW>;
+		};
+	};
+
 	reg_otg_vbus: mba8x_otg_vbus {
 		compatible = "regulator-fixed";
 		pinctrl-names = "default";
@@ -174,6 +197,14 @@
 		>;
 	};
 
+	pinctrl_gpiobutton: gpiobuttongrp {
+		fsl,pins = <
+			MX8MQ_IOMUXC_GPIO1_IO05_GPIO1_IO5		0x41
+			MX8MQ_IOMUXC_GPIO1_IO07_GPIO1_IO7		0x41
+			MX8MQ_IOMUXC_NAND_WE_B_GPIO3_IO17		0x41
+		>;
+	};
+
 	pinctrl_i2c2: i2c2grp {
 		fsl,pins = <
 			MX8MQ_IOMUXC_I2C2_SCL_I2C2_SCL			0x40000067
@@ -223,7 +254,7 @@
 	pinctrl_usbcon0: usb0congrp {
 		fsl,pins = <
 			/* ID: floating / high: device, low: host -> use PU */
-			MX8MQ_IOMUXC_GPIO1_IO10_GPIO1_IO10		0x46
+			MX8MQ_IOMUXC_GPIO1_IO10_GPIO1_IO10		0xe6
 		>;
 	};
 #if 0
