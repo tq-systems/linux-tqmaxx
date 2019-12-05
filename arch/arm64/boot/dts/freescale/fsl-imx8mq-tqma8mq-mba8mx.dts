@@ -36,6 +36,24 @@
 		stdout-path = &uart1;
 	};
 
+	extcon_usb0: extcon_usb0 {
+		compatible = "linux,extcon-usb-gpio";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_usbcon0>;
+		id-gpio = <&gpio1 10 GPIO_ACTIVE_HIGH>;
+	};
+
+	reg_otg_vbus: mba8x_otg_vbus {
+		compatible = "regulator-fixed";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_regotgvbus>;
+		regulator-name = "MBA8MQ_OTG_VBUS";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		gpio = <&gpio1 12 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+	};
+
 	reg_vcc_3v3: mba8x_vcc_3v3 {
 		compatible = "regulator-fixed";
 		regulator-name = "MBA8MQ_3V3";
@@ -176,6 +194,13 @@
 		>;
 	};
 
+	pinctrl_regotgvbus: reggotgvbusgrp {
+		fsl,pins = <
+			/* USB1 OTG PWR as GPIO */
+			MX8MQ_IOMUXC_GPIO1_IO12_GPIO1_IO12		0x06
+		>;
+	};
+
 	pinctrl_sai3: sai3grp {
 		fsl,pins = <
 			MX8MQ_IOMUXC_SAI3_MCLK_SAI3_MCLK	0xd6
@@ -195,15 +220,20 @@
 		>;
 	};
 
-	pinctrl_usb0: usb0grp {
+	pinctrl_usbcon0: usb0congrp {
 		fsl,pins = <
-			MX8MQ_IOMUXC_GPIO1_IO10_USB1_OTG_ID		0x41
-			MX8MQ_IOMUXC_GPIO1_IO12_USB1_OTG_PWR		0x41
-/* TODO: OC detection not functional in dwc3, pin mux will lead to non functional USB */
-/*			MX8MQ_IOMUXC_GPIO1_IO13_USB1_OTG_OC		0x41 */
+			/* ID: floating / high: device, low: host -> use PU */
+			MX8MQ_IOMUXC_GPIO1_IO10_GPIO1_IO10		0x46
 		>;
 	};
-
+#if 0
+	pinctrl_usb0: usb0grp {
+		fsl,pins = <
+/* TODO: OC detection not functional in dwc3, pin mux will lead to non functional USB */
+/*			MX8MQ_IOMUXC_GPIO1_IO13_USB1_OTG_OC		0x01 */
+		>;
+	};
+#endif
 	pinctrl_usdhc2_gpio: usdhc2grpgpio {
 		fsl,pins = <
 			MX8MQ_IOMUXC_SD2_CD_B_GPIO2_IO12	0x41
@@ -395,17 +425,17 @@
 
 /* TODO: not working */
 &usb3_phy0 {
+	vbus-supply = <&reg_otg_vbus>;
 	status = "okay";
 };
 
 &usb3_0 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_usb0>;
 	status = "okay";
 };
 
 &usb_dwc3_0 {
 	status = "okay";
+	extcon = <&extcon_usb0>;
 	dr_mode = "otg";
 };
 
