@@ -249,6 +249,12 @@
 		>;
 	};
 
+	pinctrl_pwm3: pwm3grp {
+		fsl,pins = <
+			MX8MQ_IOMUXC_GPIO1_IO14_PWM3_OUT		0x16
+		>;
+	};
+
 	pinctrl_pwm4: pwm4grp {
 		fsl,pins = <
 			MX8MQ_IOMUXC_GPIO1_IO15_PWM4_OUT		0x16
@@ -439,6 +445,12 @@
 	reset-gpio = <&expander2 14 GPIO_ACTIVE_LOW>;
 	ext_osc = <1>;
 	epdev_on-supply = <&reg_vcc_3v3>;
+	status = "okay";
+};
+
+&pwm3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm3>;
 	status = "okay";
 };
 
