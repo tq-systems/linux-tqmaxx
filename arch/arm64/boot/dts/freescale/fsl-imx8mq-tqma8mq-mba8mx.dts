@@ -106,6 +106,16 @@
 		regulator-max-microvolt = <3300000>;
 	};
 
+	reg_sn65dsi83_1v8: sn65dsi83_1v8 {
+		compatible = "regulator-fixed";
+		regulator-name = "SN65DSI83_1V8";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		gpio = <&expander0 5 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		status = "okay";
+	};
+
 	reg_usdhc2_vmmc: usdhc2_vmmc {
 		compatible = "regulator-fixed";
 		regulator-name = "VSD_3V3";
@@ -445,6 +455,7 @@
 		compatible = "ti,sn65dsi83";
 		reg = <0x2d>;
 		enable-gpio = <&expander0 6 GPIO_ACTIVE_HIGH>;
+		vcc1v8-supply = <&reg_sn65dsi83_1v8>;
 		status = "disabled";
 	};
 };
