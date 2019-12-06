@@ -503,6 +503,10 @@
 	};
 };
 
+&lcdif {
+	status = "disabled";
+};
+
 &pcie0{
 	ext_osc = <1>;
 	hard-wired = <1>;

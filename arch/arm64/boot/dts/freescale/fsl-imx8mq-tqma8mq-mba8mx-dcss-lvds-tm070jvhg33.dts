@@ -85,10 +85,6 @@
 	status = "okay";
 };
 
-&lcdif {
-	status = "disabled";
-};
-
 &mipi_dsi {
 	status = "okay";
 
