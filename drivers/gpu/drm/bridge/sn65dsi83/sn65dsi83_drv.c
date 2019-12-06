@@ -10,6 +10,7 @@
 #include <linux/of_device.h>
 #include <linux/of_graph.h>
 #include <linux/slab.h>
+#include <linux/regulator/consumer.h>
 
 #include <drm/drmP.h>
 #include <drm/drm_atomic.h>
@@ -36,6 +37,7 @@ struct sn65dsi83 {
 	struct mipi_dsi_device *dsi;
 	struct sn65dsi83_brg *brg;
 	struct drm_panel *panel;
+	struct regulator *vcc1v8;
 };
 
 static int sn65dsi83_attach_dsi(struct sn65dsi83 *sn65dsi83);
@@ -354,6 +356,16 @@ static int sn65dsi83_parse_dt(struct device_node *np,
 
 	DRM_INFO("gpio_enable: %s\n", (sn65dsi83->brg->gpio_enable == NULL) ? "NO" : "YES");
 
+	sn65dsi83->vcc1v8 = devm_regulator_get_optional(dev, "vcc1v8");
+	if (IS_ERR(sn65dsi83->vcc1v8)) {
+		int ret = PTR_ERR(sn65dsi83->vcc1v8);
+
+		if (ret == -EPROBE_DEFER)
+			return -EPROBE_DEFER;
+		sn65dsi83->vcc1v8 = NULL;
+		DRM_INFO("No vcc1v8 regulator found: %d\n", ret);
+	}
+
 	of_node_put(sn65dsi83->host_node);
 
 	return 0;
@@ -386,6 +398,14 @@ static int sn65dsi83_probe(struct i2c_client *i2c,
 	if (ret)
 		return ret;
 
+	if (sn65dsi83->vcc1v8) {
+		ret = regulator_enable(sn65dsi83->vcc1v8);
+		if (ret) {
+			dev_err(dev, "Failed to enable vcc1v8\n");
+			return -ENODEV;
+		}
+	}
+
 	sn65dsi83->brg->funcs->power_off(sn65dsi83->brg);
 	sn65dsi83->brg->funcs->power_on(sn65dsi83->brg);
 	ret  = sn65dsi83->brg->funcs->reset(sn65dsi83->brg);
@@ -394,7 +414,6 @@ static int sn65dsi83_probe(struct i2c_client *i2c,
 		return -ENODEV;
 	}
 	sn65dsi83->brg->funcs->power_off(sn65dsi83->brg);
-
 
 	sn65dsi83->bridge.funcs = &sn65dsi83_bridge_funcs;
 	sn65dsi83->bridge.of_node = dev->of_node;
@@ -463,6 +482,9 @@ static int sn65dsi83_remove(struct i2c_client *i2c)
 
 	sn65dsi83_detach_dsi(sn65dsi83);
 	drm_bridge_remove(&sn65dsi83->bridge);
+
+	if (sn65dsi83->vcc1v8)
+		regulator_disable(sn65dsi83->vcc1v8);
 
 	return 0;
 }
