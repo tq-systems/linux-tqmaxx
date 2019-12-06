@@ -1,0 +1,22 @@
+* Freescale / NXP USB Phy Device for DWC3 USB
+
+Required properties:
+- compatible: should contain:
+	* "fsl,imx8mq-usb-phy" for imx8mq and imx8mql
+- reg: Should contain registers location and length
+- #phy-cells: should contain <1>
+- clocks: phandle to root clock
+- clock-names: should be usb_phy_root_clk
+
+Optional properties:
+- vbus-supply: phandle to VBUS regulator that is switched by phy set mode call
+
+Example:
+usb3_phy0: phy@381f0040 {
+	compatible = "fsl,imx8mq-usb-phy";
+	#phy-cells = <1>;
+	reg = <0x0 0x381f0040 0x0 0x40>;
+	clocks = <&clk IMX8MQ_CLK_USB1_PHY_ROOT>;
+	clock-names = "usb_phy_root_clk";
+	vbus-supply = <&reg_otg_vbus>;
+};
