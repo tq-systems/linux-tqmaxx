@@ -12,24 +12,8 @@
  * GNU General Public License for more details.
  */
 
-#include "fsl-imx8mq-tqma8mq-mba8mx-dcss-lvds-tm070jvhg33.dts"
+#include "fsl-imx8mq-tqma8mq-mba8mx-dcss-lvds-g150xne-l01.dts"
 
-&ecspi2 {
-	status = "disabled";
-};
-
-&iomuxc {
-	imx8mq-mba8mx {
-		pinctrl_sn65dsi84: sn65dsi84grp {
-			fsl,pins = <
-				MX8MQ_IOMUXC_ECSPI2_SS0_GPIO5_IO13	0x16
-			>;
-		};
-	};
-};
-
-&dsi_lvds_bridge {
-	enable-gpios = <&gpio5 13 GPIO_ACTIVE_HIGH>;
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_sn65dsi84>;
+&panel0 {
+		compatible = "innolux,g150xne-l01-6bpc";
 };

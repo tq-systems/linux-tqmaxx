@@ -23,8 +23,6 @@
 	ti,lvds-bpp = <24>;
 	ti,width-mm = <150>;
 	ti,height-mm = <94>;
-	/* TODO: needed for enable since lacking regulator support */
-	enable-gpios = <&expander2 2 GPIO_ACTIVE_HIGH>;
 	status = "okay";
 
 	display-timings {
