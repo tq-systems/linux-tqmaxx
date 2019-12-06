@@ -28,10 +28,6 @@
 	status = "disabled";
 };
 
-&ecspi2 {
-	status = "disabled";
-};
-
 &hdmi {
 	status = "disabled";
 };

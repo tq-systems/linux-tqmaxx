@@ -58,10 +58,6 @@
 	};
 };
 
-&ecspi2 {
-	status = "disabled";
-};
-
 /* input port of HDMI, linked to dcss in CPU tree */
 /delete-node/ &hdmi_disp;
 /* output port of DCSS, need to overwrite */
