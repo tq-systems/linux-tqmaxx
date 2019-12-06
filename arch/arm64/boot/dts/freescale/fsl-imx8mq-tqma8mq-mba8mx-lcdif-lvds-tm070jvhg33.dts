@@ -18,17 +18,9 @@
 	display-subsystem {
 		status = "disabled";
 	};
-
-	sound-hdmi {
-		status = "disabled";
-	};
 };
 
 &dcss {
-	status = "disabled";
-};
-
-&hdmi {
 	status = "disabled";
 };
 

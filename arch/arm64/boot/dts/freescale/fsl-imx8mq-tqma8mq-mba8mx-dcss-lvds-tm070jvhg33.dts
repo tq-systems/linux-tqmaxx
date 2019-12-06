@@ -18,10 +18,6 @@
 	display-subsystem {
 		status = "okay";
 	};
-
-	sound-hdmi {
-		status = "disabled";
-	};
 };
 
 &dcss {
@@ -62,10 +58,6 @@
 /delete-node/ &hdmi_disp;
 /* output port of DCSS, need to overwrite */
 /delete-node/ &dcss_disp0_hdmi;
-
-&hdmi {
-	status = "disabled";
-};
 
 &dsi_lvds_bridge {
 	ti,dsi-lanes = <4>;

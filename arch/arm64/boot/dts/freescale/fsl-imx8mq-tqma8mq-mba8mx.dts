@@ -160,6 +160,10 @@
 		ssi-controller = <&sai3>;
 		audio-codec = <&codec>;
 	};
+
+	sound-hdmi {
+		status = "disabled";
+	};
 };
 
 &clk {
@@ -220,6 +224,10 @@
 			ti,led-cfg2 = <0x1010>; /* active low, LED0/2 driven by phy */
 		};
 	};
+};
+
+&hdmi {
+	status = "disabled";
 };
 
 &iomuxc {
