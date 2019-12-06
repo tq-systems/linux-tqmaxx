@@ -20,6 +20,10 @@
 	};
 };
 
+&backlight_lvds0 {
+	status = "okay";
+};
+
 &dcss {
 	status = "okay";
 	disp-dev = "mipi_disp";
@@ -123,3 +127,4 @@
 	compatible = "tianma,tm070jvhg33";
 	status = "okay";
 };
+

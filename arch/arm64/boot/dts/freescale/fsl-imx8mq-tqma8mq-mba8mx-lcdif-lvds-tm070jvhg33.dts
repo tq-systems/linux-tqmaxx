@@ -20,6 +20,10 @@
 	};
 };
 
+&backlight_lvds0 {
+	status = "okay";
+};
+
 &dcss {
 	status = "disabled";
 };
