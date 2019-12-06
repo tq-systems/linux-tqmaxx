@@ -405,6 +405,20 @@
 		gpio-controller;
 		#gpio-cells = <2>;
 		vcc-supply = <&reg_vcc_3v3>;
+
+		sd-mux-oe {
+			gpio-hog;
+			gpios = <8 0>;
+			output-low;
+			line-name = "SD_MUX_EN#";
+		};
+
+		boot-cfg-oe {
+			gpio-hog;
+			gpios = <12 0>;
+			output-high;
+			line-name = "BOOT_CFG_OE#";
+		};
 	};
 
 	expander1: gpio@24 {
