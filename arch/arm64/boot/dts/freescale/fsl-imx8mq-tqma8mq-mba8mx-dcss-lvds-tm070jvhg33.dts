@@ -15,16 +15,6 @@
 #include "fsl-imx8mq-tqma8mq-mba8mx.dts"
 
 / {
-	backlight_lvds0: backlight-lvds0 {
-		compatible = "pwm-backlight";
-		/* TODO: not enable yet */
-		pwms = <&pwm4 0 5000000>;
-		brightness-levels = <0 4 8 16 32 64 128 255>;
-		default-brightness-level = <7>;
-		power-supply = <&reg_mba8mq_12v>;
-		status = "disabled";
-	};
-
 	/* TODO: use pwm backlight */
 	backlight_gpio0: backlight-gpio0 {
 		compatible = "gpio-backlight";

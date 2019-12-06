@@ -23,6 +23,16 @@
 	model = "TQ Systems GmbH i.MX8MQ TQMa8MQ on MBa8MX";
 	compatible = "tq,imx8mq-tqma8mq-mba8mx", "tq,imx8mq-tqma8mq", "fsl,imx8mq";
 
+	backlight_lvds0: backlight0 {
+		compatible = "pwm-backlight";
+		pwms = <&pwm3 0 5000000>;
+		brightness-levels = <0 4 8 16 32 64 128 255>;
+		default-brightness-level = <7>;
+		power-supply = <&reg_mba8mq_12v>;
+		enable-gpios = <&expander2 2 GPIO_ACTIVE_HIGH>;
+		status = "disabled";
+	};
+
 	beeper {
 		compatible = "pwm-beeper";
 		pwms = <&pwm4 0 250000 0>;
