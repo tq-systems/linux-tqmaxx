@@ -113,6 +113,15 @@
 		regulator-max-microvolt = <3300000>;
 	};
 
+	reg_mba8mq_12v: mba8mq_12v {
+		compatible = "regulator-fixed";
+		regulator-name = "MBA8MQ_12V";
+		regulator-min-microvolt = <12000000>;
+		regulator-max-microvolt = <12000000>;
+		regulator-always-on;
+		status = "okay";
+	};
+
 	sound {
 		compatible = "fsl,imx-audio-tlv320aic32x4";
 		model = "imx8mq-mba8mx-tlv320aic32";
