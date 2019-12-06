@@ -523,7 +523,7 @@
 
 &pcie0{
 	ext_osc = <1>;
-	hard-wired = <1>;
+	reset-gpio = <&expander0 14 GPIO_ACTIVE_LOW>;
 	epdev_on-supply = <&reg_vcc_3v3>;
 	status = "okay";
 };
