@@ -83,16 +83,6 @@
 	status = "disabled";
 };
 
-&iomuxc {
-	imx8mq-mba8mx {
-		pinctrl_gpiobl: gpioblgrp {
-			fsl,pins = <
-				MX8MQ_IOMUXC_ECSPI2_MISO_GPIO5_IO12	0x16
-			>;
-		};
-	};
-};
-
 &dsi_lvds_bridge {
 	ti,dsi-lanes = <4>;
 	ti,lvds-format = <1>;

@@ -15,16 +15,6 @@
 #include "fsl-imx8mq-tqma8mq-mba8mx.dts"
 
 / {
-	/* TODO: use pwm backlight */
-	backlight_gpio0: backlight-gpio0 {
-		compatible = "gpio-backlight";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_gpiobl>;
-		gpios = <&gpio5 12 GPIO_ACTIVE_HIGH>;
-		default-on;
-		status = "okay";
-	};
-
 	display-subsystem {
 		status = "disabled";
 	};
@@ -36,8 +26,7 @@
 	panel-lvds0 {
 		compatible = "tianma,tm070jvhg33";
 		enable-gpios = <&expander2 2 GPIO_ACTIVE_HIGH>;
-/*		backlight = <&backlight_lvds0>; */
-		backlight = <&backlight_gpio0>;
+		backlight = <&backlight_lvds0>;
 		power-supply = <&reg_mba8mq_12v>;
 		status = "okay";
 
@@ -59,16 +48,6 @@
 
 &hdmi {
 	status = "disabled";
-};
-
-&iomuxc {
-	imx8mq-mba8mx {
-		pinctrl_gpiobl: gpioblgrp {
-			fsl,pins = <
-				MX8MQ_IOMUXC_ECSPI2_MISO_GPIO5_IO12	0x16
-			>;
-		};
-	};
 };
 
 &dsi_lvds_bridge {
