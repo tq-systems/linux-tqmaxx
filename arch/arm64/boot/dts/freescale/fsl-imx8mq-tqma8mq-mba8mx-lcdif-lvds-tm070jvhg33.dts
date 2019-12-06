@@ -43,6 +43,15 @@
 	};
 };
 
+&expander0 {
+	dsi-mux-oe {
+		gpio-hog;
+		gpios = <10 0>;
+		output-low;
+		line-name = "DSI_MUX_OE#";
+	};
+};
+
 &irqsteer_dcss {
 	status = "disabled";
 };
