@@ -14,9 +14,7 @@
 
 #include "fsl-imx8mq-tqma8mq-mba8mx-lcdif-lvds-tm070jvhg33.dts"
 
-/ {
-	/delete-node/ panel-lvds0;
-};
+/delete-node/ &panel0;
 
 &dsi_lvds_bridge {
 	ti,lvds-format = <1>;

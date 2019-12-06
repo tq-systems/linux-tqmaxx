@@ -22,19 +22,6 @@
 	sound-hdmi {
 		status = "disabled";
 	};
-
-	panel0: panel_lvds0 {
-		compatible = "tianma,tm070jvhg33";
-		backlight = <&backlight_lvds0>;
-		power-supply = <&reg_mba8mq_12v>;
-		status = "okay";
-
-		port {
-			panel_in_lvds0: endpoint {
-				remote-endpoint = <&lvds_bridge_out>;
-			};
-		};
-	};
 };
 
 &dcss {
@@ -103,14 +90,6 @@
 				remote-endpoint = <&mipi_dsi_bridge_out>;
 			};
 		};
-
-		port@1 {
-			reg = <1>;
-
-			lvds_bridge_out: endpoint {
-				remote-endpoint = <&panel_in_lvds0>;
-			};
-		};
 	};
 };
 
@@ -144,5 +123,10 @@
 };
 
 &mipi_dsi_phy {
+	status = "okay";
+};
+
+&panel0 {
+	compatible = "tianma,tm070jvhg33";
 	status = "okay";
 };
