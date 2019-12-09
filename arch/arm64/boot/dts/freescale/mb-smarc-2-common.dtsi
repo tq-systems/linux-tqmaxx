@@ -73,6 +73,14 @@
 	};
 };
 
+&flexcan2 {
+	xceiver-supply = <&reg_3v3>;
+};
+
+&flexcan3 {
+	xceiver-supply = <&reg_3v3>;
+};
+
 &i2c1 {
 	codec: tlv320aic32x4@18 {
 		compatible = "ti,tlv320aic32x4";
