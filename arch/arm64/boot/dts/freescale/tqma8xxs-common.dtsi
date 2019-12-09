@@ -145,6 +145,19 @@
 	};
 };
 
+/* CPU device tree mixes up counting from 0 and counting from 1 */
+&flexcan2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_can1>;
+	status = "okay";
+};
+
+&flexcan3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_can2>;
+	status = "okay";
+};
+
 &iomuxc {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_hog>;
@@ -187,6 +200,20 @@
 				SC_P_ESAI0_TX1_CONN_ENET1_RGMII_RXD3		0x06000048
 
 				SC_P_CSI_RESET_LSIO_GPIO3_IO03			0x06000048
+			>;
+		};
+
+		pinctrl_can1: can1grp {
+			fsl,pins = <
+				SC_P_UART2_RX_ADMA_FLEXCAN1_RX	0x00000020
+				SC_P_UART2_TX_ADMA_FLEXCAN1_TX	0x00000020
+			>;
+		};
+
+		pinctrl_can2: can2grp {
+			fsl,pins = <
+				SC_P_FLEXCAN2_TX_ADMA_FLEXCAN2_TX	0x00000020
+				SC_P_FLEXCAN2_RX_ADMA_FLEXCAN2_RX	0x00000020
 			>;
 		};
 
