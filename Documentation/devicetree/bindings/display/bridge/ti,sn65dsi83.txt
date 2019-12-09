@@ -1,0 +1,58 @@
+SN65DSI83 DSI to LVDS bridge chip
+---------------------------------
+
+This is the binding for Texas Instruments SN65DSI83 bridge.
+http://www.ti.com/general/docs/lit/getliterature.tsp?genericPartNumber=sn65dsi83&fileType=pdf
+
+Required properties:
+- compatible: Must be "ti,sn65dsi83"
+- reg: i2c address of the chip, 0x2d as per datasheet
+
+Optional properties:
+- vcc1v8-supply: A 1.8V supply that powers up the chip.
+- enable-gpios: gpio specification for bridge_en pin (active high)
+
+Required nodes:
+This device has two video ports. Their connections are modelled using the
+OF graph bindings specified in Documentation/devicetree/bindings/graph.txt.
+
+- Video port 0 for DSI input
+- Video port 1 for LVDS output
+
+Example
+-------
+
+lvds-bridge@2d {
+	compatible = "ti,sn65dsi83";
+	reg = <0x2d>;
+
+	enable-gpios = <&gpio3 31 GPIO_ACTIVE_HIGH>;
+
+	vcc1v8-supply = <&pm8916_l6>;
+
+	clock-names = "refclk";
+	clocks = <&input_refclk>;
+
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port@0 {
+			reg = <0>;
+
+			edp_bridge_in: endpoint {
+				remote-endpoint = <&dsi_out>;
+			};
+		};
+
+		port@1 {
+			reg = <1>;
+
+			edp_bridge_out: endpoint {
+				data-lanes = <2 1 3 0>;
+				lane-polarities = <0 1 0 1>;
+				remote-endpoint = <&edp_panel_in>;
+			};
+		};
+	};
+}
