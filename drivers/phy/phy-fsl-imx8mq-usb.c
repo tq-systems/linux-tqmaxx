@@ -12,6 +12,7 @@
 #include <linux/platform_device.h>
 #include <linux/phy/phy.h>
 #include <linux/io.h>
+#include <linux/regulator/consumer.h>
 
 #define PHY_CTRL0			0x0
 #define PHY_CTRL0_REF_SSP_EN		BIT(2)
@@ -31,6 +32,7 @@
 struct imx8mq_usb_phy {
 	struct phy *phy;
 	struct clk *clk;
+	struct regulator *vbus;
 	void __iomem *base;
 };
 
@@ -50,9 +52,35 @@ static int imx8mq_phy_exit(struct phy *_phy)
 	return 0;
 }
 
+static int imx8mq_phy_set_mode(struct phy *_phy, enum phy_mode mode)
+{
+	struct imx8mq_usb_phy *phy = phy_get_drvdata(_phy);
+
+	if (IS_ERR(phy->vbus))
+		return 0;
+
+	switch (mode) {
+	case PHY_MODE_USB_DEVICE:
+		pr_info("%s - %d\n", __func__, mode);
+		if (phy->vbus)
+			regulator_disable(phy->vbus);
+		break;
+	case PHY_MODE_USB_HOST:
+		pr_info("%s - %d\n", __func__, mode);
+		if (phy->vbus)
+			regulator_enable(phy->vbus);
+		break;
+	default:
+		pr_info("%s - unknown %d\n", __func__, mode);
+	}
+
+	return 0;
+}
+
 static struct phy_ops imx8mq_usb_phy_ops = {
 	.init		= imx8mq_phy_start,
 	.exit		= imx8mq_phy_exit,
+	.set_mode	= imx8mq_phy_set_mode,
 	.owner		= THIS_MODULE,
 };
 
@@ -102,6 +130,16 @@ static int imx8mq_usb_phy_probe(struct platform_device *pdev)
 	imx_phy->base = devm_ioremap_resource(dev, res);
 	if (IS_ERR(imx_phy->base))
 		return PTR_ERR(imx_phy->base);
+
+	imx_phy->vbus = devm_regulator_get_optional(dev, "vbus");
+	if (IS_ERR(imx_phy->vbus)) {
+		int ret = PTR_ERR(imx_phy->vbus);
+
+		if (ret == -EPROBE_DEFER)
+			return -EPROBE_DEFER;
+		imx_phy->vbus = NULL;
+		dev_dbg(&pdev->dev, "No vbus regulator found: %d\n", ret);
+	}
 
 	imx_phy->phy = devm_phy_create(dev, NULL, &imx8mq_usb_phy_ops);
 	if (IS_ERR(imx_phy->phy))
