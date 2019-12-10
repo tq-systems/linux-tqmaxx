@@ -73,6 +73,15 @@
 	};
 };
 
+&reg_panel_vdd {
+	regulator-name = "3V3_PANEL";
+	regulator-min-microvolt = <3300000>;
+	regulator-max-microvolt = <3300000>;
+	startup-delay-us = <70000>;
+	enable-active-high;
+	status = "okay";
+};
+
 &flexcan2 {
 	xceiver-supply = <&reg_3v3>;
 };

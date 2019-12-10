@@ -29,6 +29,14 @@
 		regulator-always-on;
 	};
 
+	reg_panel_vdd: panel_vdd {
+		compatible = "regulator-fixed";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_panel_vdd>;
+		gpios = <&gpio1 3 GPIO_ACTIVE_HIGH>;
+		status = "disabled";
+	};
+
 	memory@80000000 {
 		device_type = "memory";
 		/* DRAM base addr, size : 512 MiB DRAM - corrected by bootloader */
@@ -159,6 +167,12 @@
 &iomuxc {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_hog>;
+
+	pinctrl_panel_vdd: panel_vdd {
+		fsl,pins = <
+			SC_P_SPI2_SCK_LSIO_GPIO1_IO03	0x00000021
+		>;
+	};
 
 	pinctrl_fec1: fec1grp {
 		fsl,pins = <
