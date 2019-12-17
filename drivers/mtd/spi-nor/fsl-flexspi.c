@@ -1087,6 +1087,10 @@ static int fsl_flexspi_nor_setup(struct fsl_flexspi *flex)
 	/* Disable the module */
 	writel(FLEXSPI_MCR0_MDIS_MASK, base + FLEXSPI_MCR0);
 
+	/* Reset the DLL register to default value */
+	writel(FLEXSPI_DLLACR_OVRDEN_MASK, flex->iobase + FLEXSPI_DLLACR);
+	writel(FLEXSPI_DLLBCR_OVRDEN_MASK, flex->iobase + FLEXSPI_DLLBCR);
+
 	/* enable module */
 	writel(FLEXSPI_MCR0_AHB_TIMEOUT_MASK | FLEXSPI_MCR0_IP_TIMEOUT_MASK |
 	       FLEXSPI_MCR0_OCTCOMB_EN_MASK, base + FLEXSPI_MCR0);
