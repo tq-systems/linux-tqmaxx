@@ -17,6 +17,32 @@
 	compatible = ",tq,tqma8qm", "fsl,imx8qm";
 };
 
+&flexspi0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_flexspi0>;
+	status = "okay";
+
+	flash0: flash@0 {
+		reg = <0>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "spi-flash";
+		spi-max-frequency = <66000000>;
+		spi-nor,ddr-quad-read-dummy = <8>;
+	};
+};
+
+&gpio2 {
+	status = "okay";
+};
+
+&gpio4 {
+	status = "okay";
+};
+
+&gpio5 {
+	status = "okay";
+};
 
 &i2c1 {
 	#address-cells = <1>;
@@ -24,8 +50,41 @@
 	clock-frequency = <100000>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpi2c1>;
-	status = "disabled";
+	status = "okay";
 
+	/*
+	 * NXP SE97BTP with temperature sensor + eeprom
+	 * ATTENTION: do not use correct dt compatible since this will conflict
+	 * with hwmon sysfs ABI and break device registration
+	 */
+	sensor0: jc42@1b {
+		compatible = "nxp,se97", "jedec,jc-42.4-temp";
+		reg = <0x1b>;
+		status = "okay";
+	};
+
+	rtc1: pcf85063@51 {
+		compatible = "nxp,pcf85063";
+		reg = <0x51>;
+		/* TODO: wakeup / alarm not implemented yet */
+		/* TODO: capacity and offset prop needed for improved accuracy */
+		quartz-load-femtofarads = <12500>;
+		status = "okay";
+	};
+
+	eeprom1: 24c02@53 {
+		compatible = "atmel,24c02";
+		reg = <0x53>;
+		pagesize = <16>;
+		status = "okay";
+	};
+
+	eeprom0: m24c64@57 {
+		compatible = "st,24c64", "atmel,24c64", "at24";
+		reg = <0x57>;
+		pagesize = <32>;
+		status = "okay";
+	};
 };
 
 &iomuxc {
@@ -111,61 +170,6 @@
 	};
 };
 
-&gpio2 {
-	status = "okay";
-};
-
-&gpio4 {
-	status = "okay";
-};
-
-&gpio5 {
-	status = "okay";
-};
-
-&i2c1 {
-	#address-cells = <1>;
-	#size-cells = <0>;
-	clock-frequency = <100000>;
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_lpi2c1>;
-	status = "okay";
-
-	/*
-	 * NXP SE97BTP with temperature sensor + eeprom
-	 * ATTENTION: do not use correct dt compatible since this will conflict
-	 * with hwmon sysfs ABI and break device registration
-	 */
-	sensor0: jc42@1b {
-		compatible = "nxp,se97", "jedec,jc-42.4-temp";
-		reg = <0x1b>;
-		status = "okay";
-	};
-
-	rtc1: pcf85063@51 {
-		compatible = "nxp,pcf85063";
-		reg = <0x51>;
-		/* TODO: wakeup / alarm not implemented yet */
-		/* TODO: capacity and offset prop needed for improved accuracy */
-		quartz-load-femtofarads = <12500>;
-		status = "okay";
-	};
-
-	eeprom1: 24c02@53 {
-		compatible = "atmel,24c02";
-		reg = <0x53>;
-		pagesize = <16>;
-		status = "okay";
-	};
-
-	eeprom0: m24c64@57 {
-		compatible = "st,24c64", "atmel,24c64", "at24";
-		reg = <0x57>;
-		pagesize = <32>;
-		status = "okay";
-	};
-};
-
 &usdhc1 {
 	pinctrl-names = "default", "state_100mhz", "state_200mhz";
 	pinctrl-0 = <&pinctrl_usdhc1>;
@@ -174,19 +178,4 @@
 	bus-width = <8>;
 	non-removable;
 	status = "okay";
-};
-
-&flexspi0 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_flexspi0>;
-	status = "okay";
-
-	flash0: flash@0 {
-		reg = <0>;
-		#address-cells = <1>;
-		#size-cells = <1>;
-		compatible = "spi-flash";
-		spi-max-frequency = <66000000>;
-		spi-nor,ddr-quad-read-dummy = <8>;
-	};
 };
