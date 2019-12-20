@@ -37,16 +37,21 @@ static const struct snd_soc_dapm_widget imx_tlv320aic_dapm_widgets[] = {
 };
 
 static const struct snd_soc_dapm_route imx_tlv320aic_dapm_routes[] = {
-/*	{"Mic Bias", NULL, "Mic Jack"}, */
-
 	{"IN1_R", NULL, "Line In Jack"},
 	{"IN1_L", NULL, "Line In Jack"},
 
+	/* the mic in has to be supplied -> see
+	 * arch/arm/boot/dts/imx6q-novena.dts
+	 * or (but this should be wrong)
+	 * snd_soc_dapm_force_enable_pin(&rtd->card->dapm, "Mic Bias");
+	 * routing as done in sound/soc/fsl/mx27vis-aic32x4.c
+	 * will cause warning for supplying a non supply widget
+	 * see also: https://elinux.org/images/c/c1/Dapm_clausen.pdf
+	 * for broken MICBIAS widget
+	 */
 	{"IN3_L", NULL, "Mic Jack"},
-/*
-	{"IN3_L", NULL, "Mic Bias"},
-	{"Mic Bias", NULL, "Mic Jack"},
-*/
+	{"Mic Jack", NULL, "Mic Bias"},
+
 	{"Headphone Jack", NULL, "HPL"},
 	{"Headphone Jack", NULL, "HPR"},
 	{"Line In Jack", NULL, "LOL"},
