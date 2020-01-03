@@ -2,7 +2,7 @@
 /*
  * Device Tree file for NXP LS1028A RDB Board.
  *
- * Copyright 2018-2019 NXP
+ * Copyright 2018-2020 NXP
  *
  * Harninder Rai <harninder.rai@nxp.com>
  *
@@ -155,6 +155,19 @@
 				reg = <0x51>;
 			};
 		};
+	};
+};
+
+&dspi2 {
+	bus-num = <2>;
+	status = "okay";
+
+	mikrobus@0 {
+		compatible = "semtech,sx1301";
+		reg = <0>;
+		spi-max-frequency = <2000000>;
+		fsl,spi-cs-sck-delay = <1000000>;
+		fsl,spi-sck-cs-delay = <50>;
 	};
 };
 
