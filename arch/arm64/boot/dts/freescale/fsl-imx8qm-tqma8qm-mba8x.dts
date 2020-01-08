@@ -101,6 +101,15 @@
 	};
 };
 
+&gpio2 {
+	usb-rst {
+		gpio-hog;
+		gpios = <7 0>;
+		output-high;
+		line-name = "USB_RST#";
+	};
+};
+
 &i2c1 {
 	sensor1: jc42@1c {
 		compatible = "nxp,se97", "jedec,jc-42.4-temp";
@@ -117,6 +126,9 @@
 };
 
 &iomuxc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_hog>;
+
 	pinctrl_fec1: fec1grp {
 		fsl,pins = <
 			SC_P_ESAI1_SCKR_LSIO_GPIO2_IO06			0x000014a0
@@ -158,6 +170,12 @@
 			SC_P_ENET1_RGMII_RXD2_CONN_ENET1_RGMII_RXD2	0x00000060
 			SC_P_ENET1_RGMII_RXD3_CONN_ENET1_RGMII_RXD3	0x00000060
 /*			SC_P_ENET1_REFCLK_125M_25M			0x00000060 */
+		>;
+	};
+
+	pinctrl_hog: hoggrp {
+		fsl,pins = <
+			SC_P_ESAI1_SCKT_LSIO_GPIO2_IO07		0x00000021
 		>;
 	};
 
@@ -342,8 +360,9 @@
 	srp-disable;
 	hnp-disable;
 	adp-disable;
+	dr_mode = "host";
 	disable-over-current;
-	status = "disabled";
+	status = "okay";
 };
 
 &usdhc2 {
