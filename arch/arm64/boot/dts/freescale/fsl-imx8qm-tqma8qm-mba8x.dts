@@ -356,6 +356,11 @@
 	status = "okay";
 };
 
+/* HSIC not used on MBa8x */
+&usbmisc2 {
+	status = "disabled";
+};
+
 &usbotg1 {
 	srp-disable;
 	hnp-disable;
@@ -363,6 +368,10 @@
 	dr_mode = "host";
 	disable-over-current;
 	status = "okay";
+};
+
+&usbphynop2 {
+	status = "disabled";
 };
 
 &usdhc2 {
