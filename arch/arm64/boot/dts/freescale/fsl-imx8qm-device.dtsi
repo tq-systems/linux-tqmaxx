@@ -1015,10 +1015,30 @@
 				#power-domain-cells = <0>;
 				power-domains = <&pd_dma>;
 			};
+			pd_dma0_chan2: PD_LPSPI1_RX {
+				reg = <SC_R_DMA_0_CH2>;
+				power-domains =<&pd_dma>;
+				#power-domain-cells = <0>;
+			};
+			pd_dma0_chan3: PD_LPSPI1_TX {
+				reg = <SC_R_DMA_0_CH3>;
+				power-domains =<&pd_dma>;
+				#power-domain-cells = <0>;
+			};
 			pd_dma_lpspi2: PD_DMA_SPI_2 {
 				reg = <SC_R_SPI_2>;
 				#power-domain-cells = <0>;
 				power-domains = <&pd_dma>;
+			};
+			pd_dma0_chan4: PD_LPSPI2_RX {
+				reg = <SC_R_DMA_0_CH4>;
+				power-domains =<&pd_dma>;
+				#power-domain-cells = <0>;
+			};
+			pd_dma0_chan5: PD_LPSPI2_TX {
+				reg = <SC_R_DMA_0_CH5>;
+				power-domains =<&pd_dma>;
+				#power-domain-cells = <0>;			
 			};
 			pd_dma_lpspi3: PD_DMA_SPI_3 {
 				reg = <SC_R_SPI_3>;
@@ -2887,6 +2907,38 @@
 		status = "disabled";
 	};
 
+	lpspi1: lpspi@5a010000 {
+		compatible = "fsl,imx7ulp-spi";
+		reg = <0x0 0x5a010000 0x0 0x10000>;
+		interrupts = <GIC_SPI 217 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-parent = <&gic>;
+		clocks = <&clk IMX8QM_SPI1_CLK>,
+			 <&clk IMX8QM_SPI1_IPG_CLK>;
+		clock-names = "per", "ipg";
+		assigned-clocks = <&clk IMX8QM_SPI1_CLK>;
+		assigned-clock-rates = <20000000>;
+		power-domains = <&pd_dma_lpspi1>;
+		dma-names = "tx","rx";
+		dmas = <&edma0 3 0 0>, <&edma0 2 0 1>;
+		status = "disabled";
+	};
+
+	lpspi2: lpspi@5a020000 {
+		compatible = "fsl,imx7ulp-spi";
+		reg = <0x0 0x5a020000 0x0 0x10000>;
+		interrupts = <GIC_SPI 218 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-parent = <&gic>;
+		clocks = <&clk IMX8QM_SPI2_CLK>,
+			 <&clk IMX8QM_SPI2_IPG_CLK>;
+		clock-names = "per", "ipg";
+		assigned-clocks = <&clk IMX8QM_SPI2_CLK>;
+		assigned-clock-rates = <20000000>;
+		power-domains = <&pd_dma_lpspi2>;
+		dma-names = "tx","rx";
+		dmas = <&edma0 5 0 0>, <&edma0 4 0 1>;
+		status = "disabled";
+	};
+
 	lpspi3: lpspi@5a030000 {
 		compatible = "fsl,imx7ulp-spi";
 		reg = <0x0 0x5a030000 0x0 0x10000>;
@@ -3036,6 +3088,10 @@
 		compatible = "fsl,imx8qm-edma";
 		reg = <0x0 0x5a200000 0x0 0x10000>, /* channel0 LPSPI0 rx */
 		      <0x0 0x5a210000 0x0 0x10000>, /* channel1 LPSPI0 tx */
+		      <0x0 0x5a220000 0x0 0x10000>, /* channel2 LPSPI1 rx */
+		      <0x0 0x5a230000 0x0 0x10000>, /* channel3 LPSPI1 tx */
+		      <0x0 0x5a240000 0x0 0x10000>, /* channel4 LPSPI2 rx */
+		      <0x0 0x5a250000 0x0 0x10000>, /* channel5 LPSPI2 tx */
 		      <0x0 0x5a260000 0x0 0x10000>, /* channel6 LPSPI3 rx */
 		      <0x0 0x5a270000 0x0 0x10000>, /* channel7 LPSPI3 tx */
 		      <0x0 0x5a2c0000 0x0 0x10000>, /* channel12 UART0 rx */
@@ -3049,9 +3105,13 @@
 		      <0x0 0x5a340000 0x0 0x10000>, /* channel20 UART4 rx */
 		      <0x0 0x5a350000 0x0 0x10000>; /* channel21 UART4 tx */
 		#dma-cells = <3>;
-		dma-channels = <14>;
+		dma-channels = <18>;
 		interrupts = <GIC_SPI 416 IRQ_TYPE_LEVEL_HIGH>,
 			     <GIC_SPI 417 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 418 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 419 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 420 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 421 IRQ_TYPE_LEVEL_HIGH>,
 			     <GIC_SPI 422 IRQ_TYPE_LEVEL_HIGH>,
 			     <GIC_SPI 423 IRQ_TYPE_LEVEL_HIGH>,
 			     <GIC_SPI 434 IRQ_TYPE_LEVEL_HIGH>,
@@ -3065,6 +3125,8 @@
 			     <GIC_SPI 442 IRQ_TYPE_LEVEL_HIGH>,
 			     <GIC_SPI 443 IRQ_TYPE_LEVEL_HIGH>;
 		interrupt-names = "edma0-chan0-rx", "edma0-chan1-tx",
+				  "edma0-chan2-rx", "edma0-chan3-tx",
+				  "edma0-chan4-rx", "edma0-chan5-tx",
 				  "edma0-chan6-rx", "edma0-chan7-tx",
 				  "edma0-chan12-rx", "edma0-chan13-tx",
 				  "edma0-chan14-rx", "edma0-chan15-tx",
@@ -3072,6 +3134,8 @@
 				  "edma0-chan18-rx", "edma0-chan19-tx",
 				  "edma0-chan20-rx", "edma0-chan21-tx";
 		pdomains = <&pd_dma0_chan0>, <&pd_dma0_chan1>, /* lpspi0 */
+			   <&pd_dma0_chan2>, <&pd_dma0_chan3>, /* lpspi1 */
+			   <&pd_dma0_chan4>, <&pd_dma0_chan5>, /* lpspi2 */
 			   <&pd_dma0_chan6>, <&pd_dma0_chan7>, /* lpspi3 */
 			   <&pd_dma0_chan12>, <&pd_dma0_chan13>, /* lpuart0 */
 			   <&pd_dma0_chan14>, <&pd_dma0_chan15>, /* lpuart1 */
