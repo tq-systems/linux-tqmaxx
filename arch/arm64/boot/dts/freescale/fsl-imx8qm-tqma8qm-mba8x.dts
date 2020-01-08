@@ -233,6 +233,13 @@
 		>;
 	};
 
+	pinctrl_usb2: usb2grp {
+		fsl,pins = <
+			SC_P_USB_SS3_TC1_CONN_USB_OTG2_PWR	0x00000021
+			SC_P_USB_SS3_TC3_CONN_USB_OTG2_OC	0x00000021
+		>;
+	};
+
 	pinctrl_usdhc2_gpio: usdhc2grpgpio {
 		fsl,pins = <
 			SC_P_USDHC1_DATA6_LSIO_GPIO5_IO21	0x00000021
@@ -367,6 +374,13 @@
 	adp-disable;
 	dr_mode = "host";
 	disable-over-current;
+	status = "okay";
+};
+
+&usbotg3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usb2>;
+	dr_mode = "otg";
 	status = "okay";
 };
 
