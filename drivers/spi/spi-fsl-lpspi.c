@@ -838,6 +838,7 @@ static int fsl_lpspi_probe(struct platform_device *pdev)
 	struct resource *res;
 	int i, ret, irq;
 	u32 temp;
+	u32 num_cs;
 
 	if (of_property_read_bool((&pdev->dev)->of_node, "spi-slave"))
 		controller = spi_alloc_slave(&pdev->dev,
@@ -859,6 +860,14 @@ static int fsl_lpspi_probe(struct platform_device *pdev)
 	dev_set_drvdata(&pdev->dev, fsl_lpspi);
 	fsl_lpspi->is_slave = of_property_read_bool((&pdev->dev)->of_node,
 						    "spi-slave");
+
+	/*TODO: in later versions num-cs should be used instead of fsl,spi... */
+	ret = of_property_read_u32(np, "fsl,spi-num-chipselects",
+				&num_cs);
+	if (ret)
+		dev_dbg(fsl_lpspi->dev, "No 'fsl,spi-num-chipselects' property\n");
+	else
+		controller->num_chipselect = num_cs;
 
 	if (!fsl_lpspi->is_slave) {
 		for (i = 0; i < controller->num_chipselect; i++) {
