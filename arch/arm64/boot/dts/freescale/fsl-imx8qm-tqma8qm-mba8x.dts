@@ -132,6 +132,18 @@
 		output-high;
 		line-name = "USB_RST#";
 	};
+
+	/*
+	 * force PD# input of PCIe clock generator high
+	 * TODO: should better be used as gpio driven clock gate
+	 * has to chaeck against SCU firmware if possible.
+	 */
+	pcie-clk-pd {
+		gpio-hog;
+		gpios = <10 0>;
+		output-high;
+		line-name = "PCIE_CLK_PD#";
+	};
 };
 
 &i2c1 {
@@ -200,6 +212,8 @@
 	pinctrl_hog: hoggrp {
 		fsl,pins = <
 			SC_P_ESAI1_SCKT_LSIO_GPIO2_IO07		0x00000021
+			/* PCIE_CLK_PD# */
+			SC_P_ESAI1_TX2_RX3_LSIO_GPIO2_IO10	0x00000021
 		>;
 	};
 
