@@ -36,6 +36,18 @@
 		regulator-always-on;
 	};
 
+	reg_v1v5_pcie: v1v5_pcie {
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_reg_pcie_v1v5>;
+		compatible = "regulator-fixed";
+		regulator-name = "V1V5_PCIE";
+		regulator-min-microvolt = <1500000>;
+		regulator-max-microvolt = <1500000>;
+		vin-supply = <&reg_mba8x_v3v3>;
+		enable-active-high;
+		gpio = <&gpio0 31 0>;
+	};
+
 	reg_v3v3_pcie: v3v3_pcie {
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_reg_pcie_v3v3>;
@@ -242,6 +254,12 @@
 			SC_P_UART0_TX_DMA_UART0_TX		0x06000020
 			SC_P_UART0_CTS_B_DMA_UART0_CTS_B	0x00000021
 			SC_P_UART0_RTS_B_DMA_UART0_RTS_B	0x00000021
+		>;
+	};
+
+	pinctrl_reg_pcie_v1v5: regpcie1v5grp {
+		fsl,pins = <
+			SC_P_SCU_GPIO0_03_LSIO_GPIO0_IO31	0x00000021
 		>;
 	};
 
