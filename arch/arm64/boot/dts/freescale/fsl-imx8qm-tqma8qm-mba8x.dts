@@ -217,6 +217,16 @@
 		>;
 	};
 
+	pinctrl_pciea: pcieagrp {
+		fsl,pins = <
+			 /* PCIE_DISABLE */
+			SC_P_ESAI1_FST_LSIO_GPIO2_IO05			0x00000021
+			SC_P_PCIE_CTRL0_PERST_B_LSIO_GPIO4_IO29		0x06000021
+			SC_P_PCIE_CTRL0_CLKREQ_B_LSIO_GPIO4_IO27	0x06000021
+			SC_P_PCIE_CTRL0_WAKE_B_LSIO_GPIO4_IO28		0x04000021
+		>;
+	};
+
 	pinctrl_lpspi0: lpspi0grp {
 		fsl,pins = <
 			SC_P_SPI0_SCK_DMA_SPI0_SCK	0x0600004c
@@ -410,6 +420,19 @@
 &lpuart0 { /* console */
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpuart0>;
+	status = "okay";
+};
+
+&pciea {
+	ext_osc = <1>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pciea>;
+	disable-gpio = <&gpio2 5 GPIO_ACTIVE_LOW>;
+	reset-gpio = <&gpio4 29 GPIO_ACTIVE_LOW>;
+/* TODO: optional, currently without functionality */
+/*	clkreq-gpio = <&gpio4 27 GPIO_ACTIVE_LOW>; */
+	epdev_on-supply = <&reg_v3v3_pcie>;
+	vpcie-supply = <&reg_v1v5_pcie>;
 	status = "okay";
 };
 
