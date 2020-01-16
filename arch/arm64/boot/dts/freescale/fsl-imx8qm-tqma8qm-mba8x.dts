@@ -59,6 +59,17 @@
 		enable-active-high;
 		gpio = <&gpio1 1 0>;
 	};
+
+	reg_mba8x_12v: mba8x_12v {
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_reg_mba8x_12v>;
+		compatible = "regulator-fixed";
+		regulator-name = "MBa8x-V12";
+		regulator-min-microvolt = <12000000>;
+		regulator-max-microvolt = <12000000>;
+		enable-active-high;
+		gpio = <&gpio1 2 0>;
+	};
 };
 
 &flexcan1 {
@@ -326,6 +337,12 @@
 	pinctrl_reg_pcie_v3v3: regpcie3v3grp {
 		fsl,pins = <
 			SC_P_SCU_GPIO0_05_LSIO_GPIO1_IO01	0x00000021
+		>;
+	};
+
+	pinctrl_reg_mba8x_12v: mba12vgrp {
+		fsl,pins = <
+			SC_P_SCU_GPIO0_06_LSIO_GPIO1_IO02	0x00000021
 		>;
 	};
 
