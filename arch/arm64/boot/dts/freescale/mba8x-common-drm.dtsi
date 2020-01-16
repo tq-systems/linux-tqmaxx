@@ -1,0 +1,161 @@
+/*
+ * Copyright 2018-2019 TQ Systems GmbH
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+&dpr1_channel1 {
+	status = "okay";
+};
+
+&dpr1_channel2 {
+	status = "okay";
+};
+
+&dpr1_channel3 {
+	status = "okay";
+};
+
+&dpr2_channel1 {
+	status = "okay";
+};
+
+&dpr2_channel2 {
+	status = "okay";
+};
+
+&dpr2_channel3 {
+	status = "okay";
+};
+
+&dpr3_channel1 {
+	status = "okay";
+};
+
+&dpr3_channel2 {
+	status = "okay";
+};
+
+&dpr3_channel3 {
+	status = "okay";
+};
+
+&dpr4_channel1 {
+	status = "okay";
+};
+
+&dpr4_channel2 {
+	status = "okay";
+};
+
+&dpr4_channel3 {
+	status = "okay";
+};
+
+&dpu1 {
+	status = "okay";
+};
+
+&dpu2 {
+	status = "okay";
+};
+
+&gpu_3d0 {
+	status = "okay";
+};
+
+&gpu_3d1 {
+	status = "okay";
+};
+
+&imx8_gpu_ss {
+	status = "okay";
+};
+
+&pixel_combiner1 {
+	status = "okay";
+};
+
+&pixel_combiner2 {
+	status = "okay";
+};
+
+&prg1 {
+	status = "okay";
+};
+
+&prg2 {
+	status = "okay";
+};
+
+&prg3 {
+	status = "okay";
+};
+
+&prg4 {
+	status = "okay";
+};
+
+&prg5 {
+	status = "okay";
+};
+
+&prg6 {
+	status = "okay";
+};
+
+&prg7 {
+	status = "okay";
+};
+
+&prg8 {
+	status = "okay";
+};
+
+&prg9 {
+	status = "okay";
+};
+
+&prg10 {
+	status = "okay";
+};
+
+&prg11 {
+	status = "okay";
+};
+
+&prg12 {
+	status = "okay";
+};
+
+&prg13 {
+	status = "okay";
+};
+
+&prg14 {
+	status = "okay";
+};
+
+&prg15 {
+	status = "okay";
+};
+
+&prg16 {
+	status = "okay";
+};
+
+&prg17 {
+	status = "okay";
+};
+
+&prg18 {
+	status = "okay";
+};
