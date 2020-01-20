@@ -70,6 +70,24 @@
 		enable-active-high;
 		gpio = <&gpio1 2 0>;
 	};
+
+	leds {
+		compatible = "gpio-leds";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpioled>;
+
+		user-led0 {
+			label = "USER_LED0";
+			gpios = <&gpio5 20 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "heartbeat";
+		};
+		
+		user-led1 {
+			label = "USER_LED1";
+			gpios = <&gpio5 19 GPIO_ACTIVE_HIGH>;
+			default-state = "on";
+		};
+	};
 };
 
 &flexcan1 {
@@ -263,6 +281,13 @@
 		fsl,pins = <
 			SC_P_FLEXCAN1_TX_DMA_FLEXCAN1_TX        0x21
 			SC_P_FLEXCAN1_RX_DMA_FLEXCAN1_RX        0x21
+		>;
+	};
+
+	pinctrl_gpioled: gpioledgrp {
+		fsl,pins = <
+			SC_P_USDHC1_DATA4_LSIO_GPIO5_IO19		0x00000021
+			SC_P_USDHC1_DATA5_LSIO_GPIO5_IO20		0x00000021
 		>;
 	};
 
