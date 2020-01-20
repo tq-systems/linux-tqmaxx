@@ -45,7 +45,7 @@
 		regulator-max-microvolt = <1500000>;
 		vin-supply = <&reg_mba8x_v3v3>;
 		enable-active-high;
-		gpio = <&gpio0 31 0>;
+		gpio = <&gpio0 31 GPIO_ACTIVE_HIGH>;
 	};
 
 	reg_v3v3_pcie: v3v3_pcie {
@@ -57,7 +57,7 @@
 		regulator-max-microvolt = <3300000>;
 		vin-supply = <&reg_mba8x_v3v3>;
 		enable-active-high;
-		gpio = <&gpio1 1 0>;
+		gpio = <&gpio1 1 GPIO_ACTIVE_HIGH>;
 	};
 
 	reg_mba8x_12v: mba8x_12v {
@@ -68,7 +68,7 @@
 		regulator-min-microvolt = <12000000>;
 		regulator-max-microvolt = <12000000>;
 		enable-active-high;
-		gpio = <&gpio1 2 0>;
+		gpio = <&gpio1 2 GPIO_ACTIVE_HIGH>;
 	};
 
 	keys {
