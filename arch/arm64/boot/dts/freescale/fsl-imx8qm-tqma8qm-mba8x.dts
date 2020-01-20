@@ -71,6 +71,27 @@
 		gpio = <&gpio1 2 0>;
 	};
 
+	keys {
+		compatible = "gpio-keys";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpiokeys>;
+		autorepeat;
+
+		switch1 {
+			label = "SWITCH_A";
+			linux,code = <BTN_0>;
+			gpios = <&gpio2 11 GPIO_ACTIVE_LOW>;
+			wakeup-source;
+		};
+
+		switch2 {
+			label = "SWITCH_B";
+			linux,code = <BTN_1>;
+			gpios = <&gpio1 0 GPIO_ACTIVE_LOW>;
+			wakeup-source;
+		};
+	};
+
 	leds {
 		compatible = "gpio-leds";
 		pinctrl-names = "default";
@@ -168,7 +189,17 @@
 	};
 };
 
+&gpio1 {
+	/* enable wakeup for gpio-key for gpio1 line 0 (SWITCH_B)*/
+	pad-wakeup-num = <1>;
+	pad-wakeup = <SC_P_SCU_GPIO0_04 4 0>;
+};
+
 &gpio2 {
+	/* enable wakeup for gpio-key for gpio2 line 11 (SWITCH_A)*/
+	pad-wakeup-num = <1>;
+	pad-wakeup = <SC_P_ESAI1_TX3_RX2 4 11>;
+	
 	usb-rst {
 		gpio-hog;
 		gpios = <7 0>;
@@ -281,6 +312,13 @@
 		fsl,pins = <
 			SC_P_FLEXCAN1_TX_DMA_FLEXCAN1_TX        0x21
 			SC_P_FLEXCAN1_RX_DMA_FLEXCAN1_RX        0x21
+		>;
+	};
+
+	pinctrl_gpiokeys: gpiokeys {
+		fsl,pins = <
+			SC_P_ESAI1_TX3_RX2_LSIO_GPIO2_IO11		0x00000021
+			SC_P_SCU_GPIO0_04_LSIO_GPIO1_IO00		0x00000021
 		>;
 	};
 
