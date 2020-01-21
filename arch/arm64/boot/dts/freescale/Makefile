@@ -59,7 +59,8 @@ dtb-$(CONFIG_ARCH_FSL_IMX8QM) += fsl-imx8qm-lpddr4-arm2.dtb \
 				 fsl-imx8qm-lpddr4-arm2-dp-dig-pll.dtb \
 				 fsl-imx8qm-tqma8qm-mba8x.dtb \
 				 fsl-imx8qm-tqma8qm-mba8x-lvds0-tm070jvhg33.dtb \
-				 fsl-imx8qm-tqma8qm-mba8x-lvds1-tm070jvhg33.dtb
+				 fsl-imx8qm-tqma8qm-mba8x-lvds1-tm070jvhg33.dtb \
+				 fsl-imx8qm-tqma8qm-mba8x-dp.dtb
 dtb-$(CONFIG_ARCH_FSL_IMX8QXP) += fsl-imx8qxp-lpddr4-arm2.dtb \
 				  fsl-imx8qxp-mek.dtb \
 				  fsl-imx8qxp-mek-rpmsg.dtb \
