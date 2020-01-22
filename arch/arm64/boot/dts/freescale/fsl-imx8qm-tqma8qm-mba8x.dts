@@ -563,6 +563,10 @@
 	status = "okay";
 };
 
+&sata {
+	status = "okay";
+};
+
 /* HSIC not used on MBa8x */
 &usbmisc2 {
 	status = "disabled";
