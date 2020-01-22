@@ -47,6 +47,14 @@
 		dmas = <&edma0 5 0 0>, <&edma0 4 0 1>;
 		status = "disabled";
 	};
+
+	reg_v1v8_io_filter: v1v8_io_filter {
+		compatible = "regulator-fixed";
+		regulator-name = "V_1V8_IO2_FILTER";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		regulator-always-on;
+	};
 };
 
 &flexspi0 {
