@@ -109,6 +109,20 @@
 			default-state = "on";
 		};
 	};
+
+	iio-hwmon {
+		compatible = "iio-hwmon";
+		io-channels = <&adc0 0>, <&adc0 1>, <&adc0 2>;
+		io-channel-names = "MIKROBUS_AN", "PINH_ADC_IN1", "PINH_ADC_IN2";
+	};
+};
+
+&adc0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_adc0>;
+	vref-supply = <&reg_v1v8_io_filter>;
+	#io-channel-cells = <1>;
+	status = "okay";
 };
 
 &flexcan1 {
@@ -238,6 +252,14 @@
 &iomuxc {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_hog>;
+
+	pinctrl_adc0: adc0grp {
+		fsl,pins = <
+			SC_P_ADC_IN0_DMA_ADC0_IN0		0xc0000060
+			SC_P_ADC_IN1_DMA_ADC0_IN1		0xc0000060
+			SC_P_ADC_IN2_DMA_ADC0_IN2		0xc0000060
+		>;
+	};
 
 	pinctrl_fec1: fec1grp {
 		fsl,pins = <
