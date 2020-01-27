@@ -37,6 +37,15 @@
 		status = "disabled";
 	};
 
+	reg_usbotg1_vbus: usbotg1_vbus {
+		compatible = "regulator-fixed";
+		regulator-name = "OTG1_VBUS";
+		gpio = <&gpio4 3 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+	};
+
 	memory@80000000 {
 		device_type = "memory";
 		/* DRAM base addr, size : 512 MiB DRAM - corrected by bootloader */
@@ -275,8 +284,9 @@
 
 	pinctrl_usbotg1: usbotg1grp {
 		fsl,pins = <
-			SC_P_USB_SS3_TC0_CONN_USB_OTG1_PWR	0x06000020
-			SC_P_USB_SS3_TC2_CONN_USB_OTG1_OC	0x06000020
+			/* USB_OTG1_PWR as gpio for regulator device */
+			SC_P_USB_SS3_TC0_LSIO_GPIO4_IO03	0x00000021
+			SC_P_USB_SS3_TC2_CONN_USB_OTG1_OC	0x00000021
 		>;
 	};
 
@@ -356,12 +366,27 @@
 	status = "okay";
 };
 
+&usbmisc1 {
+	status = "okay";
+};
+
 &usbotg1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usbotg1>;
-/*	vbus-supply = <&reg_mba8qx_5v>; */
+/*
+ * TODO: check if session request protocol, host negotiation protocol and / or
+ * attach detection protocol should be disabled as don by a lot of designs.
+ */
+	vbus-supply = <&reg_usbotg1_vbus>;
 	power-polarity-active-high;
+	/* not functional */
+	disable-over-current;
 	dr_mode = "otg";
+
+	status = "okay";
+};
+
+&usbphy1 {
 	status = "okay";
 };
 
