@@ -12,8 +12,15 @@
  * GNU General Public License for more details.
  */
 
-
 &panel_lvds0 {
 	compatible = "tianma,tm070jvhg33", "tianma,tm070jdhg30";
+	status = "okay";
+};
+
+&blk_lvds0 {
+	status = "okay";
+};
+
+&ldb1 {
 	status = "okay";
 };

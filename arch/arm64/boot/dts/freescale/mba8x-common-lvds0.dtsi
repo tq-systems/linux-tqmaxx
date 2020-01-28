@@ -16,7 +16,6 @@
 
 / {
 	blk_lvds0: blk_lvds0 {
-
 		compatible = "pwm-backlight";
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_lvds0_blk>;
@@ -25,7 +24,7 @@
 		default-brightness-level = <7>;
 		power-supply = <&reg_mba8x_12v>;
 		enable-gpios = <&gpio1 6 GPIO_ACTIVE_HIGH>;
-		status = "okay";
+		status = "disabled";
 	};
 
 	panel_lvds0: panel-lvds0 {
@@ -44,7 +43,6 @@
 };
 
 &iomuxc {
-
 	pinctrl_lvds0_blk: lvds0_blk {
 		fsl,pins = <
 			SC_P_LVDS0_I2C0_SCL_LSIO_GPIO1_IO06	0x00000021
@@ -62,7 +60,6 @@
 			SC_P_LVDS0_GPIO00_LVDS0_PWM0_OUT	0x00000020
 		>;
 	};
-
 };
 
 &ldb1_phy {
@@ -70,8 +67,6 @@
 };
 
 &ldb1 {
-	status = "okay";
-
 	lvds-channel@0 {
 		status = "okay";
 
@@ -90,3 +85,4 @@
 	pinctrl-0 = <&pinctrl_lvds0_pwm>;
 	status = "okay";
 };
+
