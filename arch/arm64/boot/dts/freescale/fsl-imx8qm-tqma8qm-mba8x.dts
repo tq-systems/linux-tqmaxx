@@ -203,6 +203,12 @@
 	};
 };
 
+&ftmpwm0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_ftmpwm0>;
+	status = "okay";
+};
+
 &gpio1 {
 	/* enable wakeup for gpio-key for gpio1 line 0 (SWITCH_B)*/
 	pad-wakeup-num = <1>;
@@ -373,6 +379,14 @@
 		fsl,pins = <
 			SC_P_FLEXCAN1_TX_DMA_FLEXCAN1_TX        0x21
 			SC_P_FLEXCAN1_RX_DMA_FLEXCAN1_RX        0x21
+		>;
+	};
+
+	pinctrl_ftmpwm0: ftmpwm0grp {
+		fsl,pins = <
+			SC_P_SPI3_SDO_DMA_FTM_CH0	0x00000020
+			SC_P_SPI3_SDI_DMA_FTM_CH1	0x00000020
+			SC_P_SPI3_CS0_DMA_FTM_CH2	0x00000020
 		>;
 	};
 
