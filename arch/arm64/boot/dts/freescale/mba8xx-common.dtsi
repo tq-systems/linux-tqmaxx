@@ -297,6 +297,13 @@
 		>;
 	};
 
+	pinctrl_lpuart3: lpuart3grp {
+		fsl,pins = <
+			SC_P_FLEXCAN2_RX_ADMA_UART3_RX	0x06000020
+			SC_P_FLEXCAN2_TX_ADMA_UART3_TX	0x06000020
+		>;
+	};
+
 	pinctrl_pca9538: pca9538grp {
 		fsl,pins = <
 			SC_P_MIPI_CSI0_GPIO0_00_LSIO_GPIO3_IO08		0x06000020
@@ -329,8 +336,11 @@
 			SC_P_FLEXCAN0_TX_ADMA_SAI1_TXFS		0x06000040
 			SC_P_FLEXCAN1_RX_ADMA_SAI1_TXD		0x06000040
 			SC_P_FLEXCAN1_TX_ADMA_SAI1_RXD		0x06000040
-			SC_P_FLEXCAN2_RX_ADMA_SAI1_RXFS		0x06000040
-			SC_P_FLEXCAN2_TX_ADMA_SAI1_RXC		0x06000040
+/*
+ * not used on MBa8Xx -> can be used as UART3 instead on X4:45/47
+ *			SC_P_FLEXCAN2_RX_ADMA_SAI1_RXFS		0x06000040
+ *			SC_P_FLEXCAN2_TX_ADMA_SAI1_RXC		0x06000040
+ */
 		>;
 	};
 
@@ -440,6 +450,12 @@
 &lpuart1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpuart1>;
+	status = "okay";
+};
+
+&lpuart3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_lpuart3>;
 	status = "okay";
 };
 
