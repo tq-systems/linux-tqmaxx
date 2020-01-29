@@ -215,13 +215,6 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_hog>;
 
-	pinctrl_lpuart1: lpuart1grp {
-		fsl,pins = <
-			SC_P_UART1_RX_ADMA_UART1_RX	0x06000020
-			SC_P_UART1_TX_ADMA_UART1_TX	0x06000020
-		>;
-	};
-
 	pinctrl_gpiobuttons: gpiobuttonsgrp {
 		fsl,pins = <
 			/* gpio keys */
@@ -294,6 +287,13 @@
 			/* GPIO */
 			SC_P_MIPI_DSI0_I2C0_SDA_LSIO_GPIO1_IO26		0x00000048
 			SC_P_USDHC1_RESET_B_LSIO_GPIO4_IO19		0x00000048
+		>;
+	};
+
+	pinctrl_lpuart1: lpuart1grp {
+		fsl,pins = <
+			SC_P_UART1_RX_ADMA_UART1_RX	0x06000020
+			SC_P_UART1_TX_ADMA_UART1_TX	0x06000020
 		>;
 	};
 
