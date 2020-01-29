@@ -344,6 +344,16 @@
 		>;
 	};
 
+	pinctrl_spi2: spi2grp {
+		fsl,pins = <
+			/* PU + PDRV Low + INOUT - MEK has 0x0600004c */
+			SC_P_SPI2_CS0_ADMA_SPI2_CS0		0x06000041
+			SC_P_SPI2_SCK_ADMA_SPI2_SCK		0x06000041
+			SC_P_SPI2_SDI_ADMA_SPI2_SDI		0x06000041
+			SC_P_SPI2_SDO_ADMA_SPI2_SDO		0x06000041
+		>;
+	};
+
 	pinctrl_usbotg1: usbotg1grp {
 		fsl,pins = <
 			SC_P_USB_SS3_TC0_CONN_USB_OTG1_PWR	0x06000020
@@ -445,6 +455,22 @@
 	local-mac-address = [ 00 00 00 00 00 00 ];
 
 	status = "okay";
+};
+
+&lpspi2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_spi2>;
+	#address-cells = <1>;
+	#size-cells = <0>;
+	fsl,spi-num-chipselects = <1>;
+	status = "okay";
+
+	spidev2_0: spidev0@0 {
+		reg = <0>;
+		compatible = "tq,testdev";
+		spi-max-frequency = <5000000>;
+		status = "okay";
+	};
 };
 
 &lpuart1 {
