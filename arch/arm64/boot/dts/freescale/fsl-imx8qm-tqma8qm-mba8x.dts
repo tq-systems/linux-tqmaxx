@@ -130,6 +130,14 @@
 		ssi-controller = <&sai1>;
 		audio-codec = <&codec>;
 	};
+
+	sound-hdmi {
+		compatible = "fsl,imx-audio-cdnhdmi";
+		model = "imx-audio-hdmi-tx";
+		audio-cpu = <&sai_hdmi_tx>;
+		protocol = <1>;
+		hdmi-out;
+	};
 };
 
 &acm {
@@ -717,6 +725,18 @@
 			<&clk IMX8QM_AUD_ACM_AUD_REC_CLK0_DIV>,
 			<&clk IMX8QM_AUD_SAI_1_MCLK>;
 	assigned-clock-rates = <786432000>, <49152000>, <12288000>, <49152000>;
+	status = "okay";
+};
+
+&sai_hdmi_tx {
+	assigned-clocks =<&clk IMX8QM_ACM_HDMI_TX_SAI0_MCLK_SEL>,
+			<&clk IMX8QM_AUD_PLL1_DIV>,
+			<&clk IMX8QM_AUD_ACM_AUD_PLL_CLK1_DIV>,
+			<&clk IMX8QM_AUD_ACM_AUD_REC_CLK1_DIV>,
+			<&clk IMX8QM_AUD_SAI_HDMITX0_MCLK>;
+	assigned-clock-parents = <&clk IMX8QM_AUD_ACM_AUD_PLL_CLK1_CLK>;
+	assigned-clock-rates = <0>, <768000000>, <768000000>, <768000000>, <768000000>;
+	fsl,sai-asynchronous;
 	status = "okay";
 };
 
