@@ -123,6 +123,21 @@
 		io-channels = <&adc0 0>, <&adc0 1>, <&adc0 2>;
 		io-channel-names = "MIKROBUS_AN", "PINH_ADC_IN1", "PINH_ADC_IN2";
 	};
+
+	sound {
+		compatible = "fsl,imx-audio-tlv320aic32x4";
+		model = "imx8qm-mba8x-tlv320aic32";
+		ssi-controller = <&sai1>;
+		audio-codec = <&codec>;
+	};
+};
+
+&acm {
+	status = "okay";
+};
+
+&amix {
+	status = "okay";
 };
 
 &adc0 {
@@ -249,6 +264,16 @@
 };
 
 &i2c1 {
+	codec: tlv320aic32x4@18 {
+		compatible = "ti,tlv320aic32x4";
+		reg = <0x18>;
+		clocks = <&clk IMX8QM_AUD_MCLKOUT0>;
+		clock-names = "mclk";
+		power-domains = <&pd_mclk_out0>;
+		ldoin-supply = <&reg_mba8x_v3v3>;
+		iov-supply = <&reg_mba8x_v1v8>;
+	};
+
 	sensor1: jc42@1c {
 		compatible = "nxp,se97", "jedec,jc-42.4-temp";
 		reg = <0x1c>;
@@ -508,6 +533,17 @@
 		>;
 	};
 
+	pinctrl_sai1: sai1grp {
+		fsl,pins = <
+			SC_P_SAI1_RXD_AUD_SAI1_RXD		0x06000040
+			SC_P_SAI1_RXC_AUD_SAI1_RXC		0x06000040
+			SC_P_SAI1_RXFS_AUD_SAI1_RXFS		0x06000040
+			SC_P_SAI1_TXD_AUD_SAI1_TXD		0x06000060
+			SC_P_SAI1_TXC_AUD_SAI1_TXC		0x06000040
+			SC_P_MCLK_OUT0_AUD_ACM_MCLK_OUT0	0x0600004c
+		>;
+	};
+
 	pinctrl_usb2: usb2grp {
 		fsl,pins = <
 			SC_P_USB_SS3_TC1_CONN_USB_OTG2_PWR	0x00000021
@@ -670,6 +706,17 @@
 /* TODO: optional, currently without functionality */
 /*	clkreq-gpio = <&gpio4 30 GPIO_ACTIVE_LOW>; */
 	epdev_on-supply = <&reg_mba8x_v3v3>;
+	status = "okay";
+};
+
+&sai1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_sai1>;
+	assigned-clocks = <&clk IMX8QM_AUD_PLL0_DIV>,
+			<&clk IMX8QM_AUD_ACM_AUD_PLL_CLK0_DIV>,
+			<&clk IMX8QM_AUD_ACM_AUD_REC_CLK0_DIV>,
+			<&clk IMX8QM_AUD_SAI_1_MCLK>;
+	assigned-clock-rates = <786432000>, <49152000>, <12288000>, <49152000>;
 	status = "okay";
 };
 
