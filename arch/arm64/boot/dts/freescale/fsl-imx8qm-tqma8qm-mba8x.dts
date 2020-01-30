@@ -28,6 +28,14 @@
 		stdout-path = &lpuart0;
 	};
 
+	reg_mba8x_v1v8: mba8x_v1v8 {
+		compatible = "regulator-fixed";
+		regulator-name = "MBa8x-V1V8";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		regulator-always-on;
+	};
+
 	reg_mba8x_v3v3: mba8x_v3v3 {
 		compatible = "regulator-fixed";
 		regulator-name = "MBa8x-V3V3";
