@@ -289,6 +289,12 @@
 
 	pinctrl_hog: mba8xxhoggrp {
 		fsl,pins = <
+			/*
+			 * Audio Codec MCLK:
+			 * hog pin to guarantee MCLK is setup early - codec
+			 * gets crazy, if MCLK is switched (of) after device
+			 * is configured
+			 */
 			SC_P_MCLK_OUT0_ADMA_ACM_MCLK_OUT0		0x0600004c
 			/* REV. detect */
 			SC_P_MIPI_CSI0_I2C0_SCL_LSIO_GPIO3_IO05		0x00000048
