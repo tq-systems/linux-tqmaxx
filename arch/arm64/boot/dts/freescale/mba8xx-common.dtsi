@@ -46,18 +46,22 @@
 
 	gpio-keys {
 		compatible = "gpio-keys";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpiobuttons>;
 		autorepeat;
 
 		switcha {
 			label = "switcha";
 			linux,code = <BTN_0>;
 			gpios = <&gpio1 13 GPIO_ACTIVE_LOW>;
+			wakeup-source;
 		};
 
 		switchb {
 			label = "switchb";
 			linux,code = <BTN_1>;
 			gpios = <&gpio1 14 GPIO_ACTIVE_LOW>;
+			wakeup-source;
 		};
 	};
 
@@ -161,6 +165,12 @@
 	status = "okay";
 };
 
+&gpio1 {
+	/* enable wakeup for gpio-key for gpio1 line 13 + 14 (SWITCH_A/B)*/
+	pad-wakeup-num = <2>;
+	pad-wakeup = <SC_P_ADC_IN5 4 13 SC_P_ADC_IN4 4 14>;
+};
+
 &i2c1 {
 	codec: tlv320aic32x4@18 {
 		compatible = "ti,tlv320aic32x4";
@@ -218,8 +228,8 @@
 	pinctrl_gpiobuttons: gpiobuttonsgrp {
 		fsl,pins = <
 			/* gpio keys */
-			SC_P_ADC_IN5_LSIO_GPIO1_IO13			0x00000048
-			SC_P_ADC_IN4_LSIO_GPIO1_IO14			0x00000048
+			SC_P_ADC_IN5_LSIO_GPIO1_IO13			0x00000020
+			SC_P_ADC_IN4_LSIO_GPIO1_IO14			0x00000020
 		>;
 	};
 
