@@ -19,30 +19,14 @@
 
 	/* ET0700G0DH6 + ETM0700G0DH6 + ETM0700G0BDH6 + S070WV106H-CT44 */
 	lcd: display {
-		compatible = "emerging,et0700g0dh6", "panel-dpi";
+		compatible = "edt,etm0700g0dh6", "simple-panel";
 		bits-per-pixel = <32>; /* 32: RGB888/666 mode */
 		label = "lcd";
 		backlight = <&lcd_bl>;
 		/* lcd power enable LCD_PWR_EN */
 		enable-gpios = <&expander1 12 GPIO_ACTIVE_HIGH>;
-		vcc-supply = <&vcc_3v3_display>;
+		power-supply = <&vcc_3v3_display>;
 		status = "okay";
-
-		panel-timing {
-			clock-frequency = <33260000>;
-			hactive = <800>;
-			vactive = <480>;
-			hback-porch = <216>;
-			hfront-porch = <40>;
-			vback-porch = <35>;
-			vfront-porch = <10>;
-			hsync-len = <128>;
-			vsync-len = <2>;
-			hsync-active = <0>;
-			vsync-active = <0>;
-			de-active = <1>;
-			pixelclk-active = <0>;
-		};
 
 		port {
 			lcd_in: endpoint {

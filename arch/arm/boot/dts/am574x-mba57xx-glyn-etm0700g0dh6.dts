@@ -8,6 +8,6 @@
  * published by the Free Software Foundation.
  */
 
-#include "am572x-mba57xx.dts"
-#include "am57xx-mba57xx-lcd.dtsi"
+#include "am574x-mba57xx.dts"
+#include "am57xx-mba57xx-glyn-etm0700g0dh6.dtsi"
 

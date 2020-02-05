@@ -755,8 +755,18 @@ dtb-$(CONFIG_SOC_DRA7XX) += \
 	dra72-evm-revc.dtb \
 	dra71-evm.dtb \
 	dra76-evm.dtb \
-	tqma572x-mba57xx.dtb \
-	am572x-mba57xx.dtb
+	am571x-mba57xx.dtb \
+	am571x-mba57xx-dmb-ct44.dtb \
+	am571x-mba57xx-glyn-etm0700g0dh6.dtb \
+	am571x-mba57xx-lvds-tm070jvhg33.dtb \
+	am572x-mba57xx.dtb \
+	am572x-mba57xx-dmb-ct44.dtb \
+	am572x-mba57xx-glyn-etm0700g0dh6.dtb \
+	am572x-mba57xx-lvds-tm070jvhg33.dtb \
+	am574x-mba57xx.dtb \
+	am574x-mba57xx-dmb-ct44.dtb \
+	am574x-mba57xx-glyn-etm0700g0dh6.dtb \
+	am574x-mba57xx-lvds-tm070jvhg33.dtb
 dtb-$(CONFIG_ARCH_ORION5X) += \
 	orion5x-kuroboxpro.dtb \
 	orion5x-lacie-d2-network.dtb \
