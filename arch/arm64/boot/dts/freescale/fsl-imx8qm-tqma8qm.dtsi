@@ -61,6 +61,7 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_flexspi0>;
 	status = "okay";
+	fsl,qspi-skip-dll-config;
 
 	flash0: flash@0 {
 		reg = <0>;
