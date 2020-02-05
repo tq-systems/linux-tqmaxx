@@ -324,10 +324,20 @@
 	status = "okay";
 };
 
-/* TODO: not working */
+/*
+ * By default, we use a flash which should support up to 90 MHz SPI clk
+ * for Quad IO and DTR. Other options are devices with up to 84 MHz, So limit
+ * the clock
+ * To achieve a higher clock, reparent the QSPI clock. To prevent runing with
+ * too high frequencies for DTR / QUAD, we use 266 MHz root -> 266 / 4 MHz SCLK
+ */
 &qspi {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_qspi>;
+	assigned-clocks = <&clk IMX8MQ_CLK_QSPI>;
+	assigned-clock-parents = <&clk IMX8MQ_SYS1_PLL_266M>;
+	fsl,qspi-no-dtr-modes;
+
 	status = "okay";
 
 	flash0: flash@0 {
@@ -335,8 +345,9 @@
 		#address-cells = <1>;
 		#size-cells = <1>;
 		compatible = "spi-flash";
-		spi-max-frequency = <29000000>;
-		spi-nor,ddr-quad-read-dummy = <6>;
+		spi-max-frequency = <84000000>;
+		/* TODO: not used in spi-nor / fsl-qspi but in fsl-flexspi */
+		spi-nor,ddr-quad-read-dummy = <8>;
 	};
 };
 
