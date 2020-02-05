@@ -4849,7 +4849,7 @@ static int spi_nor_init(struct spi_nor *nor)
 	if (JEDEC_MFR(nor->info) == SNOR_MFR_MACRONIX)
 		macronix_init_dsr(nor);
 	/*
-	 * Micron flashes uses to show ST Micro ID, since TT's flash business
+	 * Micron flashes uses to show ST Micro ID, since ST's flash business
 	 * was acquired by micron some years ago. See also spi_nor_ids above
 	 */
 	else if (JEDEC_MFR(nor->info) == SNOR_MFR_ST)
@@ -5132,6 +5132,9 @@ int spi_nor_scan(struct spi_nor *nor, const char *name,
 	if (ret)
 		return ret;
 
+	dev_info(dev, "addr_width = %d erase_cmd = %x rd_cmd = %x pp_cmd = %x\n",
+		 (int)nor->addr_width, (uint32_t)nor->erase_opcode,
+		 (uint32_t)nor->read_opcode, (uint32_t)nor->program_opcode);
 	dev_info(dev, "%s (%lld Kbytes)\n", info->name,
 			(long long)mtd->size >> 10);
 
