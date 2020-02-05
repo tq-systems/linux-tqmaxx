@@ -182,8 +182,8 @@
 		assigned-clocks = <&clk IMX8QXP_AUD_PLL0_DIV>,
 				<&clk IMX8QXP_AUD_ACM_AUD_PLL_CLK0_DIV>,
 				<&clk IMX8QXP_AUD_ACM_AUD_REC_CLK0_DIV>,
-				<&clk IMX8QXP_AUD_MCLKOUT0>;
-		assigned-clock-rates = <786432000>, <49152000>, <12288000>, <12288000>;
+				<&clk IMX8QXP_AUD_SAI_1_MCLK>;
+		assigned-clock-rates = <786432000>, <49152000>, <12288000>, <49152000>;
 
 		ldoin-supply = <&reg_mba8qx_3v3>;
 		iov-supply = <&reg_mba8qx_1v8>;
