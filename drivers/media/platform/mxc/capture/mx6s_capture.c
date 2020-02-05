@@ -1797,7 +1797,7 @@ static int mx6s_vidioc_enum_framesizes(struct file *file, void *priv,
 		return 0;
 	}
 
-	fsize->type = V4L2_FRMSIZE_TYPE_DISCRETE;
+	fsize->type = V4L2_FRMSIZE_TYPE_STEPWISE;
 	fsize->stepwise.min_width = fse.min_width;
 	fsize->stepwise.max_width = fse.max_width;
 	fsize->stepwise.min_height = fse.min_height;
