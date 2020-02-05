@@ -511,6 +511,7 @@ struct fsl_flexspi {
 	u32 ddr_smp;
 	struct mutex lock;
 	struct pm_qos_request pm_qos_req;
+	bool skip_dll_config;
 
 #define FLEXSPI_INITILIZED	(1 << 0)
 	int flags;
@@ -518,6 +519,9 @@ struct fsl_flexspi {
 
 static inline int fsl_flexspi_need_config_dll(struct fsl_flexspi *flex)
 {
+	if (flex->skip_dll_config)
+		return 0;
+
 	return flex->devtype_data->driver_data & FLEXSPI_QUIRK_CONFIG_DLL;
 }
 
@@ -1021,6 +1025,14 @@ static void fsl_flexspi_config_dll(struct fsl_flexspi *flex, int rate)
 	if (!fsl_flexspi_need_config_dll(flex))
 		return;
 
+	/*
+	 * This Aproach is questionable
+	 * There are some errors in determining the number of deleay_cells.
+	 * The comment in the rev manual is not helpfull.
+	 * It says you only need this dll config
+	 * in case of an Flash witch provided read strobe.
+	 */
+
 	if (rate >= 100 * FREQ_1MHz) {
 		writel(FLEXSPI_DLLACR_DLLEN_MASK | FLEXSPI_DLLACR_SLVDLYTGT_MASK,
 			flex->iobase + FLEXSPI_DLLACR);
@@ -1405,6 +1417,9 @@ static int fsl_flexspi_probe(struct platform_device *pdev)
 
 	if (of_get_property(np, "fsl,qspi-has-second-chip", NULL))
 		flex->has_second_chip = true;
+
+	if (of_get_property(np, "fsl,qspi-skip-dll-config", NULL))
+		flex->skip_dll_config = true;
 
 	mutex_init(&flex->lock);
 
