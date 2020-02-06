@@ -1023,7 +1023,7 @@ static const struct drm_display_mode dmb_s070pws19hp_fc21_mode = {
 	.vdisplay = 600,
 	.vsync_start = 600 + 12,
 	.vsync_end = 600 + 12 + 3,
-	.vtotal = 600 + 10 + 3 + 20,
+	.vtotal = 600 + 12 + 3 + 20,
 	.vrefresh = 60,
 	.flags = DRM_MODE_FLAG_NHSYNC | DRM_MODE_FLAG_NVSYNC,
 };
@@ -1033,16 +1033,16 @@ static const struct panel_desc dmb_s070pws19hp_fc21 = {
 	.num_modes = 1,
 	.bpc = 6,
 	.size = {
-		.width = 120,
+		.width = 154,
 		.height = 86,
 	},
 	.bus_format = MEDIA_BUS_FMT_RGB666_1X18,
-	.bus_flags = DRM_BUS_FLAG_DE_HIGH | DRM_BUS_FLAG_PIXDATA_NEGEDGE,
+	.bus_flags = DRM_BUS_FLAG_DE_HIGH | DRM_BUS_FLAG_PIXDATA_POSEDGE,
 };
 
 /* S070SWV29HG-DC44 2017/09/21 */
 static const struct drm_display_mode dmb_s070swv29hg_dc44_mode = {
-	.clock = 33000,
+	.clock = 33300,
 	.hdisplay = 800,
 	.hsync_start = 800 + 210,
 	.hsync_end = 800 + 210 + 2,
