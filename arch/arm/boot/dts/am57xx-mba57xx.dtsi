@@ -400,6 +400,7 @@
 	vmmc_aux-supply = <&ldo1_reg>;
 	bus-width = <4>;
 	cd-gpios = <&gpio6 27 0>; /* gpio 219 */
+	cd-inverted;
 	wp-gpios = <&gpio6 28 0>; /* gpio 220 */
 	pinctrl-names = "default", "hs";
 	pinctrl-0 = <&mmc1_pins_default>;
