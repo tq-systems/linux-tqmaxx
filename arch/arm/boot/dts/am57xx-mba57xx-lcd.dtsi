@@ -13,6 +13,10 @@
 		display1 = &lcd;
 	};
 
+	chosen {
+		bootargs = "omapdrm.display=1,0";
+	};
+
 	/* ET0700G0DH6 + ETM0700G0DH6 + ETM0700G0BDH6 + S070WV106H-CT44 */
 	lcd: display {
 		compatible = "emerging,et0700g0dh6", "panel-dpi";
