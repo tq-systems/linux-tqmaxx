@@ -1,0 +1,156 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Device Tree file for TQMLS1028A module
+ *
+ * Copyright 2019-2020 TQ-Systems GmbH
+ *
+ * Authors: Michael Krummsdorf <michael.krummsdorf@tq-group.com>
+ *          Matthias Schiffer <matthias.schiffer@tq-group.com>
+ */
+
+#include "fsl-ls1028a.dtsi"
+
+/ {
+	compatible = "tq,ls1028a-tqmls1028a", "fsl,ls1028a";
+
+	reg_3p3v_som: regulator-3p3v-som {
+		compatible = "regulator-fixed";
+		regulator-name = "3P3V_SOM";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-always-on;
+	};
+
+	sys_mclk: clock-mclk {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <25000000>;
+	};
+};
+
+&esdhc1 {
+	status = "okay";
+	no-sdio;
+	no-sd;
+	mmc-hs200-1_8v;
+	mmc-hs400-1_8v;
+	mmc-ddr-1_8v;
+	bus-width = <8>;
+};
+
+&fspi {
+	status = "okay";
+
+	flash@0 {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "jedec,spi-nor";  /* 64MB */
+		reg = <0>;
+		spi-max-frequency = <100000000>;
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			pbl@0 {
+				label = "PBL";
+				reg = <0x0 0x100000>;
+			};
+
+			bl3@100000 {
+				label = "BL3";
+				reg = <0x100000 0x400000>;
+			};
+
+			ubootenv@500000 {
+				label = "U-Boot-ENV";
+				reg = <0x500000 0x100000>;
+			};
+
+			reserved1@600000 {
+				label = "Reserved1";
+				reg = <0x600000 0x340000>;
+			};
+
+			hdp@940000 {
+				label = "HDP";
+				reg = <0x940000 0x40000>;
+			};
+
+			reserved2@980000 {
+				label = "Reserved2";
+				reg = <0x980000 0x580000>;
+			};
+
+			dtb@f00000 {
+				label = "DTB";
+				reg = <0xf00000 0x100000>;
+			};
+
+			linux@1000000 {
+				label = "Linux";
+				reg = <0x1000000 0xa00000>;
+			};
+
+			rootfs@1a00000 {
+				label = "RootFS";
+				reg = <0x1a00000 0x2600000>;
+			};
+		};
+	};
+};
+
+&i2c0 {
+	status = "okay";
+
+	js42_18: eeprom-temperature-sensor@18 {
+		compatible = "nxp,se97", "jedec,jc-42.4-temp";
+		reg = <0x18>;
+		status = "okay";
+	};
+
+	sa56004_4c: temperature-sensor@4c {
+		compatible = "nxp,sa56004";
+		reg = <0x4c>;
+		vcc-supply = <&reg_3p3v_som>;
+		status = "okay";
+	};
+
+	se97_50: eeprom@50 {
+		compatible = "nxp,spd", "atmel,24c02";
+		reg = <0x50>;
+		pagesize = <16>;
+		status = "okay";
+	};
+
+	rtc1: rtc@51 {
+		compatible = "nxp,pcf85063";
+		reg = <0x51>;
+		quartz-load-femtofarads = <12500>;
+		status = "okay";
+	};
+
+	m24c256_57: eeprom@57 {
+		compatible = "atmel,24c256";
+		pagesize = <32>;
+		reg = <0x57>;
+		status = "okay";
+	};
+};
+
+&hdptx0 {
+	status = "disabled";
+};
+
+&malidp0 {
+	status = "disabled";
+};
+
+&usb0 {
+	status = "disabled";
+};
+
+&usb1 {
+	status = "disabled";
+};
