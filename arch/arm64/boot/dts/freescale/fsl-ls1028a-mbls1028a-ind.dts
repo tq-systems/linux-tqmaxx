@@ -1,0 +1,77 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Device Tree file for MBLS1028A-IND starterkit
+ *
+ * Copyright 2019-2020 TQ-Systems GmbH
+ *
+ * Authors: Gregor Herburger <gregor.herburger@tq-group.com>
+ *          Matthias Schiffer <matthias.schiffer@tq-group.com>
+ */
+
+/dts-v1/;
+
+#include "fsl-ls1028a-mbls1028a.dtsi"
+
+/ {
+	model = "MBLS1028A-IND starterkit";
+	compatible = "tq,ls1028a-mbls1028a-ind", "tq,ls1028a-tqmls1028a", "fsl,ls1028a";
+};
+
+&i2c5 {
+	gpio_exp_3v3: gpio-expander@72 {
+		compatible = "nxp,pca9538";
+		reg = <0x72>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		status = "okay";
+
+		clk_intn {
+			gpio-hog;
+			gpios = <0 0>;
+			input;
+			line-name = "CLK_INT#";
+		};
+
+		usb_rstn {
+			gpio-hog;
+			gpios = <1 0>;
+			output-high;
+			line-name = "USB_RST#";
+		};
+
+		mpcie_waken {
+			gpio-hog;
+			gpios = <2 0>;
+			input;
+			line-name = "MPCIE_WAKE#";
+		};
+
+		mpcie_disn {
+			gpio-hog;
+			gpios = <3 0>;
+			output-high;
+			line-name = "MPCIE_DIS#";
+		};
+
+		mpcie_rstn {
+			gpio-hog;
+			gpios = <4 0>;
+			output-high;
+			line-name = "MPCIE_RST#";
+		};
+
+		sata_perstn {
+			gpio-hog;
+			gpios = <6 0>;
+			output-high;
+			line-name = "SATA_PERST#";
+		};
+
+		dcdc_reset {
+			gpio-hog;
+			gpios = <7 0>;
+			output-low;
+			line-name = "DCDC_RESET";
+		};
+	};
+};
