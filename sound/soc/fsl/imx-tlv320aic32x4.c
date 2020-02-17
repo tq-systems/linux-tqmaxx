@@ -25,7 +25,6 @@ struct imx_tlv320aic_data {
 	struct snd_soc_card card;
 	char codec_dai_name[DAI_NAME_SIZE];
 	char platform_name[DAI_NAME_SIZE];
-	struct clk *codec_clk;
 	unsigned int clk_frequency;
 };
 
@@ -50,10 +49,10 @@ static int imx_tlv320aic_probe(struct platform_device *pdev)
 	struct device_node *ssi_np, *codec_np;
 	struct platform_device *ssi_pdev;
 	struct i2c_client *codec_dev;
+	struct clk *codec_clk;
 	struct imx_tlv320aic_data *data;
 	struct snd_soc_dai_link_component *comp;
 	int ret = 0;
-
 
 	ssi_np = of_parse_phandle(pdev->dev.of_node, "ssi-controller", 0);
 	codec_np = of_parse_phandle(pdev->dev.of_node, "audio-codec", 0);
@@ -65,14 +64,16 @@ static int imx_tlv320aic_probe(struct platform_device *pdev)
 
 	ssi_pdev = of_find_device_by_node(ssi_np);
 	if (!ssi_pdev) {
-		dev_err(&pdev->dev, "failed to find SSI platform device\n");
+		dev_dbg(&pdev->dev, "failed to find SSI platform device\n");
 		ret = -EPROBE_DEFER;
 		goto fail;
 	}
+	put_device(&ssi_pdev->dev);
 	codec_dev = of_find_i2c_device_by_node(codec_np);
 	if (!codec_dev) {
-		dev_err(&pdev->dev, "failed to find codec platform device\n");
-		return -EPROBE_DEFER;
+		dev_dbg(&pdev->dev, "failed to find codec platform device\n");
+		ret = -EPROBE_DEFER;
+		goto fail;
 	}
 
 	data = devm_kzalloc(&pdev->dev, sizeof(*data), GFP_KERNEL);
@@ -87,19 +88,14 @@ static int imx_tlv320aic_probe(struct platform_device *pdev)
 		goto fail;
 	}
 
-	data->codec_clk = devm_clk_get(&codec_dev->dev, NULL);
-	if (IS_ERR(data->codec_clk)) {
-		dev_err(&pdev->dev, "Failed to get codec clock\n");
+	codec_clk = clk_get(&codec_dev->dev, NULL);
+	if (IS_ERR(codec_clk)) {
+		ret = PTR_ERR(codec_clk);
 		goto fail;
 	}
 
-	ret = clk_prepare_enable(data->codec_clk);
-	if (ret) {
-		dev_err(&pdev->dev, "Failed to enable codec clk %d\n", ret);
-		return ret;
-	}
-
-	data->clk_frequency = clk_get_rate(data->codec_clk);
+	data->clk_frequency = clk_get_rate(codec_clk);
+	clk_put(codec_clk);
 
 	data->dai.cpus		= &comp[0];
 	data->dai.codecs	= &comp[1];
@@ -137,16 +133,10 @@ static int imx_tlv320aic_probe(struct platform_device *pdev)
 	}
 
 	platform_set_drvdata(pdev, data);
-	of_node_put(ssi_np);
-	of_node_put(codec_np);
-
-	return 0;
 
 fail:
-	if (ssi_np)
-		of_node_put(ssi_np);
-	if (codec_np)
-		of_node_put(codec_np);
+	of_node_put(ssi_np);
+	of_node_put(codec_np);
 
 	return ret;
 }
