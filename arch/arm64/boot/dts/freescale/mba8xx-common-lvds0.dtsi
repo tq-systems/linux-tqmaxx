@@ -86,28 +86,25 @@
 };
 
 &iomuxc {
-	tqma8qx-mba8qx {
+	pinctrl_gpiobl: gpioblgrp {
+		fsl,pins = <
+			/* TODO: LCD_CONTRAST -> DSI PMW */
+			SC_P_SPI0_CS1_LSIO_GPIO1_IO07		0x00000021
+		>;
+	};
 
-		pinctrl_gpiobl: gpioblgrp {
-			fsl,pins = <
-				/* TODO: LCD_CONTRAST -> DSI PMW */
-				SC_P_SPI0_CS1_LSIO_GPIO1_IO07		0x00000021
-			>;
-		};
+	pinctrl_lbdpanel: lbdpanelgrp {
+		fsl,pins = <
+			/* TODO: LCD_BLT_EN -> DSI_GPIO */
+			SC_P_MIPI_DSI1_I2C0_SDA_LSIO_GPIO1_IO30	0x00000021
+		>;
+	};
 
-		pinctrl_lbdpanel: lbdpanelgrp {
-			fsl,pins = <
-				/* TODO: LCD_BLT_EN -> DSI_GPIO */
-				SC_P_MIPI_DSI1_I2C0_SDA_LSIO_GPIO1_IO30	0x00000021
-			>;
-		};
-
-		pinctrl_pwmbl: pwmblgrp {
-			fsl,pins = <
-				/* TODO: LCD_CONTRAST -> DSI PMW */
-				SC_P_SPI0_CS1_ADMA_LCD_PWM0_OUT		0x00000021
-			>;
-		};
+	pinctrl_pwmbl: pwmblgrp {
+		fsl,pins = <
+			/* TODO: LCD_CONTRAST -> DSI PMW */
+			SC_P_SPI0_CS1_ADMA_LCD_PWM0_OUT		0x00000021
+		>;
 	};
 };
 
