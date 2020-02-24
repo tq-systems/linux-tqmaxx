@@ -523,6 +523,18 @@
 		>;
 	};
 
+	pinctrl_pwm2: pwm2grp {
+		fsl,pins = <
+			SC_P_GPT1_COMPARE_LSIO_PWM2_OUT		0x00000020
+		>;
+	};
+
+	pinctrl_pwm3: pwm3grp {
+		fsl,pins = <
+			SC_P_GPT0_COMPARE_LSIO_PWM3_OUT		0x00000020
+		>;
+	};
+
 	pinctrl_reg_pcie_v1v5: regpcie1v5grp {
 		fsl,pins = <
 			SC_P_SCU_GPIO0_03_LSIO_GPIO0_IO31	0x00000021
@@ -601,6 +613,20 @@
 			SC_P_USDHC1_VSELECT_CONN_USDHC1_VSELECT	0x00000020
 		>;
 	};
+};
+
+&pwm2 {
+	/* MIKROBUS PWM*/
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm2>;
+	status = "okay";
+};
+
+&pwm3 {
+	/* FAN PWM*/
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm3>;
+	status = "okay";
 };
 
 &lpspi0 {
