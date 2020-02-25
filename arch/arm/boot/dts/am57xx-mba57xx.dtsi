@@ -20,6 +20,7 @@
 		display0 = &hdmi0;
 		ethernet2 = &pruss2_emac0;
 		ethernet3 = &pruss2_emac1;
+		spi1 = &mcspi1;
 	};
 
 
@@ -226,6 +227,15 @@
 	gpio2_pins: pinmux_gpio2_pins {
 		pinctrl-single,pins = <
 			DRA7XX_CORE_IOPAD(0x3470, MUX_MODE14 | PIN_INPUT | WAKEUP_EN) /* gpmc_a12.gpio2_2 */
+		>;
+	};
+
+	spi1_pins: pinmux_spi1_pins {
+		pinctrl-single,pins = <
+			DRA7XX_CORE_IOPAD(0x37a4, PIN_INPUT | MUX_MODE0)         /* spi1_sclk */
+			DRA7XX_CORE_IOPAD(0x37a8, PIN_OUTPUT | MUX_MODE0)        /* spi1_d1 */
+			DRA7XX_CORE_IOPAD(0x37ac, PIN_INPUT_PULLUP | MUX_MODE0)  /* spi1_d0 */
+			DRA7XX_CORE_IOPAD(0x37b0, PIN_OUTPUT | MUX_MODE0)        /* spi1_cs0 */
 		>;
 	};
 };
@@ -459,6 +469,18 @@
 	};
 	mbox_pru2_1: mbox_pru2_1 {
 		status = "okay";
+	};
+};
+
+&mcspi1 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&spi1_pins>;
+
+	spidev0: spidev@0 {
+		compatible = "rohm,dh2228fv";
+		reg = <0>;
+		spi-max-frequency = <100000>;
 	};
 };
 
