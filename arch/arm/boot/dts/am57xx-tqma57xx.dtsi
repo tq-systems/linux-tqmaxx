@@ -414,11 +414,6 @@
 	};
 };
 
-/* 2D BitBlt (BB2D) graphics accelerator */
-&bb2d {
-	status = "okay";
-};
-
 &cpu0 {
 	vdd-supply = <&smps12_reg>;
 };
@@ -454,30 +449,6 @@
 
 &mmu_ipu2 {
 	status = "okay";
-};
-
-&ipu2 {
-	status = "okay";
-	memory-region = <&ipu2_cma_pool>;
-	mboxes = <&mailbox6 &mbox_ipu2_ipc3x>;
-	timers = <&timer3>;
-	watchdog-timers = <&timer4>, <&timer9>;
-};
-
-&ipu1 {
-	status = "okay";
-	memory-region = <&ipu1_cma_pool>;
-	mboxes = <&mailbox5 &mbox_ipu1_ipc3x>;
-	timers = <&timer11>;
-	watchdog-timers = <&timer7>, <&timer8>;
-};
-
-&dsp1 {
-	status = "okay";
-	memory-region = <&dsp1_cma_pool>;
-	mboxes = <&mailbox5 &mbox_dsp1_ipc3x>;
-	timers = <&timer5>;
-	watchdog-timers = <&timer10>;
 };
 
 &dra7_pmx_core {

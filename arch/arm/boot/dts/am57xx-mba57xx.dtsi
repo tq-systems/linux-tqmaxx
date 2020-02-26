@@ -18,8 +18,6 @@
 / {
 	aliases {
 		display0 = &hdmi0;
-		ethernet2 = &pruss2_emac0;
-		ethernet3 = &pruss2_emac1;
 		spi1 = &mcspi1;
 	};
 
@@ -153,32 +151,6 @@
 					remote-endpoint = <&hdmi_connector_in>;
 				};
 			};
-		};
-	};
-
-	/* Dual-MAC Ethernet application node on PRU-ICSS2 */
-	pruss2_eth {
-		compatible = "ti,am57-prueth";
-		pruss = <&pruss2>;
-		sram = <&ocmcram1>;
-		interrupt-parent = <&pruss2_intc>;
-
-		pruss2_emac0: ethernet-mii0 {
-			phy-handle = <&dp83822_0>;
-			phy-mode = "mii";
-			interrupts = <20>, <22>;
-			interrupt-names = "rx", "tx";
-			/* Filled in by bootloader */
-			local-mac-address = [00 00 00 00 00 00];
-		};
-
-		pruss2_emac1: ethernet-mii1 {
-			phy-handle = <&dp83822_1>;
-			phy-mode = "mii";
-			interrupts = <21>, <23>;
-			interrupt-names = "rx", "tx";
-			/* Filled in by bootloader */
-			local-mac-address = [00 00 00 00 00 00];
 		};
 	};
 
@@ -481,58 +453,6 @@
 		compatible = "rohm,dh2228fv";
 		reg = <0>;
 		spi-max-frequency = <100000>;
-	};
-};
-
-&pruss_soc_bus1 {
-	status = "okay";
-	pruss1: pruss@4b200000 {
-		status = "okay";
-		pru1_0: pru@4b234000 {
-			interrupt-parent = <&pruss1_intc>;
-			interrupts = <16>, <17>;
-			interrupt-names = "vring", "kick";
-			status = "okay";
-		};
-		pru1_1: pru@4b238000 {
-			interrupt-parent = <&pruss1_intc>;
-			interrupts = <18>, <19>;
-			interrupt-names = "vring", "kick";
-			status = "okay";
-		};
-	};
-};
-
-&pruss_soc_bus2 {
-	status = "okay";
-	pruss2: pruss@4b280000 {
-		status = "okay";
-		pru2_0: pru@4b2b4000 {
-			interrupt-parent = <&pruss2_intc>;
-			interrupts = <16>, <17>;
-			interrupt-names = "vring", "kick";
-			status = "okay";
-		};
-		pru2_1: pru@4b2b8000 {
-			interrupt-parent = <&pruss2_intc>;
-			interrupts = <18>, <19>;
-			interrupt-names = "vring", "kick";
-			status = "okay";
-		};
-	};
-};
-
-&pruss2_mdio {
-	status = "okay";
-	reset-gpios = <&expander1 6 GPIO_ACTIVE_LOW>,
-		      <&expander1 7 GPIO_ACTIVE_LOW>;
-	reset-delay-us = <2>;
-	dp83822_0: ethernet-phy@0 {
-		reg = <0>;
-	};
-
-	dp83822_1: ethernet-phy@1 {
-		reg = <1>;
 	};
 };
 
