@@ -42,8 +42,8 @@
 	};
 
 	chosen {
-		bootargs = "console=ttymxc0,115200 earlycon=ec_imx6q,0x30860000,115200";
-		stdout-path = &uart1;
+		bootargs = "console=ttymxc2,115200 earlycon=ec_imx6q,0x30880000,115200";
+		stdout-path = &uart3;
 	};
 
 	extcon_usb0: extcon_usb0 {
@@ -584,11 +584,11 @@
 	status = "okay";
 };
 
-&uart1 { /* console */
+&uart1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart1>;
 	assigned-clocks = <&clk IMX8MQ_CLK_UART1>;
-	assigned-clock-parents = <&clk IMX8MQ_CLK_25M>;
+	assigned-clock-parents = <&clk IMX8MQ_SYS1_PLL_80M>;
 	status = "okay";
 };
 
@@ -600,11 +600,12 @@
 	status = "okay";
 };
 
+/* console */
 &uart3 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart3>;
 	assigned-clocks = <&clk IMX8MQ_CLK_UART3>;
-	assigned-clock-parents = <&clk IMX8MQ_SYS1_PLL_80M>;
+	assigned-clock-parents = <&clk IMX8MQ_CLK_25M>;
 	status = "okay";
 };
 
