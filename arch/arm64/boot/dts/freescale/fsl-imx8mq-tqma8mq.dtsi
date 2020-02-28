@@ -295,7 +295,6 @@
 	rtc1: rtc@51 {
 		compatible = "nxp,pcf85063a";
 		reg = <0x51>;
-		/* TODO: wakeup / alarm not implemented yet */
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_rtc>;
 		interrupt-names = "irq";
