@@ -13,6 +13,7 @@
 		serial1 = &hscif0;
 		serial2 = &hscif1;
 		serial3 = &scif0;
+		spi0 = &msiof0;
 	};
 
 	chosen {
@@ -339,6 +340,12 @@
 		groups = "usb30";
 		function = "usb30";
 	};
+
+	msiof0_pins: spi0 {
+		groups = "msiof0_clk", "msiof0_sync",
+			 "msiof0_rxd", "msiof0_txd";
+		function = "msiof0";
+	};
 };
 
 &rcar_sound {
@@ -504,5 +511,12 @@
 };
 
 &vspi0 {
+	status = "okay";
+};
+
+&msiof0 {
+	pinctrl-0 = <&msiof0_pins>;
+	pinctrl-names = "default";
+
 	status = "okay";
 };
