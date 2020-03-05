@@ -159,9 +159,13 @@
 	/* Dual-MAC Ethernet application node on PRU-ICSS2 */
 	pruss2_eth {
 		compatible = "ti,am57-prueth";
-		pruss = <&pruss2>;
+		prus = <&pru2_0>, <&pru2_1>;
+		firmware-name = "ti-pruss/am57xx-pru0-prueth-fw.elf",
+				"ti-pruss/am57xx-pru1-prueth-fw.elf";
 		sram = <&ocmcram1>;
 		interrupt-parent = <&pruss2_intc>;
+		mii-rt = <&pruss2_mii_rt>;
+		iep = <&pruss2_iep>;
 
 		pruss2_emac0: ethernet-mii0 {
 			phy-handle = <&dp83822_0>;
