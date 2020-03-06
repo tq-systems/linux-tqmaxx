@@ -788,14 +788,20 @@ dtb-merge-$(CONFIG_SOC_DRA7XX) += \
 	dra76-evm-tfp410-ov5640.dtb \
 	am571x-mba57xx.dtb \
 	am571x-mba57xx-dmb-ct44.dtb \
+	am571x-mba57xx-dmb-ct44-min.dtb \
+	am571x-mba57xx-dmb-ct44-max.dtb \
 	am571x-mba57xx-glyn-etm0700g0dh6.dtb \
 	am571x-mba57xx-lvds-tm070jvhg33.dtb \
 	am572x-mba57xx.dtb \
 	am572x-mba57xx-dmb-ct44.dtb \
+	am572x-mba57xx-dmb-ct44-min.dtb \
+	am572x-mba57xx-dmb-ct44-max.dtb \
 	am572x-mba57xx-glyn-etm0700g0dh6.dtb \
 	am572x-mba57xx-lvds-tm070jvhg33.dtb \
 	am574x-mba57xx.dtb \
 	am574x-mba57xx-dmb-ct44.dtb \
+	am574x-mba57xx-dmb-ct44-min.dtb \
+	am574x-mba57xx-dmb-ct44-max.dtb \
 	am574x-mba57xx-glyn-etm0700g0dh6.dtb \
 	am574x-mba57xx-lvds-tm070jvhg33.dtb
 ifeq ($(CONFIG_SOC_DRA7XX),y)

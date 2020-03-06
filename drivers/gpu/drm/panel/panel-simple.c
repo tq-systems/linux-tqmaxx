@@ -1067,22 +1067,73 @@ static const struct panel_desc dmb_s070pws19hp_fc21 = {
 };
 
 /* S070SWV29HG-DC44 2017/09/21 */
-static const struct drm_display_mode dmb_s070swv29hg_dc44_mode = {
-	.clock = 33300,
-	.hdisplay = 800,
-	.hsync_start = 800 + 210,
-	.hsync_end = 800 + 210 + 2,
-	.htotal = 800 + 210 + 2 + 44,
-	.vdisplay = 480,
-	.vsync_start = 480 + 22,
-	.vsync_end = 480 + 22 + 2,
-	.vtotal = 480 + 22 + 2 + 21,
-	.vrefresh = 60,
-	.flags = DRM_MODE_FLAG_NHSYNC | DRM_MODE_FLAG_NVSYNC,
+static const struct drm_display_mode dmb_s070swv29hg_dc44_mode[] = {
+	{
+		.clock = 26300,
+		.hdisplay = 800,
+		.hsync_start = 800 + 15,
+		.hsync_end = 800 + 15 + 1,
+		.htotal = 800 + 15 + 1 + 46,
+		.vdisplay = 480,
+		.vsync_start = 480 + 6,
+		.vsync_end = 480 + 6 + 1,
+		.vtotal = 480 + 6 + 1 + 23,
+		.vrefresh = 60,
+		.flags = DRM_MODE_FLAG_NHSYNC | DRM_MODE_FLAG_NVSYNC,
+	},{
+		.clock = 33300,
+		.hdisplay = 800,
+		.hsync_start = 800 + 210,
+		.hsync_end = 800 + 210 + 2,
+		.htotal = 800 + 210 + 2 + 44,
+		.vdisplay = 480,
+		.vsync_start = 480 + 22,
+		.vsync_end = 480 + 22 + 2,
+		.vtotal = 480 + 22 + 2 + 21,
+		.vrefresh = 60,
+		.flags = DRM_MODE_FLAG_NHSYNC | DRM_MODE_FLAG_NVSYNC,
+	}, {
+		.clock = 46800,
+		.hdisplay = 800,
+		.hsync_start = 800 + 352,
+		.hsync_end = 800 + 352 + 2,
+		.htotal = 800 + 352 + 2 + 46,
+		.vdisplay = 480,
+		.vsync_start = 480 + 145,
+		.vsync_end = 480 + 145 + 2,
+		.vtotal = 480 + 145 + 2 + 23,
+		.vrefresh = 60,
+		.flags = DRM_MODE_FLAG_NHSYNC | DRM_MODE_FLAG_NVSYNC,
+	}
+};
+
+
+static const struct panel_desc dmb_s070swv29hg_dc44_min = {
+	.modes = &dmb_s070swv29hg_dc44_mode[0],
+	.num_modes = 1,
+	.bpc = 6,
+	.size = {
+		.width = 154,
+		.height = 86,
+	},
+	.bus_format = MEDIA_BUS_FMT_RGB666_1X18,
+	.bus_flags = DRM_BUS_FLAG_DE_HIGH | DRM_BUS_FLAG_PIXDATA_POSEDGE,
 };
 
 static const struct panel_desc dmb_s070swv29hg_dc44 = {
-	.modes = &dmb_s070swv29hg_dc44_mode,
+	.modes = &dmb_s070swv29hg_dc44_mode[1],
+	.num_modes = 1,
+	.bpc = 6,
+	.size = {
+		.width = 154,
+		.height = 86,
+	},
+	.bus_format = MEDIA_BUS_FMT_RGB666_1X18,
+	.bus_flags = DRM_BUS_FLAG_DE_HIGH | DRM_BUS_FLAG_PIXDATA_POSEDGE,
+};
+
+static const struct panel_desc dmb_s070swv29hg_dc44_max = {
+	.modes = &dmb_s070swv29hg_dc44_mode[2],
 	.num_modes = 1,
 	.bpc = 6,
 	.size = {
@@ -2587,6 +2638,12 @@ static const struct of_device_id platform_of_match[] = {
 	}, {
 		.compatible = "dmb,s070swv29hg_dc44",
 		.data = &dmb_s070swv29hg_dc44,
+	}, {
+		.compatible = "dmb,s070swv29hg_dc44_min",
+		.data = &dmb_s070swv29hg_dc44_min,
+	}, {
+		.compatible = "dmb,s070swv29hg_dc44_max",
+		.data = &dmb_s070swv29hg_dc44_max,
 	}, {
 		.compatible = "edt,et057090dhu",
 		.data = &edt_et057090dhu,
