@@ -528,6 +528,9 @@
 
 &pruss2_mdio {
 	status = "okay";
+	reset-gpios = <&expander1 6 GPIO_ACTIVE_LOW>,
+		      <&expander1 7 GPIO_ACTIVE_LOW>;
+	reset-delay-us = <2>;
 
 	dp83822_0: ethernet-phy@0 {
 		reg = <0>;
