@@ -633,7 +633,6 @@
 };
 
 
-/* TODO: not working */
 &usb3_phy0 {
 	vbus-supply = <&reg_otg_vbus>;
 	status = "okay";
