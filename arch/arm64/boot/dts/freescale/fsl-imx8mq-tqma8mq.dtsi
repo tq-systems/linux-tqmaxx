@@ -19,6 +19,9 @@
 
 #include "fsl-imx8mq.dtsi"
 
+/* disable until we fix it */
+/delete-node/ &rpmsg_reserved;
+
 / {
 	model = "TQ Systems GmbH i.MX8MQ TQMa8MQ";
 	compatible = "tq,imx8mq-tqma8mq", "fsl,imx8mq";
@@ -47,9 +50,6 @@
 			alloc-ranges = <0 0x40000000 0 0x1C000000>;
 			linux,cma-default;
 		};
-
-		/* disable until we fix it */
-		/delete-node/ rpmsg@0x78000000;
 	};
 
 	reg_tqma8mx_vcc3v3: tqma8mx-vcc3v3 {
