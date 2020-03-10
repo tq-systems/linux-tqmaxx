@@ -81,6 +81,15 @@
 	};
 };
 
+/* disable until we fix it */
+&pcie0 {
+	/delete-property/ reserved-region;
+};
+
+&pcie1 {
+	/delete-property/ reserved-region;
+};
+
 &A53_0 {
 	operating-points = <
 		/* kHz    uV */
