@@ -645,6 +645,10 @@
 &usb_dwc3_0 {
 	status = "okay";
 	extcon = <&extcon_usb0>;
+	/*
+	 * TODO: sugested as workaround 1) for errata e11193, has to be tested
+	 */
+	/* snps,dis_u2_susphy_quirk; */
 	dr_mode = "otg";
 };
 
