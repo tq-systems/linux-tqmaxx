@@ -752,9 +752,27 @@ dtb-$(CONFIG_SOC_DRA7XX) += \
 	am57xx-beagle-x15-revc.dtb \
 	am57xx-cl-som-am57x.dtb \
 	am57xx-sbc-am57x.dtb \
+	am571x-mba57xx.dtb \
+	am571x-mba57xx-dmb-ct44.dtb \
+	am571x-mba57xx-dmb-ct44-min.dtb \
+	am571x-mba57xx-dmb-ct44-max.dtb \
+	am571x-mba57xx-glyn-etm0700g0dh6.dtb \
+	am571x-mba57xx-lvds-tm070jvhg33.dtb \
 	am572x-idk.dtb \
+	am572x-mba57xx.dtb \
+	am572x-mba57xx-dmb-ct44.dtb \
+	am572x-mba57xx-dmb-ct44-min.dtb \
+	am572x-mba57xx-dmb-ct44-max.dtb \
+	am572x-mba57xx-glyn-etm0700g0dh6.dtb \
+	am572x-mba57xx-lvds-tm070jvhg33.dtb \
 	am5729-beagleboneai.dtb \
 	am574x-idk.dtb \
+	am574x-mba57xx.dtb \
+	am574x-mba57xx-dmb-ct44.dtb \
+	am574x-mba57xx-dmb-ct44-min.dtb \
+	am574x-mba57xx-dmb-ct44-max.dtb \
+	am574x-mba57xx-glyn-etm0700g0dh6.dtb \
+	am574x-mba57xx-lvds-tm070jvhg33.dtb \
 	dra7-evm.dtb \
 	dra72-evm.dtb \
 	dra72-evm-revc.dtb \
@@ -785,25 +803,7 @@ dtb-merge-$(CONFIG_SOC_DRA7XX) += \
 	dra76-evm-ov5640.dtb \
 	dra76-evm-tfp410.dtb \
 	dra76-evm-tfp410-ov490.dtb \
-	dra76-evm-tfp410-ov5640.dtb \
-	am571x-mba57xx.dtb \
-	am571x-mba57xx-dmb-ct44.dtb \
-	am571x-mba57xx-dmb-ct44-min.dtb \
-	am571x-mba57xx-dmb-ct44-max.dtb \
-	am571x-mba57xx-glyn-etm0700g0dh6.dtb \
-	am571x-mba57xx-lvds-tm070jvhg33.dtb \
-	am572x-mba57xx.dtb \
-	am572x-mba57xx-dmb-ct44.dtb \
-	am572x-mba57xx-dmb-ct44-min.dtb \
-	am572x-mba57xx-dmb-ct44-max.dtb \
-	am572x-mba57xx-glyn-etm0700g0dh6.dtb \
-	am572x-mba57xx-lvds-tm070jvhg33.dtb \
-	am574x-mba57xx.dtb \
-	am574x-mba57xx-dmb-ct44.dtb \
-	am574x-mba57xx-dmb-ct44-min.dtb \
-	am574x-mba57xx-dmb-ct44-max.dtb \
-	am574x-mba57xx-glyn-etm0700g0dh6.dtb \
-	am574x-mba57xx-lvds-tm070jvhg33.dtb
+	dra76-evm-tfp410-ov5640.dtb
 ifeq ($(CONFIG_SOC_DRA7XX),y)
 dts-dirs += ti
 endif
