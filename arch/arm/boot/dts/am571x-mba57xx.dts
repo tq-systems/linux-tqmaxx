@@ -14,7 +14,7 @@
 #include "am57xx-mba57xx.dtsi"
 
 / {
-	model = "TQ TQMa5718 MBa57xx";
+	model = "TQ TQMa5718 MBa57xx (TI)";
 	compatible = "tq,mba57xx", "tq,tqma5718", "ti,am5718",
 		     "ti,dra7";
 };
