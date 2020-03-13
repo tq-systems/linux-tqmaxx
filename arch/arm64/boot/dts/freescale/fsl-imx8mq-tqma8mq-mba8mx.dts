@@ -366,14 +366,18 @@
 			MX8MQ_IOMUXC_GPIO1_IO10_GPIO1_IO10		0xe6
 		>;
 	};
-#if 0
+
+	/*
+	 * TODO: OC detection is not functional yet since signal is expected to
+	 * be low active. HW on MBa8Mx has high active signalling
+	 * See: https://community.nxp.com/message/1247228?commentID=1247228#comment-1247228
+	 */
 	pinctrl_usb0: usb0grp {
 		fsl,pins = <
-/* TODO: OC detection not functional in dwc3, pin mux will lead to non functional USB */
-/*			MX8MQ_IOMUXC_GPIO1_IO13_USB1_OTG_OC		0x01 */
+			MX8MQ_IOMUXC_GPIO1_IO13_USB1_OTG_OC		0x01
 		>;
 	};
-#endif
+
 	pinctrl_usdhc2_gpio: usdhc2grpgpio {
 		fsl,pins = <
 			MX8MQ_IOMUXC_SD2_CD_B_GPIO2_IO12	0x41
@@ -644,6 +648,11 @@
 
 &usb_dwc3_0 {
 	status = "okay";
+	/*
+	 * TODO: OC not supported due to non matching active polarity
+	 *	pinctrl-names = "default";
+	 *	pinctrl-0 = <&pinctrl_usb0>;
+	 */
 	extcon = <&extcon_usb0>;
 	/*
 	 * TODO: sugested as workaround 1) for errata e11193, has to be tested
