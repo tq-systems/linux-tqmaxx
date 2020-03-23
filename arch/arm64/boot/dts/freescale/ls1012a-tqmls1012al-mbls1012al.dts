@@ -76,6 +76,8 @@
 		gpio-controller;
 		#gpio-cells = <2>;
 		vcc-supply = <&reg_3p3v>;
+		interrupt-parent = <&gpio0>;
+		interrupts = <24 IRQ_TYPE_EDGE_FALLING>;
 
 		vcc_pcie_en_3v3 {
 			gpio-hog;
@@ -112,6 +114,8 @@
 		gpio-controller;
 		#gpio-cells = <2>;
 		vcc-supply = <&reg_1p8v>;
+		interrupt-parent = <&gpio0>;
+		interrupts = <27 IRQ_TYPE_EDGE_FALLING>;
 
 		/* do not change PCIE_CLK_PD */
 		pcie_clk_pd {
