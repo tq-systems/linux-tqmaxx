@@ -27,6 +27,23 @@
 		stdout-path = &duart0;
 	};
 
+	leds {
+		compatible = "gpio-leds";
+		status = "okay";
+
+		v15 {
+			label = "V15";
+			gpios = <&gpio_ext0 14 GPIO_ACTIVE_LOW>;
+			linux,default-trigger = "heartbeat";
+		};
+
+		v16 {
+			label = "V16";
+			gpios = <&gpio_ext0 15 GPIO_ACTIVE_LOW>;
+			default-state = "on";
+		};
+	};
+
 	reg_1p5v: regulator_1p5v {
 		compatible = "regulator-fixed";
 		regulator-name = "1P5V";
