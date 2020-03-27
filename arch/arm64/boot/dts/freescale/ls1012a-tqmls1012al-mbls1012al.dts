@@ -69,6 +69,29 @@
 		};
 	};
 
+	memory@80000000 {
+		device_type = "memory";
+		/*  our minimum RAM config will be 256 MiB */
+		reg = <0x00000000 0x80000000 0 0x10000000>;
+	};
+
+	reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		/* global autoconfigured region for contiguous allocations */
+		linux,cma {
+			compatible = "shared-dma-pool";
+			reusable;
+			/* 64 MiB */
+			size = <0 0x04000000>;
+			/*  256 - 128 MiB, our minimum RAM config will be 256 MiB */
+			alloc-ranges = <0 0x80000000 0 0x88000000>;
+			linux,cma-default;
+		};
+	};
+
 	reg_1p5v: regulator_1p5v {
 		compatible = "regulator-fixed";
 		regulator-name = "1P5V";
