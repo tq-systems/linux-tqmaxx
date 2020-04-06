@@ -3037,7 +3037,6 @@ static const struct display_timing tianma_tm070jvhg33_timing = {
 	.vfront_porch = { 3, 40, 99 },
 	.vback_porch = { 2, 2, 2 },
 	.vsync_len = { 1, 1, 128 },
-	.flags = DISPLAY_FLAGS_DE_HIGH,
 };
 
 static const struct panel_desc tianma_tm070jvhg33 = {
@@ -3048,7 +3047,9 @@ static const struct panel_desc tianma_tm070jvhg33 = {
 		.width = 150,
 		.height = 94,
 	},
-	.bus_format = MEDIA_BUS_FMT_RGB888_1X7X4_SPWG,
+	/* MEDIA_BUS_FMT_RGB888_1X7X4_SPWG is not accepted by i.MX8MQ eLCDIF */
+	.bus_format = MEDIA_BUS_FMT_RGB888_1X24,
+	.bus_flags = DRM_BUS_FLAG_DE_LOW,
 };
 
 static const struct drm_display_mode ti_nspire_cx_lcd_mode[] = {
