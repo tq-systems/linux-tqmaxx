@@ -108,7 +108,7 @@ static const struct cpg_core_clk r8a774e1_core_clks[] __initconst = {
 	DEF_DIV6P1("mso",       R8A774E1_CLK_MSO,   CLK_PLL1_DIV4, 0x014),
 	DEF_DIV6P1("hdmi",      R8A774E1_CLK_HDMI,  CLK_PLL1_DIV4, 0x250),
 
-	DEF_DIV6_RO("osc",      R8A774E1_CLK_OSC,   CLK_EXTAL, CPG_RCKCR,  8),
+	DEF_GEN3_OSC("osc",     R8A774E1_CLK_OSC,   CLK_EXTAL,     8),
 
 	DEF_BASE("r",           R8A774E1_CLK_R,     CLK_TYPE_GEN3_R, CLK_RINT),
 };
