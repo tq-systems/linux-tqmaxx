@@ -146,6 +146,7 @@
 			clocks = <&cpg CPG_CORE R8A774E1_CLK_Z>;
 			operating-points-v2 = <&cluster0_opp>;
 			cpu-idle-states = <&CPU_SLEEP_0>;
+			capacity-dmips-mhz = <1024>;
 		};
 
 		a57_1: cpu@1 {
@@ -158,6 +159,7 @@
 			clocks = <&cpg CPG_CORE R8A774E1_CLK_Z>;
 			operating-points-v2 = <&cluster0_opp>;
 			cpu-idle-states = <&CPU_SLEEP_0>;
+			capacity-dmips-mhz = <1024>;
 		};
 
 		a57_2: cpu@2 {
@@ -170,6 +172,7 @@
 			clocks = <&cpg CPG_CORE R8A774E1_CLK_Z>;
 			operating-points-v2 = <&cluster0_opp>;
 			cpu-idle-states = <&CPU_SLEEP_0>;
+			capacity-dmips-mhz = <1024>;
 		};
 
 		a57_3: cpu@3 {
@@ -182,6 +185,7 @@
 			clocks = <&cpg CPG_CORE R8A774E1_CLK_Z>;
 			operating-points-v2 = <&cluster0_opp>;
 			cpu-idle-states = <&CPU_SLEEP_0>;
+			capacity-dmips-mhz = <1024>;
 		};
 
 		a53_0: cpu@100 {
@@ -194,6 +198,7 @@
 			clocks = <&cpg CPG_CORE R8A774E1_CLK_Z2>;
 			operating-points-v2 = <&cluster1_opp>;
 			cpu-idle-states = <&CPU_SLEEP_1>;
+			capacity-dmips-mhz = <535>;
 		};
 
 		a53_1: cpu@101 {
@@ -206,6 +211,7 @@
 			clocks = <&cpg CPG_CORE R8A774E1_CLK_Z2>;
 			operating-points-v2 = <&cluster1_opp>;
 			cpu-idle-states = <&CPU_SLEEP_1>;
+			capacity-dmips-mhz = <535>;
 		};
 
 		a53_2: cpu@102 {
@@ -218,6 +224,7 @@
 			clocks = <&cpg CPG_CORE R8A774E1_CLK_Z2>;
 			operating-points-v2 = <&cluster1_opp>;
 			cpu-idle-states = <&CPU_SLEEP_1>;
+			capacity-dmips-mhz = <535>;
 		};
 
 		a53_3: cpu@103 {
@@ -230,6 +237,7 @@
 			clocks = <&cpg CPG_CORE R8A774E1_CLK_Z2>;
 			operating-points-v2 = <&cluster1_opp>;
 			cpu-idle-states = <&CPU_SLEEP_1>;
+			capacity-dmips-mhz = <535>;
 		};
 
 		L2_CA57: cache-controller-0 {
