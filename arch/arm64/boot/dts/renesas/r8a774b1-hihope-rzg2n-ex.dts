@@ -24,3 +24,7 @@
 		line-name = "pcie-en-gpio";
 	};
 };
+
+&pciec1 {
+	status = "okay";
+};
