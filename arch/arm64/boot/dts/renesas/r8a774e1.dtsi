@@ -147,6 +147,10 @@
 			operating-points-v2 = <&cluster0_opp>;
 			cpu-idle-states = <&CPU_SLEEP_0>;
 			capacity-dmips-mhz = <1024>;
+			#cooling-cells = <2>;
+			dynamic-power-coefficient = <854>;
+			cooling-min-level = <0>;
+			cooling-max-level = <2>;
 		};
 
 		a57_1: cpu@1 {
@@ -199,6 +203,10 @@
 			operating-points-v2 = <&cluster1_opp>;
 			cpu-idle-states = <&CPU_SLEEP_1>;
 			capacity-dmips-mhz = <535>;
+			#cooling-cells = <2>;
+			dynamic-power-coefficient = <277>;
+			cooling-min-level = <0>;
+			cooling-max-level = <2>;
 		};
 
 		a53_1: cpu@101 {
@@ -2583,6 +2591,7 @@
 			polling-delay-passive = <250>;
 			polling-delay = <0>;
 			thermal-sensors = <&tsc 0>;
+			sustainable-power = <6313>;
 
 			trips {
 				sensor1_crit: sensor1-crit {
@@ -2596,6 +2605,7 @@
 			polling-delay-passive = <250>;
 			polling-delay = <0>;
 			thermal-sensors = <&tsc 1>;
+			sustainable-power = <6313>;
 
 			trips {
 				sensor2_crit: sensor2-crit {
@@ -2610,12 +2620,39 @@
 			polling-delay-passive = <250>;
 			polling-delay = <0>;
 			thermal-sensors = <&tsc 2>;
+			sustainable-power = <6313>;
 
 			trips {
+				threshold: trip-point0 {
+					temperature = <90000>;
+					hysteresis = <1000>;
+					type = "passive";
+				};
+
+				target: trip-point1 {
+					temperature = <100000>;
+					hysteresis = <1000>;
+					type = "passive";
+				};
+
 				sensor3_crit: sensor3-crit {
 					temperature = <120000>;
 					hysteresis = <2000>;
 					type = "critical";
+				};
+			};
+
+			cooling-maps {
+				map0 {
+					trip = <&target>;
+					cooling-device = <&a57_0 0 2>;
+					contribution = <1024>;
+				};
+
+				map1 {
+					trip = <&target>;
+					cooling-device = <&a53_0 0 2>;
+					contribution = <1024>;
 				};
 			};
 		};
