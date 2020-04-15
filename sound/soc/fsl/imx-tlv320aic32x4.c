@@ -51,10 +51,17 @@ static const struct snd_soc_dapm_route imx_tlv320aic_dapm_routes[] = {
 	{"IN3_L", NULL, "Mic Jack"},
 	{"Mic Jack", NULL, "Mic Bias"},
 
+	/*
+	 * if HPR/HPL are connected to the jack via 0 Ohm LOL/LOR are not
+	 * connected
+	 */
+#if 0
 	{"Headphone Jack", NULL, "HPL"},
 	{"Headphone Jack", NULL, "HPR"},
-	{"Line In Jack", NULL, "LOL"},
-	{"Line In Jack", NULL, "LOR"},
+#else
+	{"Line Out Jack", NULL, "LOL"},
+	{"Line Out Jack", NULL, "LOR"},
+#endif
 };
 
 static int imx_tlv320aic_dai_init(struct snd_soc_pcm_runtime *rtd)
