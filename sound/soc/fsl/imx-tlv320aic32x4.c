@@ -77,6 +77,20 @@ static int imx_tlv320aic_dai_init(struct snd_soc_pcm_runtime *rtd)
 		return ret;
 	}
 
+	snd_soc_dapm_force_enable_pin(&rtd->card->dapm, "Mic Bias");
+
+	return 0;
+}
+
+static int imx_tlv320aic_suspend_pre(struct snd_soc_card *card)
+{
+	snd_soc_dapm_disable_pin(&card->dapm, "Mic Bias");
+	return 0;
+}
+
+static int imx_tlv320aic_resume_post(struct snd_soc_card *card)
+{
+	snd_soc_dapm_force_enable_pin(&card->dapm, "Mic Bias");
 	return 0;
 }
 
@@ -140,6 +154,9 @@ static int imx_tlv320aic_probe(struct platform_device *pdev)
 	data->card.dapm_routes	= imx_tlv320aic_dapm_routes,
 	data->card.num_dapm_routes = ARRAY_SIZE(imx_tlv320aic_dapm_routes),
 	data->card.dev = &pdev->dev;
+
+	data->card.suspend_pre = imx_tlv320aic_suspend_pre,
+	data->card.resume_post = imx_tlv320aic_resume_post,
 
 	ret = snd_soc_of_parse_card_name(&data->card, "model");
 	if (ret)
