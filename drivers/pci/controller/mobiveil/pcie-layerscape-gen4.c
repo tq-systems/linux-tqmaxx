@@ -74,7 +74,7 @@ static bool ls_pcie_g4_is_bridge(struct ls_pcie_g4 *pcie)
 	struct mobiveil_pcie *mv_pci = &pcie->pci;
 	u32 header_type;
 
-	header_type = csr_readb(mv_pci, PCI_HEADER_TYPE);
+	header_type = mobiveil_csr_readb(mv_pci, PCI_HEADER_TYPE);
 	header_type &= 0x7f;
 
 	return header_type == PCI_HEADER_TYPE_BRIDGE;
@@ -86,17 +86,17 @@ static void workaround_A011451(struct ls_pcie_g4 *pcie)
 	u32 val;
 
 	/* Set ACK latency timeout */
-	val = csr_readl(mv_pci, GPEX_ACK_REPLAY_TO);
+	val = mobiveil_csr_readl(mv_pci, GPEX_ACK_REPLAY_TO);
 	val &= ~(ACK_LAT_TO_VAL_MASK << ACK_LAT_TO_VAL_SHIFT);
 	val |= (4 << ACK_LAT_TO_VAL_SHIFT);
-	csr_writel(mv_pci, val, GPEX_ACK_REPLAY_TO);
+	mobiveil_csr_writel(mv_pci, val, GPEX_ACK_REPLAY_TO);
 }
 
 static int ls_pcie_g4_host_init(struct mobiveil_pcie *pci)
 {
 	struct ls_pcie_g4 *pcie = to_ls_pcie_g4(pci);
 
-	pcie->rev = csr_readb(pci, PCI_REVISION_ID);
+	pcie->rev = mobiveil_csr_readb(pci, PCI_REVISION_ID);
 
 	if (pcie->rev == REV_1_0)
 		workaround_A011451(pcie);
@@ -122,7 +122,7 @@ static void ls_pcie_g4_disable_interrupt(struct ls_pcie_g4 *pcie)
 {
 	struct mobiveil_pcie *mv_pci = &pcie->pci;
 
-	csr_writel(mv_pci, 0, PAB_INTP_AMBA_MISC_ENB);
+	mobiveil_csr_writel(mv_pci, 0, PAB_INTP_AMBA_MISC_ENB);
 }
 
 static void ls_pcie_g4_enable_interrupt(struct ls_pcie_g4 *pcie)
@@ -131,11 +131,11 @@ static void ls_pcie_g4_enable_interrupt(struct ls_pcie_g4 *pcie)
 	u32 val;
 
 	/* Clear the interrupt status */
-	csr_writel(mv_pci, 0xffffffff, PAB_INTP_AMBA_MISC_STAT);
+	mobiveil_csr_writel(mv_pci, 0xffffffff, PAB_INTP_AMBA_MISC_STAT);
 
 	val = PAB_INTP_INTX_MASK | PAB_INTP_MSI | PAB_INTP_RESET |
 	      PAB_INTP_PCIE_UE | PAB_INTP_IE_PMREDI | PAB_INTP_IE_EC;
-	csr_writel(mv_pci, val, PAB_INTP_AMBA_MISC_ENB);
+	mobiveil_csr_writel(mv_pci, val, PAB_INTP_AMBA_MISC_ENB);
 }
 
 static void ls_pcie_g4_reinit_hw(struct ls_pcie_g4 *pcie)
@@ -149,7 +149,7 @@ static void ls_pcie_g4_reinit_hw(struct ls_pcie_g4 *pcie)
 	do {
 		usleep_range(10, 15);
 		val = ls_pcie_g4_pf_readl(pcie, PCIE_PF_INT_STAT);
-		act_stat = csr_readl(mv_pci, PAB_ACTIVITY_STAT);
+		act_stat = mobiveil_csr_readl(mv_pci, PAB_ACTIVITY_STAT);
 	} while (((val & PF_INT_STAT_PABRST) == 0 || act_stat) && to--);
 	if (to < 0) {
 		dev_err(dev, "Poll PABRST&PABACT timeout\n");
@@ -184,7 +184,7 @@ static irqreturn_t ls_pcie_g4_isr(int irq, void *dev_id)
 	struct mobiveil_pcie *mv_pci = &pcie->pci;
 	u32 val;
 
-	val = csr_readl(mv_pci, PAB_INTP_AMBA_MISC_STAT);
+	val = mobiveil_csr_readl(mv_pci, PAB_INTP_AMBA_MISC_STAT);
 	if (!val)
 		return IRQ_NONE;
 
@@ -193,7 +193,7 @@ static irqreturn_t ls_pcie_g4_isr(int irq, void *dev_id)
 		schedule_delayed_work(&pcie->dwork, msecs_to_jiffies(1));
 	}
 
-	csr_writel(mv_pci, val, PAB_INTP_AMBA_MISC_STAT);
+	mobiveil_csr_writel(mv_pci, val, PAB_INTP_AMBA_MISC_STAT);
 
 	return IRQ_HANDLED;
 }
@@ -228,9 +228,9 @@ static void ls_pcie_g4_reset(struct work_struct *work)
 	struct mobiveil_pcie *mv_pci = &pcie->pci;
 	u16 ctrl;
 
-	ctrl = csr_readw(mv_pci, PCI_BRIDGE_CONTROL);
+	ctrl = mobiveil_csr_readw(mv_pci, PCI_BRIDGE_CONTROL);
 	ctrl &= ~PCI_BRIDGE_CTL_BUS_RESET;
-	csr_writew(mv_pci, ctrl, PCI_BRIDGE_CONTROL);
+	mobiveil_csr_writew(mv_pci, ctrl, PCI_BRIDGE_CONTROL);
 	ls_pcie_g4_reinit_hw(pcie);
 	ls_pcie_g4_enable_interrupt(pcie);
 }

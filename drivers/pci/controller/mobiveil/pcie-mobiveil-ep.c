@@ -20,10 +20,10 @@ static void mobiveil_pcie_ep_func_select(struct mobiveil_pcie *pcie, u8 func_no)
 	 * select to access the config space of func_no by setting func_no
 	 * to FUNC_SEL_SHIFT bit of PAB_CTRL register.
 	 */
-	func_num = csr_readl(pcie, PAB_CTRL);
+	func_num = mobiveil_csr_readl(pcie, PAB_CTRL);
 	func_num &= ~(FUNC_SEL_MASK << FUNC_SEL_SHIFT);
 	func_num |= (func_no & FUNC_SEL_MASK) << FUNC_SEL_SHIFT;
-	csr_writel(pcie, func_num, PAB_CTRL);
+	mobiveil_csr_writel(pcie, func_num, PAB_CTRL);
 }
 
 static void mobiveil_pcie_ep_func_deselect(struct mobiveil_pcie *pcie)
@@ -34,16 +34,16 @@ static void mobiveil_pcie_ep_func_deselect(struct mobiveil_pcie *pcie)
 	 * clear the FUNC_SEL_SHIFT bits when access other registers except
 	 * config space register.
 	 */
-	func_num = csr_readl(pcie, PAB_CTRL);
+	func_num = mobiveil_csr_readl(pcie, PAB_CTRL);
 	func_num &= ~(FUNC_SEL_MASK << FUNC_SEL_SHIFT);
-	csr_writel(pcie, func_num, PAB_CTRL);
+	mobiveil_csr_writel(pcie, func_num, PAB_CTRL);
 }
 
 static void __mobiveil_pcie_ep_reset_bar(struct mobiveil_pcie *pcie, u8 bar)
 {
-	csr_writel(pcie, bar, GPEX_BAR_SELECT);
-	csr_writel(pcie, 0, GPEX_BAR_SIZE_LDW);
-	csr_writel(pcie, 0, GPEX_BAR_SIZE_UDW);
+	mobiveil_csr_writel(pcie, bar, GPEX_BAR_SELECT);
+	mobiveil_csr_writel(pcie, 0, GPEX_BAR_SIZE_LDW);
+	mobiveil_csr_writel(pcie, 0, GPEX_BAR_SIZE_UDW);
 }
 
 void mobiveil_pcie_ep_reset_bar(struct mobiveil_pcie *pcie, u8 bar)
@@ -62,7 +62,7 @@ static u8 __mobiveil_pcie_ep_find_next_cap(struct mobiveil_pcie *pcie,
 
 	mobiveil_pcie_ep_func_select(pcie, func_no);
 
-	reg = csr_readw(pcie, cap_ptr);
+	reg = mobiveil_csr_readw(pcie, cap_ptr);
 	cap_id = (reg & 0x00ff);
 
 	mobiveil_pcie_ep_func_deselect(pcie);
@@ -87,7 +87,7 @@ static u8 mobiveil_pcie_ep_find_capability(struct mobiveil_pcie_ep *ep,
 
 	mobiveil_pcie_ep_func_select(pcie, func_no);
 
-	reg = csr_readw(pcie, PCI_CAPABILITY_LIST);
+	reg = mobiveil_csr_readw(pcie, PCI_CAPABILITY_LIST);
 	next_cap_ptr = (reg & 0x00ff);
 
 	mobiveil_pcie_ep_func_deselect(pcie);
@@ -104,16 +104,17 @@ static int mobiveil_pcie_ep_write_header(struct pci_epc *epc, u8 func_no,
 
 	mobiveil_pcie_ep_func_select(pcie, func_no);
 
-	csr_writew(pcie, hdr->vendorid, PCI_VENDOR_ID);
-	csr_writew(pcie, hdr->deviceid, PCI_DEVICE_ID);
-	csr_writeb(pcie, hdr->revid, PCI_REVISION_ID);
-	csr_writeb(pcie, hdr->progif_code, PCI_CLASS_PROG);
-	csr_writew(pcie, hdr->subclass_code | hdr->baseclass_code << 8,
+	mobiveil_csr_writew(pcie, hdr->vendorid, PCI_VENDOR_ID);
+	mobiveil_csr_writew(pcie, hdr->deviceid, PCI_DEVICE_ID);
+	mobiveil_csr_writeb(pcie, hdr->revid, PCI_REVISION_ID);
+	mobiveil_csr_writeb(pcie, hdr->progif_code, PCI_CLASS_PROG);
+	mobiveil_csr_writew(pcie, hdr->subclass_code | hdr->baseclass_code << 8,
 		   PCI_CLASS_DEVICE);
-	csr_writeb(pcie, hdr->cache_line_size, PCI_CACHE_LINE_SIZE);
-	csr_writew(pcie, hdr->subsys_vendor_id, PCI_SUBSYSTEM_VENDOR_ID);
-	csr_writew(pcie, hdr->subsys_id, PCI_SUBSYSTEM_ID);
-	csr_writeb(pcie, hdr->interrupt_pin, PCI_INTERRUPT_PIN);
+	mobiveil_csr_writeb(pcie, hdr->cache_line_size, PCI_CACHE_LINE_SIZE);
+	mobiveil_csr_writew(pcie, hdr->subsys_vendor_id,
+			    PCI_SUBSYSTEM_VENDOR_ID);
+	mobiveil_csr_writew(pcie, hdr->subsys_id, PCI_SUBSYSTEM_ID);
+	mobiveil_csr_writeb(pcie, hdr->interrupt_pin, PCI_INTERRUPT_PIN);
 
 	mobiveil_pcie_ep_func_deselect(pcie);
 
@@ -178,11 +179,11 @@ static int mobiveil_pcie_ep_set_bar(struct pci_epc *epc, u8 func_no,
 		mobiveil_pcie_ep_inbound_win(ep, func_no, bar,
 					     epf_bar->phys_addr);
 
-		csr_writel(pcie, func_no * ep->bar_num + bar,
+		mobiveil_csr_writel(pcie, func_no * ep->bar_num + bar,
 			   GPEX_BAR_SELECT);
-		csr_writel(pcie, lower_32_bits(~(size - 1)),
+		mobiveil_csr_writel(pcie, lower_32_bits(~(size - 1)),
 			   GPEX_BAR_SIZE_LDW);
-		csr_writel(pcie, upper_32_bits(~(size - 1)),
+		mobiveil_csr_writel(pcie, upper_32_bits(~(size - 1)),
 			   GPEX_BAR_SIZE_UDW);
 	}
 
@@ -253,7 +254,7 @@ static int mobiveil_pcie_ep_get_msi(struct pci_epc *epc, u8 func_no)
 	mobiveil_pcie_ep_func_select(pcie, func_no);
 
 	reg = msi_cap + PCI_MSI_FLAGS;
-	val = csr_readw(pcie, reg);
+	val = mobiveil_csr_readw(pcie, reg);
 
 	mobiveil_pcie_ep_func_deselect(pcie);
 
@@ -281,10 +282,10 @@ static int mobiveil_pcie_ep_set_msi(struct pci_epc *epc,
 	mobiveil_pcie_ep_func_select(pcie, func_no);
 
 	reg = msi_cap + PCI_MSI_FLAGS;
-	val = csr_readw(pcie, reg);
+	val = mobiveil_csr_readw(pcie, reg);
 	val &= ~PCI_MSI_FLAGS_QMASK;
 	val |= (interrupts << 1) & PCI_MSI_FLAGS_QMASK;
-	csr_writew(pcie, val, reg);
+	mobiveil_csr_writew(pcie, val, reg);
 
 	mobiveil_pcie_ep_func_deselect(pcie);
 
@@ -306,7 +307,7 @@ static int mobiveil_pcie_ep_get_msix(struct pci_epc *epc, u8 func_no)
 	mobiveil_pcie_ep_func_select(pcie, func_no);
 
 	reg = msix_cap + PCI_MSIX_FLAGS;
-	val = csr_readw(pcie, reg);
+	val = mobiveil_csr_readw(pcie, reg);
 
 	mobiveil_pcie_ep_func_deselect(pcie);
 
@@ -334,10 +335,10 @@ static int mobiveil_pcie_ep_set_msix(struct pci_epc *epc, u8 func_no,
 	mobiveil_pcie_ep_func_select(pcie, func_no);
 
 	reg = msix_cap + PCI_MSIX_FLAGS;
-	val = csr_readw(pcie, reg);
+	val = mobiveil_csr_readw(pcie, reg);
 	val &= ~PCI_MSIX_FLAGS_QSIZE;
 	val |= interrupts;
-	csr_writew(pcie, val, reg);
+	mobiveil_csr_writew(pcie, val, reg);
 
 	mobiveil_pcie_ep_func_deselect(pcie);
 
@@ -410,19 +411,19 @@ int mobiveil_pcie_ep_raise_msi_irq(struct mobiveil_pcie_ep *ep, u8 func_no,
 	mobiveil_pcie_ep_func_select(pcie, func_no);
 
 	reg = msi_cap + PCI_MSI_FLAGS;
-	msg_ctrl = csr_readw(pcie, reg);
+	msg_ctrl = mobiveil_csr_readw(pcie, reg);
 	has_upper = !!(msg_ctrl & PCI_MSI_FLAGS_64BIT);
 	reg = msi_cap + PCI_MSI_ADDRESS_LO;
-	msg_addr_lower = csr_readl(pcie, reg);
+	msg_addr_lower = mobiveil_csr_readl(pcie, reg);
 	if (has_upper) {
 		reg = msi_cap + PCI_MSI_ADDRESS_HI;
-		msg_addr_upper = csr_readl(pcie, reg);
+		msg_addr_upper = mobiveil_csr_readl(pcie, reg);
 		reg = msi_cap + PCI_MSI_DATA_64;
-		msg_data = csr_readw(pcie, reg);
+		msg_data = mobiveil_csr_readw(pcie, reg);
 	} else {
 		msg_addr_upper = 0;
 		reg = msi_cap + PCI_MSI_DATA_32;
-		msg_data = csr_readw(pcie, reg);
+		msg_data = mobiveil_csr_readw(pcie, reg);
 	}
 	msg_addr = ((u64) msg_addr_upper) << 32 | msg_addr_lower;
 
@@ -458,14 +459,14 @@ int mobiveil_pcie_ep_raise_msix_irq(struct mobiveil_pcie_ep *ep, u8 func_no,
 
 	mobiveil_pcie_ep_func_deselect(pcie);
 
-	msg_addr_lower = csr_readl(pcie, PAB_MSIX_TABLE_PBA_ACCESS +
+	msg_addr_lower = mobiveil_csr_readl(pcie, PAB_MSIX_TABLE_PBA_ACCESS +
 				   PCI_MSIX_ENTRY_LOWER_ADDR +
 				   (interrupt_num - 1) * PCI_MSIX_ENTRY_SIZE);
-	msg_addr_upper = csr_readl(pcie, PAB_MSIX_TABLE_PBA_ACCESS +
+	msg_addr_upper = mobiveil_csr_readl(pcie, PAB_MSIX_TABLE_PBA_ACCESS +
 				   PCI_MSIX_ENTRY_UPPER_ADDR +
 				   (interrupt_num - 1) * PCI_MSIX_ENTRY_SIZE);
 	msg_addr = ((u64) msg_addr_upper) << 32 | msg_addr_lower;
-	msg_data = csr_readl(pcie, PAB_MSIX_TABLE_PBA_ACCESS +
+	msg_data = mobiveil_csr_readl(pcie, PAB_MSIX_TABLE_PBA_ACCESS +
 			     PCI_MSIX_ENTRY_DATA +
 			     (interrupt_num - 1) * PCI_MSIX_ENTRY_SIZE);
 

@@ -246,37 +246,41 @@ void program_ob_windows(struct mobiveil_pcie *pcie, int win_num, u64 cpu_addr,
 			u64 pci_addr, u32 type, u64 size);
 void program_ib_windows(struct mobiveil_pcie *pcie, int win_num, u64 cpu_addr,
 			u64 pci_addr, u32 type, u64 size);
-u32 csr_read(struct mobiveil_pcie *pcie, u32 off, size_t size);
-void csr_write(struct mobiveil_pcie *pcie, u32 val, u32 off, size_t size);
+u32 mobiveil_csr_read(struct mobiveil_pcie *pcie, u32 off, size_t size);
+void mobiveil_csr_write(struct mobiveil_pcie *pcie, u32 val, u32 off,
+			size_t size);
 
-static inline u32 csr_readl(struct mobiveil_pcie *pcie, u32 off)
+static inline u32 mobiveil_csr_readl(struct mobiveil_pcie *pcie, u32 off)
 {
-	return csr_read(pcie, off, 0x4);
+	return mobiveil_csr_read(pcie, off, 0x4);
 }
 
-static inline u32 csr_readw(struct mobiveil_pcie *pcie, u32 off)
+static inline u32 mobiveil_csr_readw(struct mobiveil_pcie *pcie, u32 off)
 {
-	return csr_read(pcie, off, 0x2);
+	return mobiveil_csr_read(pcie, off, 0x2);
 }
 
-static inline u32 csr_readb(struct mobiveil_pcie *pcie, u32 off)
+static inline u32 mobiveil_csr_readb(struct mobiveil_pcie *pcie, u32 off)
 {
-	return csr_read(pcie, off, 0x1);
+	return mobiveil_csr_read(pcie, off, 0x1);
 }
 
-static inline void csr_writel(struct mobiveil_pcie *pcie, u32 val, u32 off)
+static inline void mobiveil_csr_writel(struct mobiveil_pcie *pcie, u32 val,
+				       u32 off)
 {
-	csr_write(pcie, val, off, 0x4);
+	mobiveil_csr_write(pcie, val, off, 0x4);
 }
 
-static inline void csr_writew(struct mobiveil_pcie *pcie, u32 val, u32 off)
+static inline void mobiveil_csr_writew(struct mobiveil_pcie *pcie, u32 val,
+				       u32 off)
 {
-	csr_write(pcie, val, off, 0x2);
+	mobiveil_csr_write(pcie, val, off, 0x2);
 }
 
-static inline void csr_writeb(struct mobiveil_pcie *pcie, u32 val, u32 off)
+static inline void mobiveil_csr_writeb(struct mobiveil_pcie *pcie, u32 val,
+				       u32 off)
 {
-	csr_write(pcie, val, off, 0x1);
+	mobiveil_csr_write(pcie, val, off, 0x1);
 }
 
 void program_ib_windows_ep(struct mobiveil_pcie *pcie, u8 func_no,
