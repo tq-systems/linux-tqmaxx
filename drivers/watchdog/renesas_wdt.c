@@ -318,7 +318,18 @@ static struct platform_driver rwdt_driver = {
 	.probe = rwdt_probe,
 	.remove = rwdt_remove,
 };
-module_platform_driver(rwdt_driver);
+
+static int __init rwdt_init(void)
+{
+	platform_driver_register(&rwdt_driver);
+	return 0;
+}
+static void __exit rwdt_exit(void)
+{
+	platform_driver_unregister(&rwdt_driver);
+}
+late_initcall_sync(rwdt_init);
+module_exit(rwdt_exit);
 
 MODULE_DESCRIPTION("Renesas WDT Watchdog Driver");
 MODULE_LICENSE("GPL v2");
