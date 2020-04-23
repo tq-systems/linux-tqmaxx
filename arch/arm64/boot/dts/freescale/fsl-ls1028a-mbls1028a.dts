@@ -48,7 +48,7 @@
 
 / {
 	model = "MBLS1028A starterkit";
-	compatible = "tq,mbls1028a", "fsl,ls1028a";
+	compatible = "tq,mbls1028a", "tq,tqmls1028a", "fsl,ls1028a";
 
 	aliases {
 		gpio0 = &gpio1;
@@ -226,10 +226,6 @@
 };
 
 &sai4 {
-	status = "okay";
-};
-
-&malidp0 {
 	status = "okay";
 };
 

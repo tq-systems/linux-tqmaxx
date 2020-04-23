@@ -45,7 +45,6 @@
 #include "fsl-ls1028a.dtsi"
 
 / {
-	model = "TQMLS1028A module";
 	compatible = "tq,tqmls1028a", "fsl,ls1028a";
 
 	regulators {

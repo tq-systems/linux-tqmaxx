@@ -46,7 +46,7 @@
 
 / {
 	model = "MBLS1028A-IND starterkit";
-	compatible = "tq,mbls1028a-ind", "fsl,ls1028a";
+	compatible = "tq,mbls1028a-ind", "tq,tqmls1028a", "fsl,ls1028a";
 };
 
 &i2c5 {
