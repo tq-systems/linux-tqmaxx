@@ -21,6 +21,8 @@
 #define MII_DP83867_PHYCTRL	0x10
 #define MII_DP83867_MICR	0x12
 #define MII_DP83867_ISR		0x13
+#define DP83867_LEDCR1		0x18
+#define DP83867_LEDCR2		0x19
 #define DP83867_CTRL		0x1f
 #define DP83867_CFG3		0x1e
 
@@ -120,6 +122,8 @@ struct dp83867_private {
 	u32 fifo_depth;
 	int io_impedance;
 	int port_mirroring;
+	u32 led_function;
+	u32 led_ctrl;
 	bool rxctrl_strap_quirk;
 	bool set_clk_output;
 	u32 clk_output_sel;
@@ -285,6 +289,28 @@ static int dp83867_of_init(struct phy_device *phydev)
 			   dp83867->fifo_depth);
 		return -EINVAL;
 	}
+
+	ret = of_property_read_u32(of_node, "ti,led-function",
+				   &dp83867->led_function);
+	if (ret) {
+		dp83867->led_function = U32_MAX;
+	} else if (dp83867->led_function > U16_MAX) {
+		phydev_err(phydev,
+			   "ti,led-function value %x out of range\n",
+			   dp83867->led_function);
+		return -EINVAL;
+	}
+
+	ret = of_property_read_u32(of_node, "ti,led-ctrl", &dp83867->led_ctrl);
+	if (ret) {
+		dp83867->led_ctrl = U32_MAX;
+	} else if (dp83867->led_ctrl > U16_MAX) {
+		phydev_err(phydev,
+			   "ti,led-ctrl value %x out of range\n",
+			   dp83867->led_ctrl);
+		return -EINVAL;
+	}
+
 	return 0;
 }
 #else
@@ -460,6 +486,11 @@ static int dp83867_config_init(struct phy_device *phydev)
 		phy_modify_mmd(phydev, DP83867_DEVADDR, DP83867_IO_MUX_CFG,
 			       mask, val);
 	}
+
+	if (dp83867->led_function != U32_MAX)
+		phy_write(phydev, DP83867_LEDCR1, dp83867->led_function);
+	if (dp83867->led_ctrl != U32_MAX)
+		phy_write(phydev, DP83867_LEDCR2, dp83867->led_ctrl);
 
 	return 0;
 }
