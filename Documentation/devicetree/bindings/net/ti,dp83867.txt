@@ -43,6 +43,12 @@ Optional property:
 				    See data manual for details.
 	- ti,use-sw-restart	  - phy_reset function sets bit SW_RESTART
 				    instead of SW_RESET to keep register values
+	- ti,led-function	  - Value of LED configuration register 1,
+				    controlling the triggers for the PHY LED
+				    GPIOs.
+	- ti,led-ctrl		  - Value of LED configuration register 2,
+				    controlling polarity and related settings
+				    for the PHY LED GPIOs.
 
 Note: ti,min-output-impedance and ti,max-output-impedance are mutually
       exclusive. When both properties are present ti,max-output-impedance
