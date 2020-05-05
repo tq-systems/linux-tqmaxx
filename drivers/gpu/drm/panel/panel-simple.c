@@ -1264,6 +1264,18 @@ static const struct panel_desc dmb_s070pws19hp_fc21 = {
 	.bus_flags = DRM_BUS_FLAG_DE_HIGH | DRM_BUS_FLAG_PIXDATA_POSEDGE,
 };
 
+static const struct panel_desc dmb_s070pws19hp_fc21_24bit = {
+	.modes = &dmb_s070pws19hp_fc21_mode,
+	.num_modes = 1,
+	.bpc = 6,
+	.size = {
+		.width = 154,
+		.height = 86,
+	},
+	.bus_format = MEDIA_BUS_FMT_RGB888_1X24,
+	.bus_flags = DRM_BUS_FLAG_DE_HIGH | DRM_BUS_FLAG_PIXDATA_POSEDGE,
+};
+
 /* S070SWV29HG-DC44 2017/09/21 */
 static const struct drm_display_mode dmb_s070swv29hg_dc44_mode = {
 	.clock = 33300,
@@ -1288,6 +1300,18 @@ static const struct panel_desc dmb_s070swv29hg_dc44 = {
 		.height = 86,
 	},
 	.bus_format = MEDIA_BUS_FMT_RGB666_1X18,
+	.bus_flags = DRM_BUS_FLAG_DE_HIGH | DRM_BUS_FLAG_PIXDATA_POSEDGE,
+};
+
+static const struct panel_desc dmb_s070swv29hg_dc44_24bit = {
+	.modes = &dmb_s070swv29hg_dc44_mode,
+	.num_modes = 1,
+	.bpc = 6,
+	.size = {
+		.width = 154,
+		.height = 86,
+	},
+	.bus_format = MEDIA_BUS_FMT_RGB888_1X24,
 	.bus_flags = DRM_BUS_FLAG_DE_HIGH | DRM_BUS_FLAG_PIXDATA_POSEDGE,
 };
 
@@ -1402,6 +1426,18 @@ static const struct panel_desc edt_etm0700g0bdh6 = {
 		.height = 91,
 	},
 	.bus_format = MEDIA_BUS_FMT_RGB666_1X18,
+	.bus_flags = DRM_BUS_FLAG_DE_HIGH | DRM_BUS_FLAG_PIXDATA_DRIVE_POSEDGE,
+};
+
+static const struct panel_desc edt_etm0700g0bdh6_24bit = {
+	.modes = &edt_etm0700g0dh6_mode,
+	.num_modes = 1,
+	.bpc = 6,
+	.size = {
+		.width = 152,
+		.height = 91,
+	},
+	.bus_format = MEDIA_BUS_FMT_RGB888_1X24,
 	.bus_flags = DRM_BUS_FLAG_DE_HIGH | DRM_BUS_FLAG_PIXDATA_DRIVE_POSEDGE,
 };
 
@@ -3301,8 +3337,14 @@ static const struct of_device_id platform_of_match[] = {
 		.compatible = "dmb,s070pws19hp_fc21",
 		.data = &dmb_s070pws19hp_fc21,
 	}, {
+		.compatible = "dmb,s070pws19hp_fc21_24bit",
+		.data = &dmb_s070pws19hp_fc21_24bit,
+	}, {
 		.compatible = "dmb,s070swv29hg_dc44",
 		.data = &dmb_s070swv29hg_dc44,
+	}, {
+		.compatible = "dmb,s070swv29hg_dc44_24bit",
+		.data = &dmb_s070swv29hg_dc44_24bit,
 	}, {
 		.compatible = "edt,et035012dm6",
 		.data = &edt_et035012dm6,
@@ -3324,6 +3366,9 @@ static const struct of_device_id platform_of_match[] = {
 	}, {
 		.compatible = "edt,etm0700g0edh6",
 		.data = &edt_etm0700g0bdh6,
+	}, {
+		.compatible = "edt,etm0700g0edh6_24bit",
+		.data = &edt_etm0700g0bdh6_24bit,
 	}, {
 		.compatible = "evervision,vgg804821",
 		.data = &evervision_vgg804821,
