@@ -1287,6 +1287,19 @@ static const struct panel_desc cdtech_s070pws19hp_fc21 = {
 	.connector_type = DRM_MODE_CONNECTOR_DPI,
 };
 
+static const struct panel_desc cdtech_s070pws19hp_fc21_24bit = {
+	.modes = &cdtech_s070pws19hp_fc21_mode,
+	.num_modes = 1,
+	.bpc = 6,
+	.size = {
+		.width = 154,
+		.height = 86,
+	},
+	.bus_format = MEDIA_BUS_FMT_RGB888_1X24,
+	.bus_flags = DRM_BUS_FLAG_DE_HIGH | DRM_BUS_FLAG_PIXDATA_SAMPLE_NEGEDGE,
+	.connector_type = DRM_MODE_CONNECTOR_DPI,
+};
+
 /* S070SWV29HG-DC44 2017/09/21 */
 static const struct drm_display_mode cdtech_s070swv29hg_dc44_mode = {
 	.clock = 33300,
@@ -1310,6 +1323,19 @@ static const struct panel_desc cdtech_s070swv29hg_dc44 = {
 		.height = 86,
 	},
 	.bus_format = MEDIA_BUS_FMT_RGB666_1X18,
+	.bus_flags = DRM_BUS_FLAG_DE_HIGH | DRM_BUS_FLAG_PIXDATA_SAMPLE_NEGEDGE,
+	.connector_type = DRM_MODE_CONNECTOR_DPI,
+};
+
+static const struct panel_desc cdtech_s070swv29hg_dc44_24bit = {
+	.modes = &cdtech_s070swv29hg_dc44_mode,
+	.num_modes = 1,
+	.bpc = 6,
+	.size = {
+		.width = 154,
+		.height = 86,
+	},
+	.bus_format = MEDIA_BUS_FMT_RGB888_1X24,
 	.bus_flags = DRM_BUS_FLAG_DE_HIGH | DRM_BUS_FLAG_PIXDATA_SAMPLE_NEGEDGE,
 	.connector_type = DRM_MODE_CONNECTOR_DPI,
 };
@@ -1748,6 +1774,18 @@ static const struct panel_desc edt_etm0700g0bdh6 = {
 	.bus_format = MEDIA_BUS_FMT_RGB666_1X18,
 	.bus_flags = DRM_BUS_FLAG_DE_HIGH | DRM_BUS_FLAG_PIXDATA_DRIVE_POSEDGE,
 	.connector_type = DRM_MODE_CONNECTOR_DPI,
+};
+
+static const struct panel_desc edt_etm0700g0bdh6_24bit = {
+	.modes = &edt_etm0700g0dh6_mode,
+	.num_modes = 1,
+	.bpc = 6,
+	.size = {
+		.width = 152,
+		.height = 91,
+	},
+	.bus_format = MEDIA_BUS_FMT_RGB888_1X24,
+	.bus_flags = DRM_BUS_FLAG_DE_HIGH | DRM_BUS_FLAG_PIXDATA_DRIVE_POSEDGE,
 };
 
 static const struct display_timing edt_etml0700y5dha_timing = {
@@ -3994,8 +4032,14 @@ static const struct of_device_id platform_of_match[] = {
 		.compatible = "cdtech,s070pws19hp-fc21",
 		.data = &cdtech_s070pws19hp_fc21,
 	}, {
+		.compatible = "cdtech,s070pws19hp-fc21_24bit",
+		.data = &cdtech_s070pws19hp_fc21_24bit,
+	}, {
 		.compatible = "cdtech,s070swv29hg-dc44",
 		.data = &cdtech_s070swv29hg_dc44,
+	}, {
+		.compatible = "cdtech,s070swv29hg-dc44_24bit",
+		.data = &cdtech_s070swv29hg_dc44_24bit,
 	}, {
 		.compatible = "cdtech,s070wv95-ct16",
 		.data = &cdtech_s070wv95_ct16,
@@ -4053,6 +4097,9 @@ static const struct of_device_id platform_of_match[] = {
 	}, {
 		.compatible = "edt,etm0700g0edh6",
 		.data = &edt_etm0700g0bdh6,
+	}, {
+		.compatible = "edt,etm0700g0edh6_24bit",
+		.data = &edt_etm0700g0bdh6_24bit,
 	}, {
 		.compatible = "edt,etml0700y5dha",
 		.data = &edt_etml0700y5dha,
