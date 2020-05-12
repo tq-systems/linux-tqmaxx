@@ -14,11 +14,35 @@
 		stdout-path = &lpuart1;
 	};
 
+	gpio-leds {
+		compatible = "gpio-leds";
+		status = "okay";
+
+		led1 {
+			label = "leda";
+			gpios = <&pca9538 1 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "default-on";
+		};
+
+		led2 {
+			label = "ledb";
+			gpios = <&pca9538 2 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "heartbeat";
+		};
+	};
+
 	reg_usdhc2_vmmc: regulator-usdhc2-vmmc {
 		compatible = "regulator-fixed";
 		regulator-name = "SD1_PWR";
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
+	};
+
+	reg_1v8: regulator-1v8 {
+		compatible = "regulator-fixed";
+		regulator-name = "V_1V8";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
 	};
 };
 
@@ -82,6 +106,35 @@
 	status = "okay";
 };
 
+&i2c1 {
+	/* NXP SE97BTP with temperature sensor + eeprom */
+	se97b_1c: temperature-sensor-eeprom@1c {
+		compatible = "nxp,se97", "jedec,jc-42.4-temp";
+		reg = <0x1c>;
+	};
+
+	at24c02_54: eeprom@54 {
+		compatible = "nxp,se97b", "atmel,24c02";
+		reg = <0x54>;
+		pagesize = <16>;
+	};
+
+	pca9538: expander@70 {
+		compatible = "nxp,pca9538";
+		reg = <0x70>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_pca9538>;
+		gpio-controller;
+		#gpio-cells = <2>;
+/* TODO: spurious IRQ? */
+/*
+ *		interrupt-parent = <&lsio_gpio3>;
+ *		interrupts = <8 IRQ_TYPE_LEVEL_LOW>;
+*/
+		vcc-supply = <&reg_1v8>;
+	};
+};
+
 &iomuxc {
 	pinctrl_fec1: fec1grp {
 		fsl,pins = <
@@ -131,6 +184,12 @@
 		fsl,pins = <
 			IMX8QXP_UART1_RX_ADMA_UART1_RX			0x06000020
 			IMX8QXP_UART1_TX_ADMA_UART1_TX			0x06000020
+		>;
+	};
+
+	pinctrl_pca9538: pca9538grp {
+		fsl,pins = <
+			IMX8QXP_MIPI_CSI0_GPIO0_00_LSIO_GPIO3_IO08	0x00000020
 		>;
 	};
 
