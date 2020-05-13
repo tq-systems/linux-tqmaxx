@@ -423,13 +423,26 @@
 &usbotg1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usbotg1>;
-	vbus-supply = <&reg_mba8xx_5v0>;
+	vbus-supply = <&reg_usbotg1_vbus>;
 	srp-disable;
 	hnp-disable;
 	adp-disable;
-	power-polarity-active-high;
-	disable-over-current;
+	power-active-high;
+	over-current-active-low;
+	dr_mode = "otg";
+	status = "okay";
+};
+
+&usbotg3 {
 	dr_mode = "host";
+	status = "okay";
+};
+
+&usb3phynop1 {
+	status = "okay";
+};
+
+&usbphy1 {
 	status = "okay";
 };
 
@@ -442,31 +455,5 @@
 	cd-gpios = <&lsio_gpio4 22 GPIO_ACTIVE_LOW>;
 	wp-gpios = <&lsio_gpio4 21 GPIO_ACTIVE_HIGH>;
 	vmmc-supply = <&reg_usdhc2_vmmc>;
-	status = "okay";
-};
-
-&usbphy1 {
-	status = "okay";
-};
-
-&usbotg1 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_usbotg1>;
-	vbus-supply = <&reg_usbotg1_vbus>;
-	srp-disable;
-	hnp-disable;
-	adp-disable;
-	power-active-high;
-	over-current-active-low;
-	dr_mode = "otg";
-	status = "okay";
-};
-
-&usb3phynop1 {
-	status = "okay";
-};
-
-&usbotg3 {
-	dr_mode = "host";
 	status = "okay";
 };
