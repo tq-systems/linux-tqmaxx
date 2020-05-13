@@ -12,6 +12,13 @@
 	fsl,spi-num-chipselects = <1>;
 	cs-gpios = <&gpio1 17 GPIO_ACTIVE_LOW>;
 	status = "okay";
+
+	spidev5_0: spidev5-0@0 {
+		compatible = "tq,testdev";
+		spi-max-frequency = <1000000>;
+		reg = <0>;
+		status = "okay";
+	};
 };
 
 &ethphy {
