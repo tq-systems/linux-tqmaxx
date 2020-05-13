@@ -128,6 +128,12 @@
 &dspi0 {
 	bus-num = <0>;
 	status = "okay";
+
+	spidev0: spidev@0 {
+		compatible = "tq,testdev";
+		reg = <0>;
+		spi-max-frequency = <100000>;
+	};
 };
 
 &enet0 {
