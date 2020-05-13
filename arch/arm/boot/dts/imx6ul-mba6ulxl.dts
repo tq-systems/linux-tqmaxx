@@ -119,6 +119,13 @@
 	pinctrl-0 = <&pinctrl_ecspi2>;
 	fsl,spi-num-chipselects = <1>;
 	status = "okay";
+
+	spidev2_0: spidev2-0@0 {
+		compatible = "tq,testdev";
+		spi-max-frequency = <5000000>;
+		reg = <0>;
+		status = "okay";
+	};
 };
 
 &fec1 {
