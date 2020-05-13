@@ -196,6 +196,27 @@
 	cs-gpios = <&gpio4 0 GPIO_ACTIVE_LOW>, <&gpio4 1 GPIO_ACTIVE_LOW>,
 		   <&gpio4 2 GPIO_ACTIVE_LOW>;
 	status = "okay";
+
+	spidev0_0: spidev0-0@0 {
+		compatible = "tq,testdev";
+		spi-max-frequency = <5000000>;
+		reg = <0>;
+		status = "okay";
+	};
+
+	spidev0_1: spidev0-1@1 {
+		compatible = "tq,testdev";
+		spi-max-frequency = <10000000>;
+		reg = <1>;
+		status = "okay";
+	};
+
+	spidev0_2: spidev0-2@2 {
+		compatible = "tq,testdev";
+		spi-max-frequency = <25000000>;
+		reg = <2>;
+		status = "okay";
+	};
 };
 
 &ecspi2 {
@@ -203,6 +224,13 @@
 	pinctrl-0 = <&pinctrl_ecspi2>;
 	num-chipselects = <1>;
 	status = "okay";
+
+	spidev1_0: spidev1-0@0 {
+		compatible = "tq,testdev";
+		spi-max-frequency = <5000000>;
+		reg = <0>;
+		status = "okay";
+	};
 };
 
 &fec1 {
