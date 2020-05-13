@@ -28,6 +28,42 @@ struct imx_tlv320aic_data {
 	unsigned int clk_frequency;
 };
 
+static const struct snd_soc_dapm_widget imx_tlv320aic_dapm_widgets[] = {
+	SND_SOC_DAPM_MIC("Mic Jack", NULL),
+	SND_SOC_DAPM_LINE("Line In Jack", NULL),
+	SND_SOC_DAPM_HP("Headphone Jack", NULL),
+	SND_SOC_DAPM_SPK("Line Out Jack", NULL),
+};
+
+static const struct snd_soc_dapm_route imx_tlv320aic_dapm_routes[] = {
+	{"IN1_R", NULL, "Line In Jack"},
+	{"IN1_L", NULL, "Line In Jack"},
+
+	/* the mic in has to be supplied -> see
+	 * arch/arm/boot/dts/imx6q-novena.dts
+	 * or (but this should be wrong)
+	 * snd_soc_dapm_force_enable_pin(&rtd->card->dapm, "Mic Bias");
+	 * routing as done in sound/soc/fsl/mx27vis-aic32x4.c
+	 * will cause warning for supplying a non supply widget
+	 * see also: https://elinux.org/images/c/c1/Dapm_clausen.pdf
+	 * for broken MICBIAS widget
+	 */
+	{"IN3_L", NULL, "Mic Jack"},
+	{"Mic Jack", NULL, "Mic Bias"},
+
+	/*
+	 * if HPR/HPL are connected to the jack via 0 Ohm LOL/LOR are not
+	 * connected
+	 */
+#if 0
+	{"Headphone Jack", NULL, "HPL"},
+	{"Headphone Jack", NULL, "HPR"},
+#else
+	{"Line Out Jack", NULL, "LOL"},
+	{"Line Out Jack", NULL, "LOR"},
+#endif
+};
+
 static int imx_tlv320aic_dai_init(struct snd_soc_pcm_runtime *rtd)
 {
 	struct imx_tlv320aic_data *data = container_of(rtd->card,
@@ -99,8 +135,12 @@ static int imx_tlv320aic_probe(struct platform_device *pdev)
 	data->dai.init = &imx_tlv320aic_dai_init;
 	data->dai.dai_fmt = SND_SOC_DAIFMT_I2S | SND_SOC_DAIFMT_NB_NF |
 			    SND_SOC_DAIFMT_CBM_CFM;
-
+	data->card.dapm_widgets = imx_tlv320aic_dapm_widgets;
+	data->card.num_dapm_widgets = ARRAY_SIZE(imx_tlv320aic_dapm_widgets);
+	data->card.dapm_routes	= imx_tlv320aic_dapm_routes,
+	data->card.num_dapm_routes = ARRAY_SIZE(imx_tlv320aic_dapm_routes),
 	data->card.dev = &pdev->dev;
+
 	ret = snd_soc_of_parse_card_name(&data->card, "model");
 	if (ret)
 		goto fail;
