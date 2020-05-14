@@ -1,0 +1,9 @@
+Emerging Display Technology Corp. ETML1010G0DKA 10.1" WXGA TFT LVDS display panel
+
+Required properties:
+- compatible: should be "edt,etml1010g0dka"
+
+This panel is the same as ET101G0DSA with an integrated capacitive multitouch panel.
+
+This binding is compatible with the simple-panel binding, which is specified
+in simple-panel.txt in this directory.
