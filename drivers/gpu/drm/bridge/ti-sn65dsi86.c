@@ -135,7 +135,8 @@ static int __maybe_unused ti_sn_bridge_resume(struct device *dev)
 		return ret;
 	}
 
-	gpiod_set_value(pdata->enable_gpio, 1);
+	if (pdata->enable_gpio)
+		gpiod_set_value(pdata->enable_gpio, 1);
 
 	return ret;
 }
@@ -145,7 +146,8 @@ static int __maybe_unused ti_sn_bridge_suspend(struct device *dev)
 	struct ti_sn_bridge *pdata = dev_get_drvdata(dev);
 	int ret;
 
-	gpiod_set_value(pdata->enable_gpio, 0);
+	if (pdata->enable_gpio)
+		gpiod_set_value(pdata->enable_gpio, 0);
 
 	ret = regulator_bulk_disable(SN_REGULATOR_SUPPLY_NUM, pdata->supplies);
 	if (ret)
@@ -204,8 +206,24 @@ connector_to_ti_sn_bridge(struct drm_connector *connector)
 static int ti_sn_bridge_connector_get_modes(struct drm_connector *connector)
 {
 	struct ti_sn_bridge *pdata = connector_to_ti_sn_bridge(connector);
+	struct edid *edid;
+	int num_modes = 0;
 
-	return drm_panel_get_modes(pdata->panel);
+	if (pdata->panel) {
+		num_modes += drm_panel_get_modes(pdata->panel);
+	} else {
+		pm_runtime_get_sync(pdata->dev);
+		edid = drm_get_edid(connector, &pdata->aux.ddc);
+		pm_runtime_put(pdata->dev);
+		if (edid) {
+			drm_connector_update_edid_property(&pdata->connector,
+								edid);
+			num_modes += drm_add_edid_modes(&pdata->connector, edid);
+			kfree(edid);
+		}
+	}
+
+	return num_modes;
 }
 
 static enum drm_mode_status
@@ -331,7 +349,8 @@ static int ti_sn_bridge_attach(struct drm_bridge *bridge)
 	pdata->dsi = dsi;
 
 	/* attach panel to bridge */
-	drm_panel_attach(pdata->panel, &pdata->connector);
+	if (pdata->panel)
+		drm_panel_attach(pdata->panel, &pdata->connector);
 
 	return 0;
 
@@ -346,7 +365,8 @@ static void ti_sn_bridge_disable(struct drm_bridge *bridge)
 {
 	struct ti_sn_bridge *pdata = bridge_to_ti_sn_bridge(bridge);
 
-	drm_panel_disable(pdata->panel);
+	if (pdata->panel)
+		drm_panel_disable(pdata->panel);
 
 	/* disable video stream */
 	regmap_update_bits(pdata->regmap, SN_ENH_FRAME_REG, VSTREAM_ENABLE, 0);
@@ -355,7 +375,8 @@ static void ti_sn_bridge_disable(struct drm_bridge *bridge)
 	/* disable DP PLL */
 	regmap_write(pdata->regmap, SN_PLL_ENABLE_REG, 0);
 
-	drm_panel_unprepare(pdata->panel);
+	if (pdata->panel)
+		drm_panel_unprepare(pdata->panel);
 }
 
 static u32 ti_sn_bridge_get_dsi_freq(struct ti_sn_bridge *pdata)
@@ -552,12 +573,15 @@ static void ti_sn_bridge_enable(struct drm_bridge *bridge)
 	regmap_update_bits(pdata->regmap, SN_ENH_FRAME_REG, VSTREAM_ENABLE,
 			   VSTREAM_ENABLE);
 
-	drm_panel_enable(pdata->panel);
+	if (pdata->panel)
+		drm_panel_enable(pdata->panel);
 }
 
 static void ti_sn_bridge_pre_enable(struct drm_bridge *bridge)
 {
 	struct ti_sn_bridge *pdata = bridge_to_ti_sn_bridge(bridge);
+
+	DRM_INFO("%s +++\n", __func__);
 
 	pm_runtime_get_sync(pdata->dev);
 
@@ -580,10 +604,16 @@ static void ti_sn_bridge_pre_enable(struct drm_bridge *bridge)
 	 * change this to be conditional on someone specifying that HPD should
 	 * be used.
 	 */
-	regmap_update_bits(pdata->regmap, SN_HPD_DISABLE_REG, HPD_DISABLE,
-			   HPD_DISABLE);
+	if (pdata->panel) {
+		/* in case drm_panel is connected then HPD is not supported */
+		regmap_update_bits(pdata->regmap, SN_HPD_DISABLE_REG, HPD_DISABLE,
+				   HPD_DISABLE);
 
-	drm_panel_prepare(pdata->panel);
+		drm_panel_prepare(pdata->panel);
+	} else {
+		regmap_update_bits(pdata->regmap, SN_HPD_DISABLE_REG, HPD_DISABLE,
+				   0);
+	}
 }
 
 static void ti_sn_bridge_post_disable(struct drm_bridge *bridge)
@@ -727,20 +757,36 @@ static int ti_sn_bridge_probe(struct i2c_client *client,
 
 	ret = drm_of_find_panel_or_bridge(pdata->dev->of_node, 1, 0,
 					  &pdata->panel, NULL);
-	if (ret) {
-		DRM_ERROR("could not find any panel node\n");
+	switch (ret) {
+	case -ENODEV:
+		ret = 0;
+		DRM_INFO("no panel node\n");
+		pdata->panel = NULL;
+		break;
+	case -EPROBE_DEFER:
+		DRM_INFO("EPROBE_DEFER\n");
 		return ret;
+		break;
+	default:
+		DRM_INFO("Error %d from drm_of_find_panel_or_bridge\n", ret);
+		return ret;
+		break;
 	}
 
 	dev_set_drvdata(&client->dev, pdata);
 
-	pdata->enable_gpio = devm_gpiod_get(pdata->dev, "enable",
-					    GPIOD_OUT_LOW);
+	DRM_ERROR("%s parse gpio\n", __func__);
+
+	pdata->enable_gpio = devm_gpiod_get_optional(pdata->dev, "enable",
+						     GPIOD_OUT_LOW);
 	if (IS_ERR(pdata->enable_gpio)) {
-		DRM_ERROR("failed to get enable gpio from DT\n");
 		ret = PTR_ERR(pdata->enable_gpio);
+		if (ret != -EPROBE_DEFER)
+			DRM_ERROR("failed to get enable gpio from DT\n");
 		return ret;
 	}
+
+	DRM_ERROR("%s parse regulator\n", __func__);
 
 	ret = ti_sn_bridge_parse_regulators(pdata);
 	if (ret) {
