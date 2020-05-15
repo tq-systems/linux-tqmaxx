@@ -1,0 +1,8 @@
+config DRM_TI_SN65DSI83
+	bool "TI SN65DSI83 MIPI DSI to LVDS bridge"
+	depends on OF
+	select DRM_KMS_HELPER
+	select DRM_PANEL
+	select DRM_MIPI_DSI
+	help
+	  TI SN65DSI83 MIPI DSI to LVDS bridge driver
