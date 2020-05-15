@@ -241,11 +241,13 @@ static int sn65dsi83_parse_dt(struct device_node *np,
 	}
 	sn65dsi83->brg->num_dsi_lanes = num_lanes;
 
-	sn65dsi83->brg->gpio_enable = devm_gpiod_get(dev, "enable",
-						     GPIOD_OUT_LOW);
+	sn65dsi83->brg->gpio_enable = devm_gpiod_get_optional(dev, "enable",
+							      GPIOD_OUT_LOW);
 	if (IS_ERR(sn65dsi83->brg->gpio_enable)) {
-		dev_err(dev, "failed to parse enable gpio");
-		return PTR_ERR(sn65dsi83->brg->gpio_enable);
+		ret = PTR_ERR(sn65dsi83->brg->gpio_enable);
+		if (ret != -EPROBE_DEFER)
+			DRM_ERROR("failed to get enable gpio from DT\n");
+		return ret;
 	}
 
 	sn65dsi83->brg->format = format;

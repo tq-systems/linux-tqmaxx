@@ -89,9 +89,11 @@ static int sn65dsi83_brg_power_on(struct sn65dsi83_brg *brg)
 {
 	dev_dbg(&brg->client->dev, "%s\n", __func__);
 
-	gpiod_set_value_cansleep(brg->gpio_enable, 1);
-	/* Wait for 1ms for the internal voltage regulator to stabilize */
-	msleep(1);
+	if (brg->gpio_enable) {
+		gpiod_set_value_cansleep(brg->gpio_enable, 1);
+		/* Wait for 1ms for the internal voltage regulator to stabilize */
+		usleep(1000);
+	}
 
 	return 0;
 }
@@ -99,12 +101,17 @@ static int sn65dsi83_brg_power_on(struct sn65dsi83_brg *brg)
 static void sn65dsi83_brg_power_off(struct sn65dsi83_brg *brg)
 {
 	dev_dbg(&brg->client->dev, "%s\n", __func__);
-	gpiod_set_value_cansleep(brg->gpio_enable, 0);
-	/*
-	 * The EN pin must be held low for at least 10 ms
-	 * before being asserted high
-	 */
-	msleep(10);
+
+	dev_dbg(&brg->client->dev,"%s\n",__func__);
+
+	if (brg->gpio_enable) {
+		gpiod_set_value_cansleep(brg->gpio_enable, 0);
+		/*
+		* The EN pin must be held low for at least 10 ms
+		* before being asserted high
+		*/
+		usleep(10 * 1000);
+	};
 }
 
 static int sn65dsi83_write(struct i2c_client *client, u8 reg, u8 val)
