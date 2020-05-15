@@ -84,6 +84,15 @@
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
 	};
+
+	reg_12v0: regulator-12v0 {
+		compatible = "regulator-fixed";
+		regulator-name = "V_12V";
+		regulator-min-microvolt = <12000000>;
+		regulator-max-microvolt = <12000000>;
+		gpio = <&pca9538 6 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+	};
 };
 
 &fec1 {
