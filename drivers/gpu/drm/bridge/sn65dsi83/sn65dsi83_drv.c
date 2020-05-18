@@ -216,11 +216,12 @@ static int sn65dsi83_bridge_attach(struct drm_bridge *bridge)
 		return -ENODEV;
 	}
 
-	sn65dsi83->connector.polled = DRM_CONNECTOR_POLL_CONNECT;
+	/* TODO: is this correct? */
+	/* sn65dsi83->connector.polled = DRM_CONNECTOR_POLL_CONNECT; */
 
 	ret = drm_connector_init(bridge->dev, &sn65dsi83->connector,
 				 &sn65dsi83_connector_funcs,
-				 DRM_MODE_CONNECTOR_DSI);
+				 DRM_MODE_CONNECTOR_LVDS);
 	if (ret) {
 		DRM_ERROR("Failed to initialize connector with drm\n");
 		return ret;
@@ -228,6 +229,10 @@ static int sn65dsi83_bridge_attach(struct drm_bridge *bridge)
 	drm_connector_helper_add(&sn65dsi83->connector,
 	&sn65dsi83_connector_helper_funcs);
 	drm_connector_attach_encoder(&sn65dsi83->connector, bridge->encoder);
+	if (ret) {
+		DRM_ERROR("Failed to drm_mode_connector_attach_encoder\n");
+		return ret;
+	}
 
 	ret = sn65dsi83_attach_dsi(sn65dsi83);
 
@@ -236,9 +241,9 @@ static int sn65dsi83_bridge_attach(struct drm_bridge *bridge)
 
 	/* attach panel to bridge */
 	if (sn65dsi83->panel)
-		drm_panel_attach(sn65dsi83->panel, &sn65dsi83->connector);
+		ret = drm_panel_attach(sn65dsi83->panel, &sn65dsi83->connector);
 
-	return 0;
+	return ret;
 }
 
 static struct drm_bridge_funcs sn65dsi83_bridge_funcs = {
