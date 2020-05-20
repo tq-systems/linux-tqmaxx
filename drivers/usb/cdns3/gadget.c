@@ -1795,6 +1795,7 @@ int cdns3_gadget_ep_dequeue(struct usb_ep *ep,
 	struct usb_request *req, *req_temp;
 	struct cdns3_request *priv_req;
 	struct cdns3_trb *link_trb;
+	u8 req_on_hw_ring = 0;
 	unsigned long flags;
 	int ret = 0;
 
@@ -1811,8 +1812,10 @@ int cdns3_gadget_ep_dequeue(struct usb_ep *ep,
 
 	list_for_each_entry_safe(req, req_temp, &priv_ep->pending_req_list,
 				 list) {
-		if (request == req)
+		if (request == req) {
+			req_on_hw_ring = 1;
 			goto found;
+		}
 	}
 
 	list_for_each_entry_safe(req, req_temp, &priv_ep->deferred_req_list,
@@ -1825,8 +1828,16 @@ int cdns3_gadget_ep_dequeue(struct usb_ep *ep,
 
 found:
 
-	if (priv_ep->wa1_trb == priv_req->trb)
-		cdns3_wa1_restore_cycle_bit(priv_ep);
+	/* Update ring only if removed request is on pending_req_list list */
+	if (req_on_hw_ring && link_trb) {
+		link_trb->buffer = TRB_BUFFER(priv_ep->trb_pool_dma +
+			((priv_req->end_trb + 1) * TRB_SIZE));
+		link_trb->control = (link_trb->control & TRB_CYCLE) |
+				    TRB_TYPE(TRB_LINK) | TRB_CHAIN;
+
+		if (priv_ep->wa1_trb == priv_req->trb)
+			cdns3_wa1_restore_cycle_bit(priv_ep);
+	}
 
 	link_trb = priv_req->trb;
 	cdns3_move_deq_to_next_trb(priv_req);
