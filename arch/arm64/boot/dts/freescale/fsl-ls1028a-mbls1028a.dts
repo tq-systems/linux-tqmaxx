@@ -229,9 +229,12 @@
 	status = "okay";
 };
 
+&malidp0 {
+	status = "disabled";
+};
+
 &hdptx0 {
-	lane-mapping = <0x4e>;
-	status = "okay";
+	status = "disabled";
 };
 
 &enetc_mdio_pf3 {
