@@ -2514,42 +2514,13 @@ static int si5338_clkout_prepare(struct clk_hw *hw)
 {
 	struct si5338_hw_data *hwdata = HWDATA(hw);
 	struct si5338_driver_data *drvdata = hwdata->drvdata;
-	int rc;
+	int err;
 
-	rc = set_drv_powerdown(drvdata, DRV_POWERUP, hwdata->num);
-	if (rc) {
-		dev_err(&drvdata->client->dev,
-			"Error power up clkout%d\n", hwdata->num);
-	}
-	dev_dbg(&drvdata->client->dev, "Clkout%d prepared\n", hwdata->num);
+	err = set_drv_powerdown(drvdata, DRV_POWERUP, hwdata->num);
+	if (err)
+		return err;
 
-	return rc;
-}
-
-static int si5338_clkout_enable(struct clk_hw *hw)
-{
-
-	struct si5338_hw_data *hwdata = HWDATA(hw);
-	struct si5338_driver_data *drvdata = hwdata->drvdata;
-	int rc;
-
-	rc = set_out_disable(drvdata, OUT_ENABLE, hwdata->num);
-	if (rc) {
-		dev_err(&drvdata->client->dev,
-			"Error enabling clkout%d\n", hwdata->num);
-	}
-	dev_dbg(&drvdata->client->dev, "Clkout%d enabled\n", hwdata->num);
-
-	return rc;
-}
-
-static void si5338_clkout_disable(struct clk_hw *hw)
-{
-	struct si5338_hw_data *hwdata = HWDATA(hw);
-	struct si5338_driver_data *drvdata = hwdata->drvdata;
-
-	set_out_disable(drvdata, OUT_DISABLE, hwdata->num);
-	dev_dbg(&drvdata->client->dev, "Clkout%d disable\n", hwdata->num);
+	return set_out_disable(drvdata, OUT_ENABLE, hwdata->num);
 }
 
 static void si5338_clkout_unprepare(struct clk_hw *hw)
@@ -2557,8 +2528,8 @@ static void si5338_clkout_unprepare(struct clk_hw *hw)
 	struct si5338_hw_data *hwdata = HWDATA(hw);
 	struct si5338_driver_data *drvdata = hwdata->drvdata;
 
+	set_out_disable(drvdata, OUT_DISABLE, hwdata->num);
 	set_drv_powerdown(drvdata, DRV_POWERDOWN, hwdata->num);
-	dev_dbg(&drvdata->client->dev, "Clkout%d unprepared\n", hwdata->num);
 }
 
 static int si5338_clkout_reparent(struct si5338_driver_data *drvdata,
@@ -2683,8 +2654,6 @@ static int si5338_clkout_set_rate(struct clk_hw *hw, unsigned long rate,
 static const struct clk_ops si5338_clkout_ops = {
 	.prepare = si5338_clkout_prepare,
 	.unprepare = si5338_clkout_unprepare,
-	.enable = si5338_clkout_enable,
-	.disable = si5338_clkout_disable,
 	.set_parent = si5338_clkout_set_parent,
 	.get_parent = si5338_clkout_get_parent,
 	.recalc_rate = si5338_clkout_recalc_rate,
