@@ -2942,7 +2942,7 @@ static int si5338_i2c_probe(struct i2c_client *client,
 	if (!pdata->name_prefix) {
 		strlcpy(drvdata->name_prefix,
 			dev_name(&client->dev), MAX_NAME_PREFIX - 2);
-		strncat(drvdata->name_prefix, "-", 1);
+		strcat(drvdata->name_prefix, "-");
 	} else {
 		strlcpy(drvdata->name_prefix,
 			pdata->name_prefix, MAX_NAME_PREFIX);
