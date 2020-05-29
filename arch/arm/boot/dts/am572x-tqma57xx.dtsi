@@ -1,0 +1,42 @@
+/*
+ * Copyright (C) 2020 TQ-Systems GmbH
+ *
+ * Author: Michael Krummsdorf <michael.krummsdorf@tq-group.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+#include "am5728.dtsi"
+#include "dra74x-mmc-iodelay.dtsi"
+#include "am57xx-tqma57xx.dtsi"
+
+/ {
+	memory@0 {
+		device_type = "memory";
+		reg = <0x0 0x80000000 0x0 0x80000000>;
+	};
+
+	reserved-memory {
+		dsp2_cma_pool: dsp2_cma@9f000000 {
+			compatible = "shared-dma-pool";
+			reg = <0x0 0x9f000000 0x0 0x800000>;
+			reusable;
+			status = "okay";
+		};
+	};
+};
+
+&mmu0_dsp2 {
+	status = "okay";
+};
+
+&mmu1_dsp2 {
+	status = "okay";
+};
+
+&mmc2 {
+	pinctrl-2 = <&mmc2_pins_ddr_rev20>;
+	pinctrl-3 = <&mmc2_pins_hs200 &mmc2_iodelay_hs200_rev20_conf>;
+};

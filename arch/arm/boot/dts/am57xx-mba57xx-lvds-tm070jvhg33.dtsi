@@ -1,0 +1,92 @@
+/*
+ * Copyright (C) 2020 TQ-Systems GmbH
+ *
+ * Author: Michael Krummsdorf <michael.krummsdorf@tq-group.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+/ {
+	aliases {
+		display1 = &lvds;
+	};
+
+	/* TM070JVHG33 */
+	lvds: display {
+		compatible = "tianma,tm070jvhg33", "simple-panel";
+		bits-per-pixel = <32>; /* 32: RGB888/666 mode */
+		label = "lcd";
+		backlight = <&lvds_bl>;
+		/* LCD_PWR_EN = high	-> expander1 12
+		 * LCD_EN = low		-> expander1 4
+		 * LVDS_EN = high	-> expander1 15
+		 */
+		enable-gpios = <&expander1 12 GPIO_ACTIVE_HIGH>;
+		power-supply = <&vcc_3v3_display>;
+		status = "okay";
+
+		/* cpu parallel display interface attached to external
+		 * lvds display bridge
+		 */
+		port {
+			lcd_in: endpoint {
+				remote-endpoint = <&dpi_out>;
+			};
+		};
+	};
+
+	lvds_bl: backlight {
+		compatible = "pwm-backlight";
+		pwms = <&ehrpwm1 0 50000 0>;
+		brightness-levels = <0 16 32 64 96 128 160 192 224 255>;
+		default-brightness-level = <8>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&backlight_pins_default>;
+		power-supply = <&vcc_5v_display>;
+	};
+};
+
+&expander1 {
+	lcd_en {
+		gpio-hog;
+		gpios = <4 GPIO_ACTIVE_HIGH>;
+		output-low;
+		line-name = "LCD_EN";
+	};
+
+	lvds_en {
+		gpio-hog;
+		gpios = <15 GPIO_ACTIVE_HIGH>;
+		output-high;
+		line-name = "LVDS_EN";
+	};
+};
+
+&dra7_pmx_core {
+	backlight_pins_default: backlight_pins_default {
+		pinctrl-single,pins = <
+			DRA7XX_CORE_IOPAD(0x358C, PIN_OUTPUT | MUX_MODE10) /* vin2a_d9.ehrpwm2A */
+		>;
+	};
+};
+
+/* display subsystem */
+&dss {
+	status = "okay";
+	vdda_video-supply = <&ldoln_reg>;
+
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port@0 {
+			reg = <0>;
+			dpi_out: endpoint {
+				remote-endpoint = <&lcd_in>;
+				data-lines = <24>;
+			};
+		};
+	};
+};

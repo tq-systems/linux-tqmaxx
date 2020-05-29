@@ -1,0 +1,13 @@
+/*
+ * Copyright (C) 2020 TQ-Systems GmbH
+ *
+ * Author: Michael Krummsdorf <michael.krummsdorf@tq-group.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+#include "am574x-mba57xx.dts"
+#include "am57xx-mba57xx-glyn-etm0700g0dh6.dtsi"
+

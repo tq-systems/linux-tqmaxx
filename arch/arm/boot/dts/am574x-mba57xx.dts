@@ -1,0 +1,31 @@
+/*
+ * Copyright (C) 2020 TQ-Systems GmbH
+ *
+ * Author: Michael Krummsdorf <michael.krummsdorf@tq-group.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+/dts-v1/;
+
+#include "am574x-tqma57xx.dtsi"
+#include "am57xx-mba57xx.dtsi"
+
+/ {
+	model = "TQ TQMa5748 MBa57xx (TI)";
+	compatible = "tq,mba57xx", "tq,tqma5748", "ti,am5748",
+		     "ti,dra762", "ti,dra7";
+
+};
+
+/* PCIe lane 1 mPCIe connector */
+&pcie2_rc {
+	status = "okay";
+	/* PCIe reset R532 not placed */
+};
+
+&pcie2_phy {
+	status = "okay";
+};
