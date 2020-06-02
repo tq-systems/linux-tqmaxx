@@ -182,7 +182,7 @@
 &ecspi2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_ecspi2>;
-	fsl,spi-num-chipselects = <1>;
+	num-cs = <1>;
 	status = "okay";
 
 	spidev2_0: spidev2-0@0 {
