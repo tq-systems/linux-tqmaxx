@@ -192,7 +192,7 @@
 &ecspi1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_ecspi1>;
-	num-chipselects = <3>;
+	num-cs = <3>;
 	cs-gpios = <&gpio4 0 GPIO_ACTIVE_LOW>, <&gpio4 1 GPIO_ACTIVE_LOW>,
 		   <&gpio4 2 GPIO_ACTIVE_LOW>;
 	status = "okay";
@@ -222,7 +222,7 @@
 &ecspi2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_ecspi2>;
-	num-chipselects = <1>;
+	num-cs = <1>;
 	status = "okay";
 
 	spidev1_0: spidev1-0@0 {
