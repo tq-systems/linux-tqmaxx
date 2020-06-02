@@ -4,16 +4,15 @@
  * Author: Markus Niebel <Markus.Niebel@tq-group.com>
  */
 
+&hdmi {
+	ddc-i2c-bus = <&i2c2>;
+	status = "okay";
+};
+
 &i2c2 {
 	clock-frequency = <100000>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_i2c2>;
-	status = "okay";
-};
-
-&hdmi {
-	pinctrl-names = "default";
-	ddc-i2c-bus = <&i2c2>;
 	status = "okay";
 };
 
