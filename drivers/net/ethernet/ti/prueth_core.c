@@ -1006,6 +1006,9 @@ static int emac_ndo_open(struct net_device *ndev)
 		}
 	}
 
+	/* Get attached phy details */
+	phy_attached_info(emac->phydev);
+
 	prueth->emac_configured |= BIT(emac->port_id);
 	/* start PHY */
 	phy_start(emac->phydev);
