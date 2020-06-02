@@ -164,7 +164,7 @@
 &ecspi1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_ecspi1>, <&pinctrl_ecspi1_mba6>;
-	fsl,spi-num-chipselects = <2>;
+	num-cs = <2>;
 	cs-gpios = <&gpio3 19 0>, <&gpio3 24 0>;
 
 	spidev1_1: spidev1-1@1 {
