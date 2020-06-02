@@ -2701,7 +2701,9 @@ static struct omap_hwmod_ocp_if *dra72x_hwmod_ocp_ifs[] __initdata = {
 };
 
 static struct omap_hwmod_ocp_if *rtc_hwmod_ocp_ifs[] __initdata = {
+#if 0
 	&dra7xx_l4_per3__rtcss,
+#endif
 	NULL,
 };
 
