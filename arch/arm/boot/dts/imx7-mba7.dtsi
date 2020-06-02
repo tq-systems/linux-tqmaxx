@@ -243,6 +243,7 @@
 	phy-supply = <&reg_fec1_pwdn>;
 	phy-handle = <&ethphy1_0>;
 	fsl,magic-packet;
+	fsl,mii-exclusive;
 	status = "okay";
 
 	mdio {

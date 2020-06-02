@@ -27,6 +27,7 @@
 	phy-supply = <&reg_fec2_pwdn>;
 	phy-handle = <&ethphy2_0>;
 	fsl,magic-packet;
+	fsl,mii-exclusive;
 	status = "okay";
 
 	mdio {
@@ -105,6 +106,13 @@
 	reset-gpio = <&gpio5 12 GPIO_ACTIVE_LOW>;
 	disable-gpio = <&gpio2 29 GPIO_ACTIVE_LOW>;
 	power-on-gpio = <&gpio2 30 GPIO_ACTIVE_LOW>;
+	/*
+	 * ext_osc (external oscillator) is a u32 property and not a
+	 * boolean property. Values:
+	 *   0: internal oscillator
+	 *  >0: external oscillator (default)
+	 */
+	ext_osc = <0>;
 	status = "okay";
 };
 
