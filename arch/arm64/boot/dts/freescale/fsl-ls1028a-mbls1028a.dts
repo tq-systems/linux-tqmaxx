@@ -89,10 +89,6 @@
 
 &esdhc {
 	status = "okay";
-	sd-uhs-sdr104;
-	sd-uhs-sdr50;
-	sd-uhs-sdr25;
-	sd-uhs-sdr12;
 };
 
 /* When switched to baseboard-internal i2c bus,
