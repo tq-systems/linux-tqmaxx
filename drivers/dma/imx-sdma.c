@@ -1134,6 +1134,7 @@ static void sdma_set_watermarklevel_for_p2p(struct sdma_channel *sdmac)
 static int sdma_config_channel(struct dma_chan *chan)
 {
 	struct sdma_channel *sdmac = to_sdma_chan(chan);
+	int ret;
 
 	sdma_disable_channel(chan);
 
@@ -1173,7 +1174,9 @@ static int sdma_config_channel(struct dma_chan *chan)
 		sdmac->watermark_level = 0; /* FIXME: M3_BASE_ADDRESS */
 	}
 
-	return 0;
+	ret = sdma_load_context(sdmac);
+
+	return ret;
 }
 
 static int sdma_set_channel_priority(struct sdma_channel *sdmac,
