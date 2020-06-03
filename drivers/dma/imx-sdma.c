@@ -419,13 +419,6 @@ struct sdma_driver_data {
 	int num_events;
 	struct sdma_script_start_addrs	*script_addrs;
 	bool check_ratio;
-	/*
-	 * ecspi ERR009165 fixed should be done in sdma script
-	 * and it has been fixed in soc from i.mx6ul.
-	 * please get more information from the below link:
-	 * https://www.nxp.com/docs/en/errata/IMX6DQCE.pdf
-	 */
-	bool ecspi_fixed;
 };
 
 struct sdma_engine {
@@ -546,13 +539,6 @@ static struct sdma_driver_data sdma_imx6q = {
 	.script_addrs = &sdma_script_imx6q,
 };
 
-static struct sdma_driver_data sdma_imx6ul = {
-	.chnenbl0 = SDMA_CHNENBL0_IMX35,
-	.num_events = 48,
-	.script_addrs = &sdma_script_imx6q,
-	.ecspi_fixed = true,
-};
-
 static struct sdma_script_start_addrs sdma_script_imx7d = {
 	.ap_2_ap_addr = 644,
 	.uart_2_mcu_addr = 819,
@@ -601,9 +587,6 @@ static const struct platform_device_id sdma_devtypes[] = {
 		.name = "imx7d-sdma",
 		.driver_data = (unsigned long)&sdma_imx7d,
 	}, {
-		.name = "imx6ul-sdma",
-		.driver_data = (unsigned long)&sdma_imx6ul,
-	}, {
 		.name = "imx8mq-sdma",
 		.driver_data = (unsigned long)&sdma_imx8mq,
 	}, {
@@ -620,7 +603,6 @@ static const struct of_device_id sdma_dt_ids[] = {
 	{ .compatible = "fsl,imx31-sdma", .data = &sdma_imx31, },
 	{ .compatible = "fsl,imx25-sdma", .data = &sdma_imx25, },
 	{ .compatible = "fsl,imx7d-sdma", .data = &sdma_imx7d, },
-	{ .compatible = "fsl,imx6ul-sdma", .data = &sdma_imx6ul, },
 	{ .compatible = "fsl,imx8mq-sdma", .data = &sdma_imx8mq, },
 	{ /* sentinel */ }
 };
@@ -1184,17 +1166,8 @@ static int sdma_config_channel(struct dma_chan *chan)
 			if (sdmac->peripheral_type == IMX_DMATYPE_ASRC_SP ||
 			    sdmac->peripheral_type == IMX_DMATYPE_ASRC)
 				sdma_set_watermarklevel_for_p2p(sdmac);
-		} else {
-			/*
-			 * ERR009165 fixed from i.mx6ul, no errata need,
-			 * set bit31 to let sdma script skip the errata.
-			 */
-			if (sdmac->peripheral_type == IMX_DMATYPE_CSPI &&
-			    sdmac->direction == DMA_MEM_TO_DEV &&
-			    sdmac->sdma->drvdata->ecspi_fixed)
-				__set_bit(31, &sdmac->watermark_level);
+		} else
 			__set_bit(sdmac->event_id0, sdmac->event_mask);
-		}
 
 		/* Address */
 		sdmac->shp_addr = sdmac->per_address;
