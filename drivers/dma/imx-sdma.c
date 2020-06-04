@@ -377,6 +377,7 @@ struct sdma_channel {
 	unsigned long			watermark_level;
 	u32				shp_addr, per_addr;
 	enum dma_status			status;
+	bool				context_loaded;
 	struct imx_dma_data		data;
 	struct work_struct		terminate_worker;
 };
@@ -419,13 +420,6 @@ struct sdma_driver_data {
 	int num_events;
 	struct sdma_script_start_addrs	*script_addrs;
 	bool check_ratio;
-	/*
-	 * ecspi ERR009165 fixed should be done in sdma script
-	 * and it has been fixed in soc from i.mx6ul.
-	 * please get more information from the below link:
-	 * https://www.nxp.com/docs/en/errata/IMX6DQCE.pdf
-	 */
-	bool ecspi_fixed;
 };
 
 struct sdma_engine {
@@ -546,13 +540,6 @@ static struct sdma_driver_data sdma_imx6q = {
 	.script_addrs = &sdma_script_imx6q,
 };
 
-static struct sdma_driver_data sdma_imx6ul = {
-	.chnenbl0 = SDMA_CHNENBL0_IMX35,
-	.num_events = 48,
-	.script_addrs = &sdma_script_imx6q,
-	.ecspi_fixed = true,
-};
-
 static struct sdma_script_start_addrs sdma_script_imx7d = {
 	.ap_2_ap_addr = 644,
 	.uart_2_mcu_addr = 819,
@@ -601,9 +588,6 @@ static const struct platform_device_id sdma_devtypes[] = {
 		.name = "imx7d-sdma",
 		.driver_data = (unsigned long)&sdma_imx7d,
 	}, {
-		.name = "imx6ul-sdma",
-		.driver_data = (unsigned long)&sdma_imx6ul,
-	}, {
 		.name = "imx8mq-sdma",
 		.driver_data = (unsigned long)&sdma_imx8mq,
 	}, {
@@ -620,7 +604,6 @@ static const struct of_device_id sdma_dt_ids[] = {
 	{ .compatible = "fsl,imx31-sdma", .data = &sdma_imx31, },
 	{ .compatible = "fsl,imx25-sdma", .data = &sdma_imx25, },
 	{ .compatible = "fsl,imx7d-sdma", .data = &sdma_imx7d, },
-	{ .compatible = "fsl,imx6ul-sdma", .data = &sdma_imx6ul, },
 	{ .compatible = "fsl,imx8mq-sdma", .data = &sdma_imx8mq, },
 	{ /* sentinel */ }
 };
@@ -942,9 +925,6 @@ static void sdma_get_pc(struct sdma_channel *sdmac,
 		emi_2_per = sdma->script_addrs->mcu_2_ata_addr;
 		break;
 	case IMX_DMATYPE_CSPI:
-		per_2_emi = sdma->script_addrs->app_2_mcu_addr;
-		emi_2_per = sdma->script_addrs->mcu_2_ecspi_addr;
-		break;
 	case IMX_DMATYPE_EXT:
 	case IMX_DMATYPE_SSI:
 	case IMX_DMATYPE_SAI:
@@ -1008,6 +988,9 @@ static int sdma_load_context(struct sdma_channel *sdmac)
 	int ret;
 	unsigned long flags;
 
+	if (sdmac->context_loaded)
+		return 0;
+
 	if (sdmac->direction == DMA_DEV_TO_MEM)
 		load_address = sdmac->pc_from_device;
 	else if (sdmac->direction == DMA_DEV_TO_DEV)
@@ -1050,6 +1033,8 @@ static int sdma_load_context(struct sdma_channel *sdmac)
 
 	spin_unlock_irqrestore(&sdma->channel_0_lock, flags);
 
+	sdmac->context_loaded = true;
+
 	return ret;
 }
 
@@ -1089,6 +1074,7 @@ static void sdma_channel_terminate_work(struct work_struct *work)
 	sdmac->desc = NULL;
 	spin_unlock_irqrestore(&sdmac->vc.lock, flags);
 	vchan_dma_desc_free_list(&sdmac->vc, &head);
+	sdmac->context_loaded = false;
 }
 
 static int sdma_disable_channel_async(struct dma_chan *chan)
@@ -1155,6 +1141,7 @@ static void sdma_set_watermarklevel_for_p2p(struct sdma_channel *sdmac)
 static int sdma_config_channel(struct dma_chan *chan)
 {
 	struct sdma_channel *sdmac = to_sdma_chan(chan);
+	int ret;
 
 	sdma_disable_channel(chan);
 
@@ -1180,21 +1167,12 @@ static int sdma_config_channel(struct dma_chan *chan)
 	if ((sdmac->peripheral_type != IMX_DMATYPE_MEMORY) &&
 			(sdmac->peripheral_type != IMX_DMATYPE_DSP)) {
 		/* Handle multiple event channels differently */
-		if (sdmac->direction == DMA_DEV_TO_DEV) {
+		if (sdmac->event_id1) {
 			if (sdmac->peripheral_type == IMX_DMATYPE_ASRC_SP ||
 			    sdmac->peripheral_type == IMX_DMATYPE_ASRC)
 				sdma_set_watermarklevel_for_p2p(sdmac);
-		} else {
-			/*
-			 * ERR009165 fixed from i.mx6ul, no errata need,
-			 * set bit31 to let sdma script skip the errata.
-			 */
-			if (sdmac->peripheral_type == IMX_DMATYPE_CSPI &&
-			    sdmac->direction == DMA_MEM_TO_DEV &&
-			    sdmac->sdma->drvdata->ecspi_fixed)
-				__set_bit(31, &sdmac->watermark_level);
+		} else
 			__set_bit(sdmac->event_id0, sdmac->event_mask);
-		}
 
 		/* Address */
 		sdmac->shp_addr = sdmac->per_address;
@@ -1203,7 +1181,9 @@ static int sdma_config_channel(struct dma_chan *chan)
 		sdmac->watermark_level = 0; /* FIXME: M3_BASE_ADDRESS */
 	}
 
-	return 0;
+	ret = sdma_load_context(sdmac);
+
+	return ret;
 }
 
 static int sdma_set_channel_priority(struct sdma_channel *sdmac,
@@ -1348,13 +1328,14 @@ static void sdma_free_chan_resources(struct dma_chan *chan)
 
 	sdma_channel_synchronize(chan);
 
-	sdma_event_disable(sdmac, sdmac->event_id0);
-
-	if (sdmac->direction == DMA_DEV_TO_DEV)
+	if (sdmac->event_id0 >= 0)
+		sdma_event_disable(sdmac, sdmac->event_id0);
+	if (sdmac->event_id1)
 		sdma_event_disable(sdmac, sdmac->event_id1);
 
 	sdmac->event_id0 = 0;
 	sdmac->event_id1 = 0;
+	sdmac->context_loaded = false;
 
 	sdma_set_channel_priority(sdmac, 0);
 
@@ -1648,11 +1629,13 @@ static int sdma_config(struct dma_chan *chan,
 	memcpy(&sdmac->slave_config, dmaengine_cfg, sizeof(*dmaengine_cfg));
 
 	/* Set ENBLn earlier to make sure dma request triggered after that */
-	if (sdmac->event_id0 >= sdmac->sdma->drvdata->num_events)
-		return -EINVAL;
-	sdma_event_enable(sdmac, sdmac->event_id0);
+	if (sdmac->event_id0 >= 0) {
+		if (sdmac->event_id0 >= sdmac->sdma->drvdata->num_events)
+			return -EINVAL;
+		sdma_event_enable(sdmac, sdmac->event_id0);
+	}
 
-	if (sdmac->direction == DMA_DEV_TO_DEV) {
+	if (sdmac->event_id1) {
 		if (sdmac->event_id1 >= sdmac->sdma->drvdata->num_events)
 			return -EINVAL;
 		sdma_event_enable(sdmac, sdmac->event_id1);
@@ -1711,8 +1694,8 @@ static void sdma_issue_pending(struct dma_chan *chan)
 
 #define SDMA_SCRIPT_ADDRS_ARRAY_SIZE_V1	34
 #define SDMA_SCRIPT_ADDRS_ARRAY_SIZE_V2	38
-#define SDMA_SCRIPT_ADDRS_ARRAY_SIZE_V3	45
-#define SDMA_SCRIPT_ADDRS_ARRAY_SIZE_V4	46
+#define SDMA_SCRIPT_ADDRS_ARRAY_SIZE_V3	41
+#define SDMA_SCRIPT_ADDRS_ARRAY_SIZE_V4	42
 
 static void sdma_add_scripts(struct sdma_engine *sdma,
 		const struct sdma_script_start_addrs *addr)

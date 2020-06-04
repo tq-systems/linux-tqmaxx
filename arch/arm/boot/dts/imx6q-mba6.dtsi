@@ -9,7 +9,7 @@
 &ecspi5 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_ecspi5_mba6x>;
-	fsl,spi-num-chipselects = <1>;
+	num-cs = <1>;
 	cs-gpios = <&gpio1 17 GPIO_ACTIVE_LOW>;
 	status = "okay";
 
