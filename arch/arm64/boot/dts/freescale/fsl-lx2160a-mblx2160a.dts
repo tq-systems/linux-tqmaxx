@@ -1,0 +1,318 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Copyright 2020-2021 TQ-Systems GmbH
+ * Author: Gregor Herburger <gregor.herburger@tq-group.com>
+ */
+
+/dts-v1/;
+
+#include "fsl-lx2160a-tqmlx2160a.dtsi"
+#include <dt-bindings/net/ti-dp83867.h>
+#include <dt-bindings/input/input.h>
+
+/ {
+	model = "TQ Systems GmbH MBLX2160A Starterkit";
+	compatible = "tq,mblx2160a", "tq,tqmlx2160a", "fsl,lx2160a";
+
+	aliases {
+		serial0 = &uart0;
+		serial1 = &uart1;
+		serial2 = &uart2;
+		serial3 = &uart3;
+	};
+
+	chosen {
+		stdout-path = "serial0:115200n8";
+	};
+
+	leds {
+		compatible = "gpio-leds";
+
+		user1 {
+			gpios = <&gpioex1 15 GPIO_ACTIVE_LOW>;
+			label = "led:user1";
+			linux,default-trigger = "heartbeat";
+		};
+
+		user2 {
+			gpios = <&gpio2 8 GPIO_ACTIVE_LOW>;
+			label = "led:user2";
+			linux,default-trigger = "heartbeat";
+		};
+	};
+
+	gpio-keys-polled {
+		compatible = "gpio-keys-polled";
+		gpio-keys,name = "gpio-keys";
+		poll-interval = <100>;
+		autorepeat;
+
+		button0: button0 {
+			label = "button:user1";
+			gpios = <&gpio2 9 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_F1>;
+		};
+
+		button1: button1 {
+			label = "button:user2";
+			gpios = <&gpio2 10 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_F2>;
+		};
+	};
+};
+
+&can0 {
+	status = "okay";
+
+	can-transceiver {
+		max-bitrate = <5000000>;
+	};
+};
+
+&can1 {
+	status = "okay";
+
+	can-transceiver {
+		max-bitrate = <5000000>;
+	};
+};
+
+&dpmac13 {
+	phy-connection-type = "usxgmii";
+};
+
+&dpmac14 {
+	phy-connection-type = "usxgmii";
+};
+
+&dpmac17 {
+	phy-handle = <&dp83867_1_2>;
+	phy-connection-type = "sgmii";
+};
+
+&dpmac18 {
+	phy-handle = <&dp83867_1_3>;
+	phy-connection-type = "sgmii";
+};
+
+&emdio1 {
+	status = "okay";
+
+	dp83867_1_1: ethernet-phy@1 {
+		reg = <1>;
+		ti,clk-output-sel = <DP83867_CLK_O_SEL_OFF>;
+		ti,led-function = <0x6101>;
+		ti,led-ctrl = <0x4400>;
+	};
+
+	dp83867_1_2: ethernet-phy@2 {
+		reg = <2>;
+		ti,clk-output-sel = <DP83867_CLK_O_SEL_OFF>;
+		ti,led-function = <0x6101>;
+		ti,led-ctrl = <0x4400>;
+	};
+
+	dp83867_1_3: ethernet-phy@3 {
+		reg = <3>;
+		ti,clk-output-sel = <DP83867_CLK_O_SEL_OFF>;
+		ti,led-function = <0x6101>;
+		ti,led-ctrl = <0x4400>;
+	};
+
+	dp83867_1_4: ethernet-phy@4 {
+		reg = <4>;
+		ti,clk-output-sel = <DP83867_CLK_O_SEL_OFF>;
+		ti,led-function = <0x6101>;
+		ti,led-ctrl = <0x4400>;
+	};
+
+	dp83867_1_5: ethernet-phy@5 {
+		reg = <5>;
+		ti,clk-output-sel = <DP83867_CLK_O_SEL_OFF>;
+		ti,led-function = <0x6101>;
+		ti,led-ctrl = <0x4400>;
+	};
+
+	dp83867_1_6: ethernet-phy@6 {
+		reg = <6>;
+		ti,clk-output-sel = <DP83867_CLK_O_SEL_OFF>;
+		ti,led-function = <0x6101>;
+		ti,led-ctrl = <0x4400>;
+	};
+};
+
+&emdio2 {
+	status = "okay";
+
+	dp83867_2_1: ethernet-phy@1 {
+		reg = <1>;
+		ti,clk-output-sel = <DP83867_CLK_O_SEL_OFF>;
+		ti,led-function = <0x6101>;
+		ti,led-ctrl = <0x4400>;
+	};
+
+	dp83867_2_2: ethernet-phy@2 {
+		reg = <2>;
+		ti,clk-output-sel = <DP83867_CLK_O_SEL_OFF>;
+		ti,led-function = <0x6101>;
+		ti,led-ctrl = <0x4400>;
+	};
+
+	dp83867_2_3: ethernet-phy@3 {
+		reg = <3>;
+		ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_25_NS>;
+		ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_25_NS>;
+		ti,clk-output-sel = <DP83867_CLK_O_SEL_OFF>;
+		ti,led-function = <0x6101>;
+		ti,led-ctrl = <0x4400>;
+	};
+
+	dp83867_2_4: ethernet-phy@4 {
+		reg = <4>;
+		ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_25_NS>;
+		ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_25_NS>;
+		ti,clk-output-sel = <DP83867_CLK_O_SEL_OFF>;
+		ti,led-function = <0x6101>;
+		ti,led-ctrl = <0x4400>;
+	};
+};
+
+&esdhc0 {
+	sd-uhs-sdr104;
+	sd-uhs-sdr50;
+	sd-uhs-sdr25;
+	sd-uhs-sdr12;
+	no-mmc;
+	no-sdio;
+	wp-gpios = <&gpio0 30 GPIO_ACTIVE_LOW>;
+	cd-gpios = <&gpio0 31 GPIO_ACTIVE_LOW>;
+	status = "okay";
+};
+
+&i2c4 {
+	status = "okay";
+
+	mux@70 {
+		compatible = "nxp,pca9544";
+		reg = <0x70>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		i2c@0 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0>;
+		};
+
+		i2c@1 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <1>;
+		};
+
+		i2c@2 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <2>;
+
+			gpioex0: gpio@20 {
+				compatible = "nxp,pca9555";
+				reg = <0x20>;
+				#gpio-cells = <2>;
+				gpio-controller;
+			};
+
+			gpioex1: gpio@21 {
+				compatible = "nxp,pca9555";
+				reg = <0x21>;
+				#gpio-cells = <2>;
+				gpio-controller;
+			};
+
+			gpioex2: gpio@22 {
+				compatible = "nxp,pca9555";
+				reg = <0x22>;
+				#gpio-cells = <2>;
+				gpio-controller;
+			};
+		};
+
+		i2c@3 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <3>;
+		};
+	};
+};
+
+&i2c5 {
+	status = "okay";
+
+	mux@70 {
+		compatible = "nxp,pca9544";
+		reg = <0x70>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		i2c@0 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0>;
+		};
+
+		i2c@1 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <1>;
+		};
+
+		i2c@2 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <2>;
+		};
+
+		i2c@3 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <3>;
+		};
+	};
+};
+
+&sata0{
+	status = "okay";
+};
+
+&sata1{
+	status = "okay";
+};
+
+&sata2{
+	status = "okay";
+};
+
+&uart0 {
+	status = "okay";
+};
+
+&uart1 {
+	status = "okay";
+};
+
+&uart2 {
+	status = "okay";
+};
+
+&uart3 {
+	status = "okay";
+};
+
+&usb0 {
+	status = "okay";
+};
+
+&usb1 {
+	dr_mode = "otg";
+	status = "okay";
+};
