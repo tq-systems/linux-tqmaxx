@@ -1,0 +1,75 @@
+#include "fsl-lx2160a.dtsi"
+
+/ {
+	compatible = "tq,tqmlx2160a", "fsl,lx2160a";
+};
+
+&fspi {
+	bus-num = <0>;
+	status = "okay";
+
+	flash0: mx66um1g45g@0 {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "jedec,spi-nor";
+		spi-max-frequency = <10000000>;
+		reg = <0>;
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			rcw-pbl@0 {
+				label = "RCW-PBL";
+				reg = <0x0 0x100000>;
+			};
+
+			u-boot@100000 {
+				label = "U-Boot";
+				reg = <0x100000 0x100000>;
+			};
+
+			u-boot-env {
+				label = "U-Boot-Env";
+				reg = <0x300000 0x100000>;
+			};
+
+			ddr-phy {
+				label = "DDR-PHY";
+				reg = <0x800000 0x100000>;
+			};
+
+			dpaa2-mc {
+				label = "DPAA2-MC";
+				reg = <0xa00000 0x300000>;
+			};
+
+			dpaa2-dpl {
+				label = "DPAA2-DPL";
+				reg = <0xd00000 0x100000>;
+			};
+
+			dpaa2-dpc {
+				label = "DPAA2-DPC";
+				reg = <0xe00000 0x100000>;
+			};
+
+			dtb {
+				label = "DTB";
+				reg = <0xf00000 0x100000>;
+			};
+
+			linux@10000000 {
+				label = "Linux";
+				reg = <0x1000000 0x1000000>;
+			};
+
+			rootfs {
+				label = "RootFS";
+				reg = <0x3000000 0x5000000>;
+			};
+		};
+	};
+};
+

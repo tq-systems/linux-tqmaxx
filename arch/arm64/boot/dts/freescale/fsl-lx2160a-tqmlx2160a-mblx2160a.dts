@@ -1,0 +1,28 @@
+/dts-v1/;
+
+#include "fsl-lx2160a-tqmlx2160a.dtsi"
+
+/ {
+	model = "TQ Systems GmbH MBLX2160A Starterkit";
+	compatible = "tq,mblx2160a", "tq,tqmlx2160a", "fsl,lx2160a";
+
+	aliases {
+		serial0 = &uart0;
+	};
+
+	chosen {
+		stdout-path = "serial0:115200n8";
+	};
+};
+
+&esdhc0 {
+	sd-uhs-sdr104;
+	sd-uhs-sdr50;
+	sd-uhs-sdr25;
+	sd-uhs-sdr12;
+	status = "okay";
+};
+
+&uart0 {
+	status = "okay";
+};
