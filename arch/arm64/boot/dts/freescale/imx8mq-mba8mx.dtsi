@@ -113,11 +113,76 @@
 	};
 };
 
+&i2c1 {
+	systemcontroller: syscon@11 {
+		reg = <0x11>;
+		status = "disabled";
+	};
+
+	expander0: gpio@23 {
+		compatible = "nxp,pca9555";
+		reg = <0x23>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		vcc-supply = <&reg_vcc_3v3>;
+
+		sd-mux-oe {
+			gpio-hog;
+			gpios = <8 0>;
+			output-low;
+			line-name = "SD_MUX_EN#";
+		};
+
+		boot-cfg-oe {
+			gpio-hog;
+			gpios = <12 0>;
+			output-high;
+			line-name = "BOOT_CFG_OE#";
+		};
+	};
+
+	expander1: gpio@24 {
+		compatible = "nxp,pca9555";
+		reg = <0x24>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		vcc-supply = <&reg_vcc_3v3>;
+	};
+
+	expander2: gpio@25 {
+		compatible = "nxp,pca9555";
+		reg = <0x25>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		vcc-supply = <&reg_vcc_3v3>;
+	};
+};
+
 &i2c2 {
 	clock-frequency = <100000>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_i2c2>;
 	status = "okay";
+
+	/*
+	 * NXP SE97BTP with temperature sensor + eeprom
+	 */
+	sensor1: sensor@1f {
+		compatible = "nxp,se97", "jedec,jc-42.4-temp";
+		reg = <0x1f>;
+	};
+
+	eeprom3: eeprom@57 {
+		compatible = "nxp,se97b", "atmel,24c02";
+		reg = <0x57>;
+		pagesize = <16>;
+	};
+
+	/* PCIe CLK, should work without intervention */
+	pciclk: clk@68 {
+		reg = <0x68>;
+		status = "disabled";
+	};
 };
 
 &i2c3 {
