@@ -104,6 +104,17 @@
 		>;
 	};
 
+	pinctrl_qspi: qspigrp {
+		fsl,pins = <
+			MX8MQ_IOMUXC_NAND_ALE_QSPI_A_SCLK		0x97
+			MX8MQ_IOMUXC_NAND_CE0_B_QSPI_A_SS0_B		0x82
+			MX8MQ_IOMUXC_NAND_DATA00_QSPI_A_DATA0		0x97
+			MX8MQ_IOMUXC_NAND_DATA01_QSPI_A_DATA1		0x97
+			MX8MQ_IOMUXC_NAND_DATA02_QSPI_A_DATA2		0x97
+			MX8MQ_IOMUXC_NAND_DATA03_QSPI_A_DATA3		0x97
+		>;
+	};
+
 	pinctrl_rtc: rtcgrp {
 		fsl,pins = <
 			MX8MQ_IOMUXC_GPIO1_IO01_GPIO1_IO1		0x41
@@ -300,6 +311,35 @@
 
 &pcie1 {
 	/delete-property/ reserved-region;
+};
+
+/*
+ * By default, we use a flash which should support up to 90 MHz SPI clk
+ * for Quad IO and DTR. Other options are devices with up to 84 MHz, So limit
+ * the clock
+ * To achieve a higher clock, reparent the QSPI clock. To prevent runing with
+ * too high frequencies for DTR / QUAD, we use 266 MHz root -> 266 / 4 MHz SCLK
+ */
+&qspi0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_qspi>;
+	assigned-clocks = <&clk IMX8MQ_CLK_QSPI>;
+	assigned-clock-parents = <&clk IMX8MQ_SYS1_PLL_266M>;
+/*	fsl,qspi-no-dtr-modes; */
+	status = "okay";
+
+	flash0: flash@0 {
+		reg = <0>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "jedec,spi-nor";
+		spi-max-frequency = <84000000>;
+		spi-tx-bus-width = <4>;
+		spi-rx-bus-width = <4>;
+		/* TODO: not used in spi-nor / fsl-qspi but in fsl-flexspi */
+/*		spi-nor,ddr-quad-read-dummy = <8>; */
+		spi-nor,ddr-quad-read-dummy = <6>;
+	};
 };
 
 &rpmsg{
