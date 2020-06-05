@@ -22,6 +22,13 @@
 		stdout-path = &uart3;
 	};
 
+	extcon_usbotg: extcon-usbotg0 {
+		compatible = "linux,extcon-usb-gpio";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_usbcon0>;
+		id-gpio = <&gpio1 10 GPIO_ACTIVE_HIGH>;
+	};
+
 	gpio-keys {
 		compatible = "gpio-keys";
 		pinctrl-names = "default";
@@ -72,6 +79,17 @@
 			label = "led3";
 			gpios = <&gpio1 8 GPIO_ACTIVE_HIGH>;
 		};
+	};
+
+	reg_otg_vbus: regulator-otg-vbus {
+		compatible = "regulator-fixed";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_regotgvbus>;
+		regulator-name = "MBA8MQ_OTG_VBUS";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		gpio = <&gpio1 12 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
 	};
 
 	reg_vcc_3v3: regulator-3v3 {
@@ -230,6 +248,13 @@
 		>;
 	};
 
+	pinctrl_regotgvbus: reggotgvbusgrp {
+		fsl,pins = <
+			/* USB1 OTG PWR as GPIO */
+			MX8MQ_IOMUXC_GPIO1_IO12_GPIO1_IO12	0x06
+		>;
+	};
+
 	pinctrl_uart1: uart1grp {
 		fsl,pins = <
 			MX8MQ_IOMUXC_UART1_RXD_UART1_DCE_RX	0x79
@@ -255,6 +280,24 @@
 		fsl,pins = <
 			MX8MQ_IOMUXC_UART4_RXD_UART4_DCE_RX	0x79
 			MX8MQ_IOMUXC_UART4_TXD_UART4_DCE_TX	0x79
+		>;
+	};
+
+	pinctrl_usbcon0: usb0congrp {
+		fsl,pins = <
+			/* ID: floating / high: device, low: host -> use PU */
+			MX8MQ_IOMUXC_GPIO1_IO10_GPIO1_IO10	0xe6
+		>;
+	};
+
+	/*
+	 * TODO: OC detection is not functional yet since signal is expected to
+	 * be low active. HW on MBa8Mx has high active signalling
+	 * See: https://community.nxp.com/message/1247228?commentID=1247228#comment-1247228
+	 */
+	pinctrl_usb0: usb0grp {
+		fsl,pins = <
+			MX8MQ_IOMUXC_GPIO1_IO13_USB1_OTG_OC	0x01
 		>;
 	};
 
@@ -360,6 +403,13 @@
 		reg = <0x1f>;
 	};
 
+	usbhub0: usbhub@44 {
+		compatible = "ti,tusb8041", "ti,tusb80xx";
+		reg = <0x44>;
+		reset-gpios = <&expander0 13 GPIO_ACTIVE_LOW>;
+		status = "okay";
+	};
+
 	eeprom3: eeprom@57 {
 		compatible = "nxp,se97b", "atmel,24c02";
 		reg = <0x57>;
@@ -423,6 +473,44 @@
 	assigned-clocks = <&clk IMX8MQ_CLK_UART4>;
 	assigned-clock-parents = <&clk IMX8MQ_SYS1_PLL_80M>;
 	status = "okay";
+};
+
+&usb3_phy0 {
+	vbus-supply = <&reg_otg_vbus>;
+	status = "okay";
+};
+
+&usb_dwc3_0 {
+	/*
+	 * TODO: OC not supported due to non matching active polarity
+	 *	pinctrl-names = "default";
+	 *	pinctrl-0 = <&pinctrl_usb0>;
+	 */
+	/*
+	 * use extcon gpio OTG ID detection. Older versions of driver does not
+	 * support OTG ID signal. Unclear which difference is between muxable
+	 * and non muxable pin for ID
+	 */
+	extcon = <&extcon_usbotg>;
+	/*
+	 * TODO: sugested as workaround 1) for errata e11193, has to be investigated
+	 */
+	/* snps,dis_u2_susphy_quirk; */
+	/* we implement dual role but not full featured OTG */
+	hnp-disable;
+	srp-disable;
+	adp-disable;
+	dr_mode = "otg";
+	status = "okay";
+};
+
+&usb3_phy1 {
+	status = "okay";
+};
+
+&usb_dwc3_1 {
+	status = "okay";
+	dr_mode = "host";
 };
 
 &usdhc2 {
