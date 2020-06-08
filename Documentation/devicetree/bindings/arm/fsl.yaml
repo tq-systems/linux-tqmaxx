@@ -229,6 +229,16 @@ properties:
               - fsl,imx8mm-evk            # i.MX8MM EVK Board
           - const: fsl,imx8mm
 
+      - description:
+          TQMa8MxML is a series of SOM featuring NXP i.MX8MM system-on-chip
+          variants. It is designed to be soldered on different carrier boards
+          MBa8Mx together with a plugin adapter is the starterkit
+        items:
+          - enum:
+              - tq,imx8mm-mba8mx         # TQ-Systems GmbH i.MX8MM TQMa8MxML SOM on MBa8Mx
+          - const: tq,imx8mm-tqma8mxml   # TQ-Systems GmbH i.MX8MM TQMa8MxML SOM
+          - const: fsl,imx8mm
+
       - description: i.MX8MN based Boards
         items:
           - enum:
