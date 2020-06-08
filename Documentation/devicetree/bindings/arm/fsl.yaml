@@ -250,9 +250,17 @@ properties:
           - enum:
               - einfochips,imx8qxp-ai_ml  # i.MX8QXP AI_ML Board
               - fsl,imx8qxp-mek           # i.MX8QXP MEK Board
-              - tq,tqma8xqp               # TQ Systems GmbH TQMa8XQP SOM
+          - const: fsl,imx8qxp
+
+      - description:
+          TQMa8Xx is a series of SOM featuring NXP i.MX8X system-on-chip
+          variants. It is designed to be clicked on different carrier boards
+          MBa8Xx is the starterkit
+        items:
+          - enum:
               - tq,tqma8xqp-mba8xx        # TQ Systems GmbH TQMa8QXP SOM on MBa8Xx
           - const: fsl,imx8qxp
+          - const: tq,tqma8xqp            # TQ Systems GmbH TQMa8XQP SOM
 
       - description:
           Freescale Vybrid Platform Device Tree Bindings
