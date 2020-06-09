@@ -4,6 +4,14 @@
 	compatible = "tq,tqmlx2160a", "fsl,lx2160a";
 };
 
+&emdio1 {
+	status = "okay";
+};
+
+&emdio2 {
+	status = "okay";
+};
+
 &fspi {
 	bus-num = <0>;
 	status = "okay";
@@ -72,4 +80,3 @@
 		};
 	};
 };
-

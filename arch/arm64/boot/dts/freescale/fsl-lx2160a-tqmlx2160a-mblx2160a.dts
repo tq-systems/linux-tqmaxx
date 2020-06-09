@@ -1,6 +1,7 @@
 /dts-v1/;
 
 #include "fsl-lx2160a-tqmlx2160a.dtsi"
+#include <dt-bindings/net/ti-dp83867.h>
 
 / {
 	model = "TQ Systems GmbH MBLX2160A Starterkit";
@@ -12,6 +13,76 @@
 
 	chosen {
 		stdout-path = "serial0:115200n8";
+	};
+};
+
+&dpmac13 {
+	phy-connection-type = "usxgmii";
+};
+
+&dpmac14 {
+	phy-connection-type = "usxgmii";
+};
+
+&dpmac17 {
+	phy-handle = <&dp83867_1_2>;
+	phy-connection-type = "sgmii";
+};
+
+&dpmac18 {
+	phy-handle = <&dp83867_1_3>;
+	phy-connection-type = "sgmii";
+};
+
+&emdio1 {
+	status = "okay";
+
+	dp83867_1_1: ethernet-phy@1 {
+		reg = <1>;
+	};
+
+	dp83867_1_2: ethernet-phy@2 {
+		reg = <2>;
+	};
+
+	dp83867_1_3: ethernet-phy@3 {
+		reg = <3>;
+	};
+
+	dp83867_1_4: ethernet-phy@4 {
+		reg = <4>;
+	};
+
+	dp83867_1_5: ethernet-phy@5 {
+		reg = <5>;
+	};
+
+	dp83867_1_6: ethernet-phy@6 {
+		reg = <6>;
+	};
+};
+
+&emdio2 {
+	status = "okay";
+
+	dp83867_2_1: ethernet-phy@1 {
+		reg = <1>;
+	};
+
+	dp83867_2_2: ethernet-phy@2 {
+		reg = <2>;
+	};
+
+	dp83867_2_3: ethernet-phy@3 {
+		reg = <3>;
+		ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_25_NS>;
+		ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_25_NS>;
+	};
+
+	dp83867_2_4: ethernet-phy@4 {
+		reg = <4>;
+		ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_25_NS>;
+		ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_25_NS>;
 	};
 };
 
