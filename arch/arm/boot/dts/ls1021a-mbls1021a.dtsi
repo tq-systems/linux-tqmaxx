@@ -40,7 +40,7 @@
 		regulator-name = "vcc3v3-audio";
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
-		vin_supply = <&reg_3p3v>;
+		vin-supply = <&reg_3p3v>;
 	};
 
 	backlight_dcu: backlight {
