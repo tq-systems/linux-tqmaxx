@@ -89,7 +89,7 @@
 		regulator-max-microvolt = <5000000>;
 		gpio = <&gpio3 22 GPIO_ACTIVE_HIGH>;
 		enable-active-high;
-		vin_supply = <&reg_3p3v>;
+		vin-supply = <&reg_3p3v>;
 	};
 
 	reg_pcie: regulator-pcie {
@@ -101,7 +101,7 @@
 		gpio = <&gpio2 0 GPIO_ACTIVE_HIGH>;
 		enable-active-high;
 		regulator-always-on;
-		vin_supply = <&reg_mba6_3p3v>;
+		vin-supply = <&reg_mba6_3p3v>;
 	};
 
 	reg_vcc3v3_audio: regulator-vcc3v3-audio {
@@ -109,7 +109,7 @@
 		regulator-name = "vcc3v3-audio";
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
-		vin_supply = <&reg_mba6_3p3v>;
+		vin-supply = <&reg_mba6_3p3v>;
 	};
 
 	sound {
