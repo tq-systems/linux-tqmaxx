@@ -590,6 +590,7 @@
 	/* for DTE mode, add below change */
 	/* fsl,dte-mode; */
 	/* pinctrl-0 = <&pinctrl_uart6dte>; */
+	uart-has-rtscts;
 	linux,rs485-enabled-at-boot-time;
 	rs485-rts-active-low;
 	rs485-rx-during-tx;
