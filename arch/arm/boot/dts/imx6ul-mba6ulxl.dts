@@ -44,7 +44,7 @@
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
 		regulator-always-on;
-		vin_supply = <&reg_mba6ul_3v3>;
+		vin-supply = <&reg_mba6ul_3v3>;
 	};
 
 	reg_otg2vbus_5v0: regulator-otg2-vbus-5v0 {
@@ -54,7 +54,7 @@
 		regulator-name = "otg2-vbus-supply-5v0";
 		regulator-min-microvolt = <5000000>;
 		regulator-max-microvolt = <5000000>;
-		vin_supply = <&reg_mba6ul_5v0>;
+		vin-supply = <&reg_mba6ul_5v0>;
 	};
 
 	reg_otg1vbus_5v0: regulator-otg1-vbus-5v0 {
@@ -64,7 +64,7 @@
 		regulator-name = "otg1-vbus-supply-5v0";
 		regulator-min-microvolt = <5000000>;
 		regulator-max-microvolt = <5000000>;
-		vin_supply = <&reg_mba6ul_5v0>;
+		vin-supply = <&reg_mba6ul_5v0>;
 	};
 
 	reg_fec_3v3: regulator-fec-3v3 {
@@ -73,7 +73,7 @@
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
 		regulator-always-on;
-		vin_supply = <&reg_mba6ul_3v3>;
+		vin-supply = <&reg_mba6ul_3v3>;
 	};
 
 	reg_lcd_pwr: regulator-lcd-pwr {
@@ -86,7 +86,7 @@
 		regulator-always-on;
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
-		vin_supply = <&reg_mba6ul_3v3>;
+		vin-supply = <&reg_mba6ul_3v3>;
 	};
 
 	reg_mpcie: regulator-mpcie-1v5 {
@@ -97,7 +97,7 @@
 		enable-active-high;
 		regulator-min-microvolt = <1500000>;
 		regulator-max-microvolt = <1500000>;
-		vin_supply = <&reg_mba6ul_3v3>;
+		vin-supply = <&reg_mba6ul_3v3>;
 	};
 
 	reserved-memory {
