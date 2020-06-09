@@ -93,7 +93,7 @@
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
 		regulator-always-on;
-		vin_supply = <&reg_mba6ul_3v3>;
+		vin-supply = <&reg_mba6ul_3v3>;
 	};
 
 	reg_otg2vbus_5v0: regulator-otg2-vbus-5v0 {
@@ -103,7 +103,7 @@
 		regulator-name = "otg2-vbus-supply-5v0";
 		regulator-min-microvolt = <5000000>;
 		regulator-max-microvolt = <5000000>;
-		vin_supply = <&reg_mba6ul_5v0>;
+		vin-supply = <&reg_mba6ul_5v0>;
 	};
 
 	reg_fec_3v3: regulator-fec-3v3 {
@@ -112,7 +112,7 @@
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
 		regulator-always-on;
-		vin_supply = <&reg_mba6ul_3v3>;
+		vin-supply = <&reg_mba6ul_3v3>;
 	};
 
 	reg_lcd_pwr: regulator-lcd-pwr {
@@ -129,7 +129,7 @@
 		gpio = <&expander_out0 3 GPIO_ACTIVE_HIGH>;
 		enable-active-high;
 		regulator-always-on;
-		vin_supply = <&reg_mba6ul_3v3>;
+		vin-supply = <&reg_mba6ul_3v3>;
 		status = "disabled";
 	};
 
@@ -141,7 +141,7 @@
 		gpio = <&expander_out0 2 GPIO_ACTIVE_HIGH>;
 		enable-active-high;
 		regulator-always-on;
-		vin_supply = <&reg_mba6ul_3v3>;
+		vin-supply = <&reg_mba6ul_3v3>;
 	};
 
 	reg_audio_3v3: regulator-audio-3v3 {
