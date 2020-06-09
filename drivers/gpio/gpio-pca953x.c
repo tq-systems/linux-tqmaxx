@@ -934,9 +934,11 @@ static int pca953x_probe(struct i2c_client *client,
 	reg = devm_regulator_get_optional(&client->dev, "vcc");
 	if (IS_ERR(reg)) {
 		ret = PTR_ERR(reg);
-		if (ret == -EPROBE_DEFER)
+		if (ret != -ENODEV) {
+			if (ret != -EPROBE_DEFER)
+				dev_err(&client->dev, "reg get err: %d\n", ret);
 			return ret;
-		dev_err(&client->dev, "reg get err: %d\n", ret);
+		}
 		reg = NULL;
 	}
 
