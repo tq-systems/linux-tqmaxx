@@ -8,7 +8,6 @@
 #include <drm/drm_atomic_helper.h>
 #include <drm/drm_fb_cma_helper.h>
 #include <drm/drm_gem_framebuffer_helper.h>
-#include <drm/drm_print.h>
 #include <drm/drm_probe_helper.h>
 
 #include "fsl_dcu_drm_crtc.h"
@@ -39,10 +38,6 @@ int fsl_dcu_drm_modeset_init(struct fsl_dcu_drm_device *fsl_dev)
 	ret = fsl_dcu_drm_encoder_create(fsl_dev, &fsl_dev->crtc);
 	if (ret)
 		goto err;
-
-	ret = fsl_dcu_drm_hdmienc_create(fsl_dev, &fsl_dev->crtc);
-	if (ret)
-		DRM_ERROR("Failed to create HDMI encoder\n");
 
 	ret = fsl_dcu_create_outputs(fsl_dev);
 	if (ret)
