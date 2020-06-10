@@ -51,62 +51,6 @@ static const struct regmap_config fsl_dcu_regmap_config = {
 	.volatile_reg = fsl_dcu_drm_is_volatile_reg,
 };
 
-/* --- Enable Pixel clock in SCFG_PIXCLKCR */
-static const struct regmap_config fsl_scfg_regmap_config = {
-	.reg_bits = 32,
-	.reg_stride = 4,
-	.val_bits = 32,
-
-	.max_register = 0x28,
-	.cache_type = REGCACHE_FLAT,
-};
-
-static int fsl_dcu_scfg_config(struct device_node *np)
-{
-	struct device_node *scfg_np;
-	struct regmap *scfg_regmap;
-	struct platform_device *pdev;
-	struct resource *res;
-	void __iomem *base;
-
-	scfg_np = of_find_compatible_node(NULL, NULL,
-					  "fsl,ls1021a-scfg");
-	if (!scfg_np)
-		return 0;
-
-	pdev = of_find_device_by_node(scfg_np);
-	if (!pdev) {
-		pr_err("could not find platform device\n");
-		return -EINVAL;
-	}
-
-	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
-	if (!res) {
-		dev_err(&pdev->dev, "could not get resource\n");
-		return -ENODEV;
-	}
-
-	base = devm_ioremap_resource(&pdev->dev, res);
-	if (IS_ERR(base)) {
-		dev_err(&pdev->dev, "could not ioremap resource\n");
-		return PTR_ERR(base);
-	}
-
-	scfg_regmap = devm_regmap_init_mmio_clk(&pdev->dev, NULL, base,
-						&fsl_scfg_regmap_config);
-	if (IS_ERR(scfg_regmap)) {
-		dev_err(&pdev->dev, "regmap init failed\n");
-		return PTR_ERR(scfg_regmap);
-	}
-
-	regmap_write(scfg_regmap, SCFG_PIXCLKCR, SCFG_PIXCLKCR_PXCEN);
-	dev_info(&pdev->dev, "pixclk enabled\n");
-
-	devm_iounmap(&pdev->dev, base);
-
-	return 0;
-}
-
 static void fsl_dcu_irq_uninstall(struct drm_device *dev)
 {
 	struct fsl_dcu_drm_device *fsl_dev = dev->dev_private;
@@ -125,9 +69,6 @@ static int fsl_dcu_load(struct drm_device *dev, unsigned long flags)
 		dev_err(dev->dev, "failed to initialize mode setting\n");
 		return ret;
 	}
-
-	if (fsl_dcu_scfg_config(fsl_dev->np))
-		dev_err(dev->dev, "error enabling pixclk\n");
 
 	ret = drm_vblank_init(dev, dev->mode_config.num_crtc);
 	if (ret < 0) {

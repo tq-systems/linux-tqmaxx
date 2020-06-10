@@ -14,9 +14,6 @@
 #include "fsl_dcu_drm_output.h"
 #include "fsl_dcu_drm_plane.h"
 
-#define SCFG_PIXCLKCR			0x28
-#define SCFG_PIXCLKCR_PXCEN		BIT(31)
-
 #define DCU_DCU_MODE			0x0010
 #define DCU_MODE_BLEND_ITER(x)		((x) << 20)
 #define DCU_MODE_RASTER_EN		BIT(14)
