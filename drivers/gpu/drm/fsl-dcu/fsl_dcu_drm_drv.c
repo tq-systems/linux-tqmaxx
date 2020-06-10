@@ -51,6 +51,23 @@ static const struct regmap_config fsl_dcu_regmap_config = {
 	.volatile_reg = fsl_dcu_drm_is_volatile_reg,
 };
 
+static int fsl_dcu_scfg_config_ls1021a(struct device_node *np)
+{
+	struct regmap *scfg;
+
+	scfg = syscon_regmap_lookup_by_compatible("fsl,ls1021a-scfg");
+	if (IS_ERR(scfg))
+		return PTR_ERR(scfg);
+
+	/*
+	 * For simplicity, enable the PIXCLK unconditionally. Disabling
+	 * the clock in PM or on unload could be implemented as a future
+	 * improvement.
+	 */
+	return regmap_update_bits(scfg, SCFG_PIXCLKCR, SCFG_PIXCLKCR_PXCEN,
+				  SCFG_PIXCLKCR_PXCEN);
+}
+
 static void fsl_dcu_irq_uninstall(struct drm_device *dev)
 {
 	struct fsl_dcu_drm_device *fsl_dev = dev->dev_private;
@@ -68,6 +85,14 @@ static int fsl_dcu_load(struct drm_device *dev, unsigned long flags)
 	if (ret < 0) {
 		dev_err(dev->dev, "failed to initialize mode setting\n");
 		return ret;
+	}
+
+	if (of_device_is_compatible(fsl_dev->np, "fsl,ls1021a-dcu")) {
+		ret = fsl_dcu_scfg_config_ls1021a(fsl_dev->np);
+		if (ret < 0) {
+			dev_err(dev->dev, "failed to enable pixclk\n");
+			goto done;
+		}
 	}
 
 	ret = drm_vblank_init(dev, dev->mode_config.num_crtc);
