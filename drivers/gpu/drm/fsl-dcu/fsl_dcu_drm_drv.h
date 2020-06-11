@@ -14,9 +14,6 @@
 #include "fsl_dcu_drm_output.h"
 #include "fsl_dcu_drm_plane.h"
 
-#define SCFG_PIXCLKCR			0x28
-#define SCFG_PIXCLKCR_PXCEN		BIT(31)
-
 #define DCU_DCU_MODE			0x0010
 #define DCU_MODE_BLEND_ITER(x)		((x) << 20)
 #define DCU_MODE_RASTER_EN		BIT(14)
@@ -162,6 +159,9 @@
 #define FSL_DCU_ARGB1555		11
 #define FSL_DCU_ARGB4444		12
 #define FSL_DCU_YUV422			14
+
+#define SCFG_PIXCLKCR			0x28
+#define SCFG_PIXCLKCR_PXCEN		BIT(31)
 
 #define VF610_LAYER_REG_NUM		9
 #define LS1021A_LAYER_REG_NUM		10
