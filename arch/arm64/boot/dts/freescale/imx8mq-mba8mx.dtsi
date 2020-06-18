@@ -9,9 +9,69 @@
 	model = "TQ Systems GmbH i.MX8MQ TQMa8MQ on MBa8MX";
 	compatible = "tq,imx8mq-mba8mx", "tq,imx8mq-tqma8mq", "fsl,imx8mq";
 
+	beeper {
+		compatible = "pwm-beeper";
+		pwms = <&pwm4 0 250000 0>;
+		beeper-hz = <4000>;
+		amp-supply = <&reg_vcc_3v3>;
+		status = "okay";
+	};
+
 	chosen {
 		bootargs = "console=ttymxc2,115200 earlycon=ec_imx6q,0x30880000,115200";
 		stdout-path = &uart3;
+	};
+
+	gpio-keys {
+		compatible = "gpio-keys";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpiobutton>;
+		autorepeat;
+
+		switch1 {
+			label = "switch1";
+			linux,code = <BTN_0>;
+			gpios = <&gpio1 5 GPIO_ACTIVE_LOW>;
+			wakeup-source;
+		};
+
+		switch2 {
+			label = "switch2";
+			linux,code = <BTN_1>;
+			gpios = <&gpio3 17 GPIO_ACTIVE_LOW>;
+			wakeup-source;
+		};
+
+		switch3 {
+			label = "switch3";
+			linux,code = <BTN_2>;
+			gpios = <&gpio1 7 GPIO_ACTIVE_LOW>;
+			wakeup-source;
+		};
+	};
+
+	gpio-leds {
+		compatible = "gpio-leds";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpioled>;
+		status = "okay";
+
+		led1 {
+			label = "led1";
+			gpios = <&gpio1 0 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "default-on";
+		};
+
+		led2 {
+			label = "led2";
+			gpios = <&gpio3 16 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "heartbeat";
+		};
+
+		led3 {
+			label = "led3";
+			gpios = <&gpio1 8 GPIO_ACTIVE_HIGH>;
+		};
 	};
 
 	reg_vcc_3v3: regulator-3v3 {
@@ -26,6 +86,34 @@
 		regulator-name = "VSD_3V3";
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
+	};
+};
+
+&ecspi1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_ecspi1>;
+	num-cs = <1>;
+	status = "okay";
+
+	spidev1_0: spidev1@0 {
+		reg = <0>;
+		compatible = "tq,testdev";
+		spi-max-frequency = <5000000>;
+		status = "okay";
+	};
+};
+
+&ecspi2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_ecspi2>;
+	num-cs = <1>;
+	status = "okay";
+
+	spidev2_0: spidev2@0 {
+		reg = <0>;
+		compatible = "tq,testdev";
+		spi-max-frequency = <5000000>;
+		status = "okay";
 	};
 };
 
@@ -63,6 +151,24 @@
 };
 
 &iomuxc {
+	pinctrl_ecspi1: ecspi1grp {
+		fsl,pins = <
+			MX8MQ_IOMUXC_ECSPI1_SCLK_ECSPI1_SCLK	0x0000004e
+			MX8MQ_IOMUXC_ECSPI1_MOSI_ECSPI1_MOSI	0x0000004e
+			MX8MQ_IOMUXC_ECSPI1_MISO_ECSPI1_MISO	0x0000004e
+			MX8MQ_IOMUXC_ECSPI1_SS0_ECSPI1_SS0	0x0000004e
+		>;
+	};
+
+	pinctrl_ecspi2: ecspi2grp {
+		fsl,pins = <
+			MX8MQ_IOMUXC_ECSPI2_SCLK_ECSPI2_SCLK	0x0000004e
+			MX8MQ_IOMUXC_ECSPI2_MOSI_ECSPI2_MOSI	0x0000004e
+			MX8MQ_IOMUXC_ECSPI2_MISO_ECSPI2_MISO	0x0000004e
+			MX8MQ_IOMUXC_ECSPI2_SS0_ECSPI2_SS0	0x0000004e
+		>;
+	};
+
 	pinctrl_fec1: fec1grp {
 		fsl,pins = <
 			MX8MQ_IOMUXC_ENET_MDC_ENET1_MDC		0x3
@@ -82,6 +188,22 @@
 		>;
 	};
 
+	pinctrl_gpiobutton: gpiobuttongrp {
+		fsl,pins = <
+			MX8MQ_IOMUXC_GPIO1_IO05_GPIO1_IO5	0x41
+			MX8MQ_IOMUXC_GPIO1_IO07_GPIO1_IO7	0x41
+			MX8MQ_IOMUXC_NAND_WE_B_GPIO3_IO17	0x41
+		>;
+	};
+
+	pinctrl_gpioled: gpioledgrp {
+		fsl,pins = <
+			MX8MQ_IOMUXC_GPIO1_IO00_GPIO1_IO0	0x41
+			MX8MQ_IOMUXC_GPIO1_IO08_GPIO1_IO8	0x41
+			MX8MQ_IOMUXC_NAND_READY_B_GPIO3_IO16	0x41
+		>;
+	};
+
 	pinctrl_i2c2: i2c2grp {
 		fsl,pins = <
 			MX8MQ_IOMUXC_I2C2_SCL_I2C2_SCL		0x40000067
@@ -93,6 +215,18 @@
 		fsl,pins = <
 			MX8MQ_IOMUXC_I2C3_SCL_I2C3_SCL		0x40000067
 			MX8MQ_IOMUXC_I2C3_SDA_I2C3_SDA		0x40000067
+		>;
+	};
+
+	pinctrl_pwm3: pwm3grp {
+		fsl,pins = <
+			MX8MQ_IOMUXC_GPIO1_IO14_PWM3_OUT	0x16
+		>;
+	};
+
+	pinctrl_pwm4: pwm4grp {
+		fsl,pins = <
+			MX8MQ_IOMUXC_GPIO1_IO15_PWM4_OUT	0x16
 		>;
 	};
 
@@ -243,6 +377,18 @@
 	clock-frequency = <100000>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_i2c3>;
+	status = "okay";
+};
+
+&pwm3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm3>;
+	status = "okay";
+};
+
+&pwm4 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm4>;
 	status = "okay";
 };
 
