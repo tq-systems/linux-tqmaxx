@@ -118,6 +118,24 @@
 		enable-active-high;
 	};
 
+	reg_otg_vbus: regulator-otg-vbus {
+		compatible = "regulator-fixed";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_regotgvbus>;
+		regulator-name = "MBA8MQ_OTG_VBUS";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		gpio = <&gpio1 12 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+	};
+
+	reg_hub_vbus: regulator-hub-vbus {
+		compatible = "regulator-fixed";
+		regulator-name = "MBA8MQ_HUB_VBUS";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+	};
+
 	reg_usdhc2_vmmc: regulator-vmmc {
 		compatible = "regulator-fixed";
 		regulator-name = "VSD_3V3";
@@ -276,6 +294,13 @@
 		>;
 	};
 
+	pinctrl_regotgvbus: reggotgvbusgrp {
+		fsl,pins = <
+			/* USB1 OTG PWR as GPIO */
+			MX8MM_IOMUXC_GPIO1_IO12_GPIO1_IO12	0x84
+		>;
+	};
+
 	pinctrl_uart1: uart1grp {
 		fsl,pins = <
 			MX8MM_IOMUXC_UART1_RXD_UART1_DCE_RX	0x16
@@ -301,6 +326,15 @@
 		fsl,pins = <
 			MX8MM_IOMUXC_UART4_RXD_UART4_DCE_RX	0x16
 			MX8MM_IOMUXC_UART4_TXD_UART4_DCE_TX	0x16
+		>;
+	};
+
+
+
+	pinctrl_usbotg: usbotggrp {
+		fsl,pins = <
+			MX8MM_IOMUXC_GPIO1_IO13_USB1_OTG_OC	0x84
+			MX8MM_IOMUXC_GPIO1_IO10_USB1_OTG_ID	0x84
 		>;
 	};
 
@@ -406,6 +440,13 @@
 		reg = <0x1f>;
 	};
 
+	usbhub0: usbhub@44 {
+		compatible = "ti,tusb8041", "ti,tusb80xx";
+		reg = <0x44>;
+		reset-gpios = <&expander0 13 GPIO_ACTIVE_LOW>;
+		status = "okay";
+	};
+
 	eeprom3: eeprom@57 {
 		compatible = "nxp,se97b", "atmel,24c02";
 		reg = <0x57>;
@@ -501,6 +542,27 @@
 	assigned-clocks = <&clk IMX8MM_CLK_UART4>;
 	assigned-clock-parents = <&clk IMX8MM_SYS_PLL1_80M>;
 	status = "disabled";
+};
+
+&usbotg1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usbotg>;
+	dr_mode = "otg";
+	vbus-supply = <&reg_otg_vbus>;
+	srp-disable;
+	hnp-disable;
+	adp-disable;
+	power-polarity-active-high;
+	over-current-active-low;
+	status = "okay";
+};
+
+&usbotg2 {
+	dr_mode = "host";
+	disable-over-current;
+	power-active-high;
+	vbus-supply = <&reg_hub_vbus>;
+	status = "okay";
 };
 
 &usdhc2 {
