@@ -601,6 +601,8 @@
 &usbotg1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usb_otg1>;
+	power-active-high;
+	over-current-active-low;
 	dr_mode = "otg";
 	status = "okay";
 };
