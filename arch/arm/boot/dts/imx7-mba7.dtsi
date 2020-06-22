@@ -637,6 +637,7 @@
 	srp-disable;
 	hnp-disable;
 	adp-disable;
+	over-current-active-low;
 	dr_mode = "otg";
 	status = "okay";
 };
