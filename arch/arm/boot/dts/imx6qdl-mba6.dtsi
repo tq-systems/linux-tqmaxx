@@ -519,6 +519,7 @@
 &usbotg {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usbotg>;
+	over-current-active-low;
 	dr_mode = "host";
 	vbus-supply = <&reg_otgvbus>;
 	status = "okay";
