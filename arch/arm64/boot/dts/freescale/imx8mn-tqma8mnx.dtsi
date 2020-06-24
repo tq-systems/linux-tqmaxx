@@ -274,6 +274,7 @@
 	non-removable;
 	no-sd;
 	no-sdio;
+	no-1-8-v;
 	vmmc-supply = <&buck4_reg>;
 	vqmmc-supply = <&buck5_reg>;
 
