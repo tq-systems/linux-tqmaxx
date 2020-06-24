@@ -259,6 +259,38 @@
 			};
 		};
 	};
+
+	/*
+	 * NXP SE97BTP with temperature sensor + eeprom
+	 * ATTENTION: do not use correct dt compatible since this will conflict
+	 * with hwmon sysfs ABI and break device registration
+	 */
+	sensor0: temperature-sensor-eeprom@1b {
+		compatible = "nxp,se97", "jedec,jc-42.4-temp";
+		reg = <0x1b>;
+		status = "okay";
+	};
+
+	pcf85063: rtc@51 {
+		compatible = "nxp,pcf85063a";
+		reg = <0x51>;
+		quartz-load-femtofarads = <7000>;
+		status = "okay";
+	};
+
+	eeprom1: eeprom@53 {
+		compatible = "nxp,se97b", "atmel,24c02";
+		reg = <0x53>;
+		pagesize = <16>;
+		status = "okay";
+	};
+
+	eeprom0: eeprom@57 {
+		compatible = "atmel,24c64";
+		reg = <0x57>;
+		pagesize = <32>;
+		status = "okay";
+	};
 };
 
 &rpmsg{
