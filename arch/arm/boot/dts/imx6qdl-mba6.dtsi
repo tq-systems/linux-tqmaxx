@@ -520,6 +520,9 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usbotg>;
 	over-current-active-low;
+	srp-disable;
+	hnp-disable;
+	adp-disable;
 	dr_mode = "otg";
 	vbus-supply = <&reg_otgvbus>;
 	status = "okay";
