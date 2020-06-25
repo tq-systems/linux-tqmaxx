@@ -16,6 +16,23 @@
 		reg = <0x00000000 0x40000000 0 0x40000000>;
 	};
 
+	reg_vcc3v3: regulator-vcc3v3 {
+		compatible = "regulator-fixed";
+		regulator-name = "TQMA8MXNL_VCC3V3";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-always-on;
+	};
+
+	/* e-MMC IO, needed for HS modes */
+	reg_vcc1v8: regulator-vcc1v8 {
+		compatible = "regulator-fixed";
+		regulator-name = "TQMA8MXNL_VCC1V8";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		regulator-always-on;
+	};
+
 	reserved-memory {
 		#address-cells = <2>;
 		#size-cells = <2>;
@@ -190,7 +207,7 @@
 				regulator-always-on;
 			};
 
-			/* V_1V8 -> VQMMC, SPI-NOR, ... */
+			/* V_1V8 -> VQMMC, SPI-NOR, ... must not be changed */
 			buck5_reg: regulator@4 {
 				reg = <4>;
 				regulator-compatible = "buck5";
@@ -306,9 +323,8 @@
 	non-removable;
 	no-sd;
 	no-sdio;
-	no-1-8-v;
-	vmmc-supply = <&buck4_reg>;
-	vqmmc-supply = <&buck5_reg>;
+	vmmc-supply = <&reg_vcc3v3>;
+	vqmmc-supply = <&reg_vcc1v8>;
 
 	status = "okay";
 };
