@@ -1,0 +1,61 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright 2019-2021 TQ-Systems GmbH
+ */
+
+#include "imx8mq-mba8mx.dts"
+#include "imx8mq-mba8mx-lvds-tm070jvhg33.dtsi"
+
+/ {
+	display-subsystem {
+		status = "disabled";
+	};
+};
+
+&hdmi {
+	status = "disabled";
+};
+
+&dcss {
+	status = "disabled";
+};
+
+&dcss {
+	status = "disabled";
+};
+
+
+&irqsteer {
+	status = "disabled";
+};
+
+&lcdif {
+	status = "okay";
+	max-memory-bandwidth = <314676293>; /* 1280x1024-32@60 */
+
+	assigned-clocks = <&clk IMX8MQ_CLK_LCDIF_PIXEL>,
+			  <&clk IMX8MQ_VIDEO_PLL1_BYPASS>,
+			  <&clk IMX8MQ_VIDEO_PLL1_REF_SEL>,
+			  <&clk IMX8MQ_VIDEO_PLL1>;
+	assigned-clock-parents = <&clk IMX8MQ_VIDEO_PLL1_OUT>,
+				 <&clk IMX8MQ_VIDEO_PLL1>,
+				 <&clk IMX8MQ_CLK_27M>;
+	assigned-clock-rate = <126000000>, <0>, <0>, <1134000000>;
+
+	port@0 {
+		lcdif_out: endpoint {
+			remote-endpoint = <&mipi_dsi_in>;
+		};
+	};
+};
+
+&mipi_dsi {
+	ports {
+		port@0 {
+			reg = <0>;
+			mipi_dsi_in: endpoint {
+				remote-endpoint = <&lcdif_out>;
+			};
+		};
+	};
+};
