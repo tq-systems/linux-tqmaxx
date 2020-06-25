@@ -293,6 +293,7 @@ static int sn65dsi83_parse_dt(struct device_node *np,
 	struct device *dev = &sn65dsi83->brg->client->dev;
 	u32 num_lanes = 2, bpp = 24, format = 2, width = 149, height = 93;
 	struct device_node *endpoint;
+	int ret;
 
 	ret = sn65dsi83_parse_dsi_host(sn65dsi83, np);
 	if (ret)

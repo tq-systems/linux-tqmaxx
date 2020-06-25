@@ -4,6 +4,7 @@
  */
 
 #include <linux/i2c.h>
+#include <linux/delay.h>
 #include <linux/device.h>
 #include <linux/gpio/consumer.h>
 #include <linux/module.h>
@@ -95,7 +96,7 @@ static int sn65dsi83_brg_power_on(struct sn65dsi83_brg *brg)
 		 * Wait for 1ms for the internal voltage regulator to stabilize
 		 * Add some more time to be on the safe side.
 		 */
-		usleep(5 * 1000);
+		usleep_range(5 * 1000, 10 * 1000);
 	}
 
 	return 0;
@@ -105,15 +106,13 @@ static void sn65dsi83_brg_power_off(struct sn65dsi83_brg *brg)
 {
 	dev_dbg(&brg->client->dev, "%s\n", __func__);
 
-	dev_dbg(&brg->client->dev,"%s\n",__func__);
-
 	if (brg->gpio_enable) {
 		gpiod_set_value_cansleep(brg->gpio_enable, 0);
 		/*
 		* The EN pin must be held low for at least 10 ms
 		* before being asserted high
 		*/
-		usleep(10 * 1000);
+		usleep_range(10 * 1000, 20 * 1000);
 	};
 }
 
@@ -231,9 +230,6 @@ static int sn65dsi83_brg_configure(struct sn65dsi83_brg *brg)
 	int regval = 0;
 	struct i2c_client *client = I2C_CLIENT(brg);
 	struct videomode *vm = VM(brg);
-
-	u32 dsi_clk = (((PIXCLK * BPP(brg)) / DSI_LANES(brg)) >> 1);
-
 	/*
 	 * MIPI is a DDR protocol, so the real clk is bit clock resulting from
 	 * pix clock an pixel format divided by lanes and 2 for DDR
