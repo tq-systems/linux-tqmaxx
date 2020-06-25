@@ -9,6 +9,16 @@
 	model = "TQ Systems GmbH i.MX8MM TQMa8MxML on MBa8Mx";
 	compatible = "tq,imx8mm-mba8mx", "tq,imx8mm-tqma8mmx", "fsl,imx8mm";
 
+	backlight_lvds0: backlight0 {
+		compatible = "pwm-backlight";
+		pwms = <&pwm3 0 5000000>;
+		brightness-levels = <0 4 8 16 32 64 128 255>;
+		default-brightness-level = <7>;
+		power-supply = <&reg_12v>;
+		enable-gpios = <&expander2 2 GPIO_ACTIVE_HIGH>;
+		status = "disabled";
+	};
+
 	beeper {
 		compatible = "pwm-beeper";
 		pwms = <&pwm4 0 250000 0>;
@@ -74,6 +84,18 @@
 		};
 	};
 
+	panel0: panel_lvds0 {
+		backlight = <&backlight_lvds0>;
+		/* power-supply = <&reg_mba8mq_12v>; */
+		status = "disabled";
+
+		port {
+			panel_in_lvds0: endpoint {
+				remote-endpoint = <&lvds_bridge_out>;
+			};
+		};
+	};
+
 	pcie0_refclk: pcie0-refclk {
 		compatible = "fixed-clock";
 		#clock-cells = <0>;
@@ -87,11 +109,28 @@
 		regulator-max-microvolt = <3300000>;
 	};
 
+	reg_sn65dsi83_1v8: regulator-sn65dsi83-1v8 {
+		compatible = "regulator-fixed";
+		regulator-name = "SN65DSI83_1V8";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		gpio = <&expander0 5 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+	};
+
 	reg_usdhc2_vmmc: regulator-vmmc {
 		compatible = "regulator-fixed";
 		regulator-name = "VSD_3V3";
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
+	};
+
+	reg_12v: regulator-12v {
+		compatible = "regulator-fixed";
+		regulator-name = "MBA8MQ_12V";
+		regulator-min-microvolt = <12000000>;
+		regulator-max-microvolt = <12000000>;
+		regulator-always-on;
 	};
 };
 
@@ -385,6 +424,27 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_i2c3>;
 	status = "okay";
+
+	dsi_lvds_bridge: dsi-lvds-bridge@2d {
+		compatible = "ti,sn65dsi83";
+		reg = <0x2d>;
+		enable-gpio = <&expander0 6 GPIO_ACTIVE_HIGH>;
+		vcc1v8-supply = <&reg_sn65dsi83_1v8>;
+		status = "disabled";
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@1 {
+				reg = <1>;
+
+				lvds_bridge_out: endpoint {
+					remote-endpoint = <&panel_in_lvds0>;
+				};
+			};
+		};
+	};
 };
 
 &pcie0{
