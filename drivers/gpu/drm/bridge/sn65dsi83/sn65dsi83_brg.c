@@ -386,7 +386,7 @@ static int sn65dsi83_brg_reset(struct sn65dsi83_brg *brg)
 
 	dev_dbg(&client->dev, "%s\n", __func__);
 	if (ret != 0x00) {
-		dev_err(&client->dev, "Failed to reset the device");
+		dev_err(&client->dev, "Failed to reset the device %d", ret);
 		return -ENODEV;
 	}
 
