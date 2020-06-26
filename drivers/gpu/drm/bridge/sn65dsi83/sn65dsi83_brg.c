@@ -94,9 +94,10 @@ static int sn65dsi83_brg_power_on(struct sn65dsi83_brg *brg)
 		gpiod_set_value_cansleep(brg->gpio_enable, 1);
 		/*
 		 * Wait for 1ms for the internal voltage regulator to stabilize
-		 * Add some more time to be on the safe side.
+		 * TODO: make this configurable. This real high time is caused
+		 * by hardware design
 		 */
-		usleep_range(5000, 10000);
+		msleep(500);
 	}
 
 	return 0;
