@@ -454,6 +454,7 @@
 		 <&clk IMX8MQ_CLK_PCIE1_PHY>,
 		 <&pcie0_refclk>;
 	clock-names = "pcie", "pcie_aux", "pcie_phy", "pcie_bus";
+	epdev_on-supply = <&reg_vcc_3v3>;
 	hard-wired = <1>;
 	status = "okay";
 };
@@ -466,6 +467,7 @@
 		 <&clk IMX8MQ_CLK_PCIE2_PHY>,
 		 <&pcie1_refclk>;
 	clock-names = "pcie", "pcie_aux", "pcie_phy", "pcie_bus";
+	epdev_on-supply = <&reg_vcc_3v3>;
 	hard-wired = <1>;
 	status = "okay";
 };
