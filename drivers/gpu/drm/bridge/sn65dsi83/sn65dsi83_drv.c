@@ -409,8 +409,11 @@ static int sn65dsi83_probe(struct i2c_client *i2c,
 	sn65dsi83->brg->funcs->power_off(sn65dsi83->brg);
 	sn65dsi83->brg->funcs->power_on(sn65dsi83->brg);
 	ret  = sn65dsi83->brg->funcs->reset(sn65dsi83->brg);
-	if (ret)
-		return -ENODEV;
+
+	if (ret) {
+		ret = -ENODEV;
+		goto failed_reset;
+	}
 
 	sn65dsi83->brg->funcs->power_off(sn65dsi83->brg);
 
@@ -418,6 +421,12 @@ static int sn65dsi83_probe(struct i2c_client *i2c,
 	sn65dsi83->bridge.of_node = dev->of_node;
 
 	drm_bridge_add(&sn65dsi83->bridge);
+
+	return ret;
+
+failed_reset:
+	if (sn65dsi83->vcc1v8)
+		regulator_disable(sn65dsi83->vcc1v8);
 
 	return ret;
 }
