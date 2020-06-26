@@ -24,6 +24,15 @@
 		regulator-always-on;
 	};
 
+	/* e-MMC IO, needed for HS modes */
+	reg_vcc1v8: regulator-vcc1v8 {
+		compatible = "regulator-fixed";
+		regulator-name = "TQMA8MX_VCC1V8";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		regulator-always-on;
+	};
+
 	reg_vdd_arm: regulator-vdd-arm {
 		compatible = "regulator-gpio";
 		pinctrl-names = "default";
@@ -205,6 +214,7 @@
 				regulator-always-on;
 			};
 
+			/* 1.8 V for QSPI NOR, e-MMC IO, must not be changed */
 			nvcc_1v8_reg: sw4 {
 				regulator-min-microvolt = <800000>;
 				regulator-max-microvolt = <3300000>;
@@ -352,7 +362,7 @@
 	no-sd;
 	no-sdio;
 	vmmc-supply = <&reg_vcc3v3>;
-	vqmmc-supply = <&nvcc_1v8_reg>;
+	vqmmc-supply = <&reg_vcc1v8>;
 
 	status = "okay";
 };
