@@ -409,10 +409,9 @@ static int sn65dsi83_probe(struct i2c_client *i2c,
 	sn65dsi83->brg->funcs->power_off(sn65dsi83->brg);
 	sn65dsi83->brg->funcs->power_on(sn65dsi83->brg);
 	ret  = sn65dsi83->brg->funcs->reset(sn65dsi83->brg);
-	if (ret != 0x00) {
-		dev_err(dev, "Failed to reset the device");
+	if (ret)
 		return -ENODEV;
-	}
+
 	sn65dsi83->brg->funcs->power_off(sn65dsi83->brg);
 
 	sn65dsi83->bridge.funcs = &sn65dsi83_bridge_funcs;
