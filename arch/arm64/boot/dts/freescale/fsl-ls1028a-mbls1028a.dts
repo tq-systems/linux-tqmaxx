@@ -71,10 +71,6 @@
 	};
 
 	soc {
-		pcie@3400000 {
-			status = "okay";
-		};
-
 		pcie@3500000 {
 			status = "okay";
 		};
