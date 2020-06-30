@@ -89,7 +89,8 @@
 
 		label = "rcar-sound";
 
-		dais = <&rsnd_port>;
+		dais = <&rsnd_port0	/* HDMI Audio */
+			&rsnd_port1>;	/* External PCM5102A Codec */
 	};
 
 	vbus0_usb2: regulator-vbus0-usb2 {
@@ -141,6 +142,17 @@
 
 	vspm_if {
 		compatible = "renesas,vspm_if";
+	};
+
+	pcm5102a: pcm5102a {
+		compatible = "ti,pcm5102a";
+		#sound-dai-cells = <0>;
+
+		port {
+			pcm5102a_endpoint: endpoint {
+				remote-endpoint = <&rsnd_endpoint1>;
+			};
+		};
 	};
 };
 
@@ -319,6 +331,11 @@
 		function = "audio_clk";
 	};
 
+	sound_pins: sound {
+		groups = "ssi01239_ctrl", "ssi0_data", "ssi1_data_a";
+		function = "ssi";
+	};
+
 	usb0_pins: usb0 {
 		groups = "usb0";
 		function = "usb0";
@@ -353,7 +370,7 @@
 };
 
 &rcar_sound {
-	pinctrl-0 = <&sound_clk_pins>;
+	pinctrl-0 = <&sound_clk_pins &sound_pins>;
 	pinctrl-names = "default";
 
 	status = "okay";
@@ -361,17 +378,36 @@
 	/* Single DAI */
 	#sound-dai-cells = <0>;
 
-	rsnd_port: port {
-		rsnd_endpoint: endpoint {
-			remote-endpoint = <&dw_hdmi0_snd_in>;
+	ports {
+		rsnd_port0: port@0 {
+			rsnd_endpoint: endpoint {
+				remote-endpoint = <&dw_hdmi0_snd_in>;
 
-			dai-format = "i2s";
-			bitclock-master = <&rsnd_endpoint>;
-			frame-master = <&rsnd_endpoint>;
 
-			playback = <&ssi2>;
+				dai-format = "i2s";
+				bitclock-master = <&rsnd_endpoint>;
+				frame-master = <&rsnd_endpoint>;
+
+				playback = <&ssi2>;
+			};
+		};
+
+		rsnd_port1: port@1 {
+			rsnd_endpoint1: endpoint {
+				remote-endpoint = <&pcm5102a_endpoint>;
+
+				dai-format = "i2s";
+				bitclock-master = <&rsnd_endpoint1>;
+				frame-master = <&rsnd_endpoint1>;
+
+				playback = <&ssi1 &src1 &dvc0>;
+			};
 		};
 	};
+};
+
+&ssi1 {
+	shared-pin;
 };
 
 &rwdt {
