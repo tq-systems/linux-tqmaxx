@@ -78,12 +78,6 @@
 		pcie@3500000 {
 			status = "okay";
 		};
-
-		pcie@1f0000000 {
-			clocks = <&clockgen 2 4>;
-			clock-names = "hwa4csr";
-			status = "okay";
-		};
 	};
 };
 
