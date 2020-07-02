@@ -9,10 +9,6 @@
 
 &dsi_lvds_bridge {
 	ti,dsi-lanes = <4>;
-	ti,lvds-format = <1>;
-	ti,lvds-bpp = <24>;
-	ti,width-mm = <151>;
-	ti,height-mm = <95>;
 	status = "okay";
 
 	ports {
