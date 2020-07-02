@@ -34,6 +34,7 @@ struct sn65dsi83_brg {
 	u8 num_dsi_lanes;
 	bool pulse_mode;
 	bool de_neg_polarity;
+	bool test_mode;
 
 	struct sn65dsi83_brg_funcs *funcs;
 };
