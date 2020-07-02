@@ -95,6 +95,9 @@
 #define SN65DSI83_REG_3D              0x3D
 #define SN65DSI83_REG_3E              0x3E
 
+#define HIGH(A) (((A) >> 8) & 0xFF)
+#define LOW(A)  ((A)  & 0xFF)
+
 static int sn65dsi83_brg_power_on(struct sn65dsi83_brg *brg)
 {
 	dev_dbg(&brg->client->dev, "%s\n", __func__);
@@ -165,8 +168,8 @@ static int sn65dsi83_read(struct i2c_client *client, u8 reg)
 irqreturn_t sn65dsi83_irq_handler(int unused, void *data)
 {
 	struct sn65dsi83_brg *brg = data;
-	struct i2c_client *client = I2C_CLIENT(brg);
-	struct device *dev = I2C_DEVICE(brg);
+	struct i2c_client *client = brg->client;
+	struct device *dev = &brg->client->dev;
 	int regval;
 
 	/*
@@ -202,7 +205,7 @@ irqreturn_t sn65dsi83_irq_handler(int unused, void *data)
 static int sn65dsi83_brg_start_stream(struct sn65dsi83_brg *brg)
 {
 	int regval;
-	struct i2c_client *client = I2C_CLIENT(brg);
+	struct i2c_client *client = brg->client;
 
 	dev_dbg(&client->dev, "%s\n", __func__);
 	/* Set the PLL_EN bit (CSR 0x0D.0) */
@@ -223,7 +226,7 @@ static int sn65dsi83_brg_start_stream(struct sn65dsi83_brg *brg)
 
 static void sn65dsi83_brg_stop_stream(struct sn65dsi83_brg *brg)
 {
-	struct i2c_client *client = I2C_CLIENT(brg);
+	struct i2c_client *client = brg->client;
 
 	dev_dbg(&client->dev, "%s\n", __func__);
 	/* Clear the PLL_EN bit (CSR 0x0D.0) */
@@ -275,16 +278,18 @@ static int sn65dsi83_calk_div(int min_regval, int max_regval, int min_div,
 static int sn65dsi83_brg_configure(struct sn65dsi83_brg *brg)
 {
 	int regval = 0;
-	struct i2c_client *client = I2C_CLIENT(brg);
-	struct videomode *vm = VM(brg);
+	struct i2c_client *client = brg->client;
+	struct videomode *vm = &brg->vm;
+	u32 pix_clk = vm->pixelclock;
 	/*
 	 * MIPI is a DDR protocol, so the real clk is bit clock resulting from
 	 * pix clock an pixel format divided by lanes and 2 for DDR
 	 */
-	u32 dsi_clk = (((PIXCLK * brg->mipi_bpp) / brg->num_dsi_lanes) >> 1);
+	u32 dsi_clk = (((pix_clk * brg->mipi_bpp) / brg->num_dsi_lanes) >> 1);
 
 	dev_info(&client->dev, "DSI clock [ %u ] Hz\n", dsi_clk);
-	dev_info(&client->dev, "GeoMetry [ %d x %d ] Hz\n", HACTIVE, VACTIVE);
+	dev_info(&client->dev, "Geometry [ %d x %d ] Pix\n", vm->hactive,
+		 vm->vactive);
 
 	if ((brg->mipi_bpp == 18) && (brg->lvds_bpp == 24)) {
 		dev_err(&client->dev, "MIPI / LVDS format mismatch");
@@ -296,11 +301,11 @@ static int sn65dsi83_brg_configure(struct sn65dsi83_brg *brg)
 	SN65DSI83_WRITE(SN65DSI83_PLL_EN, 0x00);
 
 	/* LVDS clock setup */
-	if  ((25000000 <= PIXCLK) && (PIXCLK < 37500000))
+	if  ((25000000 <= pix_clk) && (pix_clk < 37500000))
 		regval = 0;
 	else
 		regval = sn65dsi83_calk_clk_range(0x01, 0x05, 37500000,
-						  25000000, PIXCLK);
+						  25000000, pix_clk);
 
 	if (regval < 0) {
 		dev_err(&client->dev, "failed to configure LVDS clock");
@@ -321,7 +326,7 @@ static int sn65dsi83_brg_configure(struct sn65dsi83_brg *brg)
 	SN65DSI83_WRITE(SN65DSI83_CHA_DSI_CLK_RNG, regval);
 
 	/* DSI clock divider */
-	regval = sn65dsi83_calk_div(0x0, 0x18, 1, 1, dsi_clk, PIXCLK);
+	regval = sn65dsi83_calk_div(0x0, 0x18, 1, 1, dsi_clk, pix_clk);
 	if (regval < 0) {
 		dev_err(&client->dev, "failed to calculate DSI clock divider");
 		return -EINVAL;
@@ -342,10 +347,10 @@ static int sn65dsi83_brg_configure(struct sn65dsi83_brg *brg)
 
 	/* Video formats */
 	regval = 0;
-	if (FLAGS & DISPLAY_FLAGS_HSYNC_LOW)
+	if (vm->flags & DISPLAY_FLAGS_HSYNC_LOW)
 		regval |= (1 << HS_NEG_POLARITY_SHIFT);
 
-	if (FLAGS & DISPLAY_FLAGS_VSYNC_LOW)
+	if (vm->flags & DISPLAY_FLAGS_VSYNC_LOW)
 		regval |= (1 << VS_NEG_POLARITY_SHIFT);
 
 	if (brg->de_neg_polarity)
@@ -373,23 +378,23 @@ static int sn65dsi83_brg_configure(struct sn65dsi83_brg *brg)
 	SN65DSI83_WRITE(SN65DSI83_CHA_SYNC_DELAY_HI, 0x00);
 
 	/* Geometry */
-	SN65DSI83_WRITE(SN65DSI83_CHA_LINE_LEN_LO, LOW(HACTIVE));
-	SN65DSI83_WRITE(SN65DSI83_CHA_LINE_LEN_HI, HIGH(HACTIVE));
+	SN65DSI83_WRITE(SN65DSI83_CHA_LINE_LEN_LO, LOW(vm->hactive));
+	SN65DSI83_WRITE(SN65DSI83_CHA_LINE_LEN_HI, HIGH(vm->hactive));
 
-	SN65DSI83_WRITE(SN65DSI83_CHA_VERT_LINES_LO, LOW(VACTIVE));
-	SN65DSI83_WRITE(SN65DSI83_CHA_VERT_LINES_HI, HIGH(VACTIVE));
+	SN65DSI83_WRITE(SN65DSI83_CHA_VERT_LINES_LO, LOW(vm->vactive));
+	SN65DSI83_WRITE(SN65DSI83_CHA_VERT_LINES_HI, HIGH(vm->vactive));
 
-	SN65DSI83_WRITE(SN65DSI83_CHA_HSYNC_WIDTH_LO, LOW(HPW));
-	SN65DSI83_WRITE(SN65DSI83_CHA_HSYNC_WIDTH_HI, HIGH(HPW));
+	SN65DSI83_WRITE(SN65DSI83_CHA_HSYNC_WIDTH_LO, LOW(vm->hsync_len));
+	SN65DSI83_WRITE(SN65DSI83_CHA_HSYNC_WIDTH_HI, HIGH(vm->hsync_len));
 
-	SN65DSI83_WRITE(SN65DSI83_CHA_VSYNC_WIDTH_LO, LOW(VPW));
-	SN65DSI83_WRITE(SN65DSI83_CHA_VSYNC_WIDTH_HI, HIGH(VPW));
+	SN65DSI83_WRITE(SN65DSI83_CHA_VSYNC_WIDTH_LO, LOW(vm->vsync_len));
+	SN65DSI83_WRITE(SN65DSI83_CHA_VSYNC_WIDTH_HI, HIGH(vm->vsync_len));
 
-	SN65DSI83_WRITE(SN65DSI83_CHA_HORZ_BACKPORCH, LOW(HBP));
-	SN65DSI83_WRITE(SN65DSI83_CHA_VERT_BACKPORCH, LOW(VBP));
+	SN65DSI83_WRITE(SN65DSI83_CHA_HORZ_BACKPORCH, LOW(vm->hback_porch));
+	SN65DSI83_WRITE(SN65DSI83_CHA_VERT_BACKPORCH, LOW(vm->vback_porch));
 
-	SN65DSI83_WRITE(SN65DSI83_CHA_HORZ_FRONTPORCH, LOW(HFP));
-	SN65DSI83_WRITE(SN65DSI83_CHA_VERT_FRONTPORCH, LOW(VFP));
+	SN65DSI83_WRITE(SN65DSI83_CHA_HORZ_FRONTPORCH, LOW(vm->hfront_porch));
+	SN65DSI83_WRITE(SN65DSI83_CHA_VERT_FRONTPORCH, LOW(vm->vfront_porch));
 
 	if (brg->client->irq) {
 		/* Enable IRQs */
@@ -426,7 +431,7 @@ static int sn65dsi83_brg_configure(struct sn65dsi83_brg *brg)
 
 static int sn65dsi83_brg_setup(struct sn65dsi83_brg *brg)
 {
-	struct i2c_client *client = I2C_CLIENT(brg);
+	struct i2c_client *client = brg->client;
 
 	dev_dbg(&client->dev, "%s\n", __func__);
 	sn65dsi83_brg_power_on(brg);
@@ -437,7 +442,7 @@ static int sn65dsi83_brg_setup(struct sn65dsi83_brg *brg)
 static int sn65dsi83_brg_reset(struct sn65dsi83_brg *brg)
 {
 	/* Soft Reset reg value at power on should be 0x00 */
-	struct i2c_client *client = I2C_CLIENT(brg);
+	struct i2c_client *client = brg->client;
 	int ret = SN65DSI83_READ(SN65DSI83_SOFT_RESET);
 
 	dev_dbg(&client->dev, "%s\n", __func__);
