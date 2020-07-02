@@ -32,6 +32,7 @@ struct sn65dsi83_brg {
 	u32 lvds_bpp;
 
 	u8 num_dsi_lanes;
+	bool pulse_mode;
 	struct sn65dsi83_brg_funcs *funcs;
 };
 struct sn65dsi83_brg *sn65dsi83_brg_get(void);
