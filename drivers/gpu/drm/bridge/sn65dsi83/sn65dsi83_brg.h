@@ -42,23 +42,4 @@ struct sn65dsi83_brg *sn65dsi83_brg_get(void);
 
 irqreturn_t sn65dsi83_irq_handler(int unused, void *data);
 
-#define I2C_DEVICE(A) &(A)->client->dev
-#define I2C_CLIENT(A) (A)->client
-#define VM(A) &(A)->vm
-
-/* The caller has to have a vm structure defined */
-#define PIXCLK vm->pixelclock
-#define HACTIVE vm->hactive
-#define HFP vm->hfront_porch
-#define HBP vm->hback_porch
-#define HPW vm->hsync_len
-#define VACTIVE vm->vactive
-#define VFP vm->vfront_porch
-#define VBP vm->vback_porch
-#define VPW vm->vsync_len
-#define FLAGS vm->flags
-
-#define HIGH(A) (((A) >> 8) & 0xFF)
-#define LOW(A)  ((A)  & 0xFF)
-
 #endif /* _SN65DSI83_BRG_H__ */
