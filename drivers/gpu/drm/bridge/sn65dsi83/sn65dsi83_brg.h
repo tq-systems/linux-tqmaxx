@@ -39,6 +39,8 @@ struct sn65dsi83_brg {
 };
 struct sn65dsi83_brg *sn65dsi83_brg_get(void);
 
+irqreturn_t sn65dsi83_irq_handler(int unused, void *data);
+
 #define I2C_DEVICE(A) &(A)->client->dev
 #define I2C_CLIENT(A) (A)->client
 #define VM(A) &(A)->vm

@@ -9,6 +9,7 @@
 #include <linux/of.h>
 #include <linux/of_device.h>
 #include <linux/of_graph.h>
+#include <linux/platform_device.h>
 #include <linux/slab.h>
 #include <linux/regulator/consumer.h>
 
@@ -366,6 +367,19 @@ static int sn65dsi83_parse_dt(struct device_node *np,
 			return -EPROBE_DEFER;
 		sn65dsi83->vcc1v8 = NULL;
 		DRM_INFO("No vcc1v8 regulator found: %d\n", ret);
+	}
+
+	if (!sn65dsi83->brg->client->irq) {
+		dev_info(dev, "No IRQ");
+	} else {
+		ret = devm_request_threaded_irq(dev, sn65dsi83->brg->client->irq, NULL,
+						sn65dsi83_irq_handler,
+						IRQF_TRIGGER_RISING | IRQF_ONESHOT,
+						"sn65dsi83", sn65dsi83->brg);
+		if (ret) {
+			dev_err(dev, "failed to request IRQ handler: %d\n", ret);
+			return ret;
+		}
 	}
 
 	of_node_put(sn65dsi83->host_node);
