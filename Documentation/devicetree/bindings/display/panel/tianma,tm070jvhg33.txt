@@ -1,7 +1,10 @@
 Tianma Micro-electronics TM070JVHG33 7.0" WXGA TFT LCD panel
 
 Required properties:
-- compatible: should be "tianma,tm070jvhg33"
+- compatible: should be "tianma,tm070jvhg33" or "tianma,tm070jvhg33_mx8m"
+
+second compatible is for usage with i.MX8M/i.MX8MN/i.MX8MN with DSI to LVDS
+display bridge
 
 This binding is compatible with the simple-panel binding, which is specified
 in simple-panel.txt in this directory.
