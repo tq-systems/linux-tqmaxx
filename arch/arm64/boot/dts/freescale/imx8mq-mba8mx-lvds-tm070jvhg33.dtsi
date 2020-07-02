@@ -55,6 +55,6 @@
 };
 
 &panel0 {
-	compatible = "tianma,tm070jvhg33";
+	compatible = "tianma,tm070jvhg33_mx8m";
 	status = "okay";
 };
