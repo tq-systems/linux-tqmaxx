@@ -105,7 +105,6 @@ static enum drm_mode_status
 sn65dsi83_connector_mode_valid(struct drm_connector *connector,
 			       struct drm_display_mode *mode)
 {
-	struct sn65dsi83 *sn65dsi83 = connector_to_sn65dsi83(connector);
 	struct device *dev = connector->dev->dev;
 
 	if (mode->clock > 154000)
