@@ -105,7 +105,6 @@ static enum drm_mode_status
 sn65dsi83_connector_mode_valid(struct drm_connector *connector,
 			       struct drm_display_mode *mode)
 {
-	struct sn65dsi83 *sn65dsi83 = connector_to_sn65dsi83(connector);
 	struct device *dev = connector->dev->dev;
 
 	if (mode->clock > 154000)
@@ -213,8 +212,6 @@ static void sn65dsi83_bridge_mode_set(struct drm_bridge *bridge,
 				      const struct drm_display_mode *mode,
 				      const struct drm_display_mode *adj_mode)
 {
-	struct sn65dsi83 *sn65dsi83 = bridge_to_sn65dsi83(bridge);
-
 	dev_dbg(DRM_DEVICE(bridge), "%s: mode: %d*%d@%d\n", __func__,
 		mode->hdisplay, mode->vdisplay, mode->clock);
 }
