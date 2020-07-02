@@ -347,6 +347,7 @@ static int sn65dsi83_parse_dt(struct device_node *np,
 
 	sn65dsi83->brg->pulse_mode = of_property_read_bool(np, "ti,pulse-mode");
 	sn65dsi83->brg->de_neg_polarity = of_property_read_bool(np, "ti,de-neg-polarity");
+	sn65dsi83->brg->test_mode = of_property_read_bool(np, "ti,test-mode");
 
 	sn65dsi83->brg->gpio_enable = devm_gpiod_get_optional(dev, "enable",
 							      GPIOD_OUT_LOW);
