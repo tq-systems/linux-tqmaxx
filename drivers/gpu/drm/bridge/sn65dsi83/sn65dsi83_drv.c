@@ -344,6 +344,8 @@ static int sn65dsi83_parse_dt(struct device_node *np,
 	}
 	sn65dsi83->brg->num_dsi_lanes = num_lanes;
 
+	sn65dsi83->brg->pulse_mode = of_property_read_bool(np, "ti,pulse-mode");
+
 	sn65dsi83->brg->gpio_enable = devm_gpiod_get_optional(dev, "enable",
 							      GPIOD_OUT_LOW);
 	if (IS_ERR(sn65dsi83->brg->gpio_enable)) {
@@ -460,7 +462,9 @@ static int sn65dsi83_attach_dsi(struct sn65dsi83 *sn65dsi83)
 
 	dsi->lanes = sn65dsi83->brg->num_dsi_lanes;
 	dsi->format = MIPI_DSI_FMT_RGB888;
-	dsi->mode_flags = MIPI_DSI_MODE_VIDEO | MIPI_DSI_MODE_VIDEO_BURST;
+	dsi->mode_flags = MIPI_DSI_MODE_VIDEO;
+	dsi->mode_flags |= (sn65dsi83->brg->pulse_mode) ?
+		MIPI_DSI_MODE_VIDEO_SYNC_PULSE : MIPI_DSI_MODE_VIDEO_BURST;
 
 	ret = mipi_dsi_attach(dsi);
 	if (ret < 0) {
