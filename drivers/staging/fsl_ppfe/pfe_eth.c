@@ -2386,6 +2386,7 @@ static int pfe_eth_init_one(struct pfe *pfe,
 	priv->phy_node = einfo[id].phy_node;
 
 	SET_NETDEV_DEV(priv->ndev, priv->pfe->dev);
+	priv->ndev->dev.of_node = einfo[id].of_node;
 
 	pfe->eth.eth_priv[id] = priv;
 

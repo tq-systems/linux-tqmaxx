@@ -38,8 +38,8 @@ static int pfe_get_gemac_if_properties(struct device_node *gem,
 	else
 		goto err;
 
-
 	pdata->ls1012a_eth_pdata[port].gem_id = port;
+	pdata->ls1012a_eth_pdata[port].of_node = gem;
 
 	mac_addr = of_get_mac_address(gem);
 	if (!IS_ERR_OR_NULL(mac_addr)) {
