@@ -37,6 +37,6 @@
 };
 
 &mmc2 {
-	pinctrl-2 = <&mmc2_pins_ddr>;
-	pinctrl-3 = <&mmc2_pins_hs200 &mmc2_iodelay_hs200_conf>;
+	pinctrl-2 = <&mmc2_pins_modesel_nopu>;
+	pinctrl-3 = <&mmc2_pins_modesel_nopu &mmc2_iodelay_hs200_conf>;
 };
