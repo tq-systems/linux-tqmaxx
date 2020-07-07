@@ -118,17 +118,6 @@
 		enable-active-high;
 	};
 
-	reg_otg_vbus: regulator-otg-vbus {
-		compatible = "regulator-fixed";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_regotgvbus>;
-		regulator-name = "MBA8MQ_OTG_VBUS";
-		regulator-min-microvolt = <5000000>;
-		regulator-max-microvolt = <5000000>;
-		gpio = <&gpio1 12 GPIO_ACTIVE_HIGH>;
-		enable-active-high;
-	};
-
 	reg_hub_vbus: regulator-hub-vbus {
 		compatible = "regulator-fixed";
 		regulator-name = "MBA8MQ_HUB_VBUS";
@@ -294,13 +283,6 @@
 		>;
 	};
 
-	pinctrl_regotgvbus: reggotgvbusgrp {
-		fsl,pins = <
-			/* USB1 OTG PWR as GPIO */
-			MX8MM_IOMUXC_GPIO1_IO12_GPIO1_IO12	0x84
-		>;
-	};
-
 	pinctrl_uart1: uart1grp {
 		fsl,pins = <
 			MX8MM_IOMUXC_UART1_RXD_UART1_DCE_RX	0x16
@@ -329,10 +311,9 @@
 		>;
 	};
 
-
-
 	pinctrl_usbotg: usbotggrp {
 		fsl,pins = <
+			MX8MM_IOMUXC_GPIO1_IO12_USB1_OTG_PWR	0x84
 			MX8MM_IOMUXC_GPIO1_IO13_USB1_OTG_OC	0x84
 			MX8MM_IOMUXC_GPIO1_IO10_USB1_OTG_ID	0x84
 		>;
@@ -548,11 +529,11 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usbotg>;
 	dr_mode = "otg";
-	vbus-supply = <&reg_otg_vbus>;
+	id-from-iomux;
 	srp-disable;
 	hnp-disable;
 	adp-disable;
-	power-polarity-active-high;
+	power-active-high;
 	over-current-active-low;
 	status = "okay";
 };
