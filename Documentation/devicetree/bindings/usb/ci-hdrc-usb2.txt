@@ -104,6 +104,7 @@ i.mx specific properties
 - picophy,dc-vol-level-adjust: HS DC Voltage Level Adjustment.
   Adjust the high-speed transmitter DC level voltage, details can refer
   to TXVREFTUNE0 bits of USBNC_n_PHY_CFG1.
+- id-from-iomux: enable using muxable pin as ID (i.MX7, i.MX8MM, i.MX8MN)
 
 Example:
 

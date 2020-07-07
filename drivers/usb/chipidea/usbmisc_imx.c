@@ -661,6 +661,11 @@ static int usbmisc_imx7d_init(struct imx_usbmisc_data *data)
 
 	if (!data->hsic) {
 		reg = readl(usbmisc->base + MX7D_USBNC_USB_CTRL2);
+		if (data->dig_id_sel)
+			reg |= BIT(20);
+		else
+			reg &= ~(BIT(20));
+
 		reg &= ~MX7D_USB_VBUS_WAKEUP_SOURCE_MASK;
 		writel(reg | MX7D_USB_VBUS_WAKEUP_SOURCE_BVALID
 			| MX7D_USBNC_AUTO_RESUME,
