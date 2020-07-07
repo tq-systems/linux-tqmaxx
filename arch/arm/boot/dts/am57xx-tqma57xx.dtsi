@@ -301,7 +301,7 @@
 			compatible = "ti,palmas-usb-vid";
 			ti,enable-vbus-detection;
 			ti,enable-id-detection;
-			/* ID & VBUS GPIOs provided in baseboard dts */
+			/* ID GPIO provided in baseboard dts */
 		};
 	};
 

@@ -248,6 +248,12 @@
 			DRA7XX_CORE_IOPAD(0x37b0, PIN_OUTPUT | MUX_MODE0)        /* spi1_cs0 */
 		>;
 	};
+
+	usb2_id_pin: usb2_id_pin {
+		pinctrl-single,pins = <
+			DRA7XX_CORE_IOPAD(0x3824, PIN_INPUT | MUX_MODE14)	/* WAKEUP3.gpio1_3 */
+		>;
+	};
 };
 
 &i2c4 {
@@ -423,7 +429,9 @@
 };
 
 &usb2 {
-	dr_mode = "host";
+	pinctrl-names = "default";
+	pinctrl-0 = <&usb2_id_pin>;
+	dr_mode = "otg";
 };
 
 /* sd card */
@@ -533,9 +541,8 @@
 };
 
 &extcon_usb2 {
+	/* WAKEUP3.gpio1_3 */
 	id-gpio = <&gpio1 3 GPIO_ACTIVE_HIGH>;
-	vbus-gpio = <&gpio3 23 GPIO_ACTIVE_HIGH>;
-	/* vbus-gpio: pad USB2_DRVVBUS, mode 0 */
 };
 
 /* PCIe lane 0 PCIe x4 connector */
