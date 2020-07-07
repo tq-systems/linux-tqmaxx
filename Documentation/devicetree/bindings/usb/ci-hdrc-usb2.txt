@@ -97,6 +97,7 @@ i.mx specific properties
   It's recommended to specify the over current polarity.
 - power-active-high: power signal polarity is active high
 - external-vbus-divider: enables off-chip resistor divider for Vbus
+- id-from-iomux: enable using muxable pin as ID (i.MX7, i.MX8MM, i.MX8MN)
 
 Example:
 
