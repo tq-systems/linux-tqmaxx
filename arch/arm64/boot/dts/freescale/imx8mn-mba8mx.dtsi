@@ -189,6 +189,13 @@
 };
 
 &iomuxc {
+        pinctrl_usb0hub_sel: usb0hub_sel {
+                fsl,pins = <
+			/* SEL_USB_HUB_B */
+			MX8MN_IOMUXC_NAND_WP_B_GPIO3_IO18      0x84
+                >;
+        };
+
 	pinctrl_ecspi1: ecspi1grp {
 		fsl,pins = <
 			MX8MN_IOMUXC_ECSPI1_SCLK_ECSPI1_SCLK	0x0000004e
@@ -296,6 +303,14 @@
 		>;
 	};
 
+	pinctrl_usbotg: usbotggrp {
+		fsl,pins = <
+			MX8MN_IOMUXC_GPIO1_IO12_USB1_OTG_PWR	0x84
+			MX8MN_IOMUXC_GPIO1_IO13_USB1_OTG_OC	0x84
+			MX8MN_IOMUXC_GPIO1_IO10_USB1_OTG_ID	0x1C4
+		>;
+	};
+
 	pinctrl_usdhc2_gpio: usdhc2grpgpio {
 		fsl,pins = <
 			MX8MN_IOMUXC_SD2_CD_B_GPIO2_IO12	0x84
@@ -336,6 +351,17 @@
 			MX8MN_IOMUXC_SD2_DATA3_USDHC2_DATA3	0x1d6
 			MX8MN_IOMUXC_GPIO1_IO04_USDHC2_VSELECT	0x84
 		>;
+	};
+};
+
+&gpio3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usb0hub_sel>;
+
+	sel-usb-hub {
+		gpio-hog;
+		gpios = <18 GPIO_ACTIVE_HIGH>;
+		output-high;
 	};
 };
 
@@ -396,6 +422,13 @@
 	sensor1: sensor@1f {
 		compatible = "nxp,se97", "jedec,jc-42.4-temp";
 		reg = <0x1f>;
+	};
+
+	usbhub0: usbhub@44 {
+		compatible = "ti,tusb8041", "ti,tusb80xx";
+		reg = <0x44>;
+		reset-gpios = <&expander0 13 GPIO_ACTIVE_LOW>;
+		status = "okay";
 	};
 
 	eeprom3: eeprom@57 {
@@ -469,6 +502,13 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart4>;
 	status = "disabled";
+};
+
+&usbotg1 {
+	dr_mode = "host";
+	disable-over-current;
+	power-active-high;
+	status = "okay";
 };
 
 &usdhc2 {
