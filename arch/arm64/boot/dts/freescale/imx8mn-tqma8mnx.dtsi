@@ -71,7 +71,43 @@
 	status = "okay";
 };
 
+/*
+ * TODO:
+ * improve SPI clock
+ */
+&flexspi {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_flexspi>;
+/* TODO: */
+/*	fsl,qspi-no-dtr-modes; */
+	status = "okay";
+
+	flash0: flash@0 {
+		reg = <0>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "jedec,spi-nor";
+		spi-max-frequency = <84000000>;
+		spi-tx-bus-width = <4>;
+		spi-rx-bus-width = <4>;
+		/* TODO: not used in spi-nor / fsl-qspi but in fsl-flexspi */
+/*		spi-nor,ddr-quad-read-dummy = <8>; */
+		spi-nor,ddr-quad-read-dummy = <6>;
+	};
+};
+
 &iomuxc {
+	pinctrl_flexspi: flexspigrp {
+		fsl,pins = <
+			MX8MN_IOMUXC_NAND_ALE_QSPI_A_SCLK	0x84
+			MX8MN_IOMUXC_NAND_CE0_B_QSPI_A_SS0_B	0x84
+			MX8MN_IOMUXC_NAND_DATA00_QSPI_A_DATA0	0x84
+			MX8MN_IOMUXC_NAND_DATA01_QSPI_A_DATA1	0x84
+			MX8MN_IOMUXC_NAND_DATA02_QSPI_A_DATA2	0x84
+			MX8MN_IOMUXC_NAND_DATA03_QSPI_A_DATA3	0x84
+		>;
+	};
+
 	pinctrl_i2c1: i2c1grp {
 		fsl,pins = <
 			MX8MN_IOMUXC_I2C1_SCL_I2C1_SCL		0x40000090
