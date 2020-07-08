@@ -57,6 +57,19 @@
 	status = "okay";
 };
 
+&dspi2 {
+	bus-num = <2>;
+	status = "okay";
+
+	spidev@0 {
+		compatible = "tq,testdev";
+		reg = <0>;
+		spi-max-frequency = <2000000>;
+		fsl,spi-cs-sck-delay = <1000000>;
+		fsl,spi-sck-cs-delay = <50>;
+	};
+};
+
 &duart0 {
 	status = "okay";
 };
