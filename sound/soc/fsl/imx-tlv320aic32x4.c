@@ -1,14 +1,10 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * Copyright 2014 Markus Pargmann <mpa@pengutronix.de>
  *
  *  Based on imx-sgtl5000.c
  *
- * The code contained herein is licensed under the GNU General Public
- * License. You may obtain a copy of the GNU General Public License
- * Version 2 or later at the following locations:
- *
- * http://www.opensource.org/licenses/gpl-license.html
- * http://www.gnu.org/copyleft/gpl.html
+ * Copyright 2015 - 2020 TQ Systems GmbH
  */
 
 #include <linux/module.h>
@@ -101,6 +97,7 @@ static int imx_tlv320aic_probe(struct platform_device *pdev)
 	struct i2c_client *codec_dev;
 	struct clk *codec_clk;
 	struct imx_tlv320aic_data *data;
+	struct snd_soc_dai_link_component *comp;
 	int ret = 0;
 
 	ssi_np = of_parse_phandle(pdev->dev.of_node, "ssi-controller", 0);
@@ -131,6 +128,12 @@ static int imx_tlv320aic_probe(struct platform_device *pdev)
 		goto fail;
 	}
 
+	comp = devm_kzalloc(&pdev->dev, 3 * sizeof(*comp), GFP_KERNEL);
+	if (!comp) {
+		ret = -ENOMEM;
+		goto fail;
+	}
+
 	codec_clk = clk_get(&codec_dev->dev, NULL);
 	if (IS_ERR(codec_clk)) {
 		ret = PTR_ERR(codec_clk);
@@ -140,12 +143,20 @@ static int imx_tlv320aic_probe(struct platform_device *pdev)
 	data->clk_frequency = clk_get_rate(codec_clk);
 	clk_put(codec_clk);
 
+	data->dai.cpus		= &comp[0];
+	data->dai.codecs	= &comp[1];
+	data->dai.platforms	= &comp[2];
+
+	data->dai.num_cpus	= 1;
+	data->dai.num_codecs	= 1;
+	data->dai.num_platforms	= 1;
+
 	data->dai.name = "HiFi";
 	data->dai.stream_name = "HiFi";
-	data->dai.codecs->dai_name = "tlv320aic32x4-hifi";
-	data->dai.codecs->of_node = codec_np;
-	data->dai.cpus->of_node = ssi_np;
-	data->dai.platforms->of_node = ssi_np;
+	data->dai.codecs[0].dai_name = "tlv320aic32x4-hifi";
+	data->dai.codecs[0].of_node = codec_np;
+	data->dai.cpus[0].of_node = ssi_np;
+	data->dai.platforms[0].of_node = ssi_np;
 	data->dai.init = &imx_tlv320aic_dai_init;
 	data->dai.dai_fmt = SND_SOC_DAIFMT_I2S | SND_SOC_DAIFMT_NB_NF |
 			    SND_SOC_DAIFMT_CBM_CFM;
