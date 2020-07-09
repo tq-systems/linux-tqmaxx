@@ -161,8 +161,11 @@
 		reg = <0x03>;
 		reset-names = "phy";
 		reset-gpios = <&gpio_exp_1v8 3 GPIO_ACTIVE_LOW>;
-		/* Long reset to work around PHY incorrect strap pin sampling */
-		reset-assert-us = <1500>;
+		/*
+		 * Long reset to work around PHY incorrect strap pin sampling
+		 * due to external capacitors for SGMII
+		 */
+		reset-assert-us = <2500>;
 		reset-deassert-us = <200>;
 		ti,led-function = <0x05b0>;
 		ti,led-ctrl = <0x1001>;
