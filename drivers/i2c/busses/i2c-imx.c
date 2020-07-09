@@ -50,7 +50,6 @@
 #include <linux/of_address.h>
 #include <linux/of.h>
 #include <linux/of_device.h>
-#include <linux/libata.h>
 
 /* This will be the driver name the kernel reports */
 #define DRIVER_NAME "imx-i2c"
