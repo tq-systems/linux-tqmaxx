@@ -322,8 +322,7 @@
 
 &mdio0 {
 	rgmii_phy0c: ethernet-phy@0c {
-		compatible = "ethernet-phy-id2000.a230",
-			"ethernet-phy-ieee802.3-c22";
+		compatible = "ethernet-phy-ieee802.3-c22";
 		reg = <0x0c>;
 		ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
 		ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
@@ -333,8 +332,7 @@
 	};
 
 	sgmii_phy03: ethernet-phy@03 {
-		compatible = "ethernet-phy-id2000.a230",
-			"ethernet-phy-ieee802.3-c22";
+		compatible = "ethernet-phy-ieee802.3-c22";
 		reg = <0x03>;
 		ti,led-function = <0x6b90>;
 		ti,led-ctrl = <0x0000>;
@@ -344,8 +342,7 @@
 	};
 
 	rgmii_phy04: ethernet-phy@04 {
-		compatible = "ethernet-phy-id2000.a230",
-			"ethernet-phy-ieee802.3-c22";
+		compatible = "ethernet-phy-ieee802.3-c22";
 		reg = <0x04>;
 		ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
 		ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
