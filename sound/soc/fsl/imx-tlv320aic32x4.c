@@ -24,6 +24,11 @@ struct imx_tlv320aic_data {
 	unsigned int clk_frequency;
 };
 
+/*
+ * TODO:
+ * check for replacement with snd_soc_of_parse_audio_simple_widgets
+ * simple widgets has SPK but no Line Out
+ */
 static const struct snd_soc_dapm_widget imx_tlv320aic_dapm_widgets[] = {
 	SND_SOC_DAPM_MIC("Mic Jack", NULL),
 	SND_SOC_DAPM_LINE("Line In Jack", NULL),
@@ -31,11 +36,19 @@ static const struct snd_soc_dapm_widget imx_tlv320aic_dapm_widgets[] = {
 	SND_SOC_DAPM_SPK("Line Out Jack", NULL),
 };
 
+/*
+ * TODO:
+ * check for replacement with  snd_soc_of_parse_audio_routing
+ * this would make the driver more flexible:
+ * - stereo mic
+ * - DT based swith between line Out and headphone
+ */
 static const struct snd_soc_dapm_route imx_tlv320aic_dapm_routes[] = {
 	{"IN1_R", NULL, "Line In Jack"},
 	{"IN1_L", NULL, "Line In Jack"},
 
-	/* the mic in has to be supplied -> see
+	/*
+	 * the mic in has to be supplied -> see
 	 * arch/arm/boot/dts/imx6q-novena.dts
 	 * or (but this should be wrong)
 	 * snd_soc_dapm_force_enable_pin(&rtd->card->dapm, "Mic Bias");
@@ -49,15 +62,13 @@ static const struct snd_soc_dapm_route imx_tlv320aic_dapm_routes[] = {
 
 	/*
 	 * if HPR/HPL are connected to the jack via 0 Ohm LOL/LOR are not
-	 * connected
+	 * connected. For now: if this is needed, use following code instead:
+	 *
+	 * {"Headphone Jack", NULL, "HPL"},
+	 * {"Headphone Jack", NULL, "HPR"},
 	 */
-#if 0
-	{"Headphone Jack", NULL, "HPL"},
-	{"Headphone Jack", NULL, "HPR"},
-#else
 	{"Line Out Jack", NULL, "LOL"},
 	{"Line Out Jack", NULL, "LOR"},
-#endif
 };
 
 static int imx_tlv320aic_dai_init(struct snd_soc_pcm_runtime *rtd)
