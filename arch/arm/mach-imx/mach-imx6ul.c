@@ -88,6 +88,7 @@ static void __init imx6ul_init_late(void)
 
 static void __init imx6ul_map_io(void)
 {
+	debug_ll_io_init();
 	imx6_pm_map_io();
 	imx_busfreq_map_io();
 }
