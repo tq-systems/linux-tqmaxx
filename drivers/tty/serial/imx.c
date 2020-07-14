@@ -13,6 +13,7 @@
 #endif
 
 #include <linux/module.h>
+#include <linux/atomic.h>
 #include <linux/ioport.h>
 #include <linux/init.h>
 #include <linux/console.h>
@@ -205,6 +206,8 @@ struct imx_port {
 
 	struct mctrl_gpios *gpios;
 
+	atomic_t console_printing;
+
 	/* shadow registers */
 	unsigned int ucr1;
 	unsigned int ucr2;
@@ -281,7 +284,30 @@ static const struct of_device_id imx_uart_dt_ids[] = {
 };
 MODULE_DEVICE_TABLE(of, imx_uart_dt_ids);
 
-static void imx_uart_writel(struct imx_port *sport, u32 val, u32 offset)
+static inline bool imx_uart_needs_atomic_lock(struct imx_port *sport,
+					      u32 offset)
+{
+	struct uart_port *port = &sport->port;
+
+	if (!uart_console(port))
+		return false;
+
+	switch (offset) {
+	/*
+	 * These are the registers that are touched
+	 * in imx_uart_console_write_atomic
+	 */
+	case UCR1:
+	case UCR2:
+	case UCR3:
+		return true;
+
+	default:
+		return false;
+	}
+}
+
+static void imx_uart_writel_locked(struct imx_port *sport, u32 val, u32 offset)
 {
 	switch (offset) {
 	case UCR1:
@@ -305,7 +331,26 @@ static void imx_uart_writel(struct imx_port *sport, u32 val, u32 offset)
 	writel(val, sport->port.membase + offset);
 }
 
-static u32 imx_uart_readl(struct imx_port *sport, u32 offset)
+static void imx_uart_writel(struct imx_port *sport, u32 val, u32 offset)
+{
+	bool needs_lock = imx_uart_needs_atomic_lock(sport, offset);
+	unsigned int flags;
+
+	if (needs_lock)
+		console_atomic_lock(&flags);
+
+	imx_uart_writel_locked(sport, val, offset);
+
+	if (needs_lock)
+		console_atomic_unlock(flags);
+}
+
+static u32 imx_uart_readl_raw(struct imx_port *sport, u32 offset)
+{
+	return readl(sport->port.membase + offset);
+}
+
+static u32 imx_uart_readl_locked(struct imx_port *sport, u32 offset)
 {
 	switch (offset) {
 	case UCR1:
@@ -336,6 +381,23 @@ static u32 imx_uart_readl(struct imx_port *sport, u32 offset)
 	}
 }
 
+static u32 imx_uart_readl(struct imx_port *sport, u32 offset)
+{
+	bool needs_lock = imx_uart_needs_atomic_lock(sport, offset);
+	unsigned int flags;
+	u32 ret;
+
+	if (needs_lock)
+		console_atomic_lock(&flags);
+
+	ret = imx_uart_readl_locked(sport, offset);
+
+	if (needs_lock)
+		console_atomic_unlock(flags);
+
+	return ret;
+}
+
 static inline unsigned imx_uart_uts_reg(struct imx_port *sport)
 {
 	return sport->devdata->uts_reg;
@@ -362,24 +424,26 @@ static inline int imx_uart_is_imx6q(struct imx_port *sport)
 }
 /*
  * Save and restore functions for UCR1, UCR2 and UCR3 registers
+ *
+ * Call with atomic console lock held
  */
 #if defined(CONFIG_SERIAL_IMX_CONSOLE)
 static void imx_uart_ucrs_save(struct imx_port *sport,
 			       struct imx_port_ucrs *ucr)
 {
 	/* save control registers */
-	ucr->ucr1 = imx_uart_readl(sport, UCR1);
-	ucr->ucr2 = imx_uart_readl(sport, UCR2);
-	ucr->ucr3 = imx_uart_readl(sport, UCR3);
+	ucr->ucr1 = imx_uart_readl_locked(sport, UCR1);
+	ucr->ucr2 = imx_uart_readl_locked(sport, UCR2);
+	ucr->ucr3 = imx_uart_readl_locked(sport, UCR3);
 }
 
 static void imx_uart_ucrs_restore(struct imx_port *sport,
 				  struct imx_port_ucrs *ucr)
 {
 	/* restore control registers */
-	imx_uart_writel(sport, ucr->ucr1, UCR1);
-	imx_uart_writel(sport, ucr->ucr2, UCR2);
-	imx_uart_writel(sport, ucr->ucr3, UCR3);
+	imx_uart_writel_locked(sport, ucr->ucr1, UCR1);
+	imx_uart_writel_locked(sport, ucr->ucr2, UCR2);
+	imx_uart_writel_locked(sport, ucr->ucr3, UCR3);
 }
 #endif
 
@@ -1377,7 +1441,7 @@ static int imx_uart_startup(struct uart_port *port)
 	ucr2 &= ~UCR2_SRST;
 	imx_uart_writel(sport, ucr2, UCR2);
 
-	while (!(imx_uart_readl(sport, UCR2) & UCR2_SRST) && (--i > 0))
+	while (!(imx_uart_readl_raw(sport, UCR2) & UCR2_SRST) && (--i > 0))
 		udelay(1);
 
 	/*
@@ -1550,7 +1614,7 @@ static void imx_uart_flush_buffer(struct uart_port *port)
 	ucr2 &= ~UCR2_SRST;
 	imx_uart_writel(sport, ucr2, UCR2);
 
-	while (!(imx_uart_readl(sport, UCR2) & UCR2_SRST) && (--i > 0))
+	while (!(imx_uart_readl_raw(sport, UCR2) & UCR2_SRST) && (--i > 0))
 		udelay(1);
 
 	/* Restore the registers */
@@ -1835,7 +1899,7 @@ static void imx_uart_poll_put_char(struct uart_port *port, unsigned char c)
 
 	/* drain */
 	do {
-		status = imx_uart_readl(sport, USR1);
+		status = imx_uart_readl_raw(sport, USR1);
 	} while (~status & USR1_TRDY);
 
 	/* write */
@@ -1843,7 +1907,7 @@ static void imx_uart_poll_put_char(struct uart_port *port, unsigned char c)
 
 	/* flush */
 	do {
-		status = imx_uart_readl(sport, USR2);
+		status = imx_uart_readl_raw(sport, USR2);
 	} while (~status & USR2_TXDC);
 }
 #endif
@@ -1914,14 +1978,27 @@ static const struct uart_ops imx_uart_pops = {
 static struct imx_port *imx_uart_ports[UART_NR];
 
 #ifdef CONFIG_SERIAL_IMX_CONSOLE
-static void imx_uart_console_putchar(struct uart_port *port, int ch)
+static void imx_uart_console_putchar_locked(struct uart_port *port, int ch)
 {
 	struct imx_port *sport = (struct imx_port *)port;
 
-	while (imx_uart_readl(sport, imx_uart_uts_reg(sport)) & UTS_TXFULL)
+	while (imx_uart_readl_raw(sport, imx_uart_uts_reg(sport)) & UTS_TXFULL)
 		barrier();
 
+	imx_uart_writel_locked(sport, ch, URTX0);
+}
+
+static void imx_uart_console_putchar(struct uart_port *port, int ch)
+{
+	struct imx_port *sport = (struct imx_port *)port;
+	unsigned int flags;
+
+	while (imx_uart_readl_raw(sport, imx_uart_uts_reg(sport)) & UTS_TXFULL)
+		barrier();
+
+	console_atomic_lock(&flags);
 	imx_uart_writel(sport, ch, URTX0);
+	console_atomic_unlock(flags);
 }
 
 /*
@@ -1932,16 +2009,56 @@ imx_uart_console_write(struct console *co, const char *s, unsigned int count)
 {
 	struct imx_port *sport = imx_uart_ports[co->index];
 	struct imx_port_ucrs old_ucr;
-	unsigned int ucr1;
-	unsigned long flags = 0;
-	int locked = 1;
+	unsigned int ca_flags, ucr1;
+	unsigned long flags;
 
-	if (sport->port.sysrq)
-		locked = 0;
-	else if (oops_in_progress)
-		locked = spin_trylock_irqsave(&sport->port.lock, flags);
-	else
-		spin_lock_irqsave(&sport->port.lock, flags);
+	spin_lock_irqsave(&sport->port.lock, flags);
+
+	/*
+	 *	First, save UCR1/2/3 and then disable interrupts
+	 */
+	console_atomic_lock(&ca_flags);
+
+	imx_uart_ucrs_save(sport, &old_ucr);
+	ucr1 = old_ucr.ucr1;
+
+	if (imx_uart_is_imx1(sport))
+		ucr1 |= IMX1_UCR1_UARTCLKEN;
+	ucr1 |= UCR1_UARTEN;
+	ucr1 &= ~(UCR1_TRDYEN | UCR1_RRDYEN | UCR1_RTSDEN);
+
+	imx_uart_writel_locked(sport, ucr1, UCR1);
+
+	imx_uart_writel_locked(sport, old_ucr.ucr2 | UCR2_TXEN, UCR2);
+
+	console_atomic_unlock(ca_flags);
+
+	atomic_inc(&sport->console_printing);
+	uart_console_write(&sport->port, s, count, imx_uart_console_putchar);
+	atomic_dec(&sport->console_printing);
+
+	/*
+	 *	Finally, wait for transmitter to become empty
+	 *	and restore UCR1/2/3
+	 */
+	while (!(imx_uart_readl_raw(sport, USR2) & USR2_TXDC));
+
+	console_atomic_lock(&ca_flags);
+	imx_uart_ucrs_restore(sport, &old_ucr);
+	console_atomic_unlock(ca_flags);
+
+	spin_unlock_irqrestore(&sport->port.lock, flags);
+}
+
+static void
+imx_uart_console_write_atomic(struct console *co, const char *s,
+			      unsigned int count)
+{
+	struct imx_port *sport = imx_uart_ports[co->index];
+	struct imx_port_ucrs old_ucr;
+	unsigned int ca_flags, ucr1;
+
+	console_atomic_lock(&ca_flags);
 
 	/*
 	 *	First, save UCR1/2/3 and then disable interrupts
@@ -1954,22 +2071,27 @@ imx_uart_console_write(struct console *co, const char *s, unsigned int count)
 	ucr1 |= UCR1_UARTEN;
 	ucr1 &= ~(UCR1_TRDYEN | UCR1_RRDYEN | UCR1_RTSDEN);
 
-	imx_uart_writel(sport, ucr1, UCR1);
+	imx_uart_writel_locked(sport, ucr1, UCR1);
 
-	imx_uart_writel(sport, old_ucr.ucr2 | UCR2_TXEN, UCR2);
+	imx_uart_writel_locked(sport, old_ucr.ucr2 | UCR2_TXEN, UCR2);
 
-	uart_console_write(&sport->port, s, count, imx_uart_console_putchar);
+	if (atomic_fetch_inc(&sport->console_printing)) {
+		uart_console_write(&sport->port, "\n", 1,
+				   imx_uart_console_putchar_locked);
+	}
+	uart_console_write(&sport->port, s, count,
+			   imx_uart_console_putchar_locked);
+	atomic_dec(&sport->console_printing);
 
 	/*
 	 *	Finally, wait for transmitter to become empty
 	 *	and restore UCR1/2/3
 	 */
-	while (!(imx_uart_readl(sport, USR2) & USR2_TXDC));
+	while (!(imx_uart_readl_raw(sport, USR2) & USR2_TXDC));
 
 	imx_uart_ucrs_restore(sport, &old_ucr);
 
-	if (locked)
-		spin_unlock_irqrestore(&sport->port.lock, flags);
+	console_atomic_unlock(ca_flags);
 }
 
 /*
@@ -2056,6 +2178,8 @@ imx_uart_console_setup(struct console *co, char *options)
 	if (sport == NULL)
 		return -ENODEV;
 
+	atomic_set(&sport->console_printing, 0);
+
 	/* For setting the registers, we only need to enable the ipg clock. */
 	retval = clk_prepare_enable(sport->clk_ipg);
 	if (retval)
@@ -2086,6 +2210,7 @@ static struct uart_driver imx_uart_uart_driver;
 static struct console imx_uart_console = {
 	.name		= DEV_NAME,
 	.write		= imx_uart_console_write,
+	.write_atomic	= imx_uart_console_write_atomic,
 	.device		= uart_console_device,
 	.setup		= imx_uart_console_setup,
 	.flags		= CON_PRINTBUFFER,
@@ -2100,7 +2225,7 @@ static void imx_uart_console_early_putchar(struct uart_port *port, int ch)
 {
 	struct imx_port *sport = (struct imx_port *)port;
 
-	while (imx_uart_readl(sport, IMX21_UTS) & UTS_TXFULL)
+	while (imx_uart_readl_raw(sport, IMX21_UTS) & UTS_TXFULL)
 		cpu_relax();
 
 	imx_uart_writel(sport, ch, URTX0);
