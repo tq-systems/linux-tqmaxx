@@ -185,6 +185,18 @@
 	};
 };
 
+&sata0{
+	status = "okay";
+};
+
+&sata1{
+	status = "okay";
+};
+
+&sata2{
+	status = "okay";
+};
+
 &uart0 {
 	status = "okay";
 };
