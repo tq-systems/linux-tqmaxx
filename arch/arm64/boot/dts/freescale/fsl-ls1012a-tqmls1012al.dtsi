@@ -1,0 +1,78 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Device Tree file for TQ LS1012A TQMLS1012AL SoM.
+ *
+ * Copyright 2018-2020 TQ-Systems GmbH
+ *
+ * Authors: Max Merchel <Max.Merchel@tq-group.com>
+ *          Matthias Schiffer <matthias.schiffer@tq-group.com>
+ */
+
+#include "fsl-ls1012a.dtsi"
+
+/ {
+	compatible = "tq,ls1012a-tqmls1012al", "fsl,ls1012a";
+
+	aliases {
+		spi0 = &qspi;
+	};
+};
+
+&cpu_alert {
+	temperature = <85000>;
+};
+
+&cpu_crit {
+	temperature = <95000>;
+};
+
+&i2c0 {
+	status = "okay";
+
+	jc42_19: eeprom-temperature-sensor@19 {
+		compatible = "nxp,se97", "jedec,jc-42.4-temp";
+		reg = <0x19>;
+	};
+
+	m24c64_50: eeprom@50 {
+		compatible = "atmel,24c64";
+		reg = <0x50>;
+		pagesize = <32>;
+		status = "okay";
+	};
+
+	m24c02_51: eeprom@51 {
+		compatible = "nxp,spd", "atmel,24c02";
+		pagesize = <16>;
+		reg = <0x51>;
+		readl-only;
+	};
+
+	rtc1: rtc@68 {
+		compatible = "dallas,ds1339";
+		reg = <0x68>;
+	};
+};
+
+&qspi {
+	num-cs = <2>;
+	bus-num = <0>;
+	status = "okay";
+
+	flash@0 {
+		compatible = "jedec,spi-nor";
+		reg = <0>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		spi-max-frequency = <39000000>;
+		spi-rx-bus-width = <4>;
+		spi-tx-bus-width = <1>;
+		m25p,fast-read;
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+		};
+	};
+};
