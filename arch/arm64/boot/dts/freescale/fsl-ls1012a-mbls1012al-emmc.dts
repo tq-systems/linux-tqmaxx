@@ -1,0 +1,23 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Device Tree file for TQ LS1012A MBLS1012AL Board with eMMC.
+ *
+ * Copyright 2018-2020 TQ-Systems GmbH
+ *
+ * Authors: Max Merchel <Max.Merchel@tq-group.com>
+ *          Matthias Schiffer <matthias.schiffer@tq-group.com>
+ */
+
+#include "fsl-ls1012a-mbls1012al.dts"
+
+&esdhc0 {
+	vqmmc-supply = <&reg_1p8v>;
+	/delete-property/ no-mmc;
+	disable-wp;
+	mmc-ddr-1_8v;
+	mmc-hs200-1_8v;
+	no-sdio;
+	no-sd;
+	voltage-ranges = <1800 1800>;
+	non-removable;
+};
