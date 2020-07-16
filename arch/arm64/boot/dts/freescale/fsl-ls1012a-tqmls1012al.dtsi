@@ -1,0 +1,122 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Device Tree file for TQ LS1012A TQMLS1012AL SoM.
+ *
+ * Copyright 2018-2020 TQ-Systems GmbH
+ *
+ * Authors: Max Merchel <Max.Merchel@tq-group.com>
+ *          Matthias Schiffer <matthias.schiffer@tq-group.com>
+ */
+
+#include "fsl-ls1012a.dtsi"
+
+/ {
+	compatible = "tq,ls1012a-tqmls1012al", "fsl,ls1012a";
+
+	aliases {
+		spi0 = &qspi;
+	};
+};
+
+&alert0 {
+	temperature = <85000>;
+};
+
+&crit0 {
+	temperature = <95000>;
+};
+
+&i2c0 {
+	status = "okay";
+
+	jc42_19: eeprom-temperature-sensor@19 {
+		compatible = "nxp,se97", "jedec,jc-42.4-temp";
+		reg = <0x19>;
+	};
+
+	m24c64_50: eeprom@50 {
+		compatible = "atmel,24c64";
+		reg = <0x50>;
+		pagesize = <32>;
+		status = "okay";
+	};
+
+	m24c02_51: eeprom@51 {
+		compatible = "nxp,spd", "atmel,24c02";
+		pagesize = <16>;
+		reg = <0x51>;
+	};
+
+	rtc1: rtc@68 {
+		compatible = "dallas,ds1339";
+		reg = <0x68>;
+	};
+};
+
+&qspi {
+	num-cs = <2>;
+	bus-num = <0>;
+	status = "okay";
+
+	flash@0 {
+		compatible = "jedec,spi-nor";
+		reg = <0>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		spi-max-frequency = <20000000>;
+		spi-rx-bus-width = <4>;
+		spi-tx-bus-width = <4>;
+		m25p,fast-read;
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			pbl@0 {
+				label = "PBL";
+				reg = <0x0 0x100000>;
+			};
+
+			bl3@100000 {
+				label = "BL3";
+				reg = <0x100000 0x400000>;
+			};
+
+			ubootenv@500000 {
+				label = "U-Boot-ENV";
+				reg = <0x500000 0x100000>;
+			};
+
+			reserved1@600000 {
+				label = "Reserved1";
+				reg = <0x600000 0x400000>;
+			};
+
+			pfe@a00000 {
+				label = "PFE";
+				reg = <0xa00000 0x300000>;
+			};
+
+			reserved2@d00000 {
+				label = "Reserved2";
+				reg = <0xd00000 0x200000>;
+			};
+
+			dtb@f00000 {
+				label = "DTB";
+				reg = <0xf00000 0x100000>;
+			};
+
+			linux@1000000 {
+				label = "Linux";
+				reg = <0x1000000 0xa00000>;
+			};
+
+			rootfs@1a00000 {
+				label = "RootFS";
+				reg = <0x1a00000 0x2600000>;
+			};
+		};
+	};
+};
