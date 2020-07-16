@@ -43,10 +43,10 @@
 		linux,cma {
 			compatible = "shared-dma-pool";
 			reusable;
-			/* 256 MiB */
-			size = <0 0x10000000>;
-			/*  512 - 128 MiB, our minimum RAM config will be 512 MiB */
-			alloc-ranges = <0 0x40000000 0 0x38000000>;
+			/* 640 MiB */
+			size = <0 0x28000000>;
+			/*  1024 - 128 MiB, our minimum RAM config will be 1024 MiB */
+			alloc-ranges = <0 0x40000000 0 0x78000000>;
 			linux,cma-default;
 		};
 	};
