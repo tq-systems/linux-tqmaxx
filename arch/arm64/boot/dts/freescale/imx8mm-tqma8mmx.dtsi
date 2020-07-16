@@ -322,8 +322,6 @@
 
 	/*
 	 * NXP SE97BTP with temperature sensor + eeprom
-	 * ATTENTION: do not use correct dt compatible since this will conflict
-	 * with hwmon sysfs ABI and break device registration
 	 */
 	sensor0: temperature-sensor-eeprom@1b {
 		compatible = "nxp,se97", "jedec,jc-42.4-temp";
