@@ -83,4 +83,12 @@
 
 &i2c0 {
 	status = "okay";
+
+	rtc: pcf85063@51 {
+		compatible = "nxp,pcf85063";
+		nxp,quartz_load = "12.5pF";
+		nxp,offset = <0x80>;
+		reg = <0x51>;
+		status = "okay";
+	};
 };
