@@ -1,0 +1,74 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2018-2020 TQ Systems GmbH
+ */
+
+/delete-node/ &rtc1;
+/delete-node/ &sensor0;
+/delete-node/ &eeprom0;
+/delete-node/ &pinctrl_fec2;
+
+&i2c0 {
+	status = "disabled";
+};
+
+&i2c1 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	clock-frequency = <100000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_lpi2c1>;
+	status = "okay";
+	/*
+	 * NXP SE97BTP with temperature sensor + eeprom
+	 */
+	sensor0: tempsensor@19 {
+		compatible = "nxp,se97", "jedec,jc-42.4-temp";
+		reg = <0x19>;
+		status = "okay";
+	};
+
+	eeprom0: eeprom@51 {
+		compatible = "atmel,24c02";
+		reg = <0x51>;
+		pagesize = <16>;
+		status = "okay";
+	};
+
+	rtc1: rtc@68 {
+		compatible = "dallas,ds1339", "dallas,ds1337";
+		reg = <0x68>;
+	};
+};
+
+&fec2 {
+	phy-reset-gpios = <&lsio_gpio0 0 GPIO_ACTIVE_LOW>;
+};
+
+&iomuxc {
+	pinctrl_lpi2c1: lpi2c1grp {
+		fsl,pins = <
+			IMX8QXP_MIPI_DSI0_GPIO0_00_ADMA_I2C1_SCL	0x06000020
+			IMX8QXP_MIPI_DSI0_GPIO0_01_ADMA_I2C1_SDA	0x06000020
+		>;
+	};
+
+	pinctrl_fec2: fec2grp {
+		fsl,pins = <
+			IMX8QXP_ESAI0_SCKR_CONN_ENET1_RGMII_TX_CTL	0x06000048
+			IMX8QXP_ESAI0_FSR_CONN_ENET1_RGMII_TXC		0x06000048
+			IMX8QXP_ESAI0_TX4_RX1_CONN_ENET1_RGMII_TXD0	0x06000048
+			IMX8QXP_ESAI0_TX5_RX0_CONN_ENET1_RGMII_TXD1	0x06000048
+			IMX8QXP_ESAI0_FST_CONN_ENET1_RGMII_TXD2		0x06000048
+			IMX8QXP_ESAI0_SCKT_CONN_ENET1_RGMII_TXD3	0x06000048
+			IMX8QXP_ESAI0_TX0_CONN_ENET1_RGMII_RXC		0x06000048
+			IMX8QXP_SPDIF0_TX_CONN_ENET1_RGMII_RX_CTL	0x06000048
+			IMX8QXP_SPDIF0_RX_CONN_ENET1_RGMII_RXD0		0x06000048
+			IMX8QXP_ESAI0_TX3_RX2_CONN_ENET1_RGMII_RXD1	0x06000048
+			IMX8QXP_ESAI0_TX2_RX3_CONN_ENET1_RGMII_RXD2	0x06000048
+			IMX8QXP_ESAI0_TX1_CONN_ENET1_RGMII_RXD3		0x06000048
+
+			IMX8QXP_MIPI_CSI0_GPIO0_00_MIPI_CSI0_GPIO0_IO00	0x00000048
+		>;
+	};
+};
