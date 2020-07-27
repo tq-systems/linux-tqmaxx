@@ -86,8 +86,8 @@
 &qspi {
 	status = "okay";
 
-	qflash0: mt25ql512@0 {
-		compatible = "micron,n25q512ax3", "jedec,spi-nor";
+	qflash0: flash@0 {
+		compatible = "jedec,spi-nor";
 		#address-cells = <1>;
 		#size-cells = <1>;
 		spi-max-frequency = <20000000>;
