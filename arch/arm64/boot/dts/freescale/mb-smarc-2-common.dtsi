@@ -52,6 +52,15 @@
 		regulator-max-microvolt = <12000000>;
 		regulator-always-on;
 	};
+
+
+	reg_pcie_3v3: regulator-pcie-3v3 {
+		compatible = "regulator-fixed";
+		regulator-name = "MBA8QX_PCIE_3V3";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-always-on;
+	};
 };
 
 &ethphy0 {
@@ -95,6 +104,11 @@
 };
 
 &lpuart0 {
+	status = "okay";
+};
+
+&pcieb{
+	epdev_on-supply = <&reg_pcie_3v3>;
 	status = "okay";
 };
 
