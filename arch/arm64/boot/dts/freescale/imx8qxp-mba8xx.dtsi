@@ -93,6 +93,32 @@
 		gpio = <&pca9538 6 GPIO_ACTIVE_HIGH>;
 		enable-active-high;
 	};
+
+	reg_pcie_1v5: regulator-pcie-1v5 {
+		compatible = "regulator-fixed";
+		regulator-name = "MBA8QX_PCIE_1V5";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_reg_pcie_1v5>;
+		regulator-min-microvolt = <1500000>;
+		regulator-max-microvolt = <1500000>;
+		gpio = <&lsio_gpio0 30 GPIO_ACTIVE_HIGH>;
+		startup-delay-us = <1000>;
+		enable-active-high;
+		status = "okay";
+	};
+
+	reg_pcie_3v3: regulator-pcie-3v3 {
+		compatible = "regulator-fixed";
+		regulator-name = "MBA8QX_PCIE_3V3";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_reg_pcie_3v3>;
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		gpio = <&lsio_gpio0 31 GPIO_ACTIVE_HIGH>;
+		startup-delay-us = <1000>;
+		enable-active-high;
+		status = "okay";
+	};
 };
 
 &fec1 {
@@ -303,6 +329,26 @@
 		>;
 	};
 
+	pinctrl_pcieb: pcieagrp{
+		fsl,pins = <
+			IMX8QXP_PCIE_CTRL0_PERST_B_LSIO_GPIO4_IO00	0x06000041
+			IMX8QXP_PCIE_CTRL0_CLKREQ_B_LSIO_GPIO4_IO01	0x06000041
+			IMX8QXP_PCIE_CTRL0_WAKE_B_LSIO_GPIO4_IO02	0x04000041
+		>;
+	};
+
+	pinctrl_reg_pcie_1v5: regpcie1v5grp {
+		fsl,pins = <
+			IMX8QXP_SAI1_RXC_LSIO_GPIO0_IO30		0x00000021
+		>;
+	};
+
+	pinctrl_reg_pcie_3v3: regpcie3v3grp {
+		fsl,pins = <
+			IMX8QXP_SAI1_RXFS_LSIO_GPIO0_IO31		0x00000021
+		>;
+	};
+
 	pinctrl_reg_usbotg1_vbus: regusbotg1vbusgrp {
 		fsl,pins = <
 			IMX8QXP_USB_SS3_TC0_LSIO_GPIO4_IO03		0x00000021
@@ -462,6 +508,18 @@
 &lpuart3 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpuart3>;
+	status = "okay";
+};
+
+&pcieb{
+	compatible = "fsl,imx8qxp-pcie","snps,dw-pcie";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pcieb>;
+	disable-gpio = <&pca9538 7 GPIO_ACTIVE_LOW>;
+	reset-gpio = <&lsio_gpio4 0 GPIO_ACTIVE_LOW>;
+	ext_osc = <1>;
+	epdev_on-supply = <&reg_pcie_3v3>;
+	vpcie-supply = <&reg_pcie_1v5>;
 	status = "okay";
 };
 
