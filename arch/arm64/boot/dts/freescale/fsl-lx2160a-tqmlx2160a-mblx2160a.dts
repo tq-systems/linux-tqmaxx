@@ -17,6 +17,23 @@
 	chosen {
 		stdout-path = "serial0:115200n8";
 	};
+
+	leds {
+		compatible = "gpio-leds";
+
+		user1 {
+			gpios = <&gpioex1 15 GPIO_ACTIVE_LOW>;
+			label = "led:user1";
+			linux,default-trigger = "heartbeat";
+		};
+
+		user2 {
+			gpios = <&gpio2 8 GPIO_ACTIVE_LOW>;
+			label = "led:user2";
+			linux,default-trigger = "heartbeat";
+		};
+	};
+
 };
 
 &dpmac13 {
