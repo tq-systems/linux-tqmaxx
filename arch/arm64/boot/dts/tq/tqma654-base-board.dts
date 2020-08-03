@@ -1,0 +1,738 @@
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * Copyright (C) 2016-2018 Texas Instruments Incorporated - http://www.ti.com/
+ * Copyright (C) 2020 TQ Systems
+ */
+
+/dts-v1/;
+
+#include "tqma654.dtsi"
+#include <dt-bindings/input/input.h>
+#include <dt-bindings/net/ti-dp83867.h>
+
+/ {
+	compatible =  "ti,am654-evm", "ti,am654";
+	model = "Texas Instruments AM654 Base Board";
+
+	aliases {
+		// ethernet1 = &pruss2_emac0;
+		// ethernet2 = &pruss2_emac1;
+	};
+
+	chosen {
+		stdout-path = "serial2:115200n8";
+		bootargs = "earlycon=ns16550a,mmio32,0x02800000";
+	};
+
+	memory@80000000 {
+		device_type = "memory";
+		/* 2G RAM */
+		reg = <0x00000000 0x80000000 0x00000000 0x80000000>;
+	};
+
+	reserved_memory: reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		secure_ddr: secure_ddr@9e800000 {
+			reg = <0 0x9e800000 0 0x01800000>; /* for OP-TEE */
+			alignment = <0x1000>;
+			no-map;
+		};
+
+		mcu_r5fss0_core0_dma_memory_region: r5f-dma-memory@a0000000 {
+			compatible = "shared-dma-pool";
+			reg = <0 0xa0000000 0 0x100000>;
+			no-map;
+		};
+
+		mcu_r5fss0_core0_memory_region: r5f-memory@a0100000 {
+			compatible = "shared-dma-pool";
+			reg = <0 0xa0100000 0 0xf00000>;
+			no-map;
+		};
+
+		mcu_r5fss0_core1_dma_memory_region: r5f-dma-memory@a1000000 {
+			compatible = "shared-dma-pool";
+			reg = <0 0xa1000000 0 0x100000>;
+			no-map;
+		};
+
+		mcu_r5fss0_core1_memory_region: r5f-memory@a1100000 {
+			compatible = "shared-dma-pool";
+			reg = <0 0xa1100000 0 0xf00000>;
+			no-map;
+		};
+
+		rtos_ipc_memory_region: ipc-memories@a2000000 {
+			reg = <0x00 0xa2000000 0x00 0x00200000>;
+			alignment = <0x1000>;
+			no-map;
+		};
+	};
+
+	gpio-keys {
+		compatible = "gpio-keys";
+		autorepeat;
+		pinctrl-names = "default";
+		pinctrl-0 = <&push_button_pins_default>;
+
+		sw5 {
+			label = "GPIO Key USER1";
+			linux,code = <BTN_0>;
+			gpios = <&wkup_gpio0 24 GPIO_ACTIVE_LOW>;
+		};
+
+		sw6 {
+			label = "GPIO Key USER2";
+			linux,code = <BTN_1>;
+			gpios = <&wkup_gpio0 27 GPIO_ACTIVE_LOW>;
+		};
+	};
+
+	clk_ov5640_fixed: fixed-clock-ov5640 {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <24000000>;
+	};
+
+	/* Dual Ethernet application node on PRU-ICSSG2 */
+	// pruss2_eth: pruss2_eth {
+	// 	compatible = "ti,am654-icssg-prueth";
+	// 	pinctrl-names = "default";
+	// 	pinctrl-0 = <&icssg2_rgmii_pins_default>;
+	// 	sram = <&msmc_ram>;
+	// 	prus = <&pru2_0>, <&rtu2_0>, <&tx_pru2_0>,
+	// 		<&pru2_1>, <&rtu2_1>, <&tx_pru2_1>;
+	// 	firmware-name = "ti-pruss/am65x-sr2-pru0-prueth-fw.elf",
+	// 			"ti-pruss/am65x-sr2-rtu0-prueth-fw.elf",
+	// 			"ti-pruss/am65x-sr2-txpru0-prueth-fw.elf",
+	// 			"ti-pruss/am65x-sr2-pru1-prueth-fw.elf",
+	// 			"ti-pruss/am65x-sr2-rtu1-prueth-fw.elf",
+	// 			"ti-pruss/am65x-sr2-txpru1-prueth-fw.elf";
+
+	// 	ti,pruss-gp-mux-sel = <2>,      /* MII mode */
+	// 			      <2>,
+	// 			      <2>,
+	// 			      <2>,	/* MII mode */
+	// 			      <2>,
+	// 			      <2>;
+	// 	mii-g-rt = <&icssg2_mii_g_rt>;
+	// 	mii-rt = <&icssg2_mii_rt>;
+	// 	dma-coherent;
+	// 	dmas = <&main_udmap 0xc300>, /* egress slice 0 */
+	// 	       <&main_udmap 0xc301>, /* egress slice 0 */
+	// 	       <&main_udmap 0xc302>, /* egress slice 0 */
+	// 	       <&main_udmap 0xc303>, /* egress slice 0 */
+	// 	       <&main_udmap 0xc304>, /* egress slice 1 */
+	// 	       <&main_udmap 0xc305>,  egress slice 1 
+	// 	       <&main_udmap 0xc306>, /* egress slice 1 */
+	// 	       <&main_udmap 0xc307>, /* egress slice 1 */
+
+	// 	       <&main_udmap 0x4300>, /* ingress slice 0 */
+	// 	       <&main_udmap 0x4301>, /* ingress slice 1 */
+	// 	       <&main_udmap 0x4302>, /* mgmnt rsp slice 0 */
+	// 	       <&main_udmap 0x4303>; /* mgmnt rsp slice 1 */
+	// 	dma-names = "tx0-0", "tx0-1", "tx0-2", "tx0-3",
+	// 		    "tx1-0", "tx1-1", "tx1-2", "tx1-3",
+	// 		    "rx0", "rx1",
+	// 		    "rxmgm0", "rxmgm1";
+
+	// 	pruss2_emac0: ethernet-mii0 {
+	// 		phy-handle = <&pruss2_eth0_phy>;
+	// 		phy-mode = "rgmii-rxid";
+	// 		interrupts-extended = <&icssg2_intc 24>;
+	// 		syscon-rgmii-delay = <&scm_conf 0x4120>;
+	// 		iep = <&icssg2_iep0>;
+	// 		/* Filled in by bootloader */
+	// 		local-mac-address = [00 00 00 00 00 00];
+	// 	};
+
+	// 	pruss2_emac1: ethernet-mii1 {
+	// 		phy-handle = <&pruss2_eth1_phy>;
+	// 		phy-mode = "rgmii-rxid";
+	// 		interrupts-extended = <&icssg2_intc 25>;
+	// 		syscon-rgmii-delay = <&scm_conf 0x4124>;
+	// 		/* Filled in by bootloader */
+	// 		local-mac-address = [00 00 00 00 00 00];
+	// 	};
+	// };
+
+	// vdd_mmc1_sd: fixedregulator-sd {
+	// 	compatible = "regulator-fixed";
+	// 	regulator-name = "vdd_mmc1_sd";
+	// 	regulator-min-microvolt = <3300000>;
+	// 	regulator-max-microvolt = <3300000>;
+	// 	regulator-boot-on;
+	// 	enable-active-high;
+	// 	gpios = <&pca9554 4 GPIO_ACTIVE_HIGH>;
+	// };
+
+};
+
+&wkup_pmx0 {
+
+	mcu_mcan0_pins_default: mcu_mcan0_pins_default {
+		pinctrl-single,pins = <
+			AM65X_WKUP_IOPAD(0x00ac, PIN_INPUT, 0) /* (W2) MCU_MCAN0_RX */
+			AM65X_WKUP_IOPAD(0x00a8, PIN_OUTPUT, 0) /* (W1) MCU_MCAN0_TX */
+		>;
+	};
+
+	mcu_mcan1_pins_default: mcu_mcan1_pins_default {
+		pinctrl-single,pins = <
+			AM65X_WKUP_IOPAD(0x00c4, PIN_INPUT, 1) /* (AD3) WKUP_GPIO0_5.MCU_MCAN1_RX */
+			AM65X_WKUP_IOPAD(0x00c0, PIN_OUTPUT, 1) /* (AC3) WKUP_GPIO0_4.MCU_MCAN1_TX */
+		>;
+	};
+
+	wkup_i2c0_pins_default: wkup-i2c0-pins-default {
+		pinctrl-single,pins = <
+			AM65X_WKUP_IOPAD(0x00e0, PIN_INPUT, 0) /* (AC7) WKUP_I2C0_SCL */
+			AM65X_WKUP_IOPAD(0x00e4, PIN_INPUT, 0) /* (AD6) WKUP_I2C0_SDA */
+		>;
+	};
+
+	push_button_pins_default: push_button__pins_default {
+		pinctrl-single,pins = <
+			AM65X_WKUP_IOPAD(0x0030, PIN_INPUT, 7) /* (R5) WKUP_GPIO0_24 */
+			AM65X_WKUP_IOPAD(0x003c, PIN_INPUT, 7) /* (P2) WKUP_GPIO0_27 */
+		>;
+	};
+
+	mcu_i2c_pins_default: mcu-i2c-pins-default {
+		pinctrl-single,pins = <
+			AM65X_WKUP_IOPAD(0x00e8, PIN_INPUT, 0) /* (AD8) MCU_I2C0_SCL */
+			AM65X_WKUP_IOPAD(0x00ec, PIN_INPUT, 0) /* (AD7) MCU_I2C0_SDA */
+		>;
+	};
+
+	mcu_cpsw_pins_default: mcu_cpsw_pins_default {
+		pinctrl-single,pins = <
+			AM65X_WKUP_IOPAD(0x0058, PIN_OUTPUT, 0) /* (N4) MCU_RGMII1_TX_CTL */
+			AM65X_WKUP_IOPAD(0x005c, PIN_INPUT, 0) /* (N5) MCU_RGMII1_RX_CTL */
+			AM65X_WKUP_IOPAD(0x0060, PIN_OUTPUT, 0) /* (M2) MCU_RGMII1_TD3 */
+			AM65X_WKUP_IOPAD(0x0064, PIN_OUTPUT, 0) /* (M3) MCU_RGMII1_TD2 */
+			AM65X_WKUP_IOPAD(0x0068, PIN_OUTPUT, 0) /* (M4) MCU_RGMII1_TD1 */
+			AM65X_WKUP_IOPAD(0x006c, PIN_OUTPUT, 0) /* (M5) MCU_RGMII1_TD0 */
+			AM65X_WKUP_IOPAD(0x0078, PIN_INPUT, 0) /* (L2) MCU_RGMII1_RD3 */
+			AM65X_WKUP_IOPAD(0x007c, PIN_INPUT, 0) /* (L5) MCU_RGMII1_RD2 */
+			AM65X_WKUP_IOPAD(0x0080, PIN_INPUT, 0) /* (M6) MCU_RGMII1_RD1 */
+			AM65X_WKUP_IOPAD(0x0084, PIN_INPUT, 0) /* (L6) MCU_RGMII1_RD0 */
+			AM65X_WKUP_IOPAD(0x0070, PIN_INPUT, 0) /* (N1) MCU_RGMII1_TXC */
+			AM65X_WKUP_IOPAD(0x0074, PIN_INPUT, 0) /* (M1) MCU_RGMII1_RXC */
+		>;
+	};
+
+	mcu_mdio_pins_default: mcu_mdio1_pins_default {
+		pinctrl-single,pins = <
+			AM65X_WKUP_IOPAD(0x008c, PIN_OUTPUT, 0) /* (L1) MCU_MDIO0_MDC */
+			AM65X_WKUP_IOPAD(0x0088, PIN_INPUT, 0) /* (L4) MCU_MDIO0_MDIO */
+		>;
+	};
+
+	nor_flash_pins_default: nor_flash_pins_default {
+		pinctrl-single,pins = <
+			AM65X_WKUP_IOPAD(0x0000, PIN_OUTPUT, 0) /* (V1) MCU_OSPI0_CLK */
+			AM65X_WKUP_IOPAD(0x002c, PIN_OUTPUT, 0) /* (R4) MCU_OSPI0_CSn0 */
+			AM65X_WKUP_IOPAD(0x000c, PIN_INPUT, 0) /* (U4) MCU_OSPI0_D0 */
+			AM65X_WKUP_IOPAD(0x0010, PIN_INPUT, 0) /* (U5) MCU_OSPI0_D1 */
+			AM65X_WKUP_IOPAD(0x0014, PIN_INPUT, 0) /* (T2) MCU_OSPI0_D2 */
+			AM65X_WKUP_IOPAD(0x0018, PIN_INPUT, 0) /* (T3) MCU_OSPI0_D3 */
+			AM65X_WKUP_IOPAD(0x001c, PIN_INPUT, 0) /* (T4) MCU_OSPI0_D4 */
+			AM65X_WKUP_IOPAD(0x0020, PIN_INPUT, 0) /* (T5) MCU_OSPI0_D5 */
+			AM65X_WKUP_IOPAD(0x0024, PIN_INPUT, 0) /* (R2) MCU_OSPI0_D6 */
+			AM65X_WKUP_IOPAD(0x0028, PIN_INPUT, 0) /* (R3) MCU_OSPI0_D7 */
+			AM65X_WKUP_IOPAD(0x0008, PIN_INPUT, 0) /* (U2) MCU_OSPI0_DQS */
+		>;
+	};
+
+	wkup_pca554_default: wkup_pca554_default {
+		pinctrl-single,pins = <
+			AM65X_WKUP_IOPAD(0x0034, PIN_INPUT, 7) /* (T1) MCU_OSPI1_CLK.WKUP_GPIO0_25 */
+
+		>;
+	};
+};
+
+&main_pmx0 {
+	main_uart0_pins_default: main-uart0-pins-default {
+		pinctrl-single,pins = <
+			AM65X_IOPAD(0x01e4, PIN_INPUT, 0)	/* (AF11) UART0_RXD */
+			AM65X_IOPAD(0x01e8, PIN_OUTPUT, 0)	/* (AE11) UART0_TXD */
+			AM65X_IOPAD(0x01ec, PIN_INPUT, 0)	/* (AG11) UART0_CTSn */
+			AM65X_IOPAD(0x01f0, PIN_OUTPUT, 0)	/* (AD11) UART0_RTSn */
+		>;
+	};
+
+	// main_i2c2_pins_default: main-i2c2-pins-default {
+	// 	pinctrl-single,pins = <
+	// 		AM65X_IOPAD(0x0074, PIN_INPUT, 5) /* (T27) GPMC0_CSn3.I2C2_SCL */
+	// 		AM65X_IOPAD(0x0070, PIN_INPUT, 5) /* (R25) GPMC0_CSn2.I2C2_SDA */
+	// 	>;
+	// };
+
+	emmc_pins_default: emmc-pins-default {
+		pinctrl-single,pins = <
+			AM65X_IOPAD(0x01a8, PIN_INPUT_PULLDOWN, 0) /* (B25) MMC0_CLK */
+			AM65X_IOPAD(0x01ac, PIN_INPUT_PULLUP, 0) /* (B27) MMC0_CMD */
+			AM65X_IOPAD(0x01a4, PIN_INPUT_PULLUP, 0) /* (A26) MMC0_DAT0 */
+			AM65X_IOPAD(0x01a0, PIN_INPUT_PULLUP, 0) /* (E25) MMC0_DAT1 */
+			AM65X_IOPAD(0x019c, PIN_INPUT_PULLUP, 0) /* (C26) MMC0_DAT2 */
+			AM65X_IOPAD(0x0198, PIN_INPUT_PULLUP, 0) /* (A25) MMC0_DAT3 */
+			AM65X_IOPAD(0x0194, PIN_INPUT_PULLUP, 0) /* (E24) MMC0_DAT4 */
+			AM65X_IOPAD(0x0190, PIN_INPUT_PULLUP, 0) /* (A24) MMC0_DAT5 */
+			AM65X_IOPAD(0x018c, PIN_INPUT_PULLUP, 0) /* (B26) MMC0_DAT6 */
+			AM65X_IOPAD(0x0188, PIN_INPUT_PULLUP, 0) /* (D25) MMC0_DAT7 */
+			AM65X_IOPAD(0x01b4, PIN_INPUT_PULLDOWN, 0) /* (A23) MMC0_SDCD */
+			AM65X_IOPAD(0x01b0, PIN_INPUT, 0) /* (C25) MMC0_DS */
+		>;
+	};
+
+	main_mmc1_pins_default: main_mmc1_pins_default {
+		pinctrl-single,pins = <
+			AM65X_IOPAD(0x02d4, PIN_INPUT_PULLDOWN, 0) /* (C27) MMC1_CLK */
+			AM65X_IOPAD(0x02d8, PIN_INPUT_PULLUP, 0) /* (C28) MMC1_CMD */
+			AM65X_IOPAD(0x02d0, PIN_INPUT_PULLUP, 0) /* (D28) MMC1_DAT0 */
+			AM65X_IOPAD(0x02cc, PIN_INPUT_PULLUP, 0) /* (E27) MMC1_DAT1 */
+			AM65X_IOPAD(0x02c8, PIN_INPUT_PULLUP, 0) /* (D26) MMC1_DAT2 */
+			AM65X_IOPAD(0x02c4, PIN_INPUT_PULLUP, 0) /* (D27) MMC1_DAT3 */
+			AM65X_IOPAD(0x02dc, PIN_INPUT_PULLUP, 0) /* (B24) MMC1_SDCD */
+			AM65X_IOPAD(0x02e0, PIN_INPUT, 0) /* (C24) MMC1_SDWP */
+		>;
+	};
+
+	usb1_pins_default: usb1_pins_default {
+		pinctrl-single,pins = <
+			AM65X_IOPAD(0x02c0, PIN_OUTPUT, 0) /* (AC8) USB1_DRVVBUS */
+		>;
+	};
+
+	// icssg2_mdio_pins_default: icssg2_mdio_pins_default {
+	// 	pinctrl-single,pins = <
+	// 		AM65X_IOPAD(0x0094, PIN_INPUT, 2) /* (AC19) PRG2_PRU0_GPO7.PRG2_MDIO0_MDIO */
+	// 		AM65X_IOPAD(0x00c8, PIN_OUTPUT, 2) /* (AE15) PRG2_PRU1_GPO7.PRG2_MDIO0_MDC */
+	// 	>;
+	// };
+
+	// icssg2_rgmii_pins_default: icssg2_rgmii_pins_default {
+	// 	pinctrl-single,pins = <
+	// 		AM65X_IOPAD(0x00ac, PIN_INPUT, 2) /* (AH15) PRG2_PRU1_GPO0.PRG2_RGMII2_RD0 */
+	// 		AM65X_IOPAD(0x00b0, PIN_INPUT, 2) /* (AC16) PRG2_PRU1_GPO1.PRG2_RGMII2_RD1 */
+	// 		AM65X_IOPAD(0x00b4, PIN_INPUT, 2) /* (AD17) PRG2_PRU1_GPO2.PRG2_RGMII2_RD2 */
+	// 		AM65X_IOPAD(0x00b8, PIN_INPUT, 2) /* (AH14) PRG2_PRU1_GPO3.PRG2_RGMII2_RD3 */
+	// 		AM65X_IOPAD(0x00cc, PIN_OUTPUT, 2) /* (AD15) PRG2_PRU1_GPO8.PRG2_RGMII2_TD0 */
+	// 		AM65X_IOPAD(0x00d0, PIN_OUTPUT, 2) /* (AF14) PRG2_PRU1_GPO9.PRG2_RGMII2_TD1 */
+	// 		AM65X_IOPAD(0x00d4, PIN_OUTPUT, 2) /* (AC15) PRG2_PRU1_GPO10.PRG2_RGMII2_TD2 */
+	// 		AM65X_IOPAD(0x00d8, PIN_OUTPUT, 2) /* (AD14) PRG2_PRU1_GPO11.PRG2_RGMII2_TD3 */
+	// 		AM65X_IOPAD(0x00dc, PIN_INPUT, 2) /* (AE14) PRG2_PRU1_GPO16.PRG2_RGMII2_TXC */
+	// 		AM65X_IOPAD(0x00c4, PIN_OUTPUT, 2) /* (AC17) PRG2_PRU1_GPO6.PRG2_RGMII2_TX_CTL */
+	// 		AM65X_IOPAD(0x00c0, PIN_INPUT, 2) /* (AG15) PRG2_PRU1_GPO5.PRG2_RGMII2_RXC */
+	// 		AM65X_IOPAD(0x00bc, PIN_INPUT, 2) /* (AG14) PRG2_PRU1_GPO4.PRG2_RGMII2_RX_CTL */
+
+	// 		AM65X_IOPAD(0x0078, PIN_INPUT, 2) /* (AF18) PRG2_PRU0_GPO0.PRG2_RGMII1_RD0 */
+	// 		AM65X_IOPAD(0x007c, PIN_INPUT, 2) /* (AE18) PRG2_PRU0_GPO1.PRG2_RGMII1_RD1 */
+	// 		AM65X_IOPAD(0x0080, PIN_INPUT, 2) /* (AH17) PRG2_PRU0_GPO2.PRG2_RGMII1_RD2 */
+	// 		AM65X_IOPAD(0x0084, PIN_INPUT, 2) /* (AG18) PRG2_PRU0_GPO3.PRG2_RGMII1_RD3 */
+	// 		AM65X_IOPAD(0x0098, PIN_OUTPUT, 2) /* (AH16) PRG2_PRU0_GPO8.PRG2_RGMII1_TD0 */
+	// 		AM65X_IOPAD(0x009c, PIN_OUTPUT, 2) /* (AG16) PRG2_PRU0_GPO9.PRG2_RGMII1_TD1 */
+	// 		AM65X_IOPAD(0x00a0, PIN_OUTPUT, 2) /* (AF16) PRG2_PRU0_GPO10.PRG2_RGMII1_TD2 */
+	// 		AM65X_IOPAD(0x00a4, PIN_OUTPUT, 2) /* (AE16) PRG2_PRU0_GPO11.PRG2_RGMII1_TD3 */
+	// 		AM65X_IOPAD(0x00a8, PIN_INPUT, 2) /* (AD16) PRG2_PRU0_GPO16.PRG2_RGMII1_TXC */
+	// 		AM65X_IOPAD(0x0090, PIN_OUTPUT, 2) /* (AE17) PRG2_PRU0_GPO6.PRG2_RGMII1_TX_CTL */
+	// 		AM65X_IOPAD(0x008c, PIN_INPUT, 2) /* (AF17) PRG2_PRU0_GPO5.PRG2_RGMII1_RXC */
+	// 		AM65X_IOPAD(0x0088, PIN_INPUT, 2) /* (AG17) PRG2_PRU0_GPO4.PRG2_RGMII1_RX_CTL */
+	// 	>;
+	// };
+};
+
+&main_pmx1 {
+	// main_i2c0_pins_default: main-i2c0-pins-default {
+	// 	pinctrl-single,pins = <
+	// 		AM65X_IOPAD(0x0000, PIN_INPUT, 0) /* (D20) I2C0_SCL */
+	// 		AM65X_IOPAD(0x0004, PIN_INPUT, 0) /* (C21) I2C0_SDA */
+	// 	>;
+	// };
+
+	// main_i2c1_pins_default: main-i2c1-pins-default {
+	// 	pinctrl-single,pins = <
+	// 		AM65X_IOPAD(0x0008, PIN_INPUT, 0) /* (B21) I2C1_SCL */
+	// 		AM65X_IOPAD(0x000c, PIN_INPUT, 0) /* (E21) I2C1_SDA */
+	// 	>;
+	// };
+
+	ecap0_pins_default: ecap0-pins-default {
+		pinctrl-single,pins = <
+			AM65X_IOPAD(0x0010, PIN_INPUT, 0) /* (D21) ECAP0_IN_APWM_OUT */
+		>;
+	};
+};
+
+&wkup_uart0 {
+	/* Wakeup UART is used by System firmware */
+	status = "disabled";
+};
+
+&main_uart0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&main_uart0_pins_default>;
+	power-domains = <&k3_pds 146 TI_SCI_PD_SHARED>;
+};
+
+&wkup_i2c0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&wkup_i2c0_pins_default>;
+	clock-frequency = <400000>;
+
+
+	pcf85063: rtc@51 {
+		compatible = "nxp,pcf85063";
+		reg = <0x51>;
+	};
+
+	// pca9554: gpio@39 {
+	// 	compatible = "nxp,pca9554";
+	// 	reg = <0x39>;
+	// 	gpio-controller;
+	// 	#gpio-cells = <2>;
+	// 	pinctrl-names = "default";
+	// 	pinctrl-0 = <&wkup_pca554_default>;
+	// 	interrupt-parent = <&wkup_gpio0>;
+	// 	interrupts = <25 IRQ_TYPE_EDGE_FALLING>;
+	// 	interrupt-controller;
+	// 	#interrupt-cells = <2>;
+	// };
+};
+
+&mcu_i2c0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&mcu_i2c_pins_default>;
+	clock-frequency = <400000>;
+
+	pca9555: gpio@20 {
+		compatible = "nxp,pca9555";
+		reg = <0x20>;
+		gpio-controller;
+		#gpio-cells = <2>;
+	};
+
+	d25_gpio_expander: gpio@21 {
+		compatible = "nxp,pca9555";
+		reg = <0x21>;
+		gpio-controller;
+		#gpio-cells = <2>;
+	};
+};
+
+&pca9555 {
+	p9 {
+		/* P9 - MCU_RGMII0_RST# */
+		gpio-hog;
+		gpios = <0x09 GPIO_ACTIVE_HIGH>;
+		output-high;
+		line-name = "MCU_RGMII0_RST#";
+	};
+};
+
+&d25_gpio_expander {
+	p6 {
+		/* P6 - USB_HUB_RST# */
+		gpio-hog;
+		gpios = <0x06 GPIO_ACTIVE_LOW>;
+		output-low;
+		line-name = "USB_HUB_RST#";
+	};
+};
+
+// &main_i2c1 {
+// 	pinctrl-names = "default";
+// 	pinctrl-0 = <&main_i2c1_pins_default>;
+// 	clock-frequency = <400000>;
+
+// 	ov5640@3c {
+// 		compatible = "ovti,ov5640";
+// 		reg = <0x3c>;
+
+// 		clocks = <&clk_ov5640_fixed>;
+// 		clock-names = "xclk";
+
+// 		port {
+// 			csi2_cam0: endpoint {
+// 				remote-endpoint = <&csi2_phy0>;
+// 				clock-lanes = <0>;
+// 				data-lanes = <1 2>;
+// 			};
+// 		};
+// 	};
+
+// };
+
+// &main_i2c2 {
+// 	pinctrl-names = "default";
+// 	pinctrl-0 = <&main_i2c2_pins_default>;
+// 	clock-frequency = <400000>;
+// };
+
+&ecap0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&ecap0_pins_default>;
+};
+
+&main_spi0 {
+	status = "disabled";
+};
+
+&sdhci0 {
+	broken-cd;
+	pinctrl-names = "default";
+	pinctrl-0 = <&emmc_pins_default>;
+	bus-width = <8>;
+	non-removable;
+	ti,driver-strength-ohm = <50>;
+	disable-wp;
+    status = "okay";
+};
+
+&sdhci1 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&main_mmc1_pins_default>;
+	sdhci-caps-mask = <0x7 0x0>;
+	ti,driver-strength-ohm = <50>;
+	disable-wp;
+};
+
+&m_can0 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&mcu_mcan0_pins_default>;
+	can-transceiver {
+		max-bitrate = <5000000>;
+	};
+};
+
+&m_can1 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&mcu_mcan1_pins_default>;
+	can-transceiver {
+		max-bitrate = <5000000>;
+	};
+};
+
+&dwc3_1 {
+	status = "okay";
+};
+
+&usb1_phy {
+	status = "okay";
+};
+
+&usb1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&usb1_pins_default>;
+	dr_mode = "host";
+	status = "okay";
+};
+
+&dwc3_0 {
+	status = "disabled";
+};
+
+&usb0_phy {
+	status = "disabled";
+};
+
+&tscadc0 {
+	adc {
+		ti,adc-channels = <0 1 2 3 4 5 6 7>;
+	};
+};
+
+&tscadc1 {
+	adc {
+		ti,adc-channels = <0 1 2 3 4 5 6 7>;
+	};
+};
+
+&serdes0 {
+	status = "disabled";
+};
+
+&serdes1 {
+	status = "disabled";
+};
+
+&pcie0_rc {
+	status = "disabled";
+};
+
+&pcie0_ep {
+	status = "disabled";
+};
+
+&pcie1_rc {
+	status = "disabled";
+};
+
+&pcie1_ep {
+	status = "disabled";
+};
+
+&mailbox0_cluster0 {
+	interrupts = <436>;
+
+	mbox_mcu_r5fss0_core0: mbox-mcu-r5fss0-core0 {
+		ti,mbox-tx = <1 0 0>;
+		ti,mbox-rx = <0 0 0>;
+	};
+};
+
+&mailbox0_cluster1 {
+	interrupts = <432>;
+
+	mbox_mcu_r5fss0_core1: mbox-mcu-r5fss0-core1 {
+		ti,mbox-tx = <1 0 0>;
+		ti,mbox-rx = <0 0 0>;
+	};
+};
+
+&mailbox0_cluster2 {
+	status = "disabled";
+};
+
+&mailbox0_cluster3 {
+	status = "disabled";
+};
+
+&mailbox0_cluster4 {
+	status = "disabled";
+};
+
+&mailbox0_cluster5 {
+	status = "disabled";
+};
+
+&mailbox0_cluster6 {
+	status = "disabled";
+};
+
+&mailbox0_cluster7 {
+	status = "disabled";
+};
+
+&mailbox0_cluster8 {
+	status = "disabled";
+};
+
+&mailbox0_cluster9 {
+	status = "disabled";
+};
+
+&mailbox0_cluster10 {
+	status = "disabled";
+};
+
+&mailbox0_cluster11 {
+	status = "disabled";
+};
+
+&mcu_r5fss0_core0 {
+	memory-region = <&mcu_r5fss0_core0_dma_memory_region>,
+			<&mcu_r5fss0_core0_memory_region>;
+	mboxes = <&mailbox0_cluster0 &mbox_mcu_r5fss0_core0>;
+};
+
+&mcu_r5fss0_core1 {
+	memory-region = <&mcu_r5fss0_core1_dma_memory_region>,
+			<&mcu_r5fss0_core1_memory_region>;
+	mboxes = <&mailbox0_cluster1 &mbox_mcu_r5fss0_core1>;
+};
+
+// &csi2_0 {
+// 	csi2_phy0: endpoint {
+// 		remote-endpoint = <&csi2_cam0>;
+// 		clock-lanes = <0>;
+// 		data-lanes = <1 2>;
+// 	};
+// };
+
+
+&mcu_cpsw {
+	pinctrl-names = "default";
+	pinctrl-0 = <&mcu_cpsw_pins_default &mcu_mdio_pins_default>;
+
+	cpts {
+		ti,pps = <3 1>;
+	};
+};
+
+&davinci_mdio {
+	phy0: ethernet-phy@0 {
+		reg = <1>;
+		/* TODO: phy reset: TCA9555RTWR(i2c:0x21)[p04].GPIO_MCU_RGMII_RSTN */
+		ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
+		ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
+		ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
+	};
+};
+
+&cpsw_port1 {
+	phy-mode = "rgmii-rxid";
+	phy-handle = <&phy0>;
+};
+
+#define TS_OFFSET(pa, val)     (0x4+(pa)*4) (0x80000000 | val)
+
+&timesync_router {
+	pinctrl-names = "default";
+	pinctrl-0 = <&mcu_cpts>;
+
+	/* Example of the timesync routing */
+	mcu_cpts: mcu_cpts {
+		pinctrl-single,pins = <
+			/* pps [cpts genf1] in13 -> out25 [cpts hw4_push] */
+			TS_OFFSET(25, 13)
+		>;
+	};
+};
+
+&ospi0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&nor_flash_pins_default>;
+
+	flash@0{
+		compatible = "jedec,spi-nor";
+		reg = <0x0>;
+		spi-tx-bus-width = <8>;
+		spi-rx-bus-width = <8>;
+		spi-max-frequency = <40000000>;
+		cdns,tshsl-ns = <60>;
+		cdns,tsd2d-ns = <60>;
+		cdns,tchsh-ns = <60>;
+		cdns,tslch-ns = <60>;
+		cdns,read-delay = <2>;
+		cdns,phy-mode;
+		#address-cells = <1>;
+		#size-cells = <1>;
+	};
+};
+
+// &icssg2_mdio {
+// 	status = "okay";
+// 	pinctrl-names = "default";
+// 	pinctrl-0 = <&icssg2_mdio_pins_default>;
+
+// 	pruss2_eth0_phy: ethernet-phy@0 {
+// 		reg = <0>;
+// 		ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
+// 		ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
+// 	};
+
+// 	pruss2_eth1_phy: ethernet-phy@3 {
+// 		reg = <3>;
+// 		ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
+// 		ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
+// 	};
+// };
