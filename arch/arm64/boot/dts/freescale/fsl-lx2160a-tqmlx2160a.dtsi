@@ -92,10 +92,38 @@
 &i2c0 {
 	status = "okay";
 
+	sensor0: se97@1f {
+		compatible = "nxp,se97", "jedec,jc-42.4-temp";
+		reg = <0x1F>;
+		status = "okay";
+	};
+
+	gpioex4: gpio@20 {
+		compatible = "nxp,pca9555";
+		reg = <0x20>;
+		#gpio-cells = <2>;
+		gpio-controller;
+	};
+
+	eeprom1: se97@57 {
+		compatible = "nxp,spd";
+		reg = <0x57>;
+		pagesize = <16>;
+		status = "okay";
+	};
+
 	rtc: pcf85063@51 {
 		compatible = "nxp,pcf85063";
 		quartz-load-femtofarads = <12500>;
 		reg = <0x51>;
+		status = "okay";
+	};
+
+	/* regular EEPROM */
+	eeprom2: 24c256@57 {
+		compatible = "at,24c256";
+		pagesize = <32>;
+		reg = <0x57>;
 		status = "okay";
 	};
 };
