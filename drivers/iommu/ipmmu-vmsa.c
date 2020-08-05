@@ -760,6 +760,7 @@ static int ipmmu_init_platform_device(struct device *dev,
 static const struct soc_device_attribute soc_rcar_gen3[] = {
 	{ .soc_id = "r8a774e1", },
 	{ .soc_id = "r8a774a1", },
+	{ .soc_id = "r8a774a3", },
 	{ .soc_id = "r8a774b1", },
 	{ .soc_id = "r8a774c0", },
 	{ .soc_id = "r8a7795", },
@@ -973,6 +974,9 @@ static const struct of_device_id ipmmu_of_ids[] = {
 		.data = &ipmmu_features_rcar_gen3,
 	}, {
 		.compatible = "renesas,ipmmu-r8a774a1",
+		.data = &ipmmu_features_rcar_gen3,
+	}, {
+		.compatible = "renesas,ipmmu-r8a774a3",
 		.data = &ipmmu_features_rcar_gen3,
 	}, {
 		.compatible = "renesas,ipmmu-r8a774b1",
