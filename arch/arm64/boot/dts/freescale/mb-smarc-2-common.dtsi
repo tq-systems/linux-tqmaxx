@@ -10,13 +10,7 @@
 	};
 
 	reg_sdvmmc: regulator-sdvmmc {
-		compatible = "regulator-fixed";
-		regulator-name = "SD1_VMMC";
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
-		gpio = <&lsio_gpio4 19 GPIO_ACTIVE_LOW>;
-		regulator-always-on;
-		regulator-boot-on;
+		status = "okay";
 	};
 
 	reg_1v5_vstby: regulator-1v5_vstby {
@@ -60,12 +54,36 @@
 	};
 };
 
+&ethphy0 {
+	/* LED1: Link, LED2: activity */
+	ti,led-function = <0xc100>;
+	/* active high, LED1/2 driven by phy */
+	ti,led-ctrl = <0x1441>;
+};
+
+&ethphy3 {
+	/* LED1: Link, LED2: activity */
+	ti,led-function = <0xc100>;
+	/* active high, LED1/2 driven by phy */
+	ti,led-ctrl = <0x1441>;
+};
+
+&fec1 {
+	status = "okay";
+};
+
+&fec2 {
+	status = "okay";
+};
+
 &flexcan2 {
 	xceiver-supply = <&reg_3v3>;
+	status = "okay";
 };
 
 &flexcan3 {
 	xceiver-supply = <&reg_3v3>;
+	status = "okay";
 };
 
 &i2c0 {
@@ -81,14 +99,10 @@
 };
 
 &usdhc2 {
-	pinctrl-names = "default", "state_100mhz", "state_200mhz";
-	pinctrl-0 = <&pinctrl_usdhc2>, <&pinctrl_usdhc2_gpio>;
-	pinctrl-1 = <&pinctrl_usdhc2_100mhz>, <&pinctrl_usdhc2_gpio>;
-	pinctrl-2 = <&pinctrl_usdhc2_200mhz>, <&pinctrl_usdhc2_gpio>;
-	bus-width = <4>;
 	cd-gpios = <&lsio_gpio4 22 GPIO_ACTIVE_LOW>;
 	wp-gpios = <&lsio_gpio4 21 GPIO_ACTIVE_HIGH>;
-	vmmc-supply = <&reg_vmmc>;
-	no-1-8-v;
+	vmmc-supply = <&reg_sdvmmc>;
+	no-mmc;
+	no-sdio;
 	status = "okay";
 };
