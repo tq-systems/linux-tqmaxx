@@ -112,6 +112,14 @@
 	status = "okay";
 };
 
+&usbotg1 {
+	status = "okay";
+};
+
+&usbotg3 {
+	status = "okay";
+};
+
 &usdhc2 {
 	cd-gpios = <&lsio_gpio4 22 GPIO_ACTIVE_LOW>;
 	wp-gpios = <&lsio_gpio4 21 GPIO_ACTIVE_HIGH>;
