@@ -2,6 +2,7 @@
 
 #include "fsl-lx2160a-tqmlx2160a.dtsi"
 #include <dt-bindings/net/ti-dp83867.h>
+#include <dt-bindings/input/input.h>
 
 / {
 	model = "TQ Systems GmbH MBLX2160A Starterkit";
@@ -34,6 +35,24 @@
 		};
 	};
 
+	gpio-keys-polled {
+		compatible = "gpio-keys-polled";
+		gpio-keys,name = "gpio-keys";
+		poll-interval = <100>;
+		autorepeat;
+
+		button0: button0 {
+			label = "button:user1";
+			gpios = <&gpio2 9 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_F1>;
+		};
+
+		button1: button1 {
+			label = "button:user2";
+			gpios = <&gpio2 10 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_F2>;
+		};
+	};
 };
 
 &dpmac13 {
