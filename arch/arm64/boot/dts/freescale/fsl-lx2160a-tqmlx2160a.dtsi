@@ -125,7 +125,7 @@
 	eeprom2: 24c256@57 {
 		compatible = "at,24c256";
 		pagesize = <32>;
-		reg = <0x57>;
+		reg = <0x50>;
 		status = "okay";
 	};
 };
