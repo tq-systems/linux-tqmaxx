@@ -92,6 +92,8 @@
 &i2c0 {
 	status = "okay";
 
+	scl-gpios = <&gpio2 11 GPIO_ACTIVE_HIGH>;
+
 	sensor0: se97@1f {
 		compatible = "nxp,se97", "jedec,jc-42.4-temp";
 		reg = <0x1F>;
