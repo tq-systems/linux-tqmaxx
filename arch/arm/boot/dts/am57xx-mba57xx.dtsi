@@ -390,17 +390,15 @@
 };
 
 &cpsw_emac0 {
-	phy_id = <&davinci_mdio>, <2>;
-	phy-mode = "rgmii-id";
+	phy-handle = <&dp83867_0>;
+	phy-connection-type = "rgmii-id";
 	dual_emac_res_vlan = <1>;
-	reset-gpio = <&expander2 10 GPIO_ACTIVE_LOW>;
 };
 
 &cpsw_emac1 {
-	phy_id = <&davinci_mdio>, <3>;
-	phy-mode = "rgmii-id";
+	phy-handle = <&dp83867_1>;
+	phy-connection-type = "rgmii-id";
 	dual_emac_res_vlan = <2>;
-	reset-gpio = <&expander2 11 GPIO_ACTIVE_LOW>;
 };
 
 &davinci_mdio {
@@ -410,6 +408,7 @@
 		ti,tx-internal-delay = <DP83867_RGMIIDCTL_250_PS>;
 		ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_8_B_NIB>;
 		ti,min-output-impedance;
+		reset-gpio = <&expander2 10 GPIO_ACTIVE_LOW>;
 	};
 
 	dp83867_1: ethernet-phy@3 {
@@ -418,6 +417,7 @@
 		ti,tx-internal-delay = <DP83867_RGMIIDCTL_250_PS>;
 		ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_8_B_NIB>;
 		ti,min-output-impedance;
+		reset-gpio = <&expander2 11 GPIO_ACTIVE_LOW>;
 	};
 };
 
