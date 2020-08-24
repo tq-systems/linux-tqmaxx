@@ -1,11 +1,10 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
- * Copyright (C) 2020 TQ-Systems GmbH
+ * Device Tree file for TQ AM57xx TQMa57xx SoM.
+ *
+ * Copyright 2020 TQ-Systems GmbH
  *
  * Author: Michael Krummsdorf <michael.krummsdorf@tq-group.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
  */
 
 #include "am57xx-industrial-grade.dtsi"
