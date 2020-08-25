@@ -108,7 +108,7 @@
 	};
 
 	eeprom1: se97@57 {
-		compatible = "nxp,spd";
+		compatible = "atmel,24c02";
 		reg = <0x57>;
 		pagesize = <16>;
 		status = "okay";
@@ -122,9 +122,8 @@
 	};
 
 	/* regular EEPROM */
-	eeprom2: 24c256@57 {
-		compatible = "at,24c256";
-		pagesize = <32>;
+	eeprom2: 24c256@50 {
+		compatible = "atmel,24c64";
 		reg = <0x50>;
 		status = "okay";
 	};
