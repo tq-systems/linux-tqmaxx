@@ -14,7 +14,7 @@
 
 / {
 	model = "TQ TQMa5748 MBa57xx (TI)";
-	compatible = "tq,mba57xx", "tq,tqma5748", "ti,am5748",
+	compatible = "tq,am5748-mba57xx", "tq,tqma5748", "ti,am5748",
 		     "ti,dra762", "ti,dra7";
 
 };
