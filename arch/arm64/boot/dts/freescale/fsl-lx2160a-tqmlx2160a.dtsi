@@ -29,6 +29,8 @@
 		#size-cells = <1>;
 		compatible = "jedec,spi-nor";
 		spi-max-frequency = <10000000>;
+		spi-rx-bus-width = <8>;
+		spi-tx-bus-width = <8>;
 		reg = <0>;
 
 		partitions {
@@ -86,6 +88,16 @@
 				reg = <0x3000000 0x5000000>;
 			};
 		};
+	};
+
+	flash1: mx66um1g45g@1 {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "jedec,spi-nor";
+		spi-max-frequency = <10000000>;
+		spi-rx-bus-width = <8>;
+		spi-tx-bus-width = <8>;
+		reg = <1>;
 	};
 };
 
