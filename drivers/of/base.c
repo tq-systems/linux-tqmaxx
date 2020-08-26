@@ -748,6 +748,8 @@ struct device_node *of_get_next_cpu_node(struct device_node *prev)
 		of_node_put(node);
 	}
 	for (; next; next = next->sibling) {
+		if (!__of_device_is_available(next))
+			continue;
 		if (!(of_node_name_eq(next, "cpu") ||
 		      __of_node_is_type(next, "cpu")))
 			continue;
