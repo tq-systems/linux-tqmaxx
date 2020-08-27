@@ -12,10 +12,6 @@
 		display1 = &lcd;
 	};
 
-	chosen {
-		bootargs = "omapdrm.display=1,0";
-	};
-
 	fixedregulator-vcc_5v_display {
 		gpio = <&expander1 13 GPIO_ACTIVE_LOW>;
 	};
@@ -73,5 +69,16 @@
 				data-lines = <18>;
 			};
 		};
+	};
+};
+
+&i2c4 {
+	polytouch: edt-ft5x04@38 {
+		compatible = "edt,edt-ft5406", "edt,edt-ft5x06";
+		reg = <0x38>;
+		/* Touch IRQ manually connected to GPIO_EXP_IO7 */
+		interrupt-parent = <&expander2>;
+		interrupts = <7 IRQ_TYPE_EDGE_FALLING>;
+		status = "okay";
 	};
 };
