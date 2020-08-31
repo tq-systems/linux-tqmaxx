@@ -8,5 +8,5 @@
  */
 
 #include "am572x-mba57xx.dts"
-#include "am57xx-mba57xx-dmb-ct44.dtsi"
+#include "am57xx-mba57xx-cdtech-dc44.dtsi"
 

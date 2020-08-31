@@ -8,5 +8,5 @@
  */
 
 #include "am572x-mba57xx.dts"
-#include "am57xx-mba57xx-glyn-etm0700g0dh6.dtsi"
+#include "am57xx-mba57xx-edt-etm0700g0edh6.dtsi"
 

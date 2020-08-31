@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
- * Device Tree file for TQ AM574x baseboard MBa57xx.
+ * Device Tree file for TQ AM572x baseboard MBa57xx.
  *
  * Copyright 2020 TQ-Systems GmbH
  *
  * Author: Michael Krummsdorf <michael.krummsdorf@tq-group.com>
  */
 
-#include "am574x-mba57xx.dts"
-#include "am57xx-mba57xx-dmb-ct44.dtsi"
+#include "am572x-mba57xx.dts"
+#include "am57xx-mba57xx-tianma-tm070jvhg33.dtsi"
 

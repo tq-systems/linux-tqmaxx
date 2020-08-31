@@ -12,13 +12,9 @@
 		display1 = &lcd;
 	};
 
-	fixedregulator-vcc_5v_display {
-		gpio = <&expander1 13 GPIO_ACTIVE_LOW>;
-	};
-
-	/* S070WV106H-CT44 */
+	/* ET0700G0DH6 + ETM0700G0DH6 + ETM0700G0BDH6 + S070WV106H-CT44 */
 	lcd: display {
-		compatible = "dmb,s070swv29hg_dc44", "simple-panel";
+		compatible = "edt,etm0700g0edh6", "simple-panel";
 		bits-per-pixel = <32>; /* 32: RGB888/666 mode */
 		label = "lcd";
 		backlight = <&lcd_bl>;
@@ -38,7 +34,7 @@
 		compatible = "pwm-backlight";
 		pwms = <&ehrpwm1 0 50000 1>;
 		brightness-levels = <0 69 96 123 149 170 202 228 255>;
-		default-brightness-level = <1>;
+		default-brightness-level = <8>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&backlight_pins_default>;
 		power-supply = <&vcc_5v_display>;
@@ -48,7 +44,7 @@
 &dra7_pmx_core {
 	backlight_pins_default: backlight_pins_default {
 		pinctrl-single,pins = <
-			DRA7XX_CORE_IOPAD(0x358C, PIN_OUTPUT | MUX_MODE10) /* vin2a_d9.ehrpwm2A */
+			DRA7XX_CORE_IOPAD(0x358C, PIN_INPUT_PULLDOWN | MUX_MODE10) /* vin2a_d9.ehrpwm2A */
 		>;
 	};
 };
