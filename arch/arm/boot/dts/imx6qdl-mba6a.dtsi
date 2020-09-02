@@ -9,8 +9,6 @@
 &fec {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_enet>, <&pinctrl_enet_fix>;
-	interrupts-extended = <&gpio1 6 IRQ_TYPE_LEVEL_HIGH>,
-			      <&intc 0 119 IRQ_TYPE_LEVEL_HIGH>;
 };
 
 &i2c1 {
@@ -28,14 +26,5 @@
 	rtc1: rtc@68 {
 		compatible = "dallas,ds1339";
 		reg = <0x68>;
-	};
-};
-
-&iomuxc {
-	pinctrl_enet_fix: enetfixgrp {
-		fsl,pins = <
-			/* ENET ping patch */
-			MX6QDL_PAD_GPIO_6__ENET_IRQ 0x000b1
-		>;
 	};
 };
