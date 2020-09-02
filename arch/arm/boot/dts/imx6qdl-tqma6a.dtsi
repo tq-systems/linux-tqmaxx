@@ -6,6 +6,12 @@
  * Author: Markus Niebel <Markus.Niebel@tq-group.com>
  */
 
+&fec {
+	interrupts-extended = <&gpio1 6 IRQ_TYPE_LEVEL_HIGH>,
+			      <&intc 0 119 IRQ_TYPE_LEVEL_HIGH>;
+	fsl,err006687-workaround-present;
+};
+
 &i2c1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_i2c1_tqma6>;
@@ -26,5 +32,14 @@
 		compatible = "st,24c64", "atmel,24c64";
 		reg = <0x50>;
 		pagesize = <32>;
+	};
+};
+
+&iomuxc {
+	pinctrl_enet_fix: enetfixgrp {
+		fsl,pins = <
+			/* ENET ping patch */
+			MX6QDL_PAD_GPIO_6__ENET_IRQ 0x000b1
+		>;
 	};
 };
