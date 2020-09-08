@@ -1,0 +1,13 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright 2018-2021 TQ-Systems GmbH
+ */
+
+/dts-v1/;
+
+#include "imx8qxp-tqma8xqp.dtsi"
+#include "imx8qxp-mba8xx.dtsi"
+
+&usdhc2 {
+        /delete-property/ no-1-8-v;
+};
