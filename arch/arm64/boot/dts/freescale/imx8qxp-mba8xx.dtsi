@@ -124,6 +124,13 @@
 		enable-active-high;
 		status = "okay";
 	};
+
+	sound {
+		compatible = "fsl,imx-audio-tlv320aic32x4";
+		model = "tqm-tlv320aic32";
+		ssi-controller = <&sai1>;
+		audio-codec = <&codec>;
+	};
 };
 
 &fec1 {
@@ -208,6 +215,18 @@
 };
 
 &i2c1 {
+	codec: tlv320aic3x04@18 {
+		compatible = "ti,tlv320aic32x4";
+		reg = <0x18>;
+
+		clocks = <&mclkout0_lpcg 0>;
+		clock-names = "mclk";
+
+		iov-supply = <&reg_1v8>;
+		ldoin-supply = <&reg_3v3>;
+		status = "okay";
+	};
+
 	/* NXP SE97BTP with temperature sensor + eeprom */
 	se97b_1c: temperature-sensor-eeprom@1c {
 		compatible = "nxp,se97", "jedec,jc-42.4-temp";
@@ -361,6 +380,16 @@
 	pinctrl_reg_usbotg1_vbus: regusbotg1vbusgrp {
 		fsl,pins = <
 			IMX8QXP_USB_SS3_TC0_LSIO_GPIO4_IO03		0x00000021
+		>;
+	};
+
+	pinctrl_sai1: sai1grp {
+		fsl,pins = <
+			IMX8QXP_MCLK_OUT0_ADMA_ACM_MCLK_OUT0		0x06000040
+			IMX8QXP_FLEXCAN0_RX_ADMA_SAI1_TXC		0x06000040
+			IMX8QXP_FLEXCAN0_TX_ADMA_SAI1_TXFS		0x06000040
+			IMX8QXP_FLEXCAN1_RX_ADMA_SAI1_TXD		0x06000040
+			IMX8QXP_FLEXCAN1_TX_ADMA_SAI1_RXD		0x06000040
 		>;
 	};
 
@@ -529,6 +558,17 @@
 	ext_osc = <1>;
 	epdev_on-supply = <&reg_pcie_3v3>;
 	vpcie-supply = <&reg_pcie_1v5>;
+	status = "okay";
+};
+
+&sai1 {
+	assigned-clocks = <&clk IMX_SC_R_AUDIO_PLL_0 IMX_SC_PM_CLK_PLL>,
+			<&clk IMX_SC_R_AUDIO_PLL_0 IMX_SC_PM_CLK_SLV_BUS>,
+			<&clk IMX_SC_R_AUDIO_PLL_0 IMX_SC_PM_CLK_MST_BUS>,
+			<&sai1_lpcg 0>;
+	assigned-clock-rates = <786432000>, <49152000>, <12288000>, <49152000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_sai1>;
 	status = "okay";
 };
 
