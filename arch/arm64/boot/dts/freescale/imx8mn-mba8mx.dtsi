@@ -134,7 +134,7 @@
 
 	sound {
 		compatible = "fsl,imx-audio-tlv320aic32x4";
-		model = "mba8mx-tlv320aic32";
+		model = "tqm-tlv320aic32";
 		ssi-controller = <&sai3>;
 		audio-codec = <&codec>;
 	};
