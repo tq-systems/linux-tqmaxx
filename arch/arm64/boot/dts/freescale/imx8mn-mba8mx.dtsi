@@ -9,6 +9,11 @@
 	model = "TQ Systems GmbH i.MX8MN TQMa8MxNL on MBa8Mx";
 	compatible = "tq,imx8mn-mba8mx", "tq,imx8mn-tqma8mnx", "fsl,imx8mn";
 
+	aliases {
+		rtc1 = &snvs_rtc;
+		rtc0 = &pcf85063;
+	};
+
 	backlight_lvds0: backlight0 {
 		compatible = "pwm-backlight";
 		pwms = <&pwm3 0 5000000>;
