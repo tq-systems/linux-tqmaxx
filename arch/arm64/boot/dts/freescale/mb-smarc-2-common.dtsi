@@ -108,6 +108,22 @@
 	};
 };
 
+&lpspi1 {
+	spidev0_0: spidev0@0 {
+		reg = <0>;
+		compatible = "tq,testdev";
+		spi-max-frequency = <5000000>;
+		status = "okay";
+	};
+
+	spidev0_1: spidev0@1 {
+		reg = <1>;
+		compatible = "tq,testdev";
+		spi-max-frequency = <5000000>;
+		status = "okay";
+	};
+};
+
 &lpuart0 {
 	status = "okay";
 };
