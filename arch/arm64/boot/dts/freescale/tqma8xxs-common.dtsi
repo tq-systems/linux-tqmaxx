@@ -142,6 +142,9 @@
 };
 
 &iomuxc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_hog>;
+
 	pinctrl_fec1: fec1grp {
 		fsl,pins = <
 			IMX8QXP_COMP_CTL_GPIO_1V8_3V3_ENET_ENETB0_PAD		0x000014a0
@@ -216,6 +219,13 @@
 			IMX8QXP_QSPI0B_DATA3_LSIO_QSPI0B_DATA3	0x0000004c
 			IMX8QXP_QSPI0B_SS0_B_LSIO_QSPI0B_SS0_B	0x0000004c
 			IMX8QXP_QSPI0B_SS1_B_LSIO_QSPI0B_SS1_B	0x0000004c
+		>;
+	};
+
+	pinctrl_hog: tqma8xxshoggrp {
+		fsl,pins = <
+			/* AUDIO MCLK*/
+			IMX8QXP_MCLK_OUT0_ADMA_ACM_MCLK_OUT0		0x06000040
 		>;
 	};
 
@@ -305,6 +315,15 @@
 		>;
 	};
 
+	pinctrl_sai1: sai1grp {
+		fsl,pins = <
+			IMX8QXP_SAI1_RXC_ADMA_SAI1_TXC			0x06000040
+			IMX8QXP_SAI1_RXFS_ADMA_SAI1_TXFS		0x06000040
+			IMX8QXP_FLEXCAN1_RX_ADMA_SAI1_TXD		0x06000040
+			IMX8QXP_FLEXCAN1_TX_ADMA_SAI1_RXD		0x06000040
+		>;
+	};
+
 	pinctrl_usbotg1: usbotg1grp {
 		fsl,pins = <
 			IMX8QXP_USB_SS3_TC2_CONN_USB_OTG1_OC		0x00000021
@@ -390,6 +409,17 @@
 	pinctrl-0 = <&pinctrl_pcieb>;
 	reset-gpio = <&lsio_gpio4 0 GPIO_ACTIVE_LOW>;
 	ext_osc = <1>;
+};
+
+&sai1 {
+	assigned-clocks = <&clk IMX_SC_R_AUDIO_PLL_0 IMX_SC_PM_CLK_PLL>,
+			<&clk IMX_SC_R_AUDIO_PLL_0 IMX_SC_PM_CLK_SLV_BUS>,
+			<&clk IMX_SC_R_AUDIO_PLL_0 IMX_SC_PM_CLK_MST_BUS>,
+			<&sai1_lpcg 0>;
+	assigned-clock-rates = <786432000>, <49152000>, <12288000>, <49152000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_sai1>;
+	status = "okay";
 };
 
 &usbphy1 {

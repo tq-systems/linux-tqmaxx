@@ -66,6 +66,13 @@
 		regulator-max-microvolt = <3300000>;
 		regulator-always-on;
 	};
+
+	sound {
+		compatible = "fsl,imx-audio-tlv320aic32x4";
+		model = "tqm-tlv320aic32";
+		ssi-controller = <&sai1>;
+		audio-codec = <&codec>;
+	};
 };
 
 &ethphy0 {
@@ -101,6 +108,18 @@
 };
 
 &i2c0 {
+	codec: tlv320aic3x04@18 {
+		compatible = "ti,tlv320aic32x4";
+		reg = <0x18>;
+		
+		clocks = <&mclkout0_lpcg 0>;
+		clock-names = "mclk";
+
+		iov-supply = <&reg_1v8>;
+		ldoin-supply = <&reg_3v3>;
+		status = "okay";
+	};
+
 	eeprom2: eeprom@57 {
 		compatible = "st,24c32", "atmel,24c32";
 		reg = <0x57>;
