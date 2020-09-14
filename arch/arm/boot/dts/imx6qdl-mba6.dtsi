@@ -66,13 +66,13 @@
 
 		led1 {
 			label = "led1";
-			gpios = <&gpio6 16 GPIO_ACTIVE_LOW>;
+			gpios = <&gpio6 16 GPIO_ACTIVE_HIGH>;
 			linux,default-trigger = "default-on";
 		};
 
 		led2 {
 			label = "led2";
-			gpios = <&gpio6 31 GPIO_ACTIVE_LOW>;
+			gpios = <&gpio6 31 GPIO_ACTIVE_HIGH>;
 			linux,default-trigger = "heartbeat";
 		};
 	};
