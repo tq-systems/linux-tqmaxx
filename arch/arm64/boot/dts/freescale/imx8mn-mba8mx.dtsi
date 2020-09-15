@@ -173,6 +173,7 @@
 	pinctrl-0 = <&pinctrl_fec1>;
 	phy-mode = "rgmii-id";
 	phy-handle = <&ethphy0>;
+	phy-supply = <&reg_vcc_3v3>;
 	fsl,magic-packet;
 	phy-reset-gpios = <&expander2 7 GPIO_ACTIVE_LOW>;
 	phy-reset-duration = <500>;
