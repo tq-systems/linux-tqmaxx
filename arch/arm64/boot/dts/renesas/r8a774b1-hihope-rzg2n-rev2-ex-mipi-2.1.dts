@@ -1,18 +1,18 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Device Tree Source for the HopeRun HiHope RZ/G2N Platform
+ * Device Tree Source for the HopeRun HiHope RZ/G2N Rev.2.0
  * connected with aistarvision-mipi-v2-adapter board
  *
  * Copyright (C) 2020 Renesas Electronics Corp.
  */
 
 /dts-v1/;
-#include "r8a774b1-hihope-rzg2n-ex.dts"
+#include "r8a774b1-hihope-rzg2n-rev2-ex.dts"
 #define MIPI_PARENT_I2C_CSI20 i2c2
 #include "aistarvision-mipi-adapter-2.1.dtsi"
 
 / {
-	model = "HopeRun HiHope RZ/G2N with sub board with aistarvision-mipi-v2-adapter board";
+	model = "HopeRun HiHope RZ/G2N Rev.2.0 with sub board with aistarvision-mipi-v2-adapter board";
 	compatible = "hoperun,hihope-rzg2-ex", "hoperun,hihope-rzg2n",
 		     "renesas,r8a774b1";
 };
