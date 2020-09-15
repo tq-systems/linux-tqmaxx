@@ -156,7 +156,7 @@
 &ecspi1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_ecspi1>;
-	num-cs = <1>;
+	cs-gpios = <&gpio5 9 GPIO_ACTIVE_LOW>;
 	status = "okay";
 
 	spidev1_0: spidev1@0 {
@@ -170,7 +170,7 @@
 &ecspi2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_ecspi2>;
-	num-cs = <1>;
+	cs-gpios = <&gpio5 13 GPIO_ACTIVE_LOW>;
 	status = "okay";
 
 	spidev2_0: spidev2@0 {
@@ -220,7 +220,7 @@
 			MX8MM_IOMUXC_ECSPI1_SCLK_ECSPI1_SCLK	0x00000006
 			MX8MM_IOMUXC_ECSPI1_MOSI_ECSPI1_MOSI	0x00000006
 			MX8MM_IOMUXC_ECSPI1_MISO_ECSPI1_MISO	0x00000006
-			MX8MM_IOMUXC_ECSPI1_SS0_ECSPI1_SS0	0x00000006
+			MX8MM_IOMUXC_ECSPI1_SS0_GPIO5_IO9	0x00000006
 		>;
 	};
 
@@ -229,7 +229,7 @@
 			MX8MM_IOMUXC_ECSPI2_SCLK_ECSPI2_SCLK	0x00000006
 			MX8MM_IOMUXC_ECSPI2_MOSI_ECSPI2_MOSI	0x00000006
 			MX8MM_IOMUXC_ECSPI2_MISO_ECSPI2_MISO	0x00000006
-			MX8MM_IOMUXC_ECSPI2_SS0_ECSPI2_SS0	0x00000006
+			MX8MM_IOMUXC_ECSPI2_SS0_GPIO5_IO13	0x00000006
 		>;
 	};
 
