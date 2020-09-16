@@ -46,6 +46,8 @@
 	enable-gpios = <&gpio5 5 GPIO_ACTIVE_HIGH>;
 	reset-gpios = <&gpio5 3 GPIO_ACTIVE_LOW>;
 
+	virtual-channel = /bits/ 8 <0>;
+
 	port {
 		ov5645_csi40_ep: endpoint {
 			clock-lanes = <0>;
