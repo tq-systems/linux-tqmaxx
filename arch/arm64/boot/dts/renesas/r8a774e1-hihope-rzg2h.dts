@@ -98,10 +98,6 @@
 		"dclkin.0", "dclkin.1", "dclkin.3";
 };
 
-&sdhi3 {
-	/delete-property/ mmc-hs400-1_8v;
-};
-
 &xhci0 {
 	memory-region = <&global_cma>;
 };
