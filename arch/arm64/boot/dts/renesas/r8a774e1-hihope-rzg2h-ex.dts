@@ -22,7 +22,11 @@
 	pcie-en-gpio {
 		gpio-hog;
 		gpios = <3 GPIO_ACTIVE_HIGH>;
-		output-high;
+		input;
 		line-name = "pcie-en-gpio";
 	};
+};
+
+&sata {
+	status = "okay";
 };
