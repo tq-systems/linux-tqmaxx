@@ -74,7 +74,7 @@
 		ranges;
 
 		/* global autoconfigured region for contiguous allocations */
-		linux,cma@58000000 {
+		global_cma: linux,cma@58000000 {
 			compatible = "shared-dma-pool";
 			reusable;
 			reg = <0x00000000 0x58000000 0x0 0x10000000>;
@@ -220,6 +220,7 @@
 
 &ehci0 {
 	dr_mode = "host";
+	memory-region = <&global_cma>;
 	status = "okay";
 };
 
@@ -340,6 +341,7 @@
 
 &ohci0 {
 	dr_mode = "host";
+	memory-region = <&global_cma>;
 	status = "okay";
 };
 
@@ -531,6 +533,7 @@
 &xhci0 {
 	pinctrl-0 = <&usb30_pins>;
 	pinctrl-names = "default";
+	memory-region = <&global_cma>;
 
 	status = "okay";
 };
