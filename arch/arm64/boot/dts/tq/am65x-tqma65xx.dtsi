@@ -122,6 +122,6 @@
 };
 
 /* Now include the peripherals for each bus segments */
-#include "tqma65-main.dtsi"
-#include "tqma65-mcu.dtsi"
-#include "tqma65-wakeup.dtsi"
+#include "am65x-tqma65xx-main.dtsi"
+#include "am65x-tqma65xx-mcu.dtsi"
+#include "am65x-tqma65xx-wakeup.dtsi"

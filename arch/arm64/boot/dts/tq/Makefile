@@ -9,13 +9,6 @@
 
 DTC_FLAGS += -@
 
-dtb-$(CONFIG_ARCH_K3_AM6_SOC) += tqma654-base-board.dtb  \
-				 tqma654-gp.dtbo \
-				 tqma654-evm-hdmi.dtbo \
-				 tqma654-base-board-jailhouse.dtbo \
-				 tqma654-evm-oldi-lcd1evm.dtbo \
-				 tqma654-evm-tc358876.dtbo \
-				 tqma654-idk.dtbo \
-				 tqma654-pcie-usb3.dtbo \
-				 tqma654-pcie-usb2.dtbo \
-				 tqma654-evm-prupwm.dtbo
+dtb-$(CONFIG_ARCH_K3_AM6_SOC) += am654-mba65xx.dtb  \
+				 am654-mba65xx-jailhouse.dtbo \
+				 am654-mba65xx-interfaces.dtbo

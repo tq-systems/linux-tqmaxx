@@ -6,7 +6,7 @@
  * Copyright (C) 2020 TQ Systems
  */
 
-#include "tqma65.dtsi"
+#include "am65x-tqma65xx.dtsi"
 
 / {
 	cpus {
