@@ -1,0 +1,58 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright 2020-2021 TQ-Systems GmbH
+ */
+
+/dts-v1/;
+
+#include "imx8mn-mba8mx.dts"
+
+/ {
+	reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		/* global autoconfigured region for contiguous allocations */
+		linux,cma {
+			/* 640 MiB */
+			size = <0 0x28000000>;
+			/*  1024 - 256 MiB, our minimum RAM config will be 1024 MiB */
+			alloc-ranges = <0 0x40000000 0 0x70000000>;
+		};
+
+		m4_reserved: m4@78000000 {
+			no-map;
+			reg = <0 0x78000000 0 0x1000000>;
+		};
+
+		rpmsg_dma_reserved: rpmsg_dma@78100000 {
+			compatible = "shared-dma-pool";
+			no-map;
+			reg = <0 0x78100000 0 0x100000>;
+		};
+	};
+};
+
+/*
+ * ATTENTION: M7 may use IPs like below
+ * UART4
+ * if access to more hardware is needed, keep in mind to disable it to prevent
+ * system lockup and other things. Also resource partitioning using RDC
+ * should beimplemented. See TF-A implementation.
+ */
+
+&rpmsg {
+	/*
+	 * 64K for one rpmsg instance:
+	 * --0x78100000~0x7810ffff: pingpong
+	 */
+	vdev-nums = <1>;
+	reg = <0x0 0x78100000 0x0 0x10000>;
+	memory-region = <&rpmsg_dma_reserved>;
+	status = "okay";
+};
+
+&uart4 {
+	status = "disabled";
+};
