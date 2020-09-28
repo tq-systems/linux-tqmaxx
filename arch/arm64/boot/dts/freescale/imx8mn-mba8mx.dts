@@ -6,5 +6,5 @@
 /dts-v1/;
 
 #include "imx8mn.dtsi"
-#include "imx8mn-tqma8mnx.dtsi"
+#include "imx8mn-tqma8mxnl.dtsi"
 #include "imx8mn-mba8mx.dtsi"
