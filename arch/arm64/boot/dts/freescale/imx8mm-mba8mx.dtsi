@@ -7,7 +7,7 @@
 
 / {
 	model = "TQ Systems GmbH i.MX8MM TQMa8MxML on MBa8Mx";
-	compatible = "tq,imx8mm-mba8mx", "tq,imx8mm-tqma8mmx", "fsl,imx8mm";
+	compatible = "tq,imx8mm-mba8mx", "tq,imx8mm-tqma8mxml", "fsl,imx8mm";
 
 	aliases {
 		rtc1 = &snvs_rtc;
