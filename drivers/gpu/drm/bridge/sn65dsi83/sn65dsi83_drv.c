@@ -309,6 +309,14 @@ static int sn65dsi83_parse_dt(struct device_node *np,
 		of_node_put(endpoint);
 		if (remote) {
 			sn65dsi83->panel = of_drm_find_panel(remote);
+			if (IS_ERR(sn65dsi83->panel)) {
+				ret = PTR_ERR(sn65dsi83->panel);
+				if (ret == -ENODEV)
+					DRM_ERROR("panel not found, no device\n");
+				else
+					DRM_INFO("panel not found, deferring probe\n");
+				return ret;
+			}
 		} else {
 			DRM_ERROR("%s: output ep parent not found\n", __func__);
 			return -EPROBE_DEFER;
