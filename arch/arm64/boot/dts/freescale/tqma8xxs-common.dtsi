@@ -58,7 +58,6 @@
 	phy-reset-duration = <500>;
 	fsl,magic-packet;
 	mac-address = [ 00 00 00 00 00 00 ];
-	local-mac-address = [ 00 00 00 00 00 00 ];
 
 	mdio {
 		#address-cells = <1>;
@@ -97,7 +96,6 @@
 	phy-reset-gpios = <&lsio_gpio0 24 GPIO_ACTIVE_LOW>;
 	phy-reset-duration = <500>;
 	mac-address = [ 00 00 00 00 00 00 ];
-	local-mac-address = [ 00 00 00 00 00 00 ];
 };
 
 &i2c0 {
