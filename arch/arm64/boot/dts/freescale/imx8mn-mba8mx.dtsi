@@ -197,12 +197,12 @@
 };
 
 &iomuxc {
-        pinctrl_usb0hub_sel: usb0hub_sel {
-                fsl,pins = <
+	pinctrl_usb0hub_sel: usb0hub_sel {
+		fsl,pins = <
 			/* SEL_USB_HUB_B */
-			MX8MN_IOMUXC_NAND_WP_B_GPIO3_IO18      0x84
-                >;
-        };
+			MX8MN_IOMUXC_NAND_WP_B_GPIO3_IO18	0x84
+		>;
+	};
 
 	pinctrl_ecspi1: ecspi1grp {
 		fsl,pins = <
