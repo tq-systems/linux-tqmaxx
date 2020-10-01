@@ -5,15 +5,15 @@
  */
 
 /dts-v1/;
-
-#include "am654-tqma65xx.dtsi"
 #include <dt-bindings/input/input.h>
 #include <dt-bindings/net/ti-dp83867.h>
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/phy/phy.h>
+#include <dt-bindings/phy/phy-am654-serdes.h>
+#include <dt-bindings/pinctrl/k3.h>
+#include "am654-tqma65xx.dtsi"
 
 / {
-	compatible =  "ti,am654-evm", "ti,am654";
-	model = "Texas Instruments AM654 Base Board";
-
 	aliases {
 		// ethernet1 = &pruss2_emac0;
 		// ethernet2 = &pruss2_emac1;
@@ -22,54 +22,6 @@
 	chosen {
 		stdout-path = "serial2:115200n8";
 		bootargs = "earlycon=ns16550a,mmio32,0x02800000";
-	};
-
-	memory@80000000 {
-		device_type = "memory";
-		/* 2G RAM */
-		reg = <0x00000000 0x80000000 0x00000000 0x80000000>;
-	};
-
-	reserved_memory: reserved-memory {
-		#address-cells = <2>;
-		#size-cells = <2>;
-		ranges;
-
-		secure_ddr: secure_ddr@9e800000 {
-			reg = <0 0x9e800000 0 0x01800000>; /* for OP-TEE */
-			alignment = <0x1000>;
-			no-map;
-		};
-
-		mcu_r5fss0_core0_dma_memory_region: r5f-dma-memory@a0000000 {
-			compatible = "shared-dma-pool";
-			reg = <0 0xa0000000 0 0x100000>;
-			no-map;
-		};
-
-		mcu_r5fss0_core0_memory_region: r5f-memory@a0100000 {
-			compatible = "shared-dma-pool";
-			reg = <0 0xa0100000 0 0xf00000>;
-			no-map;
-		};
-
-		mcu_r5fss0_core1_dma_memory_region: r5f-dma-memory@a1000000 {
-			compatible = "shared-dma-pool";
-			reg = <0 0xa1000000 0 0x100000>;
-			no-map;
-		};
-
-		mcu_r5fss0_core1_memory_region: r5f-memory@a1100000 {
-			compatible = "shared-dma-pool";
-			reg = <0 0xa1100000 0 0xf00000>;
-			no-map;
-		};
-
-		rtos_ipc_memory_region: ipc-memories@a2000000 {
-			reg = <0x00 0xa2000000 0x00 0x00200000>;
-			alignment = <0x1000>;
-			no-map;
-		};
 	};
 
 	gpio-keys {
@@ -232,22 +184,6 @@
 		pinctrl-single,pins = <
 			AM65X_WKUP_IOPAD(0x008c, PIN_OUTPUT, 0) /* (L1) MCU_MDIO0_MDC */
 			AM65X_WKUP_IOPAD(0x0088, PIN_INPUT, 0) /* (L4) MCU_MDIO0_MDIO */
-		>;
-	};
-
-	nor_flash_pins_default: nor_flash_pins_default {
-		pinctrl-single,pins = <
-			AM65X_WKUP_IOPAD(0x0000, PIN_OUTPUT, 0) /* (V1) MCU_OSPI0_CLK */
-			AM65X_WKUP_IOPAD(0x002c, PIN_OUTPUT, 0) /* (R4) MCU_OSPI0_CSn0 */
-			AM65X_WKUP_IOPAD(0x000c, PIN_INPUT, 0) /* (U4) MCU_OSPI0_D0 */
-			AM65X_WKUP_IOPAD(0x0010, PIN_INPUT, 0) /* (U5) MCU_OSPI0_D1 */
-			AM65X_WKUP_IOPAD(0x0014, PIN_INPUT, 0) /* (T2) MCU_OSPI0_D2 */
-			AM65X_WKUP_IOPAD(0x0018, PIN_INPUT, 0) /* (T3) MCU_OSPI0_D3 */
-			AM65X_WKUP_IOPAD(0x001c, PIN_INPUT, 0) /* (T4) MCU_OSPI0_D4 */
-			AM65X_WKUP_IOPAD(0x0020, PIN_INPUT, 0) /* (T5) MCU_OSPI0_D5 */
-			AM65X_WKUP_IOPAD(0x0024, PIN_INPUT, 0) /* (R2) MCU_OSPI0_D6 */
-			AM65X_WKUP_IOPAD(0x0028, PIN_INPUT, 0) /* (R3) MCU_OSPI0_D7 */
-			AM65X_WKUP_IOPAD(0x0008, PIN_INPUT, 0) /* (U2) MCU_OSPI0_DQS */
 		>;
 	};
 };
@@ -657,7 +593,7 @@
 };
 
 &serdes1 {
-	status = "disabled";
+	status = "okay";
 };
 
 &pcie0_rc {
@@ -669,11 +605,17 @@
 };
 
 &pcie1_rc {
-	status = "disabled";
+	num-lanes = <1>;
+	phys = <&serdes1 PHY_TYPE_PCIE 0>;
+	phy-names = "pcie-phy0";
+	reset-gpios = <&pca9555_D25 8 GPIO_ACTIVE_HIGH>;
+	status = "okay";
 };
 
 &pcie1_ep {
-	status = "disabled";
+	num-lanes = <1>;
+	phys = <&serdes1 PHY_TYPE_PCIE 0>;
+	phy-names = "pcie-phy0";
 };
 
 &mailbox0_cluster0 {
@@ -791,27 +733,6 @@
 			/* pps [cpts genf1] in13 -> out25 [cpts hw4_push] */
 			TS_OFFSET(25, 13)
 		>;
-	};
-};
-
-&ospi0 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&nor_flash_pins_default>;
-
-	flash@0{
-		compatible = "jedec,spi-nor";
-		reg = <0x0>;
-		spi-tx-bus-width = <8>;
-		spi-rx-bus-width = <8>;
-		spi-max-frequency = <40000000>;
-		cdns,tshsl-ns = <60>;
-		cdns,tsd2d-ns = <60>;
-		cdns,tchsh-ns = <60>;
-		cdns,tslch-ns = <60>;
-		cdns,read-delay = <2>;
-		cdns,phy-mode;
-		#address-cells = <1>;
-		#size-cells = <1>;
 	};
 };
 
