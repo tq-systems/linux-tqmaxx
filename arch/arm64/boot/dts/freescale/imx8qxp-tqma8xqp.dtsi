@@ -7,7 +7,7 @@
 
 / {
 	model = "TQ Systems i.MX8QXP TQMa8XQP";
-	compatible = "tq,tqma8xqp", "fsl,imx8qxp";
+	compatible = "tq,imx8qxp-tqma8xqp", "fsl,imx8qxp";
 
 	memory@80000000 {
 		device_type = "memory";
