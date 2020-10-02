@@ -236,8 +236,8 @@ properties:
         items:
           - enum:
               - tq,imx8mm-mba8mx         # TQ Systems GmbH i.MX8MM TQMa8MxML SOM on MBa8Mx
-          - const: fsl,imx8mm
           - const: tq,imx8mm-tqma8mxml   # TQ Systems GmbH i.MX8MM TQMa8MxML SOM
+          - const: fsl,imx8mm
 
       - description: i.MX8MN based Boards
         items:
@@ -262,8 +262,8 @@ properties:
         items:
           - enum:
               - tq,imx8mq-mba8mx         # TQ Systems GmbH i.MX8MQ TQMa8Mx SOM on MBa8Mx
+          - const: tq,imx8mq-tqma8mq     # TQ Systems GmbH i.MX8MM TQMa8Mx SOM
           - const: fsl,imx8mq
-          - const: tq,imx8mq-tqma8mq     # TQ Systems GmbH i.MX8MM TQMa8MxML SOM
 
       - description: i.MX8QXP based Boards
         items:
