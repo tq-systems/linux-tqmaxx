@@ -294,9 +294,9 @@ properties:
           MBa8Xx is the starterkit
         items:
           - enum:
-              - tq,tqma8xqp-mba8xx        # TQ Systems GmbH TQMa8QXP SOM on MBa8Xx
+              - tq,imx8qxp-mba8xx         # TQ Systems GmbH TQMa8QXP SOM on MBa8Xx
+          - const: tq,imx8qxp-tqma8xqp    # TQ Systems GmbH TQMa8XQP SOM
           - const: fsl,imx8qxp
-          - const: tq,tqma8xqp            # TQ Systems GmbH TQMa8XQP SOM
 
       - description:
           TQMa8XxS is a series of SOM featuring NXP i.MX8X system-on-chip
