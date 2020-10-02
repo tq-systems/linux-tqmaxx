@@ -1,0 +1,17 @@
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * Copyright (C) 2020 TQ Systems
+ */
+
+/dts-v1/;
+/plugin/;
+
+/ {
+  fragment@101 {
+	target-path = "/";
+
+	__overlay__ {
+		
+  	};
+  };
+};
