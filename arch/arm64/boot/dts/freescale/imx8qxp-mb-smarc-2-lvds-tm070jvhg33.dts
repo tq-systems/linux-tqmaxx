@@ -5,19 +5,6 @@
 
 /dts-v1/;
 
-#include <dt-bindings/net/ti-dp83867.h>
-
-#include "imx8qxp.dtsi"
-#include "tqma8xxs-common.dtsi"
-#include "imx8qxp-tqma8xqps.dtsi"
-#include "mb-smarc-2-common.dtsi"
+#include "imx8qxp-mb-smarc-2.dts"
 #include "imx8qxp-mb-smarc-2-display.dtsi"
 #include "imx8qxp-mb-smarc-2-lvds-tm070jvhg33.dtsi"
-
-/ {
-	model = "TQ Systems i.MX8QXP TQMa8XQPS on MB-SMARC-2";
-	compatible = "tq,mb-smarc-2", "tq,tqma8xqps", "fsl,imx8qxp";
-};
-
-
-
