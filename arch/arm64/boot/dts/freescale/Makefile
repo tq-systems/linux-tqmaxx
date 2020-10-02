@@ -285,12 +285,14 @@ imx8mq-tqma8mq-mba8mx-dcss-hdmi-imx327-dtbs += imx8mq-tqma8mq-mba8mx.dtb imx8mq-
 imx8mq-tqma8mq-mba8mx-dcss-hdmi-imx327-csi2-dtbs += imx8mq-tqma8mq-mba8mx.dtb imx8mq-tqma8mq-mba8mx-dcss-hdmi.dtbo imx8mq-tqma8mq-mba8mx-imx327-csi2.dtbo
 imx8mq-tqma8mq-mba8mx-dcss-hdmi-ov9281-dtbs += imx8mq-tqma8mq-mba8mx.dtb imx8mq-tqma8mq-mba8mx-dcss-hdmi.dtbo imx8mq-tqma8mq-mba8mx-ov9281.dtbo
 imx8mq-tqma8mq-mba8mx-dcss-lvds-tm070jvhg33-dtbs += imx8mq-tqma8mq-mba8mx.dtb imx8mq-tqma8mq-mba8mx-lvds-tm070jvhg33.dtbo imx8mq-tqma8mq-mba8mx-dcss-lvds.dtbo
+imx8mq-tqma8mq-mba8mx-rpmsg-dtbs += imx8mq-tqma8mq-mba8mx.dtb imx8mq-tqma8mq-mba8mx-rpmsg.dtbo
 dtb-$(CONFIG_ARCH_MXC) += imx8mq-tqma8mq-mba8mx-lcdif-lvds-tm070jvhg33.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8mq-tqma8mq-mba8mx-dcss-hdmi.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8mq-tqma8mq-mba8mx-dcss-hdmi-imx327.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8mq-tqma8mq-mba8mx-dcss-hdmi-imx327-csi2.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8mq-tqma8mq-mba8mx-dcss-hdmi-ov9281.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8mq-tqma8mq-mba8mx-dcss-lvds-tm070jvhg33.dtb
+dtb-$(CONFIG_ARCH_MXC) += imx8mq-tqma8mq-mba8mx-rpmsg.dtb
 
 #dtb-$(CONFIG_ARCH_MXC) += imx8qm-apalis-eval.dtb
 #dtb-$(CONFIG_ARCH_MXC) += imx8qm-apalis-ixora-v1.1.dtb
