@@ -98,7 +98,8 @@ dtb-$(CONFIG_ARCH_MXC) += imx8mq-pico-pi.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8mq-evk-dp.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8mq-mba8mx.dtb \
 			  imx8mq-mba8mx-dcss-lvds-tm070jvhg33.dtb \
-			  imx8mq-mba8mx-lcdif-lvds-tm070jvhg33.dtb
+			  imx8mq-mba8mx-lcdif-lvds-tm070jvhg33.dtb \
+			  imx8mq-mba8mx-rpmsg.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8mq-zii-ultra-rmb3.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8mq-zii-ultra-zest.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8mq-ddr3l-val.dtb imx8mq-ddr4-val.dtb imx8mq-ddr4-val-gpmi-nand.dtb
