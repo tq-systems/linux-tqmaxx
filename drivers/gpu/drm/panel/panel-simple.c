@@ -432,23 +432,23 @@ static int panel_simple_probe(struct device *dev, const struct panel_desc *desc)
 	if (IS_ERR(panel->supply))
 		return PTR_ERR(panel->supply);
 
-	panel->enable_gpio = devm_gpiod_get_optional(dev, "enable",
-						     GPIOD_OUT_LOW);
-	if (IS_ERR(panel->enable_gpio)) {
-		err = PTR_ERR(panel->enable_gpio);
-		if (err != -EPROBE_DEFER)
-			dev_err(dev, "failed to request GPIO: %d\n", err);
-		return err;
-	}
+	// panel->enable_gpio = devm_gpiod_get_optional(dev, "enable",
+	// 					     GPIOD_OUT_LOW);
+	// if (IS_ERR(panel->enable_gpio)) {
+	// 	err = PTR_ERR(panel->enable_gpio);
+	// 	if (err != -EPROBE_DEFER)
+	// 		dev_err(dev, "failed to request GPIO: %d\n", err);
+	// 	return err;
+	// }
 
-	backlight = of_parse_phandle(dev->of_node, "backlight", 0);
-	if (backlight) {
-		panel->backlight = of_find_backlight_by_node(backlight);
-		of_node_put(backlight);
+	// backlight = of_parse_phandle(dev->of_node, "backlight", 0);
+	// if (backlight) {
+	// 	panel->backlight = of_find_backlight_by_node(backlight);
+	// 	of_node_put(backlight);
 
-		if (!panel->backlight)
-			return -EPROBE_DEFER;
-	}
+	// 	if (!panel->backlight)
+	// 		return -EPROBE_DEFER;
+	// }
 
 	ddc = of_parse_phandle(dev->of_node, "ddc-i2c-bus", 0);
 	if (ddc) {
