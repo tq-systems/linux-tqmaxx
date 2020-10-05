@@ -563,7 +563,7 @@
 };
 
 &dwc3_0 {
-	status = "disabled";
+	status = "okay";
 };
 
 &usb0_phy {
@@ -573,7 +573,7 @@
 &usb0 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&usb0_pins_default>;
-	dr_mode = "host";
+	dr_mode = "otg";
 	status = "okay";
 };
 
@@ -590,7 +590,9 @@
 };
 
 &serdes0 {
-	status = "disabled";
+	assigned-clocks = <&k3_clks 153 4>, <&serdes0 AM654_SERDES_CMU_REFCLK>, <&serdes0 AM654_SERDES_RO_REFCLK>;
+	assigned-clock-parents = <&k3_clks 153 8>, <&k3_clks 153 4>, <&k3_clks 153 4>;
+	status = "okay";
 };
 
 &serdes1 {
@@ -598,11 +600,16 @@
 };
 
 &pcie0_rc {
-	status = "disabled";
+	num-lanes = <2>;
+	phys = <&serdes0 PHY_TYPE_PCIE 1>, <&serdes1 PHY_TYPE_PCIE 1>;
+	phy-names = "pcie-phy0", "pcie-phy1";
+	status = "okay";
 };
 
 &pcie0_ep {
-	status = "disabled";
+	num-lanes = <2>;
+	phys = <&serdes0 PHY_TYPE_PCIE 1>, <&serdes1 PHY_TYPE_PCIE 1>;
+	phy-names = "pcie-phy0", "pcie-phy1";
 };
 
 &pcie1_rc {
