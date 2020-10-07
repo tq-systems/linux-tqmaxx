@@ -97,6 +97,7 @@ dtb-$(CONFIG_ARCH_MXC) += imx8mq-nitrogen.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8mq-pico-pi.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8mq-evk-dp.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8mq-mba8mx.dtb \
+			  imx8mq-mba8mx-hdmi.dtb \
 			  imx8mq-mba8mx-dcss-lvds-tm070jvhg33.dtb \
 			  imx8mq-mba8mx-lcdif-lvds-tm070jvhg33.dtb \
 			  imx8mq-mba8mx-rpmsg.dtb
