@@ -6,7 +6,7 @@
 #include <dt-bindings/net/ti-dp83867.h>
 
 / {
-	model = "TQ Systems GmbH i.MX8MQ TQMa8MQ on MBa8MX";
+	model = "TQ Systems GmbH i.MX8MQ TQMa8MQ on MBa8Mx";
 	compatible = "tq,imx8mq-mba8mx", "tq,imx8mq-tqma8mq", "fsl,imx8mq";
 
 	aliases {
@@ -98,7 +98,6 @@
 
 	panel0: panel_lvds0 {
 		backlight = <&backlight_lvds0>;
-		/* power-supply = <&reg_mba8mq_12v>; */
 		status = "disabled";
 
 		port {
