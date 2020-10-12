@@ -217,7 +217,7 @@
 &gpio6 {
 	usb1-reset {
 		gpio-hog;
-		gpios = <10 GPIO_ACTIVE_LOW>;
+		gpios = <22 GPIO_ACTIVE_LOW>;
 		output-low;
 		line-name = "usb1-reset";
 	};
