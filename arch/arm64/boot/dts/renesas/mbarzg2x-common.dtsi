@@ -207,7 +207,7 @@
 };
 
 &extal_clk {
-	clock-frequency = <16666666>;
+	clock-frequency = <25000000>;
 };
 
 &extalr_clk {
@@ -461,7 +461,7 @@
 };
 
 &scif_clk {
-	clock-frequency = <14745600>;
+	clock-frequency = <0>;
 };
 
 &sdhi0 {
