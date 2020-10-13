@@ -6,14 +6,6 @@
 #include "imx8mq-mba8mx.dts"
 #include "imx8mq-mba8mx-lvds-tm070jvhg33.dtsi"
 
-/delete-node/ &hdmi;
-
-/ {
-	display-subsystem {
-		status = "okay";
-	};
-};
-
 &dcss {
 	status = "okay";
 
@@ -46,10 +38,6 @@
 
 &irqsteer {
 	status = "okay";
-};
-
-&lcdif {
-	status = "disabled";
 };
 
 &mipi_dsi {
