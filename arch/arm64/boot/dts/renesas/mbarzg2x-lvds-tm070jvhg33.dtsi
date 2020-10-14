@@ -1,0 +1,44 @@
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * Device Tree Source for the Tianma TM070JVHG33 LVDS panel connected
+ * to the MBaRZG2x board
+ *
+ * Copyright (C) 2020 TQ-Systems GmbH
+ */
+
+/ {
+	panel-lvds {
+		compatible = "tianma,tm070jvhg33", "panel-lvds";
+
+		width-mm = <161>;
+		height-mm = <107>;
+
+		data-mapping = "vesa-24";
+
+		enable-gpios = <&gpio5 4 GPIO_ACTIVE_HIGH>;
+		reset-gpios = <&gpio0 5 GPIO_ACTIVE_HIGH>;
+
+		panel-timing {
+			/* 1280x800 @60Hz */
+			clock-frequency = <68300000>;
+			hactive = <1280>;
+			vactive = <800>;
+			hsync-len = <20>;
+			hfront-porch = <45>;
+			hback-porch = <5>;
+			vfront-porch = <38>;
+			vback-porch = <4>;
+			vsync-len = <1>;
+		};
+
+		port {
+			panel_in: endpoint {
+				remote-endpoint = <&lvds_connector>;
+			};
+		};
+	};
+};
+
+&lvds_connector {
+	remote-endpoint = <&panel_in>;
+};

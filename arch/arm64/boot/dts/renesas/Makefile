@@ -7,6 +7,7 @@ dtb-$(CONFIG_ARCH_R8A774A1) += r8a774a1-hihope-rzg2m.dtb \
 			       r8a774a1-hihope-rzg2m-ex.dtb \
 			       r8a774a1-hihope-rzg2m-ex-idk-1110wr.dtb \
 			       r8a774a1-hihope-rzg2m-ex-mipi-2.1.dtb
+dtb-$(CONFIG_ARCH_R8A774A1) += r8a774a1-tqmarzg2m_e-mbarzg2x.dtb
 dtb-$(CONFIG_ARCH_R8A774A3) += r8a774a3-hihope-rzg2m.dtb \
 			       r8a774a3-hihope-rzg2m-ex.dtb \
 			       r8a774a3-hihope-rzg2m-ex-idk-1110wr.dtb \
