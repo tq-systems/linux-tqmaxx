@@ -1,0 +1,225 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Copyright (C) 2014,2021 TQ-Systems GmbH - http://www.tq-group.com/
+ *
+ * Based on:
+ * Copyright (C) 2012 Texas Instruments Incorporated - http://www.ti.com/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+#include "am33xx.dtsi"
+
+/ {
+	model = "TQ-Systems GmbH TQMa335x";
+	compatible = "tq,tqma335x", "ti,am33xx";
+
+	aliases {
+		rtc0 = &rtc;
+		rtc1 = &ds1339;
+	};
+
+	cpus {
+		cpu@0 {
+			cpu0-supply = <&vdd1_reg>;
+		};
+	};
+
+	memory {
+		device_type = "memory";
+		reg = <0x80000000 0x10000000>;					/* 256 MB */
+	};
+
+	vbat: fixedregulator@0 {
+		compatible = "regulator-fixed";
+		regulator-name = "vbat";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		regulator-boot-on;
+	};
+
+	ocp {
+		sgx@0x56000000 {
+			status = "okay";
+		};
+	};
+};
+
+&elm {
+	status = "okay";
+};
+
+&am33xx_pinmux {
+	pinctrl-names = "default";
+
+	i2c0_pins: i2c0_pins {
+		pinctrl-single,pins = <
+			0x188 (PIN_INPUT_PULLUP | MUX_MODE0)		/* i2c0_sda.i2c0_sda */
+			0x18c (PIN_INPUT_PULLUP | MUX_MODE0)		/* i2c0_scl.i2c0_scl */
+		>;
+	};
+
+	mmc2_pins: mmc2_pins {
+		pinctrl-single,pins = <
+			0x00 (PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad0.mmc1_dat0 */
+			0x04 (PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad1.mmc1_dat1 */
+			0x08 (PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad2.mmc1_dat2 */
+			0x0c (PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad3.mmc1_dat3 */
+			0x10 (PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad4.mmc1_dat4 */
+			0x14 (PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad5.mmc1_dat5 */
+			0x18 (PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad6.mmc1_dat6 */
+			0x1c (PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad7.mmc1_dat7 */
+			0x80 (PIN_INPUT_PULLUP | MUX_MODE2)		/* gpmc_csn1.mmc1_clk */
+			0x84 (PIN_INPUT_PULLUP | MUX_MODE2)		/* gpmc_csn2.mmc1_cmd */
+		>;
+	};
+
+	spi0_pins: pinmux_spi0_pins {
+		pinctrl-single,pins = <
+			0x150 (PIN_INPUT_PULLUP | MUX_MODE0)		/* spi0_clk.spi0_clk */
+			0x154 (PIN_INPUT_PULLUP | MUX_MODE0)		/* spi0_d0.spi0_d0 */
+			0x158 (PIN_INPUT_PULLUP | MUX_MODE0)		/* spi0_d1.spi0_d1 */
+			0x15c (PIN_INPUT_PULLUP | MUX_MODE0)		/* spi0_cs0.spi0_cs0 */
+		>;
+	};
+};
+
+&aes {
+	status = "okay";
+};
+
+&i2c0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&i2c0_pins>;
+	clock-frequency = <100000>;
+	status = "okay";
+
+	jc42_1: temp-sensor@1f {
+		compatible = "jedec,jc-42.4-temp";
+		reg = <0x1f>;
+	};
+
+	tps: pmic@2d {
+		compatible = "ti,tps65910";
+		reg = <0x2d>;
+		interrupt-parent = <&expander2>;
+		interrupts = <4 0>;
+		ti,en-ck32k-xtal;
+	};
+
+	eeprom: eeprom@50 {
+		compatible = "atmel,24c64";
+		pagesize = <32>;
+		reg = <0x50>;
+	};
+
+	se97btp: eeprom@57 {
+		compatible = "atmel,24c02";
+		pagesize = <16>;
+		reg = <0x57>;
+	};
+
+	ds1339: rtc@68 {
+		compatible = "dallas,ds1339";
+		reg = <0x68>;
+		interrupts = <43>;
+	};
+};
+
+&mmc2 {
+	status = "okay";
+	vmmc-supply = <&vmmc_reg>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&mmc2_pins>;
+	bus-width = <8>;
+	ti,non-removable;
+	no-sd;
+	no-sdio;
+};
+
+&sham {
+	status = "okay";
+};
+
+/* include after i2c-device described */
+#include "tps65910.dtsi"
+&tps {
+	vcc1-supply = <&vbat>;
+	vcc2-supply = <&vbat>;
+	vcc3-supply = <&vbat>;
+	vcc4-supply = <&vbat>;
+	vcc5-supply = <&vbat>;
+	vcc6-supply = <&vbat>;
+	vcc7-supply = <&vbat>;
+	vccio-supply = <&vbat>;
+
+	regulators {
+		vrtc_reg: regulator@0 {
+			regulator-always-on;
+		};
+
+		vio_reg: regulator@1 {
+			regulator-always-on;
+		};
+
+		vdd1_reg: regulator@2 {
+			regulator-name = "vdd_mpu";
+			regulator-min-microvolt = <600000>;
+			regulator-max-microvolt = <1500000>;
+			regulator-boot-on;
+			regulator-always-on;
+		};
+
+		vdd2_reg: regulator@3 {
+			regulator-name = "vdd_core";
+			regulator-min-microvolt = <600000>;
+			regulator-max-microvolt = <1500000>;
+			regulator-boot-on;
+			regulator-always-on;
+		};
+
+		vdd3_reg: regulator@4 {
+			regulator-always-on;
+		};
+
+		vdig1_reg: regulator@5 {
+			regulator-always-on;
+		};
+
+		vdig2_reg: regulator@6 {
+			regulator-always-on;
+		};
+
+		vpll_reg: regulator@7 {
+			regulator-always-on;
+		};
+
+		vdac_reg: regulator@8 {
+			regulator-always-on;
+		};
+
+		vaux1_reg: regulator@9 {
+			regulator-always-on;
+		};
+
+		vaux2_reg: regulator@10 {
+			regulator-always-on;
+		};
+
+		vaux33_reg: regulator@11 {
+			regulator-always-on;
+		};
+
+		vmmc_reg: regulator@12 {
+			regulator-min-microvolt = <1800000>;
+			regulator-max-microvolt = <3300000>;
+			regulator-always-on;
+		};
+	};
+};
+
+&wkup_m3 {
+	ti,scale-data-fw = "am335x-evm-scale-data.bin";
+};

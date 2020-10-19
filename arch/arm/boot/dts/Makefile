@@ -754,6 +754,7 @@ dtb-$(CONFIG_SOC_AM33XX) += \
 	am335x-icev2.dtb \
 	am335x-icev2-prueth.dtb \
 	am335x-lxm.dtb \
+	am335x-mba335x.dtb \
 	am335x-moxa-uc-2101.dtb \
 	am335x-moxa-uc-8100-me-t.dtb \
 	am335x-nano.dtb \
