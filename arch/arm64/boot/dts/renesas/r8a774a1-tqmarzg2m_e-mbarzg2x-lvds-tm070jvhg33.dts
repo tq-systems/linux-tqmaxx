@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * Device Tree Source for the TQMaRZG2M-E on a MBaRZG2X
+ * with a TM070VJHG33 LVDS panel
  *
  * Copyright (C) 2020 TQ-Systems GmbH
  */
@@ -9,3 +10,4 @@
 
 #include "tqmarzg2m_e.dtsi"
 #include "mbarzg2x-common.dtsi"
+#include "mbarzg2x-lvds-tm070jvhg33.dtsi"

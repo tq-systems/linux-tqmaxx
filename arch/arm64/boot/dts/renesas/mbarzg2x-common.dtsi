@@ -6,8 +6,6 @@
  * Copyright (C) 2020 TQ-Systems GmbH
  */
 
-#include <dt-bindings/gpio/gpio.h>
-
 / {
 	aliases {
 		serial0 = &scif2;
@@ -18,15 +16,6 @@
 		spi1 = &msiof1;
 		spi2 = &msiof2;
 		spi3 = &msiof3;
-	};
-
-	backlight {
-		compatible = "pwm-backlight";
-		pwms = <&pwm1 0 50000>;
-
-		enable-gpios = <&gpio5 3 GPIO_ACTIVE_HIGH>;
-		brightness-levels = <0 2 8 16 32 64 128 255>;
-		default-brightness-level = <6>;
 	};
 
 	chosen {
@@ -304,17 +293,6 @@
 	};
 };
 
-&lvds0 {
-	status = "okay";
-
-	ports {
-		port@1 {
-			lvds_connector: endpoint {
-			};
-		};
-	};
-};
-
 &ohci0 {
 	status = "okay";
 };
@@ -425,11 +403,6 @@
 		groups = "msiof0_clk", "msiof0_sync",
 		"msiof0_rxd", "msiof0_txd";
 		function = "msiof0";
-	};
-
-	pwm1_pins: pwm1 {
-		groups = "pwm1_a";
-		function = "pwm1";
 	};
 };
 
@@ -698,12 +671,3 @@
 
 	status = "okay";
 };
-
-&pwm1 {
-	pinctrl-0 = <&pwm1_pins>;
-	pinctrl-names = "default";
-
-	status = "okay";
-};
-
-#include "mbarzg2x-lvds-tm070jvhg33.dtsi"
