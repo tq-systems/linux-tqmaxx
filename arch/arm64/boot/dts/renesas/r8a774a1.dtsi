@@ -2305,14 +2305,6 @@
 			resets = <&cpg 615>;
 		};
 
-		fcpvb0: fcp@fe96f000 {
-			compatible = "renesas,fcpv";
-			reg = <0 0xfe96f000 0 0x200>;
-			clocks = <&cpg CPG_MOD 607>;
-			power-domains = <&sysc R8A774A1_PD_A3VC>;
-			resets = <&cpg 607>;
-		};
-
 		fcpvd0: fcp@fea27000 {
 			compatible = "renesas,fcpv";
 			reg = <0 0xfea27000 0 0x200>;
@@ -2335,14 +2327,6 @@
 			clocks = <&cpg CPG_MOD 601>;
 			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
 			resets = <&cpg 601>;
-		};
-
-		fcpvi0: fcp@fe9af000 {
-			compatible = "renesas,fcpv";
-			reg = <0 0xfe9af000 0 0x200>;
-			clocks = <&cpg CPG_MOD 611>;
-			power-domains = <&sysc R8A774A1_PD_A3VC>;
-			resets = <&cpg 611>;
 		};
 
 		vsp@fe960000 {
