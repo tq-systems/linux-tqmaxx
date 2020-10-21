@@ -168,6 +168,20 @@
 	};
 };
 
+&flexcan1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_flexcan1>;
+	xceiver-supply = <&reg_mba8x_v3v3>;
+	status = "okay";
+};
+
+&flexcan2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_flexcan2>;
+	xceiver-supply = <&reg_mba8x_v3v3>;
+	status = "okay";
+};
+
 &iomuxc {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_gpio>;
@@ -215,6 +229,20 @@
 			IMX8QM_ENET1_RGMII_RXD3_CONN_ENET1_RGMII_RXD3		0x00000040
 			/* PHY Reset */
 			IMX8QM_ESAI1_FSR_LSIO_GPIO2_IO04			0x00000040
+		>;
+	};
+
+	pinctrl_flexcan1: flexcan0grp {
+		fsl,pins = <
+			IMX8QM_FLEXCAN0_TX_DMA_FLEXCAN0_TX        0x21
+			IMX8QM_FLEXCAN0_RX_DMA_FLEXCAN0_RX        0x21
+		>;
+	};
+
+	pinctrl_flexcan2: flexcan1grp {
+		fsl,pins = <
+			IMX8QM_FLEXCAN1_TX_DMA_FLEXCAN1_TX        0x21
+			IMX8QM_FLEXCAN1_RX_DMA_FLEXCAN1_RX        0x21
 		>;
 	};
 
