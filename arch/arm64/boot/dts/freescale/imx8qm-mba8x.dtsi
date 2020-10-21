@@ -323,6 +323,22 @@
 		>;
 	};
 
+	pinctrl_lpuart1: lpuart1grp {
+		fsl,pins = <
+			IMX8QM_UART1_RX_DMA_UART1_RX		0x06000020
+			IMX8QM_UART1_TX_DMA_UART1_TX		0x06000020
+			IMX8QM_UART1_CTS_B_DMA_UART1_CTS_B	0x00000021
+			IMX8QM_UART1_RTS_B_DMA_UART1_RTS_B	0x00000021
+		>;
+	};
+
+	pinctrl_lpuart2: lpuart2grp {
+		fsl,pins = <
+			IMX8QM_LVDS0_I2C1_SDA_DMA_UART2_RX	0x06000020
+			IMX8QM_LVDS0_I2C1_SCL_DMA_UART2_TX	0x06000020
+		>;
+	};
+
 	pinctrl_reg_usbotg1_vbus: regusbotg1vbusgrp {
 		fsl,pins = <
 			IMX8QM_USB_SS3_TC0_LSIO_GPIO4_IO03	0x00000021
@@ -415,6 +431,18 @@
 &lpuart0 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpuart0>;
+	status = "okay";
+};
+
+&lpuart1 { /* X62 pin header */
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_lpuart1>;
+	status = "okay";
+};
+
+&lpuart2 { /* mikroBUS */
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_lpuart2>;
 	status = "okay";
 };
 
