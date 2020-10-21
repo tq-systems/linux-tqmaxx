@@ -28,6 +28,14 @@
 	};
 };
 
+&soc {
+	thermal-zones {
+		core-cluster {
+			thermal-sensors = <&sa56004_4c 1>;
+		};
+	};
+};
+
 &esdhc1 {
 	status = "okay";
 	no-sdio;
@@ -113,6 +121,7 @@
 	sa56004_4c: temperature-sensor@4c {
 		compatible = "nxp,sa56004";
 		reg = <0x4c>;
+		#thermal-sensor-cells = <1>;
 		vcc-supply = <&reg_3p3v_som>;
 		status = "okay";
 	};
@@ -152,5 +161,17 @@
 };
 
 &usb1 {
+	status = "disabled";
+};
+
+/*
+  We use a separate sensor IC to measure core temperature. Disable the TMU
+  as its driver can cause log spam outside of its measurement range (0-125C).
+
+  Will have to be reevaluated if this DTS is ported to a mainline kernel,
+  as both sensors of the TMU are referenced by the default LS1028A
+  thermal-zones definitions there.
+*/
+&tmu {
 	status = "disabled";
 };
