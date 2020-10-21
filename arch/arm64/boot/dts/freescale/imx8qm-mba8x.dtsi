@@ -66,6 +66,17 @@
 		regulator-always-on;
 	};
 
+	reg_usbotg1_vbus: regulator-usbotg1-vbus {
+		compatible = "regulator-fixed";
+		regulator-name = "USBOTG1_VBUS";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_reg_usbotg1_vbus>;
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		gpio = <&lsio_gpio4 3 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+	};
+
 	reserved-memory {
 		#address-cells = <2>;
 		#size-cells = <2>;
@@ -267,6 +278,18 @@
 		>;
 	};
 
+	pinctrl_reg_usbotg1_vbus: regusbotg1vbusgrp {
+		fsl,pins = <
+			IMX8QM_USB_SS3_TC0_LSIO_GPIO4_IO03	0x00000021
+		>;
+	};
+
+	pinctrl_usbotg1: usbotg1grp {
+		fsl,pins = <
+			IMX8QM_USB_SS3_TC2_CONN_USB_OTG1_OC	0x00000021
+		>;
+	};
+
 	pinctrl_usdhc2_gpio: usdhc2grpgpio {
 		fsl,pins = <
 			IMX8QM_USDHC1_DATA6_LSIO_GPIO5_IO21	0x00000021
@@ -322,6 +345,13 @@
 	/* enable wakeup for gpio-key for gpio2 line 11 (SWITCH_A)*/
 	pad-wakeup-num = <1>;
 	pad-wakeup = <IMX8QM_ESAI1_TX3_RX2 4 11>;
+
+	usb-rst {
+		gpio-hog;
+		gpios = <7 0>;
+		output-high;
+		line-name = "USB_RST#";
+	};
 };
 
 &i2c1 {
@@ -340,6 +370,32 @@
 &lpuart0 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpuart0>;
+	status = "okay";
+};
+
+&usbphy1 {
+	status = "okay";
+};
+
+&usbotg1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usbotg1>;
+	vbus-supply = <&reg_usbotg1_vbus>;
+	srp-disable;
+	hnp-disable;
+	adp-disable;
+	power-active-high;
+	over-current-active-low;
+	dr_mode = "otg";
+	status = "okay";
+};
+
+&usb3phynop1 {
+	status = "okay";
+};
+
+&usbotg3 {
+	dr_mode = "host";
 	status = "okay";
 };
 
