@@ -269,6 +269,51 @@
 		>;
 	};
 
+	pinctrl_lpspi0: lpspi0grp {
+		fsl,pins = <
+			IMX8QM_SPI0_SCK_DMA_SPI0_SCK	0x0600004c
+			IMX8QM_SPI0_SDO_DMA_SPI0_SDO	0x0600004c
+			IMX8QM_SPI0_SDI_DMA_SPI0_SDI	0x0600004c
+		>;
+	};
+
+	pinctrl_lpspi0_cs: lpspi0cs {
+		fsl,pins = <
+			IMX8QM_SPI0_CS0_LSIO_GPIO3_IO05	0x00000021
+			IMX8QM_SPI0_CS1_LSIO_GPIO3_IO06	0x00000021
+		>;
+	};
+
+	pinctrl_lpspi1: lpspi1grp {
+		fsl,pins = <
+			IMX8QM_ADC_IN3_DMA_SPI1_SCK	0x0600004c
+			IMX8QM_ADC_IN4_DMA_SPI1_SDO	0x0600004c
+			IMX8QM_ADC_IN5_DMA_SPI1_SDI	0x0600004c
+		>;
+	};
+
+	pinctrl_lpspi1_cs: lpspi1cs {
+		fsl,pins = <
+			IMX8QM_ADC_IN6_LSIO_GPIO3_IO24	0x00000021
+			IMX8QM_ADC_IN7_LSIO_GPIO3_IO25	0x00000021
+		>;
+	};
+
+	pinctrl_lpspi2: lpspi2grp {
+		fsl,pins = <
+			IMX8QM_SPI2_SCK_DMA_SPI2_SCK	0x0600004c
+			IMX8QM_SPI2_SDO_DMA_SPI2_SDO	0x0600004c
+			IMX8QM_SPI2_SDI_DMA_SPI2_SDI	0x0600004c
+		>;
+	};
+
+	pinctrl_lpspi2_cs: lpspi02s {
+		fsl,pins = <
+			IMX8QM_SPI2_CS0_LSIO_GPIO3_IO10	0x00000021
+			IMX8QM_SPI2_CS1_LSIO_GPIO3_IO11	0x00000021
+		>;
+	};
+
 	pinctrl_lpuart0: lpuart0grp {
 		fsl,pins = <
 			IMX8QM_UART0_RX_DMA_UART0_RX		0x06000020
@@ -371,6 +416,78 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpuart0>;
 	status = "okay";
+};
+
+&lpspi0 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_lpspi0 &pinctrl_lpspi0_cs>;
+	fsl,spi-num-chipselects = <2>;
+	cs-gpios = <&lsio_gpio3 5 GPIO_ACTIVE_LOW>, <&lsio_gpio3 6 GPIO_ACTIVE_LOW>;
+	status = "okay";
+
+	spidev0_0: spidev0@0 {
+		reg = <0>;
+		compatible = "tq,testdev";
+		spi-max-frequency = <5000000>;
+		status = "okay";
+	};
+
+	spidev0_1: spidev0@1 {
+		reg = <1>;
+		compatible = "tq,testdev";
+		spi-max-frequency = <5000000>;
+		status = "okay";
+	};
+};
+
+&lpspi1 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_lpspi1 &pinctrl_lpspi1_cs>;
+	fsl,spi-num-chipselects = <2>;
+	cs-gpios = <&lsio_gpio3 24 GPIO_ACTIVE_LOW>, <&lsio_gpio3 25 GPIO_ACTIVE_LOW>;
+	status = "okay";
+
+	spidev1_0: spidev1@0 {
+		reg = <0>;
+		compatible = "tq,testdev";
+		spi-max-frequency = <5000000>;
+		status = "okay";
+	};
+
+	spidev1_1: spidev1@1 {
+		reg = <1>;
+		compatible = "tq,testdev";
+		spi-max-frequency = <5000000>;
+		status = "okay";
+	};
+};
+
+&lpspi2 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_lpspi2 &pinctrl_lpspi2_cs>;
+	fsl,spi-num-chipselects = <2>;
+	cs-gpios = <&lsio_gpio3 10 GPIO_ACTIVE_LOW>, <&lsio_gpio3 11 GPIO_ACTIVE_LOW>;
+	status = "okay";
+
+	spidev2_0: spidev2@0 {
+		reg = <0>;
+		compatible = "tq,testdev";
+		spi-max-frequency = <5000000>;
+		status = "okay";
+	};
+
+	spidev2_1: spidev2@1 {
+		reg = <1>;
+		compatible = "tq,testdev";
+		spi-max-frequency = <5000000>;
+		status = "okay";
+	};
 };
 
 &usbphy1 {
