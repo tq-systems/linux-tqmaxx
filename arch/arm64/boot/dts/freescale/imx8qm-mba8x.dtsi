@@ -219,6 +219,19 @@
 	};
 };
 
+&i2c1 {
+	sensor1: jc42@1c {
+		compatible = "nxp,se97", "jedec,jc-42.4-temp";
+		reg = <0x1c>;
+	};
+
+	eeprom2: 24c02@54 {
+		compatible = "atmel,24c02";
+		reg = <0x54>;
+		pagesize = <16>;
+	};
+};
+
 &lpuart0 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpuart0>;
