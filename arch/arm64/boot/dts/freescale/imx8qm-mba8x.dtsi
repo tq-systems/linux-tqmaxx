@@ -14,6 +14,45 @@
 		stdout-path = &lpuart0;
 	};
 
+	gpio-keys {
+		compatible = "gpio-keys";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpiokeys>;
+		autorepeat;
+
+		switch1 {
+			label = "SWITCH_A";
+			linux,code = <BTN_0>;
+			gpios = <&lsio_gpio2 11 GPIO_ACTIVE_LOW>;
+			wakeup-source;
+		};
+
+		switch2 {
+			label = "SWITCH_B";
+			linux,code = <BTN_1>;
+			gpios = <&lsio_gpio1 0 GPIO_ACTIVE_LOW>;
+			wakeup-source;
+		};
+	};
+
+	gpio-leds {
+		compatible = "gpio-leds";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpioled>;
+
+		user-led0 {
+			label = "USER_LED0";
+			gpios = <&lsio_gpio5 20 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "heartbeat";
+		};
+
+		user-led1 {
+			label = "USER_LED1";
+			gpios = <&lsio_gpio5 19 GPIO_ACTIVE_HIGH>;
+			default-state = "on";
+		};
+	};
+
 	memory@80000000 {
 		device_type = "memory";
 		reg = <0x00000000 0x80000000 0 0x40000000>;
@@ -119,6 +158,9 @@
 };
 
 &iomuxc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_gpio>;
+
 	pinctrl_fec1: fec1grp {
 		fsl,pins = <
 			IMX8QM_COMP_CTL_GPIO_1V8_3V3_ENET_ENETB_PAD		0x000014a0
@@ -162,6 +204,57 @@
 			IMX8QM_ENET1_RGMII_RXD3_CONN_ENET1_RGMII_RXD3		0x00000040
 			/* PHY Reset */
 			IMX8QM_ESAI1_FSR_LSIO_GPIO2_IO04			0x00000040
+		>;
+	};
+
+	pinctrl_gpio: pingpiogrp {
+		fsl,pins = <
+			/* GPIO0_05 on X62:26 */
+			IMX8QM_SIM0_GPIO0_00_LSIO_GPIO0_IO05	0x00000021
+			/* GPIO1_14 on X64:21 */
+			IMX8QM_LVDS1_I2C1_SCL_LSIO_GPIO1_IO14	0x00000021
+			/* GPIO1_15 on X64:23 */
+			IMX8QM_LVDS1_I2C1_SDA_LSIO_GPIO1_IO15	0x00000021
+			/* GPIO2_17 on X63:37 */
+			IMX8QM_SPI3_SCK_LSIO_GPIO2_IO17		0x00000021
+			/* GPIO2_21 on X63:39 */
+			IMX8QM_SPI3_CS1_LSIO_GPIO2_IO21		0x00000021
+			/* GPIO4_12 on X61:24 */
+			IMX8QM_USDHC2_CD_B_LSIO_GPIO4_IO12	0x00000021
+			/* GPIO4_11 on X61:26 */
+			IMX8QM_USDHC2_WP_LSIO_GPIO4_IO11	0x00000021
+			/* GPIO4_10 on X61:28 */
+			IMX8QM_USDHC2_VSELECT_LSIO_GPIO4_IO10	0x00000021
+			/* GPIO4_09 on X61:30 */
+			IMX8QM_USDHC2_RESET_B_LSIO_GPIO4_IO09	0x00000021
+			/* GPIO5_23 on X62:24 */
+			IMX8QM_USDHC1_STROBE_LSIO_GPIO5_IO23	0x00000021
+			/* GPIO5_24 on X61:15 */
+			IMX8QM_USDHC2_CLK_LSIO_GPIO5_IO24	0x00000021
+			/* GPIO5_25 on X61:17 */
+			IMX8QM_USDHC2_CMD_LSIO_GPIO5_IO25	0x00000021
+			/* GPIO5_26 on X61:19 */
+			IMX8QM_USDHC2_DATA0_LSIO_GPIO5_IO26	0x00000021
+			/* GPIO5_27 on X61:21 */
+			IMX8QM_USDHC2_DATA1_LSIO_GPIO5_IO27	0x00000021
+			/* GPIO5_28 on X61:23 */
+			IMX8QM_USDHC2_DATA2_LSIO_GPIO5_IO28	0x00000021
+			/* GPIO5_29 on X61:25 */
+			IMX8QM_USDHC2_DATA3_LSIO_GPIO5_IO29	0x00000021
+		>;
+	};
+
+	pinctrl_gpiokeys: gpiokeys {
+		fsl,pins = <
+			IMX8QM_ESAI1_TX3_RX2_LSIO_GPIO2_IO11		0x00000021
+			IMX8QM_SCU_GPIO0_04_LSIO_GPIO1_IO00		0x00000021
+		>;
+	};
+
+	pinctrl_gpioled: gpioledgrp {
+		fsl,pins = <
+			IMX8QM_USDHC1_DATA4_LSIO_GPIO5_IO19		0x00000021
+			IMX8QM_USDHC1_DATA5_LSIO_GPIO5_IO20		0x00000021
 		>;
 	};
 
@@ -217,6 +310,18 @@
 			IMX8QM_USDHC1_VSELECT_CONN_USDHC1_VSELECT	0x00000020
 		>;
 	};
+};
+
+&lsio_gpio1 {
+	/* enable wakeup for gpio-key for gpio1 line 0 (SWITCH_B)*/
+	pad-wakeup-num = <1>;
+	pad-wakeup = <IMX8QM_SCU_GPIO0_04 4 0>;
+};
+
+&lsio_gpio2 {
+	/* enable wakeup for gpio-key for gpio2 line 11 (SWITCH_A)*/
+	pad-wakeup-num = <1>;
+	pad-wakeup = <IMX8QM_ESAI1_TX3_RX2 4 11>;
 };
 
 &i2c1 {
