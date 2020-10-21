@@ -1,0 +1,122 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright 2019-2021 TQ-Systems GmbH
+ */
+
+/ {
+	model = "TQ Systems i.MX8QM TQMa8QM on MBa8x";
+	compatible = "tq,imx8qm-mba8x", "tq,imx8qm-tqma8qm", "fsl,imx8qm";
+
+	chosen {
+		bootargs = "console=ttyLP0,115200 earlycon";
+		stdout-path = &lpuart0;
+	};
+
+	memory@80000000 {
+		device_type = "memory";
+		reg = <0x00000000 0x80000000 0 0x40000000>;
+	};
+
+	reg_mba8x_v3v3: mba8x_v3v3 {
+		compatible = "regulator-fixed";
+		regulator-name = "MBa8x-V3V3";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-always-on;
+	};
+
+	reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		dsp_reserved: dsp@0x92400000 {
+			no-map;
+			reg = <0 0x92400000 0 0x2000000>;
+		};
+
+		/* global autoconfigured region for contiguous allocations */
+		linux,cma {
+			compatible = "shared-dma-pool";
+			reusable;
+			size = <0 0x3c000000>;
+			alloc-ranges = <0 0x96000000 0 0x3c000000>;
+			linux,cma-default;
+		};
+	};
+};
+
+&iomuxc {
+	pinctrl_lpuart0: lpuart0grp {
+		fsl,pins = <
+			IMX8QM_UART0_RX_DMA_UART0_RX		0x06000020
+			IMX8QM_UART0_TX_DMA_UART0_TX		0x06000020
+			IMX8QM_UART0_CTS_B_DMA_UART0_CTS_B	0x00000021
+			IMX8QM_UART0_RTS_B_DMA_UART0_RTS_B	0x00000021
+		>;
+	};
+
+	pinctrl_usdhc2_gpio: usdhc2grpgpio {
+		fsl,pins = <
+			IMX8QM_USDHC1_DATA6_LSIO_GPIO5_IO21	0x00000021
+			IMX8QM_USDHC1_DATA7_LSIO_GPIO5_IO22	0x00000021
+			IMX8QM_USDHC1_RESET_B_LSIO_GPIO4_IO07	0x00000021
+		>;
+	};
+
+	pinctrl_usdhc2: usdhc2grp {
+		fsl,pins = <
+			IMX8QM_USDHC1_CLK_CONN_USDHC1_CLK		0x06000041
+			IMX8QM_USDHC1_CMD_CONN_USDHC1_CMD		0x00000021
+			IMX8QM_USDHC1_DATA0_CONN_USDHC1_DATA0		0x00000021
+			IMX8QM_USDHC1_DATA1_CONN_USDHC1_DATA1		0x00000021
+			IMX8QM_USDHC1_DATA2_CONN_USDHC1_DATA2		0x00000021
+			IMX8QM_USDHC1_DATA3_CONN_USDHC1_DATA3		0x00000021
+			IMX8QM_USDHC1_VSELECT_CONN_USDHC1_VSELECT	0x00000021
+		>;
+	};
+
+	pinctrl_usdhc2_100mhz: usdhc2grp100mhz {
+		fsl,pins = <
+			IMX8QM_USDHC1_CLK_CONN_USDHC1_CLK		0x06000040
+			IMX8QM_USDHC1_CMD_CONN_USDHC1_CMD		0x00000021
+			IMX8QM_USDHC1_DATA0_CONN_USDHC1_DATA0		0x00000021
+			IMX8QM_USDHC1_DATA1_CONN_USDHC1_DATA1		0x00000021
+			IMX8QM_USDHC1_DATA2_CONN_USDHC1_DATA2		0x00000021
+			IMX8QM_USDHC1_DATA3_CONN_USDHC1_DATA3		0x00000021
+			IMX8QM_USDHC1_VSELECT_CONN_USDHC1_VSELECT	0x00000020
+		>;
+	};
+
+	pinctrl_usdhc2_200mhz: usdhc2grp200mhz {
+		fsl,pins = <
+			IMX8QM_USDHC1_CLK_CONN_USDHC1_CLK		0x06000040
+			IMX8QM_USDHC1_CMD_CONN_USDHC1_CMD		0x00000021
+			IMX8QM_USDHC1_DATA0_CONN_USDHC1_DATA0		0x00000021
+			IMX8QM_USDHC1_DATA1_CONN_USDHC1_DATA1		0x00000021
+			IMX8QM_USDHC1_DATA2_CONN_USDHC1_DATA2		0x00000021
+			IMX8QM_USDHC1_DATA3_CONN_USDHC1_DATA3		0x00000021
+			IMX8QM_USDHC1_VSELECT_CONN_USDHC1_VSELECT	0x00000020
+		>;
+	};
+};
+
+&lpuart0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_lpuart0>;
+	status = "okay";
+};
+
+&usdhc2 {
+	pinctrl-names = "default", "state_100mhz", "state_200mhz";
+	pinctrl-0 = <&pinctrl_usdhc2>, <&pinctrl_usdhc2_gpio>;
+	pinctrl-1 = <&pinctrl_usdhc2_100mhz>, <&pinctrl_usdhc2_gpio>;
+	pinctrl-2 = <&pinctrl_usdhc2_200mhz>, <&pinctrl_usdhc2_gpio>;
+	bus-width = <4>;
+	cd-gpios = <&lsio_gpio5 22 GPIO_ACTIVE_LOW>;
+	wp-gpios = <&lsio_gpio5 21 GPIO_ACTIVE_HIGH>;
+	vmmc-supply = <&reg_mba8x_v3v3>;
+	no-mmc;
+	no-1-8-v;
+	status = "okay";
+};
