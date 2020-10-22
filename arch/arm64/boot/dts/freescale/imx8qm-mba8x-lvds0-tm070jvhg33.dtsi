@@ -1,0 +1,81 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright 2018-2021 TQ-Systems GmbH
+ */
+
+/ {
+	blk_lvds0: blk_lvds0 {
+		compatible = "pwm-backlight";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_lvds0_blk>;
+		pwms = <&pwm_lvds0 0 100000 0>;
+		brightness-levels = <0 4 8 16 32 64 128 255>;
+		default-brightness-level = <7>;
+		power-supply = <&reg_mba8x_12v>;
+		enable-gpios = <&lsio_gpio1 6 GPIO_ACTIVE_HIGH>;
+		status = "okay";
+	};
+
+	panel_lvds0: panel-lvds0 {
+		compatible = "tianma,tm070jvhg33";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_lvds0_enable>;
+		backlight = <&blk_lvds0>;
+		enable-gpios = <&lsio_gpio1 5 GPIO_ACTIVE_HIGH>;
+		status = "okay";
+
+		port {
+			panel_in_lvds0: endpoint {
+				remote-endpoint = <&lvds0_out>;
+			};
+		};
+	};
+};
+
+&pwm_lvds0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_lvds0_pwm>;
+	status = "okay";
+};
+
+&iomuxc {
+	pinctrl_lvds0_blk: lvds0_blk {
+		fsl,pins = <
+			IMX8QM_LVDS0_I2C0_SCL_LSIO_GPIO1_IO06	0x00000021
+		>;
+	};
+
+	pinctrl_lvds0_enable: lvds0_enable {
+		fsl,pins = <
+			IMX8QM_LVDS0_GPIO01_LSIO_GPIO1_IO05	0x00000021
+		>;
+	};
+
+	pinctrl_lvds0_pwm: lvds0pwm0grp {
+		fsl,pins = <
+			IMX8QM_LVDS0_GPIO00_LVDS0_PWM0_OUT	0x00000020
+		>;
+	};
+};
+
+&ldb1_phy {
+	status = "okay";
+};
+
+&ldb1 {
+	status = "okay";
+
+	lvds-channel@0 {
+		fsl,data-mapping = "spwg";
+		fsl,data-width = <24>;
+		status = "okay";
+
+		port@1 {
+			reg = <1>;
+
+			lvds0_out: endpoint {
+				remote-endpoint = <&panel_in_lvds0>;
+			};
+		};
+	};
+};
