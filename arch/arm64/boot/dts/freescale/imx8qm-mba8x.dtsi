@@ -66,6 +66,17 @@
 		regulator-always-on;
 	};
 
+	reg_mba8x_12v: mba8x_12v {
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_reg_mba8x_12v>;
+		compatible = "regulator-fixed";
+		regulator-name = "MBa8x-V12";
+		regulator-min-microvolt = <12000000>;
+		regulator-max-microvolt = <12000000>;
+		enable-active-high;
+		gpio = <&lsio_gpio1 2 GPIO_ACTIVE_HIGH>;
+	};
+
 	reg_usbotg1_vbus: regulator-usbotg1-vbus {
 		compatible = "regulator-fixed";
 		regulator-name = "USBOTG1_VBUS";
@@ -364,6 +375,12 @@
 		fsl,pins = <
 			IMX8QM_LVDS0_I2C1_SDA_DMA_UART2_RX	0x06000020
 			IMX8QM_LVDS0_I2C1_SCL_DMA_UART2_TX	0x06000020
+		>;
+	};
+
+	pinctrl_reg_mba8x_12v: mba12vgrp {
+		fsl,pins = <
+			IMX8QM_SCU_GPIO0_06_LSIO_GPIO1_IO02	0x00000021
 		>;
 	};
 
