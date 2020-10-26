@@ -77,6 +77,30 @@
 		gpio = <&lsio_gpio1 2 GPIO_ACTIVE_HIGH>;
 	};
 
+	reg_v1v5_pcie: v1v5_pcie {
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_reg_pcie_v1v5>;
+		compatible = "regulator-fixed";
+		regulator-name = "V1V5_PCIE";
+		regulator-min-microvolt = <1500000>;
+		regulator-max-microvolt = <1500000>;
+		vin-supply = <&reg_mba8x_v3v3>;
+		enable-active-high;
+		gpio = <&lsio_gpio0 31 GPIO_ACTIVE_HIGH>;
+	};
+
+	reg_v3v3_pcie: v3v3_pcie {
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_reg_pcie_v3v3>;
+		compatible = "regulator-fixed";
+		regulator-name = "V3V3_PCIE";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		vin-supply = <&reg_mba8x_v3v3>;
+		enable-active-high;
+		gpio = <&lsio_gpio1 1 GPIO_ACTIVE_HIGH>;
+	};
+
 	reg_usbotg1_vbus: regulator-usbotg1-vbus {
 		compatible = "regulator-fixed";
 		regulator-name = "USBOTG1_VBUS";
@@ -195,7 +219,7 @@
 
 &iomuxc {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_gpio>;
+	pinctrl-0 = <&pinctrl_gpio &pinctrl_hog>;
 
 	pinctrl_fec1: fec1grp {
 		fsl,pins = <
@@ -308,6 +332,13 @@
 		>;
 	};
 
+	pinctrl_hog: hoggrp {
+		fsl,pins = <
+			IMX8QM_ESAI1_SCKT_LSIO_GPIO2_IO07		0x00000021
+			IMX8QM_ESAI1_TX2_RX3_LSIO_GPIO2_IO10		0x00000021
+		>;
+	};
+
 	pinctrl_lpspi0: lpspi0grp {
 		fsl,pins = <
 			IMX8QM_SPI0_SCK_DMA_SPI0_SCK	0x0600004c
@@ -378,9 +409,39 @@
 		>;
 	};
 
+	pinctrl_pciea: pcieagrp {
+		fsl,pins = <
+			 /* PCIE_DISABLE */
+			IMX8QM_ESAI1_FST_LSIO_GPIO2_IO05			0x00000021
+			IMX8QM_PCIE_CTRL0_PERST_B_LSIO_GPIO4_IO29		0x06000021
+			IMX8QM_PCIE_CTRL0_CLKREQ_B_LSIO_GPIO4_IO27		0x06000021
+			IMX8QM_PCIE_CTRL0_WAKE_B_LSIO_GPIO4_IO28		0x04000021
+		>;
+	};
+
+	pinctrl_pcieb: pciebgrp {
+		fsl,pins = <
+			IMX8QM_PCIE_CTRL1_PERST_B_LSIO_GPIO5_IO00		0x06000021
+			IMX8QM_PCIE_CTRL1_CLKREQ_B_LSIO_GPIO4_IO30		0x06000021
+			IMX8QM_PCIE_CTRL1_WAKE_B_LSIO_GPIO4_IO31		0x04000021
+		>;
+	};
+
 	pinctrl_reg_mba8x_12v: mba12vgrp {
 		fsl,pins = <
 			IMX8QM_SCU_GPIO0_06_LSIO_GPIO1_IO02	0x00000021
+		>;
+	};
+
+	pinctrl_reg_pcie_v1v5: regpcie1v5grp {
+		fsl,pins = <
+			IMX8QM_SCU_GPIO0_03_LSIO_GPIO0_IO31	0x00000021
+		>;
+	};
+
+	pinctrl_reg_pcie_v3v3: regpcie3v3grp {
+		fsl,pins = <
+			IMX8QM_SCU_GPIO0_05_LSIO_GPIO1_IO01	0x00000021
 		>;
 	};
 
@@ -457,6 +518,18 @@
 		gpios = <7 0>;
 		output-high;
 		line-name = "USB_RST#";
+	};
+
+	/*
+	 * force PD# input of PCIe clock generator high
+	 * TODO: should better be used as gpio driven clock gate
+	 * has to check against SCU firmware if possible.
+	 */
+	pcie-clk-pd {
+		gpio-hog;
+		gpios = <10 0>;
+		output-high;
+		line-name = "PCIE_CLK_PD#";
 	};
 };
 
@@ -561,6 +634,36 @@
 		spi-max-frequency = <5000000>;
 		status = "okay";
 	};
+};
+
+&pciea {
+	ext_osc = <1>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pciea>;
+	disable-gpio = <&lsio_gpio2 5 GPIO_ACTIVE_LOW>;
+	reset-gpio = <&lsio_gpio4 29 GPIO_ACTIVE_LOW>;
+/* TODO: optional, currently without functionality */
+/*	clkreq-gpio = <&gpio4 27 GPIO_ACTIVE_LOW>; */
+	epdev_on-supply = <&reg_v3v3_pcie>;
+	vpcie-supply = <&reg_v1v5_pcie>;
+	status = "okay";
+};
+
+&pcieb {
+	ext_osc = <1>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pcieb>;
+	reset-gpio = <&lsio_gpio5 0 GPIO_ACTIVE_LOW>;
+/* TODO: optional, currently without functionality */
+/*	clkreq-gpio = <&gpio4 30 GPIO_ACTIVE_LOW>; */
+	epdev_on-supply = <&reg_mba8x_v3v3>;
+	status = "okay";
+};
+
+&sata {
+	ext_osc = <1>;
+	clkreq-gpio = <&lsio_gpio4 30 GPIO_ACTIVE_LOW>;
+	status = "okay";
 };
 
 &usbphy1 {
