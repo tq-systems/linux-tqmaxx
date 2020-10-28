@@ -9,6 +9,11 @@
 	model = "TQ Systems i.MX8QM TQMa8QM on MBa8x";
 	compatible = "tq,imx8qm-mba8x", "tq,imx8qm-tqma8qm", "fsl,imx8qm";
 
+	aliases {
+		rtc1 = &rtc;
+		rtc0 = &pcf85063;
+	};
+
 	chosen {
 		bootargs = "console=ttyLP0,115200 earlycon";
 		stdout-path = &lpuart0;
