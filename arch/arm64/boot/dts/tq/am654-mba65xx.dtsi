@@ -114,18 +114,6 @@
 			local-mac-address = [00 00 00 00 00 00];
 		};
 	};
-
-
-	// vdd_mmc1_sd: fixedregulator-sd {
-	// 	compatible = "regulator-fixed";
-	// 	regulator-name = "vdd_mmc1_sd";
-	// 	regulator-min-microvolt = <3300000>;
-	// 	regulator-max-microvolt = <3300000>;
-	// 	regulator-boot-on;
-	// 	enable-active-high;
-	// 	gpios = <&pca9554 4 GPIO_ACTIVE_HIGH>;
-	// };
-
 };
 
 &wkup_pmx0 {

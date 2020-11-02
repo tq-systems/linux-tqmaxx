@@ -441,14 +441,14 @@ static int panel_simple_probe(struct device *dev, const struct panel_desc *desc)
 	// 	return err;
 	// }
 
-	// backlight = of_parse_phandle(dev->of_node, "backlight", 0);
-	// if (backlight) {
-	// 	panel->backlight = of_find_backlight_by_node(backlight);
-	// 	of_node_put(backlight);
+	backlight = of_parse_phandle(dev->of_node, "backlight", 0);
+	if (backlight) {
+		panel->backlight = of_find_backlight_by_node(backlight);
+		of_node_put(backlight);
 
-	// 	if (!panel->backlight)
-	// 		return -EPROBE_DEFER;
-	// }
+		if (!panel->backlight)
+			return -EPROBE_DEFER;
+	}
 
 	ddc = of_parse_phandle(dev->of_node, "ddc-i2c-bus", 0);
 	if (ddc) {
