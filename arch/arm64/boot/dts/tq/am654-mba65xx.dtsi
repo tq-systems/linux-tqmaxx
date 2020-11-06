@@ -318,6 +318,11 @@
 		reg = <0x51>;
 	};
 
+	m24c64: eeprom@50 {
+		compatible = "st-micro,24c256";
+		reg  = <0x50>;
+    };
+
 	// pca9554: gpio@39 {
 	// 	compatible = "nxp,pca9554";
 	// 	reg = <0x39>;
