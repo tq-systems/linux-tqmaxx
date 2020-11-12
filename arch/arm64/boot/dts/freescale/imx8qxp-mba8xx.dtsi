@@ -251,7 +251,7 @@
 /*
  *		interrupt-parent = <&lsio_gpio3>;
  *		interrupts = <8 IRQ_TYPE_LEVEL_LOW>;
-*/
+ */
 		vcc-supply = <&reg_1v8>;
 	};
 };
@@ -302,7 +302,7 @@
 	pinctrl_fec2: fec2grp {
 		fsl,pins = <
 			IMX8QXP_COMP_CTL_GPIO_1V8_3V3_ENET_ENETB1_PAD	0x000014a0
-			
+
 			IMX8QXP_ESAI0_SCKR_CONN_ENET1_RGMII_TX_CTL	0x00000040
 			IMX8QXP_ESAI0_FSR_CONN_ENET1_RGMII_TXC		0x00000040
 			IMX8QXP_ESAI0_TX4_RX1_CONN_ENET1_RGMII_TXD0	0x00000040
