@@ -86,25 +86,6 @@
 	memory-region = <&global_cma>;
 };
 
-&vspb {
-	status = "okay";
-};
-
-&vspi0 {
-	status = "okay";
-};
-
-&du {
-	clocks = <&cpg CPG_MOD 724>,
-		 <&cpg CPG_MOD 723>,
-		 <&cpg CPG_MOD 722>,
-		 <&versaclock5 1>,
-		 <&x302_clk>,
-		 <&versaclock5 2>;
-	clock-names = "du.0", "du.1", "du.2",
-		      "dclkin.0", "dclkin.1", "dclkin.2";
-};
-
 &rpc {
 	renesas,rpc-mode = "spi";
 	status = "okay";
@@ -112,9 +93,9 @@
 	flash@0 {
 		compatible = "jedec,spi-nor";
 		reg = <0>;
-		spi-max-frequency = <40000000>;
-		spi-tx-bus-width = <4>;
-		spi-rx-bus-width = <4>;
+		spi-max-frequency = <67000000>;
+		spi-tx-bus-width = <1>;
+		spi-rx-bus-width = <1>;
 		m25p,fast-read;
 
 		partitions {
@@ -154,5 +135,13 @@
 				reg = <0x00400000 0xC00000>;
 			};
 		};
+	};
+};
+
+&pfc {
+	sdhi3_pins: sd3 {
+		groups = "sdhi3_data8", "sdhi3_ctrl", "sdhi3_ds";
+		function = "sdhi3";
+		power-source = <1800>;
 	};
 };

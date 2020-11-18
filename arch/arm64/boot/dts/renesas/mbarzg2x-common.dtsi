@@ -16,6 +16,8 @@
 		spi1 = &msiof1;
 		spi2 = &msiof2;
 		spi3 = &msiof3;
+		mmc0 = &sdhi0;
+		mmc1 = &sdhi3;
 	};
 
 	chosen {
@@ -37,34 +39,16 @@
 	leds {
 		compatible = "gpio-leds";
 
-		bt_active_led {
-			label = "blue:bt";
-			gpios = <&gpio7  0 GPIO_ACTIVE_HIGH>;
-			linux,default-trigger = "hci0-power";
-			default-state = "off";
+		user_led_1 {
+			gpios = <&gpio6 19 GPIO_ACTIVE_HIGH>;
 		};
 
-		led0 {
+		user_led_2 {
 			gpios = <&gpio6 11 GPIO_ACTIVE_HIGH>;
 		};
 
-		led1 {
-			gpios = <&gpio6 12 GPIO_ACTIVE_HIGH>;
-		};
-
-		led2 {
-			gpios = <&gpio6 13 GPIO_ACTIVE_HIGH>;
-		};
-
-		led3 {
-			gpios = <&gpio0  0 GPIO_ACTIVE_HIGH>;
-		};
-
-		wlan_active_led {
-			label = "yellow:wlan";
-			gpios = <&gpio7  1 GPIO_ACTIVE_HIGH>;
-			linux,default-trigger = "phy0tx";
-			default-state = "off";
+		user_led_3 {
+			gpios = <&gpio6 14 GPIO_ACTIVE_HIGH>;
 		};
 	};
 
@@ -86,6 +70,8 @@
 		regulator-always-on;
 	};
 
+	/* disabled due to unknown pin-muxing... */
+#if 0
 	sound_card: sound {
 		compatible = "audio-graph-card";
 
@@ -94,16 +80,14 @@
 		dais = <&rsnd_port0	/* HDMI Audio */
 			&rsnd_port1>;	/* External PCM5102A Codec */
 	};
+#endif
 
-	vbus0_usb2: regulator-vbus0-usb2 {
+	vbus0_usb2: regulator_vbus_usb2 {
 		compatible = "regulator-fixed";
 
 		regulator-name = "USB20_VBUS0";
 		regulator-min-microvolt = <5000000>;
 		regulator-max-microvolt = <5000000>;
-
-		gpio = <&gpio6 16 GPIO_ACTIVE_HIGH>;
-		enable-active-high;
 	};
 
 	vccq_sdhi0: regulator-vccq-sdhi0 {
@@ -119,77 +103,35 @@
 			  1800000 1>;
 	};
 
-	wlan_en_reg: regulator-wlan_en {
-		compatible = "regulator-fixed";
-		regulator-name = "wlan-en-regulator";
-		regulator-min-microvolt = <1800000>;
-		regulator-max-microvolt = <1800000>;
-		startup-delay-us = <70000>;
-
-		gpio = <&gpio_expander 1 GPIO_ACTIVE_HIGH>;
-		enable-active-high;
-	};
-
-	x302_clk: x302-clock {
+	du_dotclk_in0: du-dotclock-in0 {
 		compatible = "fixed-clock";
 		#clock-cells = <0>;
 		clock-frequency = <33000000>;
 	};
 
-	x304_clk: x304-clock {
+	du_dotclk_in1: du-dotclock-in1 {
 		compatible = "fixed-clock";
 		#clock-cells = <0>;
-		clock-frequency = <25000000>;
+		clock-frequency = <33000000>;
+	};
+
+	du_dotclk_in2: du-dotclock-in2 {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <33000000>;
 	};
 
 	vspm_if {
 		compatible = "renesas,vspm_if";
 	};
-
-	camera_vdddo_1v8: 1p8v {
-		compatible = "regulator-fixed";
-		regulator-name = "camera_vdddo";
-		regulator-min-microvolt = <1800000>;
-		regulator-max-microvolt = <1800000>;
-		regulator-always-on;
-	};
-
-	camera_vdda_2v8: 2p8v {
-		compatible = "regulator-fixed";
-		regulator-name = "camera_vdda";
-		regulator-min-microvolt = <2800000>;
-		regulator-max-microvolt = <2800000>;
-		regulator-always-on;
-	};
-
-	camera_vddd_1v5: 1p5v {
-		compatible = "regulator-fixed";
-		regulator-name = "camera_vddd";
-		regulator-min-microvolt = <1500000>;
-		regulator-max-microvolt = <1500000>;
-		regulator-always-on;
-	};
-
-	camera_clk: camera_clk {
-		compatible = "fixed-clock";
-		#clock-cells = <0>;
-		clock-frequency = <24000000>;
-	};
-
-	pcm5102a: pcm5102a {
-		compatible = "ti,pcm5102a";
-		#sound-dai-cells = <0>;
-
-		port {
-			pcm5102a_endpoint: endpoint {
-				remote-endpoint = <&rsnd_endpoint1>;
-			};
-		};
-	};
 };
 
-&audio_clk_a {
-	clock-frequency = <22579200>;
+&audio_clk_b {
+	clock-frequency = <12288000>;
+};
+
+&audio_clk_c {
+	clock-frequency = <24576000>;
 };
 
 &du {
@@ -197,10 +139,6 @@
 };
 
 &ehci0 {
-	status = "okay";
-};
-
-&ehci1 {
 	status = "okay";
 };
 
@@ -213,11 +151,11 @@
 };
 
 &gpio6 {
-	usb1-reset {
+	usb3-hub-reset {
 		gpio-hog;
 		gpios = <22 GPIO_ACTIVE_LOW>;
 		output-low;
-		line-name = "usb1-reset";
+		line-name = "usb3-hub-reset";
 	};
 };
 
@@ -246,11 +184,6 @@
 
 	uart-has-rtscts;
 	status = "okay";
-
-	bluetooth {
-		compatible = "ti,wl1837-st";
-		enable-gpios = <&gpio_expander 2 GPIO_ACTIVE_HIGH>;
-	};
 };
 
 &hscif1 {
@@ -277,20 +210,71 @@
 	clock-frequency = <400000>;
 	status = "okay";
 
-	gpio_expander: gpio@20 {
-		compatible = "onnn,pca9654";
-		reg = <0x20>;
-		gpio-controller;
-		#gpio-cells = <2>;
+	codec: tlv320aic32x4@18 {
+		compatible = "ti,tlv320aic32x4";
+		reg = <0x18>;
+		reset-gpios = <&gpio6 28 GPIO_ACTIVE_LOW>;
+		clocks = <&rcar_sound 0>;
+		clock-names = "mclk";
+		pinctrl-names = "default";
+		pinctrl-0 = <&sound_pins>;
+		ldoin-supply = <&reg_3p3v>;
+		iov-supply = <&reg_3p3v>;
+
+		port {
+			tlv320_endpoint: endpoint {
+				remote-endpoint = <&rsnd_endpoint1>;
+			};
+		};
 	};
 
-	versaclock5: clock-generator@6a {
-		compatible = "idt,5p49v5923";
-		reg = <0x6a>;
-		#clock-cells = <1>;
-		clocks = <&x304_clk>;
-		clock-names = "xin";
+	/* STMPE touchscreen controller */
+	touch: touch@41 {
+		compatible = "st,stmpe811";
+		reg = <0x41>;
+		wakeup-source;
+		st,autosleep-timeout = <1024>;
+		stmpe_touchscreen {
+			compatible = "st,stmpe-ts";
+			st,sample-time = <4>;
+			st,mod-12b = <1>;
+			st,ref-sel = <0>;
+			st,adc-freq = <1>;
+			st,ave-ctrl = <1>;
+			st,touch-det-delay = <2>;
+			st,settling = <2>;
+			st,fraction-z = <7>;
+			st,i-drive = <1>;
+		};
 	};
+
+	/* SE97B temp sensor */
+	temp-sensor@1f {
+		compatible = "nxp,se97b", "jedec,jc-42.4-temp";
+		reg = <0x1f>;
+	};
+
+	/* config eeprom SE97B */
+	eeprom@57 {
+		compatible = "nxp,se97b", "atmel,24c02";
+		reg = <0x57>;
+		pagesize = <16>;
+	};
+
+	csa_vin: adc@70 {
+		compatible = "maxim,max9611";
+		reg = <0x70>;
+
+		shunt-resistor-micro-ohms = <3000>;
+	};
+
+	csa_mod: adc@7d {
+		compatible = "maxim,max9611";
+		reg = <0x7d>;
+
+		shunt-resistor-micro-ohms = <3000>;
+	};
+
 };
 
 &ohci0 {
@@ -306,12 +290,18 @@
 };
 
 &pfc {
+/* ??? */
 	pinctrl-0 = <&scif_clk_pins>;
 	pinctrl-names = "default";
 
-	hscif0_pins: hscif0 {
-		groups = "hscif0_data", "hscif0_ctrl";
-		function = "hscif0";
+	scif_clk_pins: scif_clk {
+		groups = "scif_clk_a";
+		function = "scif_clk";
+	};
+
+	scif0_pins: scif0 {
+		groups = "scif0_data";
+		function = "scif0";
 	};
 
 	scif2_pins: scif2 {
@@ -319,19 +309,14 @@
 		function = "scif2";
 	};
 
-	scif_clk_pins: scif_clk {
-		groups = "scif_clk_a";
-		function = "scif_clk";
+	hscif0_pins: hscif0 {
+		groups = "hscif0_data", "hscif0_ctrl";
+		function = "hscif0";
 	};
 
 	hscif1_pins: hscif1 {
-		groups = "hscif1_data_a", "hscif1_ctrl_a";
+		groups = "hscif1_data_a";
 		function = "hscif1";
-	};
-
-	scif0_pins: scif0 {
-		groups = "scif0_data";
-		function = "scif0";
 	};
 
 	sdhi0_pins: sd0 {
@@ -347,9 +332,9 @@
 	};
 
 	sdhi2_pins: sd2 {
-		groups = "sdhi2_data4", "sdhi2_ctrl";
+		groups = "sdhi2_data4", "sdhi2_ctrl", "sdhi2_ds";
 		function = "sdhi2";
-		power-source = <1800>;
+		power-source = <3300>;
 	};
 
 	sdhi3_pins: sd3 {
@@ -364,7 +349,7 @@
 	};
 
 	sound_clk_pins: sound_clk {
-		groups = "audio_clk_a_a";
+		groups = "audio_clk_b_a", "audio_clk_c_b", "audio_clkout3_a";
 		function = "audio_clk";
 	};
 
@@ -373,30 +358,11 @@
 		function = "usb0";
 	};
 
-	usb1_pins: usb1 {
-		mux {
-			groups = "usb1";
-			function = "usb1";
-		};
+	/* USB2 ch1 and USB3 do not use PWEN and OVC pins, so no muxing here... */
 
-		ovc {
-			pins = "GP_6_27";
-			bias-pull-up;
-		};
-
-		pwen {
-			pins = "GP_6_26";
-		};
-	};
-
-	usb30_pins: usb30 {
-		groups = "usb30";
-		function = "usb30";
-	};
-
-	i2c2_pins: i2c2 {
-		groups = "i2c2_a";
-		function = "i2c2";
+	i2c6_pins: i2c6 {
+		groups = "i2c6_a";
+		function = "i2c6";
 	};
 
 	msiof0_pins: spi0 {
@@ -430,8 +396,7 @@
 
 		rsnd_port1: port@1 {
 			rsnd_endpoint1: endpoint {
-				remote-endpoint = <&pcm5102a_endpoint>;
-
+				remote-endpoint = <&tlv320_endpoint>;
 				dai-format = "i2s";
 				bitclock-master = <&rsnd_endpoint1>;
 				frame-master = <&rsnd_endpoint1>;
@@ -482,20 +447,8 @@
 	pinctrl-0 = <&sdhi2_pins>;
 	pinctrl-names = "default";
 
-	vmmc-supply = <&wlan_en_reg>;
+	vmmc-supply = <&reg_3p3v>;
 	bus-width = <4>;
-	non-removable;
-	cap-power-off-card;
-	keep-power-in-suspend;
-
-	#address-cells = <1>;
-	#size-cells = <0>;
-	wlcore: wlcore@2 {
-		compatible = "ti,wl1837";
-		reg = <2>;
-		interrupt-parent = <&gpio2>;
-		interrupts = <5 IRQ_TYPE_LEVEL_HIGH>;
-	};
 };
 
 &sdhi3 {
@@ -527,9 +480,6 @@
 };
 
 &usb2_phy1 {
-	pinctrl-0 = <&usb1_pins>;
-	pinctrl-names = "default";
-
 	status = "okay";
 };
 
@@ -551,10 +501,26 @@
 };
 
 &xhci0 {
-	pinctrl-0 = <&usb30_pins>;
-	pinctrl-names = "default";
-
 	status = "okay";
+};
+
+&vspb {
+	status = "okay";
+};
+
+&vspi0 {
+	status = "okay";
+};
+
+&du {
+	clocks = <&cpg CPG_MOD 724>,
+		<&cpg CPG_MOD 723>,
+		<&cpg CPG_MOD 722>,
+		<&du_dotclk_in0>,
+		<&du_dotclk_in1>,
+		<&du_dotclk_in2>;
+		clock-names = "du.0", "du.1", "du.2",
+			"dclkin.0", "dclkin.1", "dclkin.2";
 };
 
 &cmt0 {
@@ -627,39 +593,6 @@
 			csi20_in: endpoint {
 				clock-lanes = <0>;
 				data-lanes = <1 2>;
-				remote-endpoint = <&ov5645_csi20>;
-			};
-		};
-	};
-};
-
-&i2c2 {
-	pinctrl-0 = <&i2c2_pins>;
-	pinctrl-names = "default";
-	status = "okay";
-
-	ov5645: ov5645@3c {
-		compatible = "ovti,ov5645";
-		reg = <0x3c>;
-
-		enable-gpios = <&gpio6 4 GPIO_ACTIVE_HIGH>;
-		reset-gpios = <&gpio6 8 GPIO_ACTIVE_LOW>;
-
-		clocks = <&camera_clk>;
-		clock-names = "xclk";
-		clock-frequency = <24000000>;
-
-		vdddo-supply = <&camera_vdddo_1v8>;
-		vdda-supply = <&camera_vdda_2v8>;
-		vddd-supply = <&camera_vddd_1v5>;
-
-		virtual-channel = /bits/ 8 <0>;
-
-		port {
-			ov5645_csi20: endpoint {
-				clock-lanes = <0>;
-				data-lanes = <1 2>;
-				remote-endpoint = <&csi20_in>;
 			};
 		};
 	};
