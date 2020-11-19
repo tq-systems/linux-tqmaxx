@@ -92,6 +92,7 @@
 		vin-supply = <&reg_mba8x_v3v3>;
 		enable-active-high;
 		gpio = <&lsio_gpio0 31 GPIO_ACTIVE_HIGH>;
+		regulator-always-on;
 	};
 
 	reg_v3v3_pcie: v3v3_pcie {
@@ -104,6 +105,7 @@
 		vin-supply = <&reg_mba8x_v3v3>;
 		enable-active-high;
 		gpio = <&lsio_gpio1 1 GPIO_ACTIVE_HIGH>;
+		regulator-always-on;
 	};
 
 	reg_usbotg1_vbus: regulator-usbotg1-vbus {
