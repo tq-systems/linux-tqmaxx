@@ -1,0 +1,8 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright 2019-2020 TQ-Systems GmbH
+ */
+
+#include "imx8qm-mba8x.dts"
+#include "imx8qm-mba8x-mikrobus-rtc5.dtsi"
+
