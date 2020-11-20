@@ -6,6 +6,8 @@
  * Copyright (C) 2020 TQ-Systems GmbH
  */
 
+#include <dt-bindings/net/ti-dp83867.h>
+
 / {
 	aliases {
 		serial0 = &scif2;
@@ -132,6 +134,28 @@
 
 &audio_clk_c {
 	clock-frequency = <24576000>;
+};
+
+&avb {
+	pinctrl-0 = <&avb_pins>;
+	pinctrl-names = "default";
+	phy-handle = <&phy0>;
+	phy-mode = "rgmii-txid";
+	status = "okay";
+
+	phy0: ethernet-phy@0 {
+		reg = <0>;
+		ti,rx-internal-delay = <DP83867_RGMIIDCTL_1_NS>;
+		ti,tx-internal-delay = <DP83867_RGMIIDCTL_1_NS>;
+		ti,min-output-impedance = "true";
+		ti,dp83867-rxctrl-strap-quirk;
+		ti,led-cfg1 = <0x0100>; /* LED1: Link, LED2: activity */
+		ti,led-cfg2 = <0x1001>; /* active low, LED1/2 driven by phy */
+
+		interrupt-parent = <&gpio2>;
+		interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
+		reset-gpios = <&gpio1 25 GPIO_ACTIVE_LOW>;
+	};
 };
 
 &du {
@@ -290,9 +314,26 @@
 };
 
 &pfc {
-/* ??? */
 	pinctrl-0 = <&scif_clk_pins>;
 	pinctrl-names = "default";
+
+	avb_pins: avb {
+		mux {
+			groups = "avb_mdio", "avb_mii";
+			function = "avb";
+		};
+
+		pins_mdio {
+			groups = "avb_mdio";
+			drive-strength = <24>;
+		};
+
+		pins_mii_tx {
+			pins = "PIN_AVB_TX_CTL", "PIN_AVB_TXC", "PIN_AVB_TD0",
+			       "PIN_AVB_TD1", "PIN_AVB_TD2", "PIN_AVB_TD3";
+			drive-strength = <12>;
+		};
+	};
 
 	scif_clk_pins: scif_clk {
 		groups = "scif_clk_a";
