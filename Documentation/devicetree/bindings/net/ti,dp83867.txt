@@ -27,6 +27,8 @@ Optional property:
 				    for details.
 	- ti,clk-output-sel - Muxing option for CLK_OUT pin - see dt-bindings/net/ti-dp83867.h
 				    for applicable values.
+	- ti,led-cfg1	Value for PHY register 0x18 (LEDCR1) to select LED source
+	- ti,led-cfg2	Value for PHY register 0x19 (LEDCR2) to select LED polarity
 
 Note: ti,min-output-impedance and ti,max-output-impedance are mutually
       exclusive. When both properties are present ti,max-output-impedance
