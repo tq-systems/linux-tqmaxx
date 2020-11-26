@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
 /*
- * Copyright 2018 TQ Systems GmbH
+ * Copyright 2018 TQ-Systems GmbH
  * Author: Markus Niebel <Markus.Niebel@tq-group.com>
  */
 
@@ -8,6 +8,6 @@
 #include "imx6ul-mba6ul-g1.dtsi"
 
 / {
-	model = "TQ Systems TQMa6UL1L SoM on MBa6ULx board";
+	model = "TQ-Systems TQMa6UL1L SoM on MBa6ULx board";
 	compatible = "tq,imx6ul-mba6ulx", "tq,imx6ul-tqma6ul1l", "fsl,imx6ul";
 };

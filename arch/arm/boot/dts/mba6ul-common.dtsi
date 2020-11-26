@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
 /*
- * Copyright 2018 TQ Systems GmbH
+ * Copyright 2018 TQ-Systems GmbH
  * Author: Markus Niebel <Markus.Niebel@tq-group.com>
  */
 
 / {
-	model = "TQ Systems i.MX6 UltraLite Baseboard";
+	model = "TQ-Systems i.MX6 UltraLite Baseboard";
 
 	aliases {
 		mmc1 = &usdhc1;
