@@ -140,8 +140,25 @@
 
 &pfc {
 	sdhi3_pins: sd3 {
-		groups = "sdhi3_data8", "sdhi3_ctrl", "sdhi3_ds";
-		function = "sdhi3";
-		power-source = <1800>;
+		mux {
+			groups = "sdhi3_data8", "sdhi3_ctrl", "sdhi3_ds";
+			function = "sdhi3";
+			power-source = <1800>;
+		};
+
+		pins_sdhi3_ctrl {
+			groups = "sdhi3_ctrl";
+			drive-strength = <9>;
+		};
+
+		pins_sdhi3_ds {
+			groups = "sdhi3_ds";
+			drive-strength = <24>;
+		};
+
+		pins_sdhi3_data8 {
+			groups = "sdhi3_data8";
+			drive-strength = <6>;
+		};
 	};
 };
