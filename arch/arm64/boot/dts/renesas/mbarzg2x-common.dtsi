@@ -367,21 +367,32 @@
 	};
 
 	sdhi0_pins_uhs: sd0_uhs {
-		groups = "sdhi0_data4", "sdhi0_ctrl";
-		function = "sdhi0";
-		power-source = <1800>;
+		mux {
+			groups = "sdhi0_data4", "sdhi0_ctrl";
+			function = "sdhi0";
+			power-source = <1800>;
+		};
+
+		pins_sdhi0_ctrl_cmd {
+			pins = "GP_3_1";
+			drive-strength = <9>;
+		};
+
+		pins_sdhi0_ctrl_clk {
+			pins = "GP_3_0";
+			drive-strength = <15>;
+		};
+
+		pins_sdhi0_data4 {
+			groups = "sdhi0_data4";
+			drive-strength = <9>;
+		};
 	};
 
 	sdhi2_pins: sd2 {
 		groups = "sdhi2_data4", "sdhi2_ctrl", "sdhi2_ds";
 		function = "sdhi2";
 		power-source = <3300>;
-	};
-
-	sdhi3_pins: sd3 {
-		groups = "sdhi3_data8", "sdhi3_ctrl", "sdhi3_ds";
-		function = "sdhi3";
-		power-source = <1800>;
 	};
 
 	sound_pins: sound {
