@@ -610,5 +610,7 @@
 	wp-gpios = <&lsio_gpio4 21 GPIO_ACTIVE_HIGH>;
 	vmmc-supply = <&reg_usdhc2_vmmc>;
 	no-1-8-v;
+	no-sdio;
+	no-mmc;
 	status = "okay";
 };
