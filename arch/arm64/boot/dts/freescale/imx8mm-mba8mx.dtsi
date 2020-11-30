@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
- * Copyright 2020 TQ Systems GmbH
+ * Copyright 2020 TQ-Systems GmbH
  */
 
 #include <dt-bindings/net/ti-dp83867.h>
 
 / {
-	model = "TQ Systems GmbH i.MX8MM TQMa8MxML on MBa8Mx";
+	model = "TQ-Systems i.MX8MM TQMa8MxML on MBa8Mx";
 	compatible = "tq,imx8mm-mba8mx", "tq,imx8mm-tqma8mxml", "fsl,imx8mm";
 
 	aliases {
