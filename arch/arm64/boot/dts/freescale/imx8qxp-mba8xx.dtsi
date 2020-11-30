@@ -256,6 +256,15 @@
 	};
 };
 
+&i2c2 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	clock-frequency = <100000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_lpi2c2>;
+	status = "okay";
+};
+
 &iomuxc {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_hog>;
@@ -336,6 +345,13 @@
 			IMX8QXP_MIPI_DSI0_I2C0_SDA_LSIO_GPIO1_IO26	0x00000040
 			IMX8QXP_QSPI0A_SS1_B_LSIO_GPIO3_IO15		0x00000040
 			IMX8QXP_USDHC1_RESET_B_LSIO_GPIO4_IO19		0x00000020
+		>;
+	};
+
+	pinctrl_lpi2c2: lpi2c2grp {
+		fsl,pins = <
+			IMX8QXP_MIPI_DSI1_GPIO0_00_ADMA_I2C2_SCL	0x06000021
+			IMX8QXP_MIPI_DSI1_GPIO0_01_ADMA_I2C2_SDA	0x06000021
 		>;
 	};
 
