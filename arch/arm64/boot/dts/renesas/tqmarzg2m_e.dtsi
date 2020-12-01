@@ -66,6 +66,41 @@
 	};
 };
 
+&i2c_dvfs {
+	clock-frequency = <400000>;
+	status = "okay";
+
+	sensor1: sensor@1f {
+		compatible = "nxp,se97", "jedec,jc-42.4-temp";
+		reg = <0x1f>;
+		status = "okay";
+	};
+
+	/* config eeprom SE97B */
+	eeprom1: eeprom@57 {
+		compatible = "nxp,se97b","atmel,24c02";
+		reg = <0x57>;
+		pagesize = <16>;
+		read-only;
+		status = "okay";
+	};
+
+	/* user eeprom 24LC64 */
+	eeprom0: eeprom@50 {
+		compatible = "atmel,24c64";
+		reg = <0x50>;
+		pagesize = <32>;
+		status = "okay";
+	};
+
+	rtc0: rtc@51 {
+		compatible = "nxp,pcf85063";
+		reg = <0x51>;
+		/* TODO: capacity and offset, needed for improved accuracy */
+		status = "okay";
+	};
+};
+
 &xhci0 {
 	memory-region = <&global_cma>;
 };
