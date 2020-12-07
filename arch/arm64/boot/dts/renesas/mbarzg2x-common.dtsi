@@ -244,6 +244,7 @@
 		pinctrl-0 = <&sound_pins>;
 		ldoin-supply = <&reg_3p3v>;
 		iov-supply = <&reg_3p3v>;
+		status = "okay";
 
 		port {
 			tlv320_endpoint: endpoint {
@@ -258,6 +259,8 @@
 		reg = <0x41>;
 		wakeup-source;
 		st,autosleep-timeout = <1024>;
+		status = "okay";
+
 		stmpe_touchscreen {
 			compatible = "st,stmpe-ts";
 			st,sample-time = <4>;
@@ -276,6 +279,7 @@
 	temp-sensor@1f {
 		compatible = "nxp,se97b", "jedec,jc-42.4-temp";
 		reg = <0x1f>;
+		status = "okay";
 	};
 
 	/* config eeprom SE97B */
@@ -283,6 +287,7 @@
 		compatible = "nxp,se97b", "atmel,24c02";
 		reg = <0x57>;
 		pagesize = <16>;
+		status = "okay";
 	};
 
 	csa_vin: adc@70 {
@@ -290,6 +295,7 @@
 		reg = <0x70>;
 
 		shunt-resistor-micro-ohms = <3000>;
+		status = "okay";
 	};
 
 	csa_mod: adc@7d {
@@ -297,6 +303,7 @@
 		reg = <0x7d>;
 
 		shunt-resistor-micro-ohms = <3000>;
+		status = "okay";
 	};
 
 };
