@@ -95,6 +95,14 @@
 		regulator-always-on;
 	};
 
+	reg_vref_v1v8: regulator-v1v8 {
+		compatible = "regulator-fixed";
+		regulator-name = "VREF_V1V8";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		regulator-always-on;
+	};
+
 	reg_v3v3_pcie: v3v3_pcie {
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_reg_pcie_v3v3>;
@@ -138,6 +146,13 @@
 			linux,cma-default;
 		};
 	};
+};
+
+&adc0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_adc0>;
+	vref-supply = <&reg_vref_v1v8>;
+	status = "okay";
 };
 
 &fec1 {
@@ -227,6 +242,13 @@
 &iomuxc {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_gpio &pinctrl_hog>;
+
+	pinctrl_adc0: adc0grp {
+		fsl,pins = <
+			IMX8QM_ADC_IN1_DMA_ADC0_IN1        0x02000060
+			IMX8QM_ADC_IN2_DMA_ADC0_IN2        0x02000060
+		>;
+	};
 
 	pinctrl_fec1: fec1grp {
 		fsl,pins = <
