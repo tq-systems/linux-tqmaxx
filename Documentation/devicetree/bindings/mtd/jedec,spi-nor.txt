@@ -78,6 +78,12 @@ Optional properties:
 		   cannot reboot properly if the flash is left in the "wrong"
 		   state. This boolean flag can be used on such systems, to
 		   denote the absence of a reliable reset mechanism.
+- macronix,dsr : Macronix chips support changing the drive strength via config
+		   register bits. This u32 property allows setting the volatile
+		   field in the configuration register during flash
+		   initialisation to prevent violating the electrical limits
+		   of host cpu SPI data input line[s]. For the exact values see
+		   data sheets of the used flash.
 
 Example:
 
