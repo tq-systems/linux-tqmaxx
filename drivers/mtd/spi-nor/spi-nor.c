@@ -1734,6 +1734,85 @@ static int macronix_quad_enable(struct spi_nor *nor)
 	return 0;
 }
 
+/*
+ * Read Macronix configuration register
+ * Return negative if error occurred or configuration register value
+ */
+static int macronix_read_cr(struct spi_nor *nor)
+{
+	int ret;
+
+	if (nor->spimem) {
+		struct spi_mem_op op =
+			SPI_MEM_OP(SPI_MEM_OP_CMD(SPINOR_OP_RDCR_MCR, 1),
+				   SPI_MEM_OP_NO_ADDR,
+				   SPI_MEM_OP_NO_DUMMY,
+				   SPI_MEM_OP_DATA_IN(1, nor->bouncebuf, 1));
+
+		ret = spi_mem_exec_op(nor->spimem, &op);
+	} else {
+		ret = nor->read_reg(nor, SPINOR_OP_RDCR_MCR, nor->bouncebuf, 1);
+	}
+
+	if (ret < 0) {
+		dev_err(nor->dev, "error %d reading MCR CR\n", ret);
+		return ret;
+	}
+
+	return nor->bouncebuf[0];
+}
+
+/*
+ * Write Macronix configuration register
+ * To preserve the status register, this register is read first
+ * and rewritten together with the configuration register.
+ * Return negative if error occurred
+ */
+static int macronix_write_cr(struct spi_nor *nor, u8 *cr)
+{
+	int val;
+	u8 sr_cr[2];
+
+	val = read_sr(nor);
+	if (val < 0)
+		return val;
+
+	sr_cr[0] = val;
+	sr_cr[1] = *cr;
+
+	return write_sr_cr(nor, sr_cr);
+}
+
+static void macronix_init_dsr(struct spi_nor *nor)
+{
+	struct device_node *np = spi_nor_get_flash_node(nor);
+	u32 val = 0x7;
+	int crr;
+	u8 cr;
+
+	/*
+	 * read from DT, if we should change the DSR value.
+	 * If yes, RMW the CR register. Bit[2:0] is the DSR mask
+	 * in all Macronix SPI NOR we've seen
+	 */
+	if (!of_property_read_u32(np, "macronix,dsr", &val)) {
+		if (val < 0x8) {
+			crr = macronix_read_cr(nor);
+			if (crr >= 0) {
+				cr = (u8)(crr & 0xf8) | (u8)val;
+				macronix_write_cr(nor, &cr);
+
+				dev_warn(nor->dev, "%s: read CR %x\n",
+					__func__, (u32)macronix_read_cr(nor));
+			} else {
+				dev_dbg(nor->dev, "read CR failed %d\n", crr);
+			}
+		} else {
+			dev_warn(nor->dev, "invalid DSR %x in dt\n", val);
+		}
+	}
+}
+
 /**
  * spansion_quad_enable() - set QE bit in Configuraiton Register.
  * @nor:	pointer to a 'struct spi_nor'
@@ -4685,6 +4764,9 @@ static int spi_nor_quad_enable(struct spi_nor *nor)
 static int spi_nor_init(struct spi_nor *nor)
 {
 	int err;
+
+	if (JEDEC_MFR(nor->info) == SNOR_MFR_MACRONIX)
+		macronix_init_dsr(nor);
 
 	if (nor->clear_sr_bp) {
 		if (nor->params.quad_enable == spansion_quad_enable)
