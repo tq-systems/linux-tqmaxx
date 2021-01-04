@@ -58,7 +58,7 @@
 		};
 	};
 
-	iio-hwmon {
+	adc {
 		compatible = "iio-hwmon";
 		io-channels = <&adc0 0>, <&adc0 1>, <&adc0 2>;
 	};
