@@ -15,6 +15,7 @@
 	};
 
 	reg_sdvmmc: regulator-sdvmmc {
+		off-on-delay-us = <200000>;
 		status = "okay";
 	};
 
