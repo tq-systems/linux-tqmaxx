@@ -668,18 +668,6 @@ static int mxc_isi_s_ctrl(struct v4l2_ctrl *ctrl)
 	spin_lock_irqsave(&mxc_isi->slock, flags);
 
 	switch (ctrl->id) {
-	case V4L2_CID_HFLIP:
-		if (ctrl->val < 0)
-			return -EINVAL;
-		mxc_isi->hflip = (ctrl->val > 0) ? 1 : 0;
-		break;
-
-	case V4L2_CID_VFLIP:
-		if (ctrl->val < 0)
-			return -EINVAL;
-		mxc_isi->vflip = (ctrl->val > 0) ? 1 : 0;
-		break;
-
 	case V4L2_CID_ALPHA_COMPONENT:
 		if (ctrl->val < 0 || ctrl->val > 255)
 			return -EINVAL;
@@ -711,10 +699,6 @@ int mxc_isi_ctrls_create(struct mxc_isi_cap_dev *isi_cap)
 
 	v4l2_ctrl_handler_init(handler, 4);
 
-	ctrls->hflip = v4l2_ctrl_new_std(handler, &mxc_isi_ctrl_ops,
-					 V4L2_CID_HFLIP, 0, 1, 1, 0);
-	ctrls->vflip = v4l2_ctrl_new_std(handler, &mxc_isi_ctrl_ops,
-					 V4L2_CID_VFLIP, 0, 1, 1, 0);
 	ctrls->alpha = v4l2_ctrl_new_std(handler, &mxc_isi_ctrl_ops,
 					 V4L2_CID_ALPHA_COMPONENT,
 					 0, 0xff, 1, 0);
