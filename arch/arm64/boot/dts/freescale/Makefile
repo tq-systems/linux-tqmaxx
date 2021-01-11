@@ -185,7 +185,8 @@ dtb-$(CONFIG_ARCH_MXC) += imx8qxp-mba8xx.dtb \
 			  imx8qxp-mba8xx-sd-uhs.dtb
 
 dtb-$(CONFIG_ARCH_MXC) += imx8qxp-mb-smarc-2.dtb \
-			  imx8qxp-mb-smarc-2-lvds-tm070jvhg33.dtb
+			  imx8qxp-mb-smarc-2-lvds-tm070jvhg33.dtb \
+			  imx8qxp-mb-smarc-2-r0200.dtb
 
 dtb-$(CONFIG_ARCH_S32) += s32v234-evb.dtb \
 			  s32v234-sbc.dtb
