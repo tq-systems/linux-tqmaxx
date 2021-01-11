@@ -1799,6 +1799,7 @@ static int mxc_isi_register_cap_device(struct mxc_isi_cap_dev *isi_cap,
 		goto err_ctrl_free;
 
 	vdev->ctrl_handler = &isi_cap->ctrls.handler;
+	v4l2_dev->ctrl_handler = &isi_cap->ctrls.handler;
 	v4l2_info(v4l2_dev, "Registered %s as /dev/%s\n",
 		  vdev->name, video_device_node_name(vdev));
 
