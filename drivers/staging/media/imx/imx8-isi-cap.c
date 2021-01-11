@@ -928,12 +928,38 @@ static int mxc_isi_cap_enum_fmt(struct file *file, void *priv,
 {
 	struct mxc_isi_cap_dev *isi_cap = video_drvdata(file);
 	struct mxc_isi_fmt *fmt;
+	struct v4l2_subdev_format src_fmt;
+	struct media_pad *source_pad;
+	struct v4l2_subdev *src_sd;
+	int ret;
 
 	dev_dbg(&isi_cap->pdev->dev, "%s\n", __func__);
-	if (f->index >= (int)ARRAY_SIZE(mxc_isi_out_formats))
+
+	if (f->index > 0)
 		return -EINVAL;
 
-	fmt = &mxc_isi_out_formats[f->index];
+	source_pad = mxc_isi_get_remote_source_pad(&isi_cap->sd);
+	if (!source_pad) {
+		v4l2_err(&isi_cap->sd,
+			 "%s, No remote pad found!\n", __func__);
+		return -EINVAL;
+	}
+
+	src_sd = mxc_get_remote_subdev(&isi_cap->sd, __func__);
+	if (!src_sd)
+		return -EINVAL;
+
+	memset(&src_fmt, 0, sizeof(src_fmt));
+
+	src_fmt.pad = source_pad->index;
+	src_fmt.which = V4L2_SUBDEV_FORMAT_ACTIVE;
+	ret = v4l2_subdev_call(src_sd, pad, get_fmt, NULL, &src_fmt);
+	if (ret < 0 && ret != -ENOIOCTLCMD) {
+		v4l2_err(&isi_cap->sd, "get remote fmt fail!\n");
+		return -EINVAL;
+	}
+
+	fmt = mxc_isi_find_format(NULL, &src_fmt.format.code, 0);
 	if (!fmt)
 		return -EINVAL;
 
