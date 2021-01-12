@@ -93,6 +93,8 @@
 		/* TODO: not used in spi-nor / fsl-qspi but in fsl-flexspi */
 /*		spi-nor,ddr-quad-read-dummy = <8>; */
 		spi-nor,ddr-quad-read-dummy = <6>;
+		/* used for macronix flash only */
+		macronix,dsr = <0x3>;
 	};
 };
 
