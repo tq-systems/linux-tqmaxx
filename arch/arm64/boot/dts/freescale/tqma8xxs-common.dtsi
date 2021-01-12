@@ -149,6 +149,8 @@
 		spi-nor,ddr-quad-read-dummy = <8>;
 		spi-tx-bus-width = <4>;
 		spi-rx-bus-width = <4>;
+		/* used for macronix flash only */
+		macronix,dsr = <0x3>;
 	};
 };
 
