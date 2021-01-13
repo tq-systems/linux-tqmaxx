@@ -16,23 +16,9 @@
 		status = "okay";
 	};
 
-	/*
-	 * TODO: use pwm backlight as soon as drivers / bindings are
-	 * available for LCDIF PWM
-	 */
-	backlight_gpio: backlight-gpio {
-		compatible = "gpio-backlight";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_gpiobl>;
-		gpios = <&lsio_gpio1 7 GPIO_ACTIVE_HIGH>;
-		default-on;
-		status = "disabled";
-	};
-
 	panel-lvds0 {
 		compatible = "tianma,tm070jvhg33";
 		backlight = <&backlight_lvds>;
-		power-supply = <&reg_12v0>;
 		status = "okay";
 
 		port {
@@ -58,15 +44,7 @@
 
 	pinctrl_bl_lvds: bllvdsgrp {
 		fsl,pins = <
-			/* TODO: LCD_BLT_EN -> DSI_GPIO */
 			IMX8QXP_MIPI_DSI1_I2C0_SDA_LSIO_GPIO1_IO30	0x00000021
-		>;
-	};
-
-	pinctrl_gpiobl: gpioblgrp {
-		fsl,pins = <
-			/* TODO: LCD_CONTRAST -> LCDIF PMW */
-			IMX8QXP_SPI0_CS1_LSIO_GPIO1_IO07		0x00000021
 		>;
 	};
 
@@ -74,9 +52,9 @@
 		fsl,pins = <
 			/* TODO: can be used if needed for panel */
 			/* LCD PWR */
-			IMX8QXP_MIPI_DSI0_I2C0_SCL_LSIO_GPIO1_IO25	0x00000048
+			IMX8QXP_MIPI_DSI0_I2C0_SCL_LSIO_GPIO1_IO25	0x00000021
 			/* LCD RST# */
-			IMX8QXP_MIPI_DSI1_I2C0_SCL_LSIO_GPIO1_IO29	0x00000048
+			IMX8QXP_MIPI_DSI1_I2C0_SCL_LSIO_GPIO1_IO29	0x00000021
 		>;
 	};
 };
