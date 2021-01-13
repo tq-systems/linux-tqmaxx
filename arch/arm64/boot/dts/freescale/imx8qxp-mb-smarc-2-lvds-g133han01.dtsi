@@ -1,0 +1,91 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright 2020 TQ-Systems GmbH
+ */
+
+/ {
+	backlight_lvds: backlight-lvds {
+		compatible = "pwm-backlight";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_backlight_lvds>;
+		pwms = <&pwm_mipi_lvds0 0 100000 0>;
+		brightness-levels = <0 4 8 16 32 64 128 255>;
+		default-brightness-level = <7>;
+		power-supply = <&reg_12v0>;
+		enable-gpios = <&lsio_gpio1 2 GPIO_ACTIVE_HIGH>;
+		status = "okay";
+	};
+
+	panel-lvds0 {
+		compatible = "auo,g133han01";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_lbdpanel>;
+		backlight = <&backlight_lvds>;
+		enable-gpios = <&lsio_gpio1 3 0>;
+		status = "okay";
+
+		port {
+			panel_in_lvds0: endpoint {
+				remote-endpoint = <&lvds0_out>;
+			};
+		};
+	};
+};
+
+&pwm_mipi_lvds0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm_mipi_lvds0>;
+	status = "okay";
+};
+
+&iomuxc {
+	pinctrl_backlight_lvds: backlight_lvds_grp {
+		fsl,pins = <
+			IMX8QXP_SPI2_SDI_LSIO_GPIO1_IO02		0x00000021
+		>;
+	};
+
+	pinctrl_pwm_mipi_lvds0: mipi_lvds0_pwm_grp {
+		fsl,pins = <
+			IMX8QXP_MIPI_DSI0_GPIO0_00_MIPI_DSI0_PWM0_OUT	0x00000021
+		>;
+	};
+
+	pinctrl_lbdpanel: lbdpanelgrp {
+		fsl,pins = <
+			/* LCD PWR */
+			IMX8QXP_SPI2_SCK_LSIO_GPIO1_IO03		0x00000021
+		>;
+	};
+};
+
+&ldb1_phy {
+	status = "okay";
+};
+
+&ldb1 {
+	fsl,dual-channel;
+	status = "okay";
+
+	lvds-channel@0 {
+		fsl,data-mapping = "jeida";
+		fsl,data-width = <24>;
+		status = "okay";
+
+		port@1 {
+			reg = <1>;
+
+			lvds0_out: endpoint {
+				remote-endpoint = <&panel_in_lvds0>;
+			};
+		};
+	};
+};
+
+&ldb2 {
+	status = "disabled";
+};
+
+&ldb2_phy {
+	status = "okay";
+};
