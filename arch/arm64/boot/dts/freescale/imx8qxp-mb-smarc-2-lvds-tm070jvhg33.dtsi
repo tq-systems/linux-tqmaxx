@@ -7,6 +7,7 @@
 	backlight_lvds: backlight-lvds {
 		compatible = "pwm-backlight";
 		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_backlight_lvds>;
 		pwms = <&pwm_mipi_lvds0 0 100000 0>;
 		brightness-levels = <0 4 8 16 32 64 128 255>;
 		default-brightness-level = <7>;
@@ -20,7 +21,6 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_lbdpanel>;
 		backlight = <&backlight_lvds>;
-		power-supply = <&reg_12v0>;
 		enable-gpios = <&lsio_gpio1 3 0>;
 		status = "okay";
 
@@ -39,19 +39,22 @@
 };
 
 &iomuxc {
-
-	pinctrl_pwm_mipi_lvds0: mipi_lvds0_pwm_grp {
+	pinctrl_backlight_lvds: backlight_lvds_grp {
 		fsl,pins = <
-			IMX8QXP_MIPI_DSI0_GPIO0_00_MIPI_DSI0_PWM0_OUT		0x00000020
-			IMX8QXP_SPI2_SDI_LSIO_GPIO1_IO02			0x00000020
+			IMX8QXP_SPI2_SDI_LSIO_GPIO1_IO02		0x00000021
 		>;
 	};
 
+	pinctrl_pwm_mipi_lvds0: mipi_lvds0_pwm_grp {
+		fsl,pins = <
+			IMX8QXP_MIPI_DSI0_GPIO0_00_MIPI_DSI0_PWM0_OUT	0x00000021
+		>;
+	};
 
 	pinctrl_lbdpanel: lbdpanelgrp {
 		fsl,pins = <
 			/* LCD PWR */
-			IMX8QXP_SPI2_SCK_LSIO_GPIO1_IO03			0x00000020
+			IMX8QXP_SPI2_SCK_LSIO_GPIO1_IO03		0x00000021
 		>;
 	};
 };
