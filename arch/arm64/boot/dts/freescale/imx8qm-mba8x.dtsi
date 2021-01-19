@@ -121,6 +121,20 @@
 		regulator-always-on;
 	};
 
+	reg_v3v3_sd: v3v3_sd {
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_reg_v3v3_sd>;
+		compatible = "regulator-fixed";
+		regulator-name = "V3V3_SD";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		vin-supply = <&reg_mba8x_v3v3>;
+		gpio = <&lsio_gpio4 7 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		regulator-boot-on;
+		off-on-delay-us = <200000>;
+	};
+
 	reg_usbotg1_vbus: regulator-usbotg1-vbus {
 		compatible = "regulator-fixed";
 		regulator-name = "USBOTG1_VBUS";
@@ -480,6 +494,12 @@
 		>;
 	};
 
+	pinctrl_reg_v3v3_sd: reg3v3sdgrp {
+		fsl,pins = <
+			IMX8QM_USDHC1_RESET_B_LSIO_GPIO4_IO07	0x00000021
+		>;
+	};
+
 	pinctrl_reg_usbotg1_vbus: regusbotg1vbusgrp {
 		fsl,pins = <
 			IMX8QM_USB_SS3_TC0_LSIO_GPIO4_IO03	0x00000021
@@ -496,7 +516,6 @@
 		fsl,pins = <
 			IMX8QM_USDHC1_DATA6_LSIO_GPIO5_IO21	0x00000021
 			IMX8QM_USDHC1_DATA7_LSIO_GPIO5_IO22	0x00000021
-			IMX8QM_USDHC1_RESET_B_LSIO_GPIO4_IO07	0x00000021
 		>;
 	};
 
@@ -735,8 +754,7 @@
 	bus-width = <4>;
 	cd-gpios = <&lsio_gpio5 22 GPIO_ACTIVE_LOW>;
 	wp-gpios = <&lsio_gpio5 21 GPIO_ACTIVE_HIGH>;
-	vmmc-supply = <&reg_mba8x_v3v3>;
+	vmmc-supply = <&reg_v3v3_sd>;
 	no-mmc;
-	no-1-8-v;
 	status = "okay";
 };
