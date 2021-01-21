@@ -39,6 +39,16 @@
 	wp-gpios = <&gpio3 3 GPIO_ACTIVE_HIGH>;
 };
 
+&dspi {
+	bus-num = <0>;
+	status = "okay";
+
+	spidev@0 {
+		compatible = "tq,testdev";
+		reg = <0>;
+		spi-max-frequency = <10000000>;
+	};
+};
+
 #include "fsl-ls1046-post.dtsi"
 #include "fsl-tqmls10xxa-mbls10xxa-fman.dtsi"
-
