@@ -317,6 +317,10 @@ static int spinand_write_to_cache_op(struct spinand_device *spinand,
 		buf += ret;
 	}
 
+	if (req->ooblen)
+		memcpy(req->oobbuf.in, spinand->oobbuf + req->ooboffs,
+		       req->ooblen);
+
 	return 0;
 }
 
@@ -1048,6 +1052,10 @@ static int spinand_init(struct spinand_device *spinand)
 		goto err_cleanup_nanddev;
 
 	mtd->oobavail = ret;
+
+	/* Propagate ECC information to mtd_info */
+	mtd->ecc_strength = nand->eccreq.strength;
+	mtd->ecc_step_size = nand->eccreq.step_size;
 
 	return 0;
 
