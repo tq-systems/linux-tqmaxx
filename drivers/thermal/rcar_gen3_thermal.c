@@ -175,7 +175,7 @@ static int rcar_gen3_thermal_round(int temp)
 static int rcar_gen3_thermal_convert_temp(struct rcar_gen3_thermal_tsc *tsc)
 {
 	int mcelsius, val;
-	u32 reg;
+	int reg;
 
 	/* Read register and convert to mili Celsius */
 	reg = rcar_gen3_thermal_read(tsc, REG_GEN3_TEMP) & CTEMP_MASK;
@@ -197,9 +197,7 @@ static int rcar_gen3_thermal_get_temp(void *devdata, int *temp)
 
 	mcelsius = rcar_gen3_thermal_convert_temp(tsc);
 
-	/* Make sure we are inside specifications */
-	if ((mcelsius < MCELSIUS(-40)) || (mcelsius > MCELSIUS(125)))
-		return -EIO;
+	/* Guaranteed operating range is -40C to 125C. */
 
 	/* Round value to device granularity setting */
 	*temp = mcelsius;
