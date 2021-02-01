@@ -104,6 +104,8 @@ struct lpi2c_imx_struct {
 	int			irq;
 	struct clk		*clk_per;
 	struct clk		*clk_ipg;
+	struct notifier_block	clk_change_nb;
+	unsigned int		per_clk_rate;
 	void __iomem		*base;
 	__u8			*rx_buf;
 	__u8			*tx_buf;
@@ -220,17 +222,12 @@ static void lpi2c_imx_stop(struct lpi2c_imx_struct *lpi2c_imx)
 static int lpi2c_imx_config(struct lpi2c_imx_struct *lpi2c_imx)
 {
 	u8 prescale, filt, sethold, datavd;
-	unsigned int clk_rate, clk_cycle, clkhi, clklo;
+	unsigned int clk_rate = lpi2c_imx->per_clk_rate;
+	unsigned int clk_cycle, clkhi, clklo;
 	enum lpi2c_imx_pincfg pincfg;
 	unsigned int temp;
 
 	lpi2c_imx_set_mode(lpi2c_imx);
-
-	clk_rate = clk_get_rate(lpi2c_imx->clk_per);
-	if (!clk_rate) {
-		dev_dbg(&lpi2c_imx->adapter.dev, "clk_per rate is 0\n");
-		return -EINVAL;
-	}
 
 	if (lpi2c_imx->mode == HS || lpi2c_imx->mode == ULTRA_FAST)
 		filt = 0;
@@ -276,6 +273,20 @@ static int lpi2c_imx_config(struct lpi2c_imx_struct *lpi2c_imx)
 		writel(temp, lpi2c_imx->base + LPI2C_MCCR0);
 
 	return 0;
+}
+
+static int lpi2c_imx_clk_notifier_call(struct notifier_block *nb,
+				       unsigned long action, void *data)
+{
+	struct clk_notifier_data *ndata = data;
+	struct lpi2c_imx_struct *lpi2c_imx = container_of(&ndata->clk,
+							  struct lpi2c_imx_struct,
+							  clk_per);
+
+	if (action & POST_RATE_CHANGE)
+		lpi2c_imx->per_clk_rate = clk_get_rate(lpi2c_imx->clk_per);
+
+	return NOTIFY_OK;
 }
 
 static int lpi2c_imx_master_enable(struct lpi2c_imx_struct *lpi2c_imx)
@@ -673,6 +684,14 @@ static int lpi2c_imx_probe(struct platform_device *pdev)
 	if (ret)
 		lpi2c_imx->bitrate = STARDARD_MAX_BITRATE;
 
+	lpi2c_imx->per_clk_rate = clk_get_rate(lpi2c_imx->clk_per);
+	lpi2c_imx->clk_change_nb.notifier_call = lpi2c_imx_clk_notifier_call;
+	clk_notifier_register(lpi2c_imx->clk_per, &lpi2c_imx->clk_change_nb);
+	if (ret < 0) {
+		dev_err(&pdev->dev, "can't get I2C per clock\n");
+		goto clk_notifier_unregister;
+	}
+
 	i2c_set_adapdata(&lpi2c_imx->adapter, lpi2c_imx);
 	platform_set_drvdata(pdev, lpi2c_imx);
 
@@ -691,17 +710,19 @@ static int lpi2c_imx_probe(struct platform_device *pdev)
 	ret = lpi2c_imx_init_recovery_info(lpi2c_imx, pdev);
 	/* Give it another chance if pinctrl used is not ready yet */
 	if (ret == -EPROBE_DEFER)
-		goto rpm_disable;
+		goto clk_notifier_unregister;
 
 	ret = i2c_add_adapter(&lpi2c_imx->adapter);
 	if (ret)
-		goto rpm_disable;
+		goto clk_notifier_unregister;
 
 	dev_info(&lpi2c_imx->adapter.dev, "LPI2C adapter registered\n");
 
 	return 0;
 
-rpm_disable:
+clk_notifier_unregister:
+	clk_notifier_unregister(lpi2c_imx->clk_per, &lpi2c_imx->clk_change_nb);
+
 	pm_runtime_disable(&pdev->dev);
 	pm_runtime_dont_use_autosuspend(&pdev->dev);
 
@@ -716,6 +737,8 @@ static int lpi2c_imx_remove(struct platform_device *pdev)
 
 	pm_runtime_disable(&pdev->dev);
 	pm_runtime_dont_use_autosuspend(&pdev->dev);
+
+	clk_notifier_unregister(lpi2c_imx->clk_per, &lpi2c_imx->clk_change_nb);
 
 	return 0;
 }
