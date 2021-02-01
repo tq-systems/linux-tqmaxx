@@ -157,7 +157,6 @@
 		model = "tqm-tlv320aic32";
 		ssi-controller = <&sai1>;
 		audio-codec = <&codec>;
-		status = "disabled";
 	};
 };
 
@@ -252,7 +251,7 @@
 
 		iov-supply = <&reg_1v8>;
 		ldoin-supply = <&reg_3v3>;
-		status = "disabled";
+		status = "okay";
 	};
 
 	/* NXP SE97BTP with temperature sensor + eeprom */
