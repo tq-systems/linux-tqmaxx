@@ -24,6 +24,7 @@
 #include <media/v4l2-device.h>
 #include <media/v4l2-ioctl.h>
 #include <media/v4l2-mem2mem.h>
+#include <media/v4l2-event.h>
 #include <media/videobuf2-core.h>
 #include <media/videobuf2-dma-contig.h>
 
@@ -1573,6 +1574,9 @@ static const struct v4l2_ioctl_ops mxc_isi_capture_ioctl_ops = {
 	.vidioc_g_input			= mxc_isi_cap_vidioc_g_input,
 	.vidioc_s_input			= mxc_isi_cap_vidioc_s_input,
 	.vidioc_enum_input		= mxc_isi_cap_vidioc_enum_input,
+
+	.vidioc_subscribe_event   =  v4l2_ctrl_subscribe_event,
+	.vidioc_unsubscribe_event =  v4l2_event_unsubscribe,
 };
 
 /* Capture subdev media entity operations */
