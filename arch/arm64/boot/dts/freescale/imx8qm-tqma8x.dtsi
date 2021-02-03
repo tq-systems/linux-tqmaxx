@@ -171,7 +171,6 @@
 	se97: temperature-sensor-eeprom@1b {
 		compatible = "nxp,se97", "jedec,jc-42.4-temp";
 		reg = <0x1b>;
-		status = "okay";
 	};
 
 	pcf85063: rtc@51 {
@@ -184,14 +183,12 @@
 		compatible = "nxp,se97b", "atmel,24c02";
 		reg = <0x53>;
 		pagesize = <16>;
-		status = "okay";
 	};
 
 	m24c64: eeprom@57 {
 		compatible = "atmel,24c64";
 		reg = <0x57>;
 		pagesize = <32>;
-		status = "okay";
 	};
 };
 
