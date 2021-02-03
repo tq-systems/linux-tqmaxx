@@ -100,9 +100,17 @@
 		regulator-always-on;
 	};
 
-	reg_vref_v1v8: regulator-v1v8 {
+	reg_vref_v1v8: regulator-vref-v1v8 {
 		compatible = "regulator-fixed";
 		regulator-name = "VREF_V1V8";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		regulator-always-on;
+	};
+
+	reg_v1v8: regulator-v1v8 {
+		compatible = "regulator-fixed";
+		regulator-name = "MBa8x-V1V8";
 		regulator-min-microvolt = <1800000>;
 		regulator-max-microvolt = <1800000>;
 		regulator-always-on;
@@ -165,6 +173,17 @@
 			linux,cma-default;
 		};
 	};
+
+	sound {
+		compatible = "fsl,imx-audio-tlv320aic32x4";
+		model = "tqm-tlv320aic32";
+		ssi-controller = <&sai1>;
+		audio-codec = <&codec>;
+	};
+};
+
+&acm {
+	status = "okay";
 };
 
 &adc0 {
@@ -173,6 +192,10 @@
 	vref-supply = <&reg_vref_v1v8>;
 	status = "okay";
 	#io-channel-cells = <1>;
+};
+
+&amix {
+	status = "okay";
 };
 
 &fec1 {
@@ -500,6 +523,17 @@
 		>;
 	};
 
+	pinctrl_sai1: sai1grp {
+		fsl,pins = <
+			IMX8QM_SAI1_RXD_AUD_SAI1_RXD		0x06000041
+			IMX8QM_SAI1_RXC_AUD_SAI1_RXC		0x06000041
+			IMX8QM_SAI1_RXFS_AUD_SAI1_RXFS		0x06000041
+			IMX8QM_SAI1_TXD_AUD_SAI1_TXD		0x06000061
+			IMX8QM_SAI1_TXC_AUD_SAI1_TXC		0x06000041
+			IMX8QM_MCLK_OUT0_AUD_ACM_MCLK_OUT0	0x0600004d
+		>;
+	};
+
 	pinctrl_reg_usbotg1_vbus: regusbotg1vbusgrp {
 		fsl,pins = <
 			IMX8QM_USB_SS3_TC0_LSIO_GPIO4_IO03	0x00000021
@@ -588,6 +622,21 @@
 };
 
 &i2c1 {
+	codec: tlv320aic32x4@18 {
+		compatible = "ti,tlv320aic32x4";
+		reg = <0x18>;
+		clocks = <&mclkout0_lpcg 0>;
+		clock-names = "mclk";
+		power-domains = <&pd IMX_SC_R_MCLK_OUT_0>;
+		assigned-clocks = <&clk IMX_SC_R_AUDIO_PLL_0 IMX_SC_PM_CLK_PLL>,
+				<&clk IMX_SC_R_AUDIO_PLL_0 IMX_SC_PM_CLK_SLV_BUS>,
+				<&clk IMX_SC_R_AUDIO_PLL_0 IMX_SC_PM_CLK_MST_BUS>,
+				<&mclkout0_lpcg 0>;
+		assigned-clock-rates = <786432000>, <49152000>, <12288000>, <12288000>;
+		ldoin-supply = <&reg_mba8x_v3v3>;
+		iov-supply = <&reg_v1v8>;
+	};
+
 	sensor1: jc42@1c {
 		compatible = "nxp,se97", "jedec,jc-42.4-temp";
 		reg = <0x1c>;
@@ -711,6 +760,23 @@
 /* TODO: optional, currently without functionality */
 /*	clkreq-gpio = <&gpio4 30 GPIO_ACTIVE_LOW>; */
 	epdev_on-supply = <&reg_mba8x_v3v3>;
+	status = "okay";
+};
+
+&sai1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_sai1>;
+/* TODO:
+	assigned-clocks = <&clk IMX8QM_AUD_PLL0_DIV>,
+			<&clk IMX8QM_AUD_ACM_AUD_PLL_CLK0_DIV>,
+			<&clk IMX8QM_AUD_ACM_AUD_REC_CLK0_DIV>,
+			<&clk IMX8QM_AUD_SAI_1_MCLK>;
+*/
+	assigned-clocks = <&clk IMX_SC_R_AUDIO_PLL_0 IMX_SC_PM_CLK_PLL>,
+			<&clk IMX_SC_R_AUDIO_PLL_0 IMX_SC_PM_CLK_SLV_BUS>,
+			<&clk IMX_SC_R_AUDIO_PLL_0 IMX_SC_PM_CLK_MST_BUS>,
+			<&sai1_lpcg 0>; /* FIXME: should be sai1, original code is 0 */
+	assigned-clock-rates = <786432000>, <49152000>, <12288000>, <49152000>;
 	status = "okay";
 };
 
