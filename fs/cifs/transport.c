@@ -340,8 +340,8 @@ __smb_send_rqst(struct TCP_Server_Info *server, int num_rqst,
 		return -EAGAIN;
 
 	if (signal_pending(current)) {
-		cifs_dbg(FYI, "signal is pending before sending any data\n");
-		return -EINTR;
+		cifs_dbg(FYI, "signal pending before send request\n");
+		return -ERESTARTSYS;
 	}
 
 	/* cork the socket */
@@ -528,7 +528,7 @@ wait_for_free_credits(struct TCP_Server_Info *server, const int num_credits,
 		      const int timeout, const int flags,
 		      unsigned int *instance)
 {
-	int rc;
+	long rc;
 	int *credits;
 	int optype;
 	long int t;

@@ -1902,6 +1902,7 @@ static void cont_add(int ctx, int cpu, u32 caller_id, int facility, int level,
 	// but later continuations can add a newline.
 	if (flags & LOG_NEWLINE) {
 		c->flags |= LOG_NEWLINE;
+		cont_flush(ctx);
 	}
 }
 
@@ -2132,6 +2133,9 @@ static int __init console_setup(char *str)
 	char buf[sizeof(console_cmdline[0].name) + 4]; /* 4 for "ttyS" */
 	char *s, *options, *brl_options = NULL;
 	int idx;
+
+	if (str[0] == 0)
+		return 1;
 
 	if (_braille_console_setup(&str, &brl_options))
 		return 1;
@@ -2746,6 +2750,7 @@ static int printk_kthread_func(void *data)
 			    &len, printk_time);
 
 		console_lock();
+		console_may_schedule = 0;
 		call_console_drivers(master_seq, ext_text, ext_len, text, len,
 				     msg->level, msg->facility);
 		if (len > 0 || ext_len > 0)

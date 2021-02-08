@@ -224,7 +224,8 @@ static int format_corename(struct core_name *cn, struct coredump_params *cprm,
 		 */
 		if (ispipe) {
 			if (isspace(*pat_ptr)) {
-				was_space = true;
+				if (cn->used != 0)
+					was_space = true;
 				pat_ptr++;
 				continue;
 			} else if (was_space) {
@@ -788,6 +789,14 @@ void do_coredump(const kernel_siginfo_t *siginfo)
 	if (displaced)
 		put_files_struct(displaced);
 	if (!dump_interrupted()) {
+		/*
+		 * umh disabled with CONFIG_STATIC_USERMODEHELPER_PATH="" would
+		 * have this set to NULL.
+		 */
+		if (!cprm.file) {
+			pr_info("Core dump to |%s disabled\n", cn.corename);
+			goto close_fail;
+		}
 		file_start_write(cprm.file);
 		core_dumped = binfmt->core_dump(&cprm);
 		file_end_write(cprm.file);

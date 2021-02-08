@@ -941,8 +941,14 @@ static irqreturn_t imx_uart_int(int irq, void *dev_id)
 	struct imx_port *sport = dev_id;
 	unsigned int usr1, usr2, ucr1, ucr2, ucr3, ucr4;
 	irqreturn_t ret = IRQ_NONE;
+	unsigned long flags = 0;
 
-	spin_lock(&sport->port.lock);
+	/*
+	 * IRQs might not be disabled upon entering this interrupt handler,
+	 * e.g. when interrupt handlers are forced to be threaded. To support
+	 * this scenario as well, disable IRQs when acquiring the spinlock.
+	 */
+	spin_lock_irqsave(&sport->port.lock, flags);
 
 	usr1 = imx_uart_readl(sport, USR1);
 	usr2 = imx_uart_readl(sport, USR2);
@@ -1010,7 +1016,7 @@ static irqreturn_t imx_uart_int(int irq, void *dev_id)
 		ret = IRQ_HANDLED;
 	}
 
-	spin_unlock(&sport->port.lock);
+	spin_unlock_irqrestore(&sport->port.lock, flags);
 
 	return ret;
 }
@@ -1123,6 +1129,8 @@ static void imx_uart_timeout(struct timer_list *t)
 	}
 }
 
+#define RX_BUF_SIZE	(PAGE_SIZE)
+
 /*
  * There are two kinds of RX DMA interrupts(such as in the MX6Q):
  *   [1] the RX DMA buffer is full.
@@ -1205,8 +1213,7 @@ static void imx_uart_dma_rx_callback(void *data)
 }
 
 /* RX DMA buffer periods */
-#define RX_DMA_PERIODS	16
-#define RX_BUF_SIZE	(RX_DMA_PERIODS * PAGE_SIZE / 4)
+#define RX_DMA_PERIODS 4
 
 static int imx_uart_start_rx_dma(struct imx_port *sport)
 {
@@ -2193,6 +2200,7 @@ imx_uart_console_setup(struct console *co, char *options)
 	imx_uart_setup_ufcr(sport, TXTL_DEFAULT, RXTL_DEFAULT);
 
 	retval = uart_set_options(&sport->port, co, baud, parity, bits, flow);
+
 	if (retval) {
 		clk_disable_unprepare(sport->clk_ipg);
 		goto error_console;

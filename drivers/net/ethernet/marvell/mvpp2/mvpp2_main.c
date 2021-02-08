@@ -1541,7 +1541,7 @@ static void mvpp2_read_stats(struct mvpp2_port *port)
 	for (q = 0; q < port->ntxqs; q++)
 		for (i = 0; i < ARRAY_SIZE(mvpp2_ethtool_txq_regs); i++)
 			*pstats++ += mvpp2_read_index(port->priv,
-						      MVPP22_CTRS_TX_CTR(port->id, i),
+						      MVPP22_CTRS_TX_CTR(port->id, q),
 						      mvpp2_ethtool_txq_regs[i].offset);
 
 	/* Rxqs are numbered from 0 from the user standpoint, but not from the
@@ -1550,7 +1550,7 @@ static void mvpp2_read_stats(struct mvpp2_port *port)
 	for (q = 0; q < port->nrxqs; q++)
 		for (i = 0; i < ARRAY_SIZE(mvpp2_ethtool_rxq_regs); i++)
 			*pstats++ += mvpp2_read_index(port->priv,
-						      port->first_rxq + i,
+						      port->first_rxq + q,
 						      mvpp2_ethtool_rxq_regs[i].offset);
 }
 
@@ -3696,6 +3696,7 @@ static int mvpp2_open(struct net_device *dev)
 	if (!valid) {
 		netdev_err(port->dev,
 			   "invalid configuration: no dt or link IRQ");
+		err = -ENOENT;
 		goto err_free_irq;
 	}
 
@@ -4319,6 +4320,8 @@ static int mvpp2_ethtool_get_rxfh_context(struct net_device *dev, u32 *indir,
 
 	if (!mvpp22_rss_is_supported())
 		return -EOPNOTSUPP;
+	if (rss_context >= MVPP22_N_RSS_TABLES)
+		return -EINVAL;
 
 	if (hfunc)
 		*hfunc = ETH_RSS_HASH_CRC32;
@@ -4742,12 +4745,16 @@ static void mvpp2_port_copy_mac_addr(struct net_device *dev, struct mvpp2 *priv,
 	eth_hw_addr_random(dev);
 }
 
+static struct mvpp2_port *mvpp2_phylink_to_port(struct phylink_config *config)
+{
+	return container_of(config, struct mvpp2_port, phylink_config);
+}
+
 static void mvpp2_phylink_validate(struct phylink_config *config,
 				   unsigned long *supported,
 				   struct phylink_link_state *state)
 {
-	struct mvpp2_port *port = container_of(config, struct mvpp2_port,
-					       phylink_config);
+	struct mvpp2_port *port = mvpp2_phylink_to_port(config);
 	__ETHTOOL_DECLARE_LINK_MODE_MASK(mask) = { 0, };
 
 	/* Invalid combinations */
@@ -4874,8 +4881,7 @@ static void mvpp2_gmac_link_state(struct mvpp2_port *port,
 static int mvpp2_phylink_mac_link_state(struct phylink_config *config,
 					struct phylink_link_state *state)
 {
-	struct mvpp2_port *port = container_of(config, struct mvpp2_port,
-					       phylink_config);
+	struct mvpp2_port *port = mvpp2_phylink_to_port(config);
 
 	if (port->priv->hw_version == MVPP22 && port->gop_id == 0) {
 		u32 mode = readl(port->base + MVPP22_XLG_CTRL3_REG);
@@ -4893,8 +4899,7 @@ static int mvpp2_phylink_mac_link_state(struct phylink_config *config,
 
 static void mvpp2_mac_an_restart(struct phylink_config *config)
 {
-	struct mvpp2_port *port = container_of(config, struct mvpp2_port,
-					       phylink_config);
+	struct mvpp2_port *port = mvpp2_phylink_to_port(config);
 	u32 val = readl(port->base + MVPP2_GMAC_AUTONEG_CONFIG);
 
 	writel(val | MVPP2_GMAC_IN_BAND_RESTART_AN,
@@ -5082,13 +5087,12 @@ static void mvpp2_gmac_config(struct mvpp2_port *port, unsigned int mode,
 static void mvpp2_mac_config(struct phylink_config *config, unsigned int mode,
 			     const struct phylink_link_state *state)
 {
-	struct net_device *dev = to_net_dev(config->dev);
-	struct mvpp2_port *port = netdev_priv(dev);
+	struct mvpp2_port *port = mvpp2_phylink_to_port(config);
 	bool change_interface = port->phy_interface != state->interface;
 
 	/* Check for invalid configuration */
 	if (mvpp2_is_xlg(state->interface) && port->gop_id != 0) {
-		netdev_err(dev, "Invalid mode on %s\n", dev->name);
+		netdev_err(port->dev, "Invalid mode on %s\n", port->dev->name);
 		return;
 	}
 
@@ -5125,8 +5129,7 @@ static void mvpp2_mac_config(struct phylink_config *config, unsigned int mode,
 static void mvpp2_mac_link_up(struct phylink_config *config, unsigned int mode,
 			      phy_interface_t interface, struct phy_device *phy)
 {
-	struct net_device *dev = to_net_dev(config->dev);
-	struct mvpp2_port *port = netdev_priv(dev);
+	struct mvpp2_port *port = mvpp2_phylink_to_port(config);
 	u32 val;
 
 	if (!phylink_autoneg_inband(mode)) {
@@ -5147,14 +5150,13 @@ static void mvpp2_mac_link_up(struct phylink_config *config, unsigned int mode,
 
 	mvpp2_egress_enable(port);
 	mvpp2_ingress_enable(port);
-	netif_tx_wake_all_queues(dev);
+	netif_tx_wake_all_queues(port->dev);
 }
 
 static void mvpp2_mac_link_down(struct phylink_config *config,
 				unsigned int mode, phy_interface_t interface)
 {
-	struct net_device *dev = to_net_dev(config->dev);
-	struct mvpp2_port *port = netdev_priv(dev);
+	struct mvpp2_port *port = mvpp2_phylink_to_port(config);
 	u32 val;
 
 	if (!phylink_autoneg_inband(mode)) {
@@ -5171,7 +5173,7 @@ static void mvpp2_mac_link_down(struct phylink_config *config,
 		}
 	}
 
-	netif_tx_stop_all_queues(dev);
+	netif_tx_stop_all_queues(port->dev);
 	mvpp2_egress_disable(port);
 	mvpp2_ingress_disable(port);
 
@@ -5923,8 +5925,8 @@ static int mvpp2_remove(struct platform_device *pdev)
 {
 	struct mvpp2 *priv = platform_get_drvdata(pdev);
 	struct fwnode_handle *fwnode = pdev->dev.fwnode;
+	int i = 0, poolnum = MVPP2_BM_POOLS_NUM;
 	struct fwnode_handle *port_fwnode;
-	int i = 0;
 
 	mvpp2_dbgfs_cleanup(priv);
 
@@ -5938,7 +5940,10 @@ static int mvpp2_remove(struct platform_device *pdev)
 
 	destroy_workqueue(priv->stats_queue);
 
-	for (i = 0; i < MVPP2_BM_POOLS_NUM; i++) {
+	if (priv->percpu_pools)
+		poolnum = mvpp2_get_nrxqs(priv) * 2;
+
+	for (i = 0; i < poolnum; i++) {
 		struct mvpp2_bm_pool *bm_pool = &priv->bm_pools[i];
 
 		mvpp2_bm_pool_destroy(&pdev->dev, priv, bm_pool);
