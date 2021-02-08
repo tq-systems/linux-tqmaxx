@@ -1,0 +1,68 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Device Tree Include file for LS1046A based SoM of TQ
+ *
+ * Copyright 2018 TQ-Systems GmbH
+ */
+
+#include "fsl-ls1046a.dtsi"
+#include "fsl-tqmls10xxa.dtsi"
+
+&qspi {
+	num-cs = <2>;
+	bus-num = <0>;
+	status = "okay";
+	fsl,qspi-has-second-chip;
+
+	qflash0: mx66u51235f@0 {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "jedec,spi-nor";
+		spi-max-frequency = <62500000>;
+		reg = <0>;
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			uboot@0 {
+				label = "U-Boot-PBL";
+				reg = <0x0 0xd0000>;
+			};
+
+			env@d0000 {
+				label = "U-Boot Environment";
+				reg = <0xd0000 0x10000>;
+			};
+
+			fman@e0000 {
+				label = "Fman Microcode";
+				reg = <0xe0000 0x10000>;
+			};
+
+			dtb@f0000 {
+				label = "DTB";
+				reg = <0xf0000 0x10000>;
+			};
+
+			linux@100000 {
+				label = "Linux";
+				reg = <0x100000 0x1700000>;
+			};
+
+			rootfs@1800000 {
+				label = "RootFS";
+				reg = <0x1800000 0x2800000>;
+			};
+		};
+	};
+
+	qflash1: mx66u51235f@1 {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "jedec,spi-nor";
+		spi-max-frequency = <62500000>;
+		reg = <1>;
+	};
+};

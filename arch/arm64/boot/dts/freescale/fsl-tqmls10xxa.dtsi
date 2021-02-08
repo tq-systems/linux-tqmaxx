@@ -1,0 +1,41 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Device Tree Include file for TQMLs10xxA SoM of TQ
+ *
+ * Copyright 2018 TQ-Systems GmbH
+ */
+
+&i2c0 {
+	status = "okay";
+
+	temp-sensor@18 {
+		compatible = "jc42";
+		reg = <0x18>;
+	};
+
+	eeprom@50 {
+		compatible = "atmel,24c02";
+		reg = <0x50>;
+	};
+
+	rtc@51 {
+		compatible = "nxp,pcf85063";
+		reg = <0x51>;
+	};
+
+	eeprom@57 {
+		compatible = "atmel,24c256";
+		reg = <0x57>;
+	};
+};
+
+&esdhc {
+	non-removable;
+	disable-wp;
+	mmc-hs200-1_8v;
+	sd-uhs-sdr104;
+	sd-uhs-sdr50;
+	sd-uhs-sdr25;
+	sd-uhs-sdr12;
+};
+

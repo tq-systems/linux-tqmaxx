@@ -1,0 +1,98 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Device Tree Include file for MBLS10xxA from TQ (FMAN related sections)
+ *
+ * Copyright 2019 TQ-Systems GmbH
+ */
+
+#include <dt-bindings/net/ti-dp83867.h>
+
+&fman0 {
+	status = "okay";
+
+	ethernet@e0000 { /* EMAC.1 */
+		phy-connection-type = "sgmii";
+
+	};
+
+	ethernet@e2000 { /* EMAC.2 */
+		phy-connection-type = "sgmii";
+	};
+
+	ethernet@e4000 { /* EMAC.3 */
+		phy-handle = <&rgmii_phy1>;
+		phy-connection-type = "rgmii";
+		phy-mode = "rgmii-id";
+	};
+
+	ethernet@e6000 { /* EMAC.4 */
+		phy-handle = <&rgmii_phy2>;
+		phy-connection-type = "rgmii";
+		phy-mode = "rgmii-id";
+	};
+
+	ethernet@e8000 { /* EMAC.5 */
+		phy-connection-type = "sgmii";
+	};
+
+	ethernet@ea000 { /* EMAC.6 */
+		phy-connection-type = "sgmii";
+	};
+
+	ethernet@f0000 { /* EMAC.9 */
+		phy-connection-type = "sgmii";
+	};
+
+	ethernet@f2000 { /* EMAC.10 */
+		phy-connection-type = "sgmii";
+	};
+
+	mdio@fc000 {
+		rgmii_phy1: ethernet-phy@0e {
+			reg = <0x0e>;
+			ti,rx-internal-delay = <DP83867_RGMIIDCTL_1_50_NS>;
+			ti,tx-internal-delay = <DP83867_RGMIIDCTL_1_50_NS>;
+			ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_8_B_NIB>;
+		};
+
+		rgmii_phy2: ethernet-phy@0c {
+			reg = <0x0c>;
+			ti,rx-internal-delay = <DP83867_RGMIIDCTL_1_50_NS>;
+			ti,tx-internal-delay = <DP83867_RGMIIDCTL_1_50_NS>;
+			ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_8_B_NIB>;
+		};
+
+		qsgmii1_phy1: ethernet-phy@1c {
+			reg = <0x1c>;
+		};
+
+		qsgmii1_phy2: ethernet-phy@1d {
+			reg = <0x1d>;
+		};
+
+		qsgmii1_phy3: ethernet-phy@1e {
+			reg = <0x1e>;
+		};
+
+		qsgmii1_phy4: ethernet-phy@1f {
+			reg = <0x1f>;
+		};
+
+		qsgmii2_phy1: ethernet-phy@00 {
+			reg = <0x00>;
+		};
+
+		qsgmii2_phy2: ethernet-phy@01 {
+			reg = <0x01>;
+		};
+
+		qsgmii2_phy3: ethernet-phy@02 {
+			reg = <0x02>;
+		};
+
+		qsgmii2_phy4: ethernet-phy@03 {
+			reg = <0x03>;
+		};
+	};
+};
+

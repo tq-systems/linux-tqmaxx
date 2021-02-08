@@ -1,0 +1,54 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Device Tree file for TQMLS1046A SoM on MBLS10xxA from TQ
+ *
+ * Copyright 2018 TQ-Systems GmbH
+ */
+
+/dts-v1/;
+
+#include <dt-bindings/gpio/gpio.h>
+
+#include "fsl-tqmls1046a.dtsi"
+#include "fsl-tqmls10xxa-mbls10xxa.dtsi"
+
+/ {
+	model = "TQ TQMLS1046A SoM on MBLS10xxA board";
+	compatible = "tqc,tqmls1046a", "fsl,ls1046a";
+
+	aliases {
+		serial0 = &duart0;
+		serial1 = &duart1;
+		qsgmii_s1_p1 = &qsgmii1_phy1;
+		qsgmii_s1_p2 = &qsgmii1_phy2;
+		qsgmii_s1_p3 = &qsgmii1_phy3;
+		qsgmii_s1_p4 = &qsgmii1_phy4;
+		qsgmii_s2_p1 = &qsgmii2_phy1;
+		qsgmii_s2_p2 = &qsgmii2_phy2;
+		qsgmii_s2_p3 = &qsgmii2_phy3;
+		qsgmii_s2_p4 = &qsgmii2_phy4;
+	};
+
+	chosen {
+		stdout-path = "serial1:115200n8";
+	};
+};
+
+&esdhc {
+	cd-gpios = <&gpio3 2 GPIO_ACTIVE_LOW>;
+	wp-gpios = <&gpio3 3 GPIO_ACTIVE_HIGH>;
+};
+
+&dspi {
+	bus-num = <0>;
+	status = "okay";
+
+	spidev@0 {
+		compatible = "tq,testdev";
+		reg = <0>;
+		spi-max-frequency = <10000000>;
+	};
+};
+
+#include "fsl-ls1046-post.dtsi"
+#include "fsl-tqmls10xxa-mbls10xxa-fman.dtsi"
