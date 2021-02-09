@@ -37,6 +37,14 @@
 	};
 };
 
+&cpu_alert0 {
+	temperature = <95000>;
+};
+
+&cpu_crit0 {
+	temperature = <100000>;
+};
+
 &iomuxc {
 	pinctrl_lpi2c1: lpi2c1grp {
 		fsl,pins = <
