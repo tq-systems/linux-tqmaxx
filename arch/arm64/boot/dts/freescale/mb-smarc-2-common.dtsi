@@ -172,6 +172,10 @@
 	status = "okay";
 };
 
+&lpuart3 {
+	status = "okay";
+};
+
 &pcieb{
 	epdev_on-supply = <&reg_pcie_3v3>;
 	status = "okay";
