@@ -206,7 +206,7 @@
 			  "LID", "SLEEP", "CHARGING#", "CHGPRSNT#",
 			  "BATLOW#", "", "", "",
 			  "", "SMARC GPIO6", "SMARC GPIO5", "",
-			  "", "", "", "",
+			  "PHY3 RST#", "", "", "",
 			  "", "", "", "";
 };
 
@@ -214,7 +214,7 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_smarc_gpio>;
 
-	gpio-line-names = "", "", "", "",
+	gpio-line-names = "LCD1_BLKT_EN", "LCD1_VDD_EN", "LCD0_BLKT_EN", "LCD0_VDD_EN",
 			  "SMARC GPIO0", "SMARC GPIO1", "SMARC GPIO2", "",
 			  "SMARC GPIO3", "SMARC GPIO8", "SMARC GPIO7", "SMARC GPIO10",
 			  "SMARC GPIO9", "SMARC GPIO4", "", "",
@@ -230,6 +230,37 @@
 	 * pad-wakeup-num = <1>;
 	 * pad-wakeup = <IMX8QXP_MIPI_DSI1_GPIO0_01 4 0>;
 	 */
+
+	gpio-line-names = "RTC_INT#", "", "", "",
+			  "", "", "", "",
+			  "", "", "", "",
+			  "", "", "", "",
+			  "", "", "", "",
+			  "", "", "", "",
+			  "", "", "", "",
+			  "", "", "", "";
+};
+
+&lsio_gpio3 {
+	gpio-line-names = "", "", "", "",
+			  "", "", "", "",
+			  "", "", "", "",
+			  "", "", "", "",
+			  "", "", "", "",
+			  "", "", "PHY0_RST#", "",
+			  "", "", "", "",
+			  "", "", "", "";
+};
+
+&lsio_gpio4 {
+	gpio-line-names = "PCIE_PERST#", "", "PCIE_WAKE#", "USB_OTG1_PWR",
+			  "", "", "", "",
+			  "", "", "", "",
+			  "", "", "", "",
+			  "", "", "", "SDIO_PWR_EN",
+			  "", "SDIO_WP", "SDIO_CD#", "",
+			  "", "", "", "",
+			  "", "", "", "";
 };
 
 &i2c0 {
