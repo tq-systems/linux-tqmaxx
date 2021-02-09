@@ -236,14 +236,12 @@
 	sensor0: tempsensor@1b {
 		compatible = "nxp,se97", "jedec,jc-42.4-temp";
 		reg = <0x1b>;
-		status = "okay";
 	};
 
 	eeprom0: eeprom@50 {
 		compatible = "st,24c64", "atmel,24c64";
 		reg = <0x50>;
 		pagesize = <32>;
-		status = "okay";
 	};
 
 	rtc1: rtc@51 {
@@ -255,7 +253,6 @@
 		compatible = "nxp,se97b", "atmel,24c02";
 		reg = <0x53>;
 		pagesize = <16>;
-		status = "okay";
 	};
 };
 

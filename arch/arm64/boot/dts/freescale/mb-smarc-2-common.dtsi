@@ -145,7 +145,6 @@
 
 		iov-supply = <&reg_1v8>;
 		ldoin-supply = <&reg_3v3>;
-		status = "okay";
 	};
 
 	eeprom2: eeprom@57 {
@@ -160,14 +159,12 @@
 		reg = <0>;
 		compatible = "tq,testdev";
 		spi-max-frequency = <5000000>;
-		status = "okay";
 	};
 
 	spidev0_1: spidev0@1 {
 		reg = <1>;
 		compatible = "tq,testdev";
 		spi-max-frequency = <5000000>;
-		status = "okay";
 	};
 };
 
