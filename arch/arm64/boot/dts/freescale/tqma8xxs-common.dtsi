@@ -198,13 +198,13 @@
 
 &lsio_gpio0 {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_smarc_fangpio>;
+	pinctrl-0 = <&pinctrl_smarc_fangpio>, <&pinctrl_smarc_mgntpio>;
 
 	gpio-line-names = "", "", "", "",
 			  "", "", "", "",
 			  "", "", "", "",
-			  "", "", "", "",
-			  "", "", "", "",
+			  "LID", "SLEEP", "CHARGING#", "CHGPRSNT#",
+			  "BATLOW#", "", "", "",
 			  "", "SMARC GPIO6", "SMARC GPIO5", "",
 			  "", "", "", "",
 			  "", "", "", "";
@@ -381,6 +381,21 @@
 			IMX8QXP_UART1_RX_LSIO_GPIO0_IO22	0x00000021
 			/* SMARC GPIO6 */
 			IMX8QXP_UART1_TX_LSIO_GPIO0_IO21	0x00000021
+		>;
+	};
+
+	pinctrl_smarc_mgntpio: smarcmgntgpiogrp {
+		fsl,pins = <
+			/* SMARC BATLOW# */
+			IMX8QXP_SPI3_CS0_LSIO_GPIO0_IO16	0x00000021
+			/* SMARC SLEEP */
+			IMX8QXP_SPI3_SCK_LSIO_GPIO0_IO13	0x00000021
+			/* SMARC CHGPRSNT# */
+			IMX8QXP_SPI3_SDI_LSIO_GPIO0_IO15	0x00000021
+			/* SMARC CHARGING# */
+			IMX8QXP_SPI3_SDO_LSIO_GPIO0_IO14	0x00000021
+			/* SMARC LID */
+			IMX8QXP_SPDIF0_EXT_CLK_LSIO_GPIO0_IO12	0x00000021
 		>;
 	};
 
