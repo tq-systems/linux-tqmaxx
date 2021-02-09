@@ -181,7 +181,6 @@
 		reg = <0>;
 		compatible = "tq,testdev";
 		spi-max-frequency = <5000000>;
-		status = "okay";
 	};
 };
 
@@ -195,7 +194,6 @@
 		reg = <0>;
 		compatible = "tq,testdev";
 		spi-max-frequency = <5000000>;
-		status = "okay";
 	};
 };
 
@@ -501,7 +499,6 @@
 		compatible = "ti,tusb8041", "ti,tusb80xx";
 		reg = <0x44>;
 		reset-gpios = <&expander0 13 GPIO_ACTIVE_LOW>;
-		status = "okay";
 	};
 
 	eeprom3: eeprom@57 {
