@@ -196,6 +196,34 @@
 	};
 };
 
+&lsio_gpio0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_smarc_fangpio>;
+
+	gpio-line-names = "", "", "", "",
+			  "", "", "", "",
+			  "", "", "", "",
+			  "", "", "", "",
+			  "", "", "", "",
+			  "", "SMARC GPIO6", "SMARC GPIO5", "",
+			  "", "", "", "",
+			  "", "", "", "";
+};
+
+&lsio_gpio1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_smarc_gpio>;
+
+	gpio-line-names = "", "", "", "",
+			  "SMARC GPIO0", "SMARC GPIO1", "SMARC GPIO2", "",
+			  "SMARC GPIO3", "SMARC GPIO8", "SMARC GPIO7", "SMARC GPIO10",
+			  "SMARC GPIO9", "SMARC GPIO4", "", "",
+			  "", "", "", "",
+			  "", "", "", "",
+			  "", "", "", "",
+			  "", "", "", "";
+};
+
 &i2c0 {
 	#address-cells = <1>;
 	#size-cells = <0>;
@@ -321,6 +349,38 @@
 			IMX8QXP_QSPI0B_DATA3_LSIO_QSPI0B_DATA3	0x0000004d
 			IMX8QXP_QSPI0B_SS0_B_LSIO_QSPI0B_SS0_B	0x0000004d
 			IMX8QXP_QSPI0B_SS1_B_LSIO_QSPI0B_SS1_B	0x0000004d
+		>;
+	};
+
+	pinctrl_smarc_gpio: smarcgpiogrp {
+		fsl,pins = <
+			/* SMARC GPIO0 / CAM0_PWR# */
+			IMX8QXP_SPI0_SCK_LSIO_GPIO1_IO04	0x00000021
+			/* SMARC GPIO1 / CAM1_PWR# */
+			IMX8QXP_SPI0_SDI_LSIO_GPIO1_IO05	0x00000021
+			/* SMARC GPIO2 / CAM0_RST# */
+			IMX8QXP_SPI0_SDO_LSIO_GPIO1_IO06	0x00000021
+			/* SMARC GPIO3 / CAM1_RST# */
+			IMX8QXP_SPI0_CS0_LSIO_GPIO1_IO08	0x00000021
+			/* SMARC GPIO4 / HDA_RST# */
+			IMX8QXP_ADC_IN5_LSIO_GPIO1_IO13		0x00000021
+			/* SMARC GPIO7 */
+			IMX8QXP_ADC_IN0_LSIO_GPIO1_IO10		0x00000021
+			/* SMARC GPIO8 */
+			IMX8QXP_ADC_IN1_LSIO_GPIO1_IO09		0x00000021
+			/* SMARC GPIO9 */
+			IMX8QXP_ADC_IN2_LSIO_GPIO1_IO12		0x00000021
+			/* SMARC GPIO10 */
+			IMX8QXP_ADC_IN3_LSIO_GPIO1_IO11		0x00000021
+		>;
+	};
+
+	pinctrl_smarc_fangpio: smarcfangpiogrp {
+		fsl,pins = <
+			/* SMARC GPIO5 */
+			IMX8QXP_UART1_RX_LSIO_GPIO0_IO22	0x00000021
+			/* SMARC GPIO6 */
+			IMX8QXP_UART1_TX_LSIO_GPIO0_IO21	0x00000021
 		>;
 	};
 
