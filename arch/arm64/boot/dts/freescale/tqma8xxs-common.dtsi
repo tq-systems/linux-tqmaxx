@@ -4,6 +4,40 @@
  */
 
 / {
+	backlight_lvds0: backlight-lvds0 {
+		compatible = "pwm-backlight";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_backlight_lvds0>;
+		pwms = <&pwm_mipi_lvds0 0 100000 0>;
+		enable-gpios = <&lsio_gpio1 2 GPIO_ACTIVE_HIGH>;
+		status = "disabled";
+	};
+
+	backlight_lvds1: backlight-lvds1 {
+		compatible = "pwm-backlight";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_backlight_lvds1>;
+		pwms = <&pwm_mipi_lvds1 0 100000 0>;
+		enable-gpios = <&lsio_gpio1 0 GPIO_ACTIVE_HIGH>;
+		status = "disabled";
+	};
+
+	panel_lvds0: panel-lvds0 {
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_lbdpanel0>;
+		backlight = <&backlight_lvds0>;
+		enable-gpios = <&lsio_gpio1 3 0>;
+		status = "disabled";
+	};
+
+	panel_lvds1: panel-lvds1 {
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_lbdpanel1>;
+		backlight = <&backlight_lvds1>;
+		enable-gpios = <&lsio_gpio1 1 0>;
+		status = "disabled";
+	};
+
 	reg_sdvmmc: regulator-sdvmmc {
 		compatible = "regulator-fixed";
 		pinctrl-names = "default";
@@ -201,6 +235,17 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_hog>;
 
+	pinctrl_backlight_lvds0: backlight_lvds0_grp {
+		fsl,pins = <
+			IMX8QXP_SPI2_SDI_LSIO_GPIO1_IO02	0x00000021
+		>;
+	};
+
+	pinctrl_backlight_lvds1: backlight_lvds1_grp {
+		fsl,pins = <
+			IMX8QXP_SPI2_CS0_LSIO_GPIO1_IO00	0x00000021
+		>;
+	};
 
 	pinctrl_can1: can1grp {
 		fsl,pins = <
@@ -282,7 +327,21 @@
 	pinctrl_hog: tqma8xxshoggrp {
 		fsl,pins = <
 			/* AUDIO MCLK*/
-			IMX8QXP_MCLK_OUT0_ADMA_ACM_MCLK_OUT0		0x06000040
+			IMX8QXP_MCLK_OUT0_ADMA_ACM_MCLK_OUT0	0x06000040
+		>;
+	};
+
+	pinctrl_lbdpanel0: lbdpanel0grp {
+		fsl,pins = <
+			/* LCD PWR */
+			IMX8QXP_SPI2_SCK_LSIO_GPIO1_IO03	0x00000021
+		>;
+	};
+
+	pinctrl_lbdpanel1: lbdpanel1grp {
+		fsl,pins = <
+			/* LCD PWR */
+			IMX8QXP_SPI2_SDO_LSIO_GPIO1_IO01	0x00000021
 		>;
 	};
 
@@ -305,6 +364,18 @@
 			IMX8QXP_PCIE_CTRL0_PERST_B_LSIO_GPIO4_IO00	0x06000041
 			IMX8QXP_PCIE_CTRL0_CLKREQ_B_LSIO_GPIO4_IO01	0x06000041
 			IMX8QXP_PCIE_CTRL0_WAKE_B_LSIO_GPIO4_IO02	0x04000041
+		>;
+	};
+
+	pinctrl_pwm_mipi_lvds0: mipi_lvds0_pwm_grp {
+		fsl,pins = <
+			IMX8QXP_MIPI_DSI0_GPIO0_00_MIPI_DSI0_PWM0_OUT	0x00000021
+		>;
+	};
+
+	pinctrl_pwm_mipi_lvds1: mipi_lvds1_pwm_grp {
+		fsl,pins = <
+			IMX8QXP_MIPI_DSI1_GPIO0_00_MIPI_DSI1_PWM0_OUT	0x00000021
 		>;
 	};
 
@@ -458,6 +529,18 @@
 	pinctrl-0 = <&pinctrl_pcieb>;
 	reset-gpio = <&lsio_gpio4 0 GPIO_ACTIVE_LOW>;
 	ext_osc = <1>;
+};
+
+&pwm_mipi_lvds0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm_mipi_lvds0>;
+	status = "disabled";
+};
+
+&pwm_mipi_lvds1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm_mipi_lvds1>;
+	status = "disabled";
 };
 
 &sai1 {
