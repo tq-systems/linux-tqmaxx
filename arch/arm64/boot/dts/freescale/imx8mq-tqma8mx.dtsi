@@ -44,7 +44,6 @@
 		regulator-settling-time-us = <150000>;
 		gpios = <&gpio1 6 GPIO_ACTIVE_LOW>;
 		states = <900000 0x1 1000000 0x0>;
-		status = "okay";
 	};
 
 
@@ -280,7 +279,6 @@
 	sensor0: temperature-sensor-eeprom@1b {
 		compatible = "nxp,se97", "jedec,jc-42.4-temp";
 		reg = <0x1b>;
-		status = "okay";
 	};
 
 	pcf85063: rtc@51 {
@@ -292,21 +290,18 @@
 		interrupt-parent = <&gpio1>;
 		interrupts = <1 IRQ_TYPE_EDGE_FALLING>;
 		quartz-load-femtofarads = <7000>;
-		status = "okay";
 	};
 
 	eeprom1: eeprom@53 {
 		compatible = "nxp,se97b", "atmel,24c02";
 		reg = <0x53>;
 		pagesize = <16>;
-		status = "okay";
 	};
 
 	eeprom0: eeprom@57 {
 		compatible = "atmel,24c64";
 		reg = <0x57>;
 		pagesize = <32>;
-		status = "okay";
 	};
 };
 

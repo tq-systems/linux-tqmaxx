@@ -181,7 +181,6 @@
 		reg = <0>;
 		compatible = "tq,testdev";
 		spi-max-frequency = <5000000>;
-		status = "okay";
 	};
 };
 
@@ -195,7 +194,6 @@
 		reg = <0>;
 		compatible = "tq,testdev";
 		spi-max-frequency = <5000000>;
-		status = "okay";
 	};
 };
 
@@ -497,21 +495,18 @@
 	sensor1: sensor@1f {
 		compatible = "nxp,se97", "jedec,jc-42.4-temp";
 		reg = <0x1f>;
-		status = "okay";
 	};
 
 	usbhub0: usbhub@44 {
 		compatible = "ti,tusb8041", "ti,tusb80xx";
 		reg = <0x44>;
 		reset-gpios = <&expander0 13 GPIO_ACTIVE_LOW>;
-		status = "okay";
 	};
 
 	eeprom3: eeprom@57 {
 		compatible = "nxp,se97b", "atmel,24c02";
 		reg = <0x57>;
 		pagesize = <16>;
-		status = "okay";
 	};
 
 	/* PCIe CLK, should work without intervention */
