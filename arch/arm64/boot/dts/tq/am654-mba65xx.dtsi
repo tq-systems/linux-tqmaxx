@@ -355,6 +355,18 @@
 		gpio-controller;
 		#gpio-cells = <2>;
 	};
+
+	ina226@40 {
+		compatible = "ti,ina226";
+		reg = <0x40>;
+		shunt-resistor = <3>;
+	};
+
+	ina226@45 {
+		compatible = "ti,ina226";
+		reg = <0x45>;
+		shunt-resistor = <3>;
+	};
 };
 
 
