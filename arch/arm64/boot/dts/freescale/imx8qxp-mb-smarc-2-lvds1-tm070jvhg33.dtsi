@@ -1,0 +1,49 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright 2018-2021 TQ-Systems GmbH
+ */
+
+&backlight_lvds1 {
+	pwms = <&pwm_mipi_lvds1 0 100000 0>;
+	brightness-levels = <0 4 8 16 32 64 128 255>;
+	default-brightness-level = <7>;
+	power-supply = <&reg_12v0>;
+	status = "okay";
+};
+
+&ldb1_phy {
+	status = "okay";
+};
+
+&ldb1 {
+	status = "okay";
+
+	lvds-channel@1 {
+		fsl,data-mapping = "spwg";
+		fsl,data-width = <24>;
+		status = "okay";
+
+		port@1 {
+			reg = <1>;
+
+			lvds1_out: endpoint {
+				remote-endpoint = <&panel_in_lvds1>;
+			};
+		};
+	};
+};
+
+&panel_lvds1 {
+	compatible = "tianma,tm070jvhg33";
+	status = "okay";
+
+	port {
+		panel_in_lvds1: endpoint {
+			remote-endpoint = <&lvds1_out>;
+		};
+	};
+};
+
+&pwm_mipi_lvds1 {
+	status = "okay";
+};
