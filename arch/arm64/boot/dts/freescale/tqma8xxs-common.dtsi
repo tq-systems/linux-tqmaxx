@@ -224,6 +224,14 @@
 			  "", "", "", "";
 };
 
+&lsio_gpio2 {
+	/* TODO: enable wakeup for rtc @ line 0 */
+	/*
+	 * pad-wakeup-num = <1>;
+	 * pad-wakeup = <IMX8QXP_MIPI_DSI1_GPIO0_01 4 0>;
+	 */
+};
+
 &i2c0 {
 	#address-cells = <1>;
 	#size-cells = <0>;
@@ -247,6 +255,18 @@
 	rtc1: rtc@51 {
 		compatible = "nxp,pcf85063a";
 		reg = <0x51>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_rtc>;
+		/*
+		 * TODO: using IRQ leads to crash:
+		 * Internal error: synchronous external abort: 96000210 in
+		 * mx3_gpio_irq_handler+0x3c/0xd8
+		 *
+		 * interrupt-names = "irq";
+		 * interrupt-parent = <&lsio_gpio2>;
+		 * interrupts = <0 IRQ_TYPE_LEVEL_LOW>;
+		 */
+		quartz-load-femtofarads = <7000>;
 	};
 
 	eeprom1: eeprom@53 {
@@ -448,6 +468,12 @@
 	pinctrl_pwm_mipi_lvds1: mipi_lvds1_pwm_grp {
 		fsl,pins = <
 			IMX8QXP_MIPI_DSI1_GPIO0_00_MIPI_DSI1_PWM0_OUT	0x00000021
+		>;
+	};
+
+	pinctrl_rtc: rtc_grp {
+		fsl,pins = <
+			IMX8QXP_MIPI_DSI1_GPIO0_01_LSIO_GPIO2_IO00	0x00000021
 		>;
 	};
 
