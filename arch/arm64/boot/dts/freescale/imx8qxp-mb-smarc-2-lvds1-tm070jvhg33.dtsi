@@ -11,14 +11,14 @@
 	status = "okay";
 };
 
-&ldb1_phy {
+&ldb2_phy {
 	status = "okay";
 };
 
-&ldb1 {
+&ldb2 {
 	status = "okay";
 
-	lvds-channel@1 {
+	lvds-channel@0 {
 		fsl,data-mapping = "spwg";
 		fsl,data-width = <24>;
 		status = "okay";
