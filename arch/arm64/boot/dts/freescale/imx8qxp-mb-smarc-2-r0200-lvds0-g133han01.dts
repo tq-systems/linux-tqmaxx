@@ -7,4 +7,4 @@
 
 #include "imx8qxp-mb-smarc-2-r0200.dts"
 #include "imx8qxp-mb-smarc-2-display.dtsi"
-#include "imx8qxp-mb-smarc-2-lvds-tm070jvhg33.dtsi"
+#include "imx8qxp-mb-smarc-2-lvds0-g133han01.dtsi"
