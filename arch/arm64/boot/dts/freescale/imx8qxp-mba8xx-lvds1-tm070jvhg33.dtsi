@@ -1,0 +1,82 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright 2018-2021 TQ-Systems GmbH
+ */
+
+/ {
+	backlight_lvds: backlight-lvds {
+		compatible = "pwm-backlight";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_bl_lvds>;
+		pwms = <&adma_pwm 0 5000000>;
+		brightness-levels = <0 4 8 16 32 64 128 255>;
+		default-brightness-level = <7>;
+		power-supply = <&reg_12v0>;
+		enable-gpios = <&lsio_gpio1 30 GPIO_ACTIVE_HIGH>;
+		status = "okay";
+	};
+
+	panel-lvds1 {
+		compatible = "tianma,tm070jvhg33";
+		backlight = <&backlight_lvds>;
+		status = "okay";
+
+		port {
+			panel_in_lvds1: endpoint {
+				remote-endpoint = <&lvds1_out>;
+			};
+		};
+	};
+};
+
+&adma_pwm {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_admapwm>;
+	status = "okay";
+};
+
+&iomuxc {
+	pinctrl_admapwm: admapwmgrp {
+		fsl,pins = <
+			IMX8QXP_SPI0_CS1_ADMA_LCD_PWM0_OUT		0x00000021
+		>;
+	};
+
+	pinctrl_bl_lvds: bllvdsgrp {
+		fsl,pins = <
+			IMX8QXP_MIPI_DSI1_I2C0_SDA_LSIO_GPIO1_IO30	0x00000021
+		>;
+	};
+
+	pinctrl_lbdpanel_hog: lbdpanelhoggrp {
+		fsl,pins = <
+			/* TODO: can be used if needed for panel */
+			/* LCD PWR */
+			IMX8QXP_MIPI_DSI0_I2C0_SCL_LSIO_GPIO1_IO25	0x00000021
+			/* LCD RST# */
+			IMX8QXP_MIPI_DSI1_I2C0_SCL_LSIO_GPIO1_IO29	0x00000021
+		>;
+	};
+};
+
+&ldb2_phy {
+	status = "okay";
+};
+
+&ldb2 {
+	status = "okay";
+
+	lvds-channel@0 {
+		fsl,data-mapping = "spwg";
+		fsl,data-width = <24>;
+		status = "okay";
+
+		port@1 {
+			reg = <1>;
+
+			lvds1_out: endpoint {
+				remote-endpoint = <&panel_in_lvds1>;
+			};
+		};
+	};
+};
