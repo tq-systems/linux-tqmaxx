@@ -5,6 +5,6 @@
 
 /dts-v1/;
 
-#include "imx8qxp-mb-smarc-2.dts"
+#include "imx8qxp-mb-smarc-2-r0200.dts"
 #include "imx8qxp-mb-smarc-2-display.dtsi"
-#include "imx8qxp-mb-smarc-2-lvds-g133han01.dtsi"
+#include "imx8qxp-mb-smarc-2-lvds0-g133han01.dtsi"
