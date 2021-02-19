@@ -892,7 +892,7 @@ unlock:
 		/* increase usage count for ISI channel */
 		mutex_lock(&mxc_isi->lock);
 		atomic_inc(&mxc_isi->usage_count);
-		mxc_isi->m2m_enabled = false;
+		mxc_isi->cap_enabled = true;
 		mutex_unlock(&mxc_isi->lock);
 	}
 
@@ -932,6 +932,11 @@ static int mxc_isi_capture_release(struct file *file)
 	if (do_release) {
 		pr_info("%s - do release\n", __func__);
 		v4l2_subdev_call(sd, core, s_power, 0);
+
+		mutex_lock(&mxc_isi->lock);
+		mxc_isi->cap_enabled = false;
+		mutex_unlock(&mxc_isi->lock);
+
 		pm_runtime_put(dev);
 	}
 
