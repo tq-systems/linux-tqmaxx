@@ -312,6 +312,12 @@
 	pinctrl-0 = <&wkup_i2c0_pins_default>;
 	clock-frequency = <400000>;
 
+	/* NXP SE97BTP with temperature sensor + eeprom */
+	sensor1: se97@1f {
+		compatible = "nxp,se97", "jedec,jc-42.4-temp";
+		reg = <0x1f>;
+		status = "okay";
+	};
 
 	pcf85063: rtc@51 {
 		compatible = "nxp,pcf85063";
@@ -321,7 +327,15 @@
 	m24c64: eeprom@50 {
 		compatible = "st-micro,24c256";
 		reg  = <0x50>;
-    };
+	};
+
+	/* NXP SE97BTP with temperature sensor + eeprom */
+	eeprom1: se97@57 {
+		compatible = "nxp,spd";
+		reg = <0x57>;
+		pagesize = <16>;
+		status = "okay";
+	};
 
 	// pca9554: gpio@39 {
 	// 	compatible = "nxp,pca9554";
@@ -720,7 +734,7 @@
 };
 
 &davinci_mdio {
-	phy0: ethernet-phy@0 {
+	phy1: ethernet-phy@1 {
 		reg = <1>;
 		/* TODO: phy reset: TCA9555RTWR(i2c:0x21)[p04].GPIO_MCU_RGMII_RSTN */
 		ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
@@ -731,7 +745,7 @@
 
 &cpsw_port1 {
 	phy-mode = "rgmii-rxid";
-	phy-handle = <&phy0>;
+	phy-handle = <&phy1>;
 };
 
 #define TS_OFFSET(pa, val)     (0x4+(pa)*4) (0x80000000 | val)
