@@ -3,10 +3,7 @@
  * Copyright 2021 TQ-Systems GmbH
  */
 
-/dts-v1/;
-
-#include "imx8qxp-tqma8xqp.dtsi"
-#include "imx8qxp-mba8xx.dtsi"
-#include "imx8qxp-mba8xx-display.dtsi"
-#include "imx8qxp-mba8xx-lvds1-tm070jvhg33.dtsi"
+#include "imx8qxp-mba8xx.dts"
+#include "mba8xx-display.dtsi"
+#include "mba8xx-lvds1-tm070jvhg33.dtsi"
 
