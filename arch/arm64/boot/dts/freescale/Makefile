@@ -180,7 +180,11 @@ dtb-$(CONFIG_ARCH_MXC) += imx8dxl-evk.dtb imx8dxl-evk-rpmsg.dtb \
 			  imx8dxl-ddr3-evk.dtb imx8dxl-ddr3-evk-rpmsg.dtb \
 			  imx8dxl-evk-root.dtb imx8dxl-evk-inmate.dtb
 
-dtb-$(CONFIG_ARCH_MXC) += imx8qxp-mba8xx.dtb \
+dtb-$(CONFIG_ARCH_MXC) += imx8dxp-mba8xx.dtb \
+			  imx8dxp-mba8xx-lvds0-tm070jvhg33.dtb \
+			  imx8dxp-mba8xx-lvds1-tm070jvhg33.dtb \
+			  imx8dxp-mba8xx-sd-uhs.dtb \
+			  imx8qxp-mba8xx.dtb \
 			  imx8qxp-mba8xx-lvds0-tm070jvhg33.dtb \
 			  imx8qxp-mba8xx-lvds1-tm070jvhg33.dtb \
 			  imx8qxp-mba8xx-sd-uhs.dtb
