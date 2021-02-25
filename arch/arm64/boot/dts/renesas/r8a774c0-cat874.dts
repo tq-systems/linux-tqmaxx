@@ -218,6 +218,58 @@
 	};
 };
 
+&rpc {
+	renesas,rpc-mode = "spi";
+	status = "okay";
+
+	flash@0 {
+		compatible = "jedec,spi-nor";
+		reg = <0>;
+		spi-max-frequency = <40000000>;
+		spi-tx-bus-width = <1>;
+		spi-rx-bus-width = <4>;
+		m25p,fast-read;
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			bootparam@0 {
+				reg = <0x00000000 0x040000>;
+				read-only;
+			};
+			bl2@40000 {
+				reg = <0x00040000 0x140000>;
+				read-only;
+			};
+			cert_header_sa6@180000 {
+				reg = <0x00180000 0x040000>;
+				read-only;
+			};
+			bl31@1c0000 {
+				reg = <0x001c0000 0x040000>;
+				read-only;
+			};
+			tee@200000 {
+				reg = <0x00200000 0x100000>;
+				read-only;
+			};
+			uboot@300000 {
+				reg = <0x00300000 0x0F0000>;
+				read-only;
+			};
+			uboot-env@3f0000 {
+				reg = <0x003f0000 0x010000>;
+				read-only;
+			};
+			user@400000 {
+				reg = <0x00400000 0xC00000>;
+			};
+		};
+	};
+};
+
 &ehci0 {
 	dr_mode = "host";
 	memory-region = <&global_cma>;
