@@ -121,7 +121,11 @@ dtb-$(CONFIG_ARCH_MXC) += imx8qxp-mek.dtb imx8qxp-mek-dsp.dtb imx8qxp-mek-ov5640
 dtb-$(CONFIG_ARCH_MXC) += imx8qxp-mek-dom0.dtb imx8qxp-mek-root.dtb \
 			  imx8qxp-mek-inmate.dtb
 
-dtb-$(CONFIG_ARCH_MXC) += imx8qxp-mba8xx.dtb \
+dtb-$(CONFIG_ARCH_MXC) += imx8dxp-mba8xx.dtb \
+			  imx8dxp-mba8xx-lvds0-tm070jvhg33.dtb \
+			  imx8dxp-mba8xx-lvds1-tm070jvhg33.dtb \
+			  imx8dxp-mba8xx-sd-uhs.dtb \
+			  imx8qxp-mba8xx.dtb \
 			  imx8qxp-mba8xx-lvds0-tm070jvhg33.dtb \
 			  imx8qxp-mba8xx-lvds1-tm070jvhg33.dtb \
 			  imx8qxp-mba8xx-sd-uhs.dtb
