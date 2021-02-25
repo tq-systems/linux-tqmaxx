@@ -567,17 +567,6 @@
 	status = "okay";
 };
 
-&du {
-	clocks = <&cpg CPG_MOD 724>,
-		<&cpg CPG_MOD 723>,
-		<&cpg CPG_MOD 722>,
-		<&du_dotclk_in0>,
-		<&du_dotclk_in1>,
-		<&du_dotclk_in2>;
-		clock-names = "du.0", "du.1", "du.2",
-			"dclkin.0", "dclkin.1", "dclkin.2";
-};
-
 &cmt0 {
 	status = "okay";
 };
