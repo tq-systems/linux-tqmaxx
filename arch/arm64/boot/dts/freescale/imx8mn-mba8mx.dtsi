@@ -6,10 +6,13 @@
 #include <dt-bindings/net/ti-dp83867.h>
 
 / {
-	model = "TQ Systems GmbH i.MX8MN TQMa8MxNL on MBa8Mx";
-	compatible = "tq,imx8mn-mba8mx", "tq,imx8mn-tqma8mnx", "fsl,imx8mn";
+	model = "TQ-Systems i.MX8MN TQMa8MxNL on MBa8Mx";
+	compatible = "tq,imx8mn-mba8mx", "tq,imx8mn-tqma8mxnl", "fsl,imx8mn";
 
 	aliases {
+		mmc0 = &usdhc3;
+		mmc1 = &usdhc2;
+		mmc2 = &usdhc1;
 		rtc1 = &snvs_rtc;
 		rtc0 = &pcf85063;
 	};
@@ -53,7 +56,7 @@
 		switch2 {
 			label = "switch2";
 			linux,code = <BTN_1>;
-			gpios = <&gpio3 17 GPIO_ACTIVE_LOW>;
+			gpios = <&gpio2 0 GPIO_ACTIVE_LOW>;
 			wakeup-source;
 		};
 
@@ -79,7 +82,7 @@
 
 		led2 {
 			label = "led2";
-			gpios = <&gpio3 16 GPIO_ACTIVE_HIGH>;
+			gpios = <&gpio3 14 GPIO_ACTIVE_HIGH>;
 			linux,default-trigger = "heartbeat";
 		};
 	};
@@ -200,7 +203,7 @@
 	pinctrl_usb0hub_sel: usb0hub_sel {
 		fsl,pins = <
 			/* SEL_USB_HUB_B */
-			MX8MN_IOMUXC_NAND_WP_B_GPIO3_IO18	0x84
+			MX8MN_IOMUXC_SD1_CMD_GPIO2_IO1		0x84
 		>;
 	};
 
@@ -238,6 +241,7 @@
 			MX8MN_IOMUXC_ENET_RXC_ENET1_RGMII_RXC		0x90
 			MX8MN_IOMUXC_ENET_RX_CTL_ENET1_RGMII_RX_CTL	0x90
 			MX8MN_IOMUXC_ENET_TX_CTL_ENET1_RGMII_TX_CTL	0x16
+			/* TODO: PWDN / IRQ */
 		>;
 	};
 
@@ -245,14 +249,14 @@
 		fsl,pins = <
 			MX8MN_IOMUXC_GPIO1_IO05_GPIO1_IO5	0x41
 			MX8MN_IOMUXC_GPIO1_IO07_GPIO1_IO7	0x41
-			MX8MN_IOMUXC_NAND_WE_B_GPIO3_IO17	0x41
+			MX8MN_IOMUXC_SD1_CLK_GPIO2_IO0		0x41
 		>;
 	};
 
 	pinctrl_gpioled: gpioledgrp {
 		fsl,pins = <
 			MX8MN_IOMUXC_GPIO1_IO00_GPIO1_IO0	0x41
-			MX8MN_IOMUXC_NAND_READY_B_GPIO3_IO16	0x41
+			MX8MN_IOMUXC_NAND_DQS_GPIO3_IO14	0x41
 		>;
 	};
 
@@ -373,13 +377,13 @@
 	};
 };
 
-&gpio3 {
+&gpio2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usb0hub_sel>;
 
 	sel-usb-hub {
 		gpio-hog;
-		gpios = <18 GPIO_ACTIVE_HIGH>;
+		gpios = <1 GPIO_ACTIVE_HIGH>;
 		output-high;
 	};
 };
