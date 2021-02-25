@@ -3,11 +3,8 @@
  * Copyright 2018-2021 TQ-Systems GmbH
  */
 
-/dts-v1/;
-
-#include "imx8qxp-tqma8xqp.dtsi"
-#include "imx8qxp-mba8xx.dtsi"
+#include "imx8qxp-mba8xx.dts"
 
 &usdhc2 {
-        /delete-property/ no-1-8-v;
+	/delete-property/ no-1-8-v;
 };

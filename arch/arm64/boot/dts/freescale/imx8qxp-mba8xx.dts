@@ -6,5 +6,9 @@
 /dts-v1/;
 
 #include "imx8qxp-tqma8xqp.dtsi"
-#include "imx8qxp-mba8xx.dtsi"
+#include "mba8xx-common.dtsi"
 
+/ {
+	model = "TQ-Systems i.MX8QXP TQMa8XQP on MBa8Xx";
+	compatible = "tq,imx8qxp-mba8xx", "tq,imx8qxp-tqma8xqp", "fsl,imx8qxp";
+};
