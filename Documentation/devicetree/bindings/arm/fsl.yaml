@@ -305,8 +305,11 @@ properties:
         items:
           - enum:
               - tq,imx8qxp-mba8xx         # TQ-Systems GmbH TQMa8QXP SOM on MBa8Xx
-          - const: tq,imx8qxp-tqma8xqp    # TQ-Systems GmbH TQMa8XQP SOM
+              - tq,imx8dxp-mba8xx         # TQ-Systems GmbH TQMa8DXP SOM on MBa8Xx
+          - const: tq,imx8qxp-tqma8xqp    # TQ-Systems GmbH TQMa8XQP SOM (with i.MX8QXP)
+          - const: tq,imx8dxp-tqma8xdp    # TQ-Systems GmbH TQMa8XDP SOM (with i.MX8DXP)
           - const: fsl,imx8qxp
+          - const: fsl,imx8dxp
 
       - description:
           TQMa8XxS is a series of SOM featuring NXP i.MX8X system-on-chip
