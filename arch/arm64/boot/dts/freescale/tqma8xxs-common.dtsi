@@ -318,7 +318,11 @@
 	pinctrl-1 = <&pinctrl_i2c0_gpio_mipi_lvds0>;
 	scl-gpios = <&lsio_gpio1 25 GPIO_ACTIVE_HIGH>;
 	sda-gpios = <&lsio_gpio1 26 GPIO_ACTIVE_HIGH>;
-	clock-frequency = <100000>;
+	/*
+	 * clocks near 100kHz: too short high time (I2C standard violation)
+	 * clocks > 100kHz: too short fall time (I2C standard violation)
+	 */
+	clock-frequency = <81000>;
 	status = "okay";
 };
 
