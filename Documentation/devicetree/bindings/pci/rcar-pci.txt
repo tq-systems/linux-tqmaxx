@@ -43,6 +43,9 @@ Optional properties:
 - phys: from common PHY binding: PHY phandle and specifier (only make sense
 	for R-Car gen3 SoCs where the PCIe PHYs have their own register blocks).
 - phy-names: from common PHY binding: should be "pcie".
+- deemph: Set to <1> to select -3.5dB deemphasis. Default is <0> which means
+	-6dB deemphasis. This setting corresponds directly to bit 6 of the
+	EXPCAP12 register (SELDEEM).
 
 Example:
 
