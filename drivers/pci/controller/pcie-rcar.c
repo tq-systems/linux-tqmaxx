@@ -81,6 +81,7 @@
 #define PMCAP(x)		(0x010040 + ((x) * 0x4))
 #define EXPCAP(x)		(0x010070 + ((x) * 0x4))
 #define VCCAP(x)		(0x010100 + ((x) * 0x4))
+#define SELDEEM_BIT		6
 
 /* link layer */
 #define IDSETR1			0x011004
@@ -155,6 +156,7 @@ struct rcar_pcie {
 	int			root_bus_nr;
 	struct clk		*bus_clk;
 	struct			rcar_msi msi;
+	unsigned int		deemph;
 };
 
 static void rcar_pci_write_reg(struct rcar_pcie *pcie, u32 val,
@@ -603,6 +605,10 @@ static int rcar_pcie_hw_init(struct rcar_pcie *pcie)
 		PCI_EXP_FLAGS_TYPE, PCI_EXP_TYPE_ROOT_PORT << 4);
 	rcar_rmw32(pcie, RCONF(PCI_HEADER_TYPE), 0x7f,
 		PCI_HEADER_TYPE_BRIDGE);
+
+	/* Set de-emphasis */
+	rcar_rmw32(pcie, EXPCAP(12), 1 << SELDEEM_BIT,
+		pcie->deemph << SELDEEM_BIT);
 
 	/* Enable data link layer active state reporting */
 	rcar_rmw32(pcie, REXPCAP(PCI_EXP_LNKCAP), PCI_EXP_LNKCAP_DLLLARC,
@@ -1172,6 +1178,9 @@ static int rcar_pcie_probe(struct platform_device *pdev)
 	err = rcar_pcie_parse_map_dma_ranges(pcie, dev->of_node);
 	if (err)
 		goto err_clk_disable;
+
+	if (of_property_read_u32(dev->of_node, "deemph", &pcie->deemph))
+		pcie->deemph = 0;
 
 	phy_init_fn = of_device_get_match_data(dev);
 	err = phy_init_fn(pcie);
