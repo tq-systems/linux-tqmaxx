@@ -334,6 +334,7 @@
 
 &pciec0 {
 	status = "okay";
+	deemph = <1>;
 };
 
 &pciec1 {
