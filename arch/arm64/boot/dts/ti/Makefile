@@ -23,6 +23,12 @@ dtb-$(CONFIG_ARCH_K3_AM6_SOC) += k3-am654-base-board.dtb  \
 
 dtb-$(CONFIG_ARCH_K3_J721E_SOC) += k3-j721e-common-proc-board.dtb \
 				   k3-j721e-proc-board-tps65917.dtb \
+				   k3-j7200-common-proc-board.dtb \
 				   k3-j721e-common-proc-board-infotainment.dtbo \
 				   k3-j721e-pcie-backplane.dtbo \
-				   k3-j721e-common-proc-board-jailhouse.dtbo
+				   k3-j721e-common-proc-board-jailhouse.dtbo \
+				   k3-j7200-common-proc-board-jailhouse.dtbo
+
+dtb-$(CONFIG_ARCH_K3) += k3-am642-evm.dtb
+
+dtb-$(CONFIG_ARCH_K3) += k3-am642-sk.dtb

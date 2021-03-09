@@ -8,7 +8,6 @@
 #include <linux/remoteproc.h>
 #include <net/switchdev.h>
 #include "prueth.h"
-#include "icss_switch.h"
 #include "prueth_switch.h"
 #include "prueth_fdb_tbl.h"
 
@@ -46,7 +45,7 @@ u8 prueth_sw_port_get_stp_state(struct prueth *prueth, enum prueth_port port)
 	return state;
 }
 
-const struct prueth_queue_info sw_queue_infos[][4] = {
+const struct prueth_queue_info sw_queue_infos[][NUM_QUEUES] = {
 	[PRUETH_PORT_QUEUE_HOST] = {
 		[PRUETH_QUEUE1] = {
 			P0_Q1_BUFFER_OFFSET,
@@ -135,7 +134,7 @@ const struct prueth_queue_info sw_queue_infos[][4] = {
 	},
 };
 
-static const struct prueth_queue_info rx_queue_infos[][4] = {
+static const struct prueth_queue_info rx_queue_infos[][NUM_QUEUES] = {
 	[PRUETH_PORT_QUEUE_HOST] = {
 		[PRUETH_QUEUE1] = {
 			P0_Q1_BUFFER_OFFSET,
@@ -266,7 +265,16 @@ static const struct prueth_queue_desc col_queue_descs[3] = {
 		.rd_ptr = END_OF_BD_POOL, .wr_ptr = END_OF_BD_POOL, }
 };
 
-int prueth_sw_hostconfig(struct prueth *prueth)
+void prueth_sw_free_fdb_table(struct prueth *prueth)
+{
+	if (prueth->emac_configured)
+		return;
+
+	kfree(prueth->fdb_tbl);
+	prueth->fdb_tbl = NULL;
+}
+
+void prueth_sw_hostconfig(struct prueth *prueth)
 {
 	void __iomem *dram1_base = prueth->mem[PRUETH_MEM_DRAM1].va;
 	void __iomem *dram;
@@ -305,8 +313,6 @@ int prueth_sw_hostconfig(struct prueth *prueth)
 	dram = dram1_base + P0_QUEUE_DESC_OFFSET;
 	memcpy_toio(dram, queue_descs[PRUETH_PORT_QUEUE_HOST],
 		    sizeof(queue_descs[PRUETH_PORT_QUEUE_HOST]));
-
-	return 0;
 }
 
 static int prueth_sw_port_config(struct prueth *prueth,
@@ -768,7 +774,7 @@ static int prueth_sw_insert_fdb_entry(struct prueth_emac *emac,
 	u8 hash_val, mac_tbl_idx;
 	s16 ret;
 
-	other_emac = prueth->emac[other_port_id(emac->port_id)];
+	other_emac = prueth->emac[other_port_id(emac->port_id) - 1];
 
 	if (fdb->total_entries == FDB_MAC_TBL_MAX_ENTRIES)
 		return -ENOMEM;
@@ -904,6 +910,13 @@ static void prueth_sw_fdb_work(struct work_struct *work)
 	struct prueth_emac *emac = fdb_work->emac;
 
 	rtnl_lock();
+
+	/* Interface is not up */
+	if (!emac->prueth->fdb_tbl) {
+		rtnl_unlock();
+		return;
+	}
+
 	switch (fdb_work->event) {
 	case FDB_LEARN:
 		prueth_sw_insert_fdb_entry(emac, fdb_work->addr, 0);
@@ -957,14 +970,33 @@ static int prueth_sw_purge_fdb(struct prueth_emac *emac)
 	return 0;
 }
 
+int prueth_sw_init_fdb_table(struct prueth *prueth)
+{
+	if (prueth->emac_configured)
+		return 0;
+
+	prueth->fdb_tbl = kmalloc(sizeof(*prueth->fdb_tbl), GFP_KERNEL);
+	if (!prueth->fdb_tbl)
+		return -ENOMEM;
+
+	prueth_sw_fdb_tbl_init(prueth);
+
+	return 0;
+}
+
 int prueth_sw_boot_prus(struct prueth *prueth, struct net_device *ndev)
 {
+	const struct prueth_firmware *pru_firmwares;
+	const char *fw_name, *fw_name1;
 	int ret;
-	char *fw_name = "ti-pruss/am57xx-pru0-prusw-fw.elf";
-	char *fw_name1 = "ti-pruss/am57xx-pru1-prusw-fw.elf";
 
 	if (prueth->emac_configured)
 		return 0;
+
+	pru_firmwares = &prueth->fw_data->fw_pru[PRUSS_PRU0];
+	fw_name = pru_firmwares->fw_name[prueth->eth_type];
+	pru_firmwares = &prueth->fw_data->fw_pru[PRUSS_PRU1];
+	fw_name1 = pru_firmwares->fw_name[prueth->eth_type];
 
 	ret = rproc_set_firmware(prueth->pru0, fw_name);
 	if (ret) {
@@ -990,18 +1022,8 @@ int prueth_sw_boot_prus(struct prueth *prueth, struct net_device *ndev)
 		goto rproc0_shutdown;
 	}
 
-	prueth->fdb_tbl = kmalloc(sizeof(*prueth->fdb_tbl), GFP_KERNEL);
-	if (!prueth->fdb_tbl) {
-		ret = -ENOMEM;
-		goto rproc1_shutdown;
-	}
-
-	prueth_sw_fdb_tbl_init(prueth);
-
 	return 0;
 
-rproc1_shutdown:
-	rproc_shutdown(prueth->pru1);
 rproc0_shutdown:
 	rproc_shutdown(prueth->pru0);
 	return ret;
@@ -1010,19 +1032,12 @@ rproc0_shutdown:
 int prueth_sw_shutdown_prus(struct prueth_emac *emac, struct net_device *ndev)
 {
 	struct prueth *prueth = emac->prueth;
-	char *fw_name = "ti-pruss/am57xx-pru0-prueth-fw.elf";
-	char *fw_name1 = "ti-pruss/am57xx-pru1-prueth-fw.elf";
 
 	if (prueth->emac_configured)
 		return 0;
 
 	rproc_shutdown(prueth->pru0);
 	rproc_shutdown(prueth->pru1);
-	rproc_set_firmware(prueth->pru0, fw_name);
-	rproc_set_firmware(prueth->pru1, fw_name1);
-
-	kfree(prueth->fdb_tbl);
-	prueth->fdb_tbl = NULL;
 
 	return 0;
 }
@@ -1035,6 +1050,10 @@ static int prueth_switchdev_attr_set(struct net_device *ndev,
 	struct prueth *prueth = emac->prueth;
 	int err = 0;
 	u8 o_state;
+
+	/* Interface is not up */
+	if (!prueth->fdb_tbl)
+		return 0;
 
 	switch (attr->id) {
 	case SWITCHDEV_ATTR_ID_PORT_STP_STATE:
@@ -1056,6 +1075,68 @@ static int prueth_switchdev_attr_set(struct net_device *ndev,
 	return err;
 }
 
+static int prueth_switchdev_obj_add(struct net_device *ndev,
+				    const struct switchdev_obj *obj,
+				    struct switchdev_trans *trans,
+				    struct netlink_ext_ack *extack)
+{
+	struct prueth_emac *emac = netdev_priv(ndev);
+	struct prueth *prueth = emac->prueth;
+	struct switchdev_obj_port_mdb *mdb;
+	int ret = 0;
+	u8 hash;
+
+	if (switchdev_trans_ph_prepare(trans))
+		return 0;
+
+	switch (obj->id) {
+	case SWITCHDEV_OBJ_ID_HOST_MDB:
+		mdb = SWITCHDEV_OBJ_PORT_MDB(obj);
+		dev_dbg(prueth->dev, "MDB add: %s: vid %u:%pM  port: %x\n",
+			ndev->name, mdb->vid, mdb->addr, emac->port_id);
+		hash = emac_get_mc_hash(mdb->addr, emac->mc_filter_mask);
+		emac_mc_filter_bin_allow(emac, hash);
+		break;
+	default:
+		ret = -EOPNOTSUPP;
+		break;
+	}
+
+	return ret;
+}
+
+static int prueth_switchdev_obj_del(struct net_device *ndev,
+				    const struct switchdev_obj *obj)
+{
+	struct prueth_emac *emac = netdev_priv(ndev);
+	struct prueth *prueth = emac->prueth;
+	struct switchdev_obj_port_mdb *mdb;
+	struct netdev_hw_addr *ha;
+	u8 hash, tmp_hash;
+	int ret = 0;
+
+	switch (obj->id) {
+	case SWITCHDEV_OBJ_ID_HOST_MDB:
+		mdb = SWITCHDEV_OBJ_PORT_MDB(obj);
+		dev_dbg(prueth->dev, "MDB del: %s: vid %u:%pM  port: %x\n",
+			ndev->name, mdb->vid, mdb->addr, emac->port_id);
+		hash = emac_get_mc_hash(mdb->addr, emac->mc_filter_mask);
+		netdev_for_each_mc_addr(ha, prueth->hw_bridge_dev) {
+			tmp_hash = emac_get_mc_hash(ha->addr, emac->mc_filter_mask);
+			/* Another MC address is in the bin. Don't disable. */
+			if (tmp_hash == hash)
+				return 0;
+		}
+		emac_mc_filter_bin_disallow(emac, hash);
+		break;
+	default:
+		ret = -EOPNOTSUPP;
+		break;
+	}
+
+	return ret;
+}
+
 /* switchdev notifiers */
 static int prueth_sw_switchdev_blocking_event(struct notifier_block *unused,
 					      unsigned long event, void *ptr)
@@ -1073,6 +1154,18 @@ static int prueth_sw_switchdev_blocking_event(struct notifier_block *unused,
 		err = switchdev_handle_port_attr_set(ndev, ptr,
 						     prueth_sw_port_dev_check,
 						     prueth_switchdev_attr_set);
+		return notifier_from_errno(err);
+
+	case SWITCHDEV_PORT_OBJ_ADD:
+		err = switchdev_handle_port_obj_add(ndev, ptr,
+						    prueth_sw_port_dev_check,
+						    prueth_switchdev_obj_add);
+		return notifier_from_errno(err);
+
+	case SWITCHDEV_PORT_OBJ_DEL:
+		err = switchdev_handle_port_obj_del(ndev, ptr,
+						    prueth_sw_port_dev_check,
+						    prueth_switchdev_obj_del);
 		return notifier_from_errno(err);
 	default:
 		break;

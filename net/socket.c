@@ -485,7 +485,7 @@ static struct socket *sockfd_lookup_light(int fd, int *err, int *fput_needed)
 	if (f.file) {
 		sock = sock_from_file(f.file, err);
 		if (likely(sock)) {
-			*fput_needed = f.flags;
+			*fput_needed = f.flags & FDPUT_FPUT;
 			return sock;
 		}
 		fdput(f);
@@ -828,6 +828,25 @@ void __sock_recv_timestamp(struct msghdr *msg, struct sock *sk,
 	}
 }
 EXPORT_SYMBOL_GPL(__sock_recv_timestamp);
+
+void __sock_recv_redinfo_timestamp(struct msghdr *msg, struct sock *sk,
+				   struct sk_buff *skb)
+{
+	struct scm_timestamping tss;
+	int empty = 1;
+	struct skb_shared_hwtstamps *red_shhwtstamps =
+		skb_redinfo_hwtstamps(skb);
+
+	if (red_shhwtstamps &&
+	    (sk->sk_tsflags & SOF_TIMESTAMPING_RAW_HARDWARE) &&
+	    ktime_to_timespec_cond(red_shhwtstamps->hwtstamp, tss.ts + 2))
+		empty = 0;
+
+	if (!empty)
+		put_cmsg(msg, SOL_SOCKET,
+			 SCM_RED_TIMESTAMPING, sizeof(tss), &tss);
+}
+EXPORT_SYMBOL_GPL(__sock_recv_redinfo_timestamp);
 
 void __sock_recv_wifi_status(struct msghdr *msg, struct sock *sk,
 	struct sk_buff *skb)

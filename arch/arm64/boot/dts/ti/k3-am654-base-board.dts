@@ -604,14 +604,9 @@
 	};
 };
 
-
 &mcu_cpsw {
 	pinctrl-names = "default";
 	pinctrl-0 = <&mcu_cpsw_pins_default &mcu_mdio_pins_default>;
-
-	cpts {
-		ti,pps = <3 1>;
-	};
 };
 
 &davinci_mdio {
@@ -629,21 +624,6 @@
 	phy-handle = <&phy0>;
 };
 
-#define TS_OFFSET(pa, val)     (0x4+(pa)*4) (0x80000000 | val)
-
-&timesync_router {
-	pinctrl-names = "default";
-	pinctrl-0 = <&mcu_cpts>;
-
-	/* Example of the timesync routing */
-	mcu_cpts: mcu_cpts {
-		pinctrl-single,pins = <
-			/* pps [cpts genf1] in13 -> out25 [cpts hw4_push] */
-			TS_OFFSET(25, 13)
-		>;
-	};
-};
-
 &ospi0 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&mcu_fss0_ospi0_pins_default>;
@@ -653,15 +633,19 @@
 		reg = <0x0>;
 		spi-tx-bus-width = <8>;
 		spi-rx-bus-width = <8>;
-		spi-max-frequency = <40000000>;
+		spi-max-frequency = <25000000>;
 		cdns,tshsl-ns = <60>;
 		cdns,tsd2d-ns = <60>;
 		cdns,tchsh-ns = <60>;
 		cdns,tslch-ns = <60>;
-		cdns,read-delay = <2>;
+		cdns,read-delay = <0>;
 		cdns,phy-mode;
 		#address-cells = <1>;
 		#size-cells = <1>;
+		partition@3fe0000 {
+			label = "ospi.phypattern";
+			reg = <0x3fe0000 0x20000>;
+		};
 	};
 };
 

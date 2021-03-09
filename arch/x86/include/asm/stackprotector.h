@@ -55,12 +55,17 @@
 /*
  * Initialize the stackprotector canary value.
  *
- * NOTE: this must only be called from functions that never return,
+ * NOTE: this must only be called from functions that never return
  * and it must always be inlined.
+ *
+ * In addition, it should be called from a compilation unit for which
+ * stack protector is disabled. Alternatively, the caller should not end
+ * with a function call which gets tail-call optimized as that would
+ * lead to checking a modified canary value.
  */
 static __always_inline void boot_init_stack_canary(void)
 {
-	u64 canary;
+	u64 uninitialized_var(canary);
 	u64 tsc;
 
 #ifdef CONFIG_X86_64
@@ -71,8 +76,14 @@ static __always_inline void boot_init_stack_canary(void)
 	 * of randomness. The TSC only matters for very early init,
 	 * there it already has some randomness on most systems. Later
 	 * on during the bootup the random pool has true entropy too.
+	 * For preempt-rt we need to weaken the randomness a bit, as
+	 * we can't call into the random generator from atomic context
+	 * due to locking constraints. We just leave canary
+	 * uninitialized and use the TSC based randomness on top of it.
 	 */
+#ifndef CONFIG_PREEMPT_RT
 	get_random_bytes(&canary, sizeof(canary));
+#endif
 	tsc = rdtsc();
 	canary += tsc + (tsc << 32UL);
 	canary &= CANARY_MASK;

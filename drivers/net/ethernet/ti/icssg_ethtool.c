@@ -294,9 +294,47 @@ static int emac_get_ts_info(struct net_device *ndev,
 		SOF_TIMESTAMPING_SOFTWARE |
 		SOF_TIMESTAMPING_RAW_HARDWARE;
 
-	info->phc_index = ptp_clock_index(emac->iep.ptp_clock);
+	info->phc_index = icss_iep_get_ptp_clock_idx(emac->iep);
 	info->tx_types = BIT(HWTSTAMP_TX_OFF) | BIT(HWTSTAMP_TX_ON);
 	info->rx_filters = BIT(HWTSTAMP_FILTER_NONE) | BIT(HWTSTAMP_FILTER_ALL);
+
+	return 0;
+}
+
+static void emac_get_channels(struct net_device *ndev,
+			      struct ethtool_channels *ch)
+{
+	struct prueth_emac *emac = netdev_priv(ndev);
+
+	ch->max_rx = 1;
+	/* SR1 use high priority channel for management messages */
+	ch->max_tx = emac->is_sr1 ? PRUETH_MAX_TX_QUEUES - 1 :
+				    PRUETH_MAX_TX_QUEUES;
+	ch->rx_count = 1;
+	ch->tx_count = emac->is_sr1 ? emac->tx_ch_num - 1 :
+				      emac->tx_ch_num;
+}
+
+static int emac_set_channels(struct net_device *ndev,
+			     struct ethtool_channels *ch)
+{
+	struct prueth_emac *emac = netdev_priv(ndev);
+
+	/* verify we have at least one channel in each direction */
+	/* TODO: remove below check before sending to LKML */
+	if (!ch->rx_count || !ch->tx_count)
+		return -EINVAL;
+
+	/* Check if interface is up. Can change the num queues when
+	 * the interface is down.
+	 */
+	if (netif_running(emac->ndev))
+		return -EBUSY;
+
+	emac->tx_ch_num = ch->tx_count;
+	/* highest channel number for management messaging on SR1 */
+	if (emac->is_sr1)
+		emac->tx_ch_num++;
 
 	return 0;
 }
@@ -310,6 +348,8 @@ const struct ethtool_ops icssg_ethtool_ops = {
 	.get_ethtool_stats = emac_get_ethtool_stats,
 	.get_ts_info = emac_get_ts_info,
 
+	.get_channels = emac_get_channels,
+	.set_channels = emac_set_channels,
 	.get_link_ksettings = emac_get_link_ksettings,
 	.set_link_ksettings = emac_set_link_ksettings,
 	.get_link = ethtool_op_get_link,

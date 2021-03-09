@@ -165,7 +165,11 @@ struct nfs_inode {
 
 	/* Readers: in-flight sillydelete RPC calls */
 	/* Writers: rmdir */
+#ifdef CONFIG_PREEMPT_RT
+	struct semaphore        rmdir_sem;
+#else
 	struct rw_semaphore	rmdir_sem;
+#endif
 	struct mutex		commit_mutex;
 
 #if IS_ENABLED(CONFIG_NFS_V4)
@@ -225,6 +229,7 @@ struct nfs4_copy_state {
 #define NFS_INO_INVALID_OTHER	BIT(12)		/* other attrs are invalid */
 #define NFS_INO_DATA_INVAL_DEFER	\
 				BIT(13)		/* Deferred cache invalidation */
+#define NFS_INO_INVALID_BLOCKS	BIT(14)         /* cached blocks are invalid */
 
 #define NFS_INO_INVALID_ATTR	(NFS_INO_INVALID_CHANGE \
 		| NFS_INO_INVALID_CTIME \

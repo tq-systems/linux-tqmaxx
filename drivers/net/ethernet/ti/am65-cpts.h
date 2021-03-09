@@ -20,7 +20,7 @@ struct am65_cpts_estf_cfg {
 	int on;
 };
 
-#if IS_ENABLED(CONFIG_TI_AM65_CPTS)
+#if IS_ENABLED(CONFIG_TI_K3_AM65_CPTS)
 struct am65_cpts *am65_cpts_create(struct device *dev, void __iomem *regs,
 				   struct device_node *node);
 int am65_cpts_phc_index(struct am65_cpts *cpts);
@@ -57,13 +57,13 @@ static inline void am65_cpts_rx_enable(struct am65_cpts *cpts, bool en)
 {
 }
 
-static s64 am65_cpts_ns_gettime(struct am65_cpts *cpts)
+static inline s64 am65_cpts_ns_gettime(struct am65_cpts *cpts)
 {
 	return 0;
 }
 
-static int am65_cpts_estf_enable(struct am65_cpts *cpts,
-				 struct am65_cpts_estf_cfg *req)
+static inline int am65_cpts_estf_enable(struct am65_cpts *cpts,
+					struct am65_cpts_estf_cfg *req)
 {
 	return 0;
 }
