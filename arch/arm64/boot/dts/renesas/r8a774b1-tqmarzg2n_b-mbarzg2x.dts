@@ -1,0 +1,11 @@
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * Device Tree Source for the TQMaRZG2N-B on a MBaRZG2X
+ *
+ * Copyright (C) 2021 TQ-Systems GmbH
+ */
+
+#include <dt-bindings/gpio/gpio.h>
+
+#include "tqmarzg2n_b.dtsi"
+#include "mbarzg2x-common.dtsi"
