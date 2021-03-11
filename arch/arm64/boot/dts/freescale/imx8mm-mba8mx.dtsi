@@ -1,0 +1,174 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright 2020-2021 TQ-Systems GmbH
+ */
+
+/ {
+	model = "TQ Systems GmbH i.MX8MM TQMa8MxML on MBa8Mx";
+	compatible = "tq,imx8mm-mba8mx", "tq,imx8mm-tqma8mmx", "fsl,imx8mm";
+
+	chosen {
+		bootargs = "console=ttymxc2,115200 earlycon=ec_imx6q,0x30880000,115200";
+		stdout-path = &uart3;
+	};
+
+	reg_vcc_3v3: regulator-3v3 {
+		compatible = "regulator-fixed";
+		regulator-name = "MBA8MQ_3V3";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+	};
+
+	reg_usdhc2_vmmc: regulator-vmmc {
+		compatible = "regulator-fixed";
+		regulator-name = "VSD_3V3";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+	};
+};
+
+&iomuxc {
+	pinctrl_i2c2: i2c2grp {
+		fsl,pins = <
+			MX8MM_IOMUXC_I2C2_SCL_I2C2_SCL		0x40000067
+			MX8MM_IOMUXC_I2C2_SDA_I2C2_SDA		0x40000067
+		>;
+	};
+
+	pinctrl_i2c3: i2c3grp {
+		fsl,pins = <
+			MX8MM_IOMUXC_I2C3_SCL_I2C3_SCL		0x40000067
+			MX8MM_IOMUXC_I2C3_SDA_I2C3_SDA		0x40000067
+		>;
+	};
+
+	pinctrl_uart1: uart1grp {
+		fsl,pins = <
+			MX8MM_IOMUXC_UART1_RXD_UART1_DCE_RX	0x16
+			MX8MM_IOMUXC_UART1_TXD_UART1_DCE_TX	0x16
+		>;
+	};
+
+	pinctrl_uart2: uart2grp {
+		fsl,pins = <
+			MX8MM_IOMUXC_UART2_RXD_UART2_DCE_RX	0x16
+			MX8MM_IOMUXC_UART2_TXD_UART2_DCE_TX	0x16
+		>;
+	};
+
+	pinctrl_uart3: uart3grp {
+		fsl,pins = <
+			MX8MM_IOMUXC_UART3_RXD_UART3_DCE_RX	0x16
+			MX8MM_IOMUXC_UART3_TXD_UART3_DCE_TX	0x16
+		>;
+	};
+
+	pinctrl_uart4: uart4grp {
+		fsl,pins = <
+			MX8MM_IOMUXC_UART4_RXD_UART4_DCE_RX	0x16
+			MX8MM_IOMUXC_UART4_TXD_UART4_DCE_TX	0x16
+		>;
+	};
+
+	pinctrl_usdhc2_gpio: usdhc2grpgpio {
+		fsl,pins = <
+			MX8MM_IOMUXC_SD2_CD_B_GPIO2_IO12	0x84
+		>;
+	};
+
+	pinctrl_usdhc2: usdhc2grp {
+		fsl,pins = <
+			MX8MM_IOMUXC_SD2_CLK_USDHC2_CLK		0x92
+			MX8MM_IOMUXC_SD2_CMD_USDHC2_CMD		0x92
+			MX8MM_IOMUXC_SD2_DATA0_USDHC2_DATA0	0x94
+			MX8MM_IOMUXC_SD2_DATA1_USDHC2_DATA1	0x94
+			MX8MM_IOMUXC_SD2_DATA2_USDHC2_DATA2	0x94
+			MX8MM_IOMUXC_SD2_DATA3_USDHC2_DATA3	0x94
+			MX8MM_IOMUXC_GPIO1_IO04_USDHC2_VSELECT	0x84
+		>;
+	};
+
+	pinctrl_usdhc2_100mhz: usdhc2grp100mhz {
+		fsl,pins = <
+			MX8MM_IOMUXC_SD2_CLK_USDHC2_CLK		0x92
+			MX8MM_IOMUXC_SD2_CMD_USDHC2_CMD		0x92
+			MX8MM_IOMUXC_SD2_DATA0_USDHC2_DATA0	0x92
+			MX8MM_IOMUXC_SD2_DATA1_USDHC2_DATA1	0x92
+			MX8MM_IOMUXC_SD2_DATA2_USDHC2_DATA2	0x92
+			MX8MM_IOMUXC_SD2_DATA3_USDHC2_DATA3	0x92
+			MX8MM_IOMUXC_GPIO1_IO04_USDHC2_VSELECT	0x84
+		>;
+	};
+
+	pinctrl_usdhc2_200mhz: usdhc2grp200mhz {
+		fsl,pins = <
+			MX8MM_IOMUXC_SD2_CLK_USDHC2_CLK		0x96
+			MX8MM_IOMUXC_SD2_CMD_USDHC2_CMD		0x96
+			MX8MM_IOMUXC_SD2_DATA0_USDHC2_DATA0	0x96
+			MX8MM_IOMUXC_SD2_DATA1_USDHC2_DATA1	0x96
+			MX8MM_IOMUXC_SD2_DATA2_USDHC2_DATA2	0x96
+			MX8MM_IOMUXC_SD2_DATA3_USDHC2_DATA3	0x96
+			MX8MM_IOMUXC_GPIO1_IO04_USDHC2_VSELECT	0x84
+		>;
+	};
+};
+
+&i2c2 {
+	clock-frequency = <100000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_i2c2>;
+	status = "okay";
+};
+
+&i2c3 {
+	clock-frequency = <100000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_i2c3>;
+	status = "okay";
+};
+
+&uart1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart1>;
+	assigned-clocks = <&clk IMX8MM_CLK_UART1>;
+	assigned-clock-parents = <&clk IMX8MM_SYS_PLL1_80M>;
+	status = "okay";
+};
+
+&uart2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart2>;
+	assigned-clocks = <&clk IMX8MM_CLK_UART2>;
+	assigned-clock-parents = <&clk IMX8MM_SYS_PLL1_80M>;
+	status = "okay";
+};
+
+/* console */
+&uart3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart3>;
+	status = "okay";
+};
+
+/* TODO: does not work, leads to system stall */
+&uart4 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart4>;
+	assigned-clocks = <&clk IMX8MM_CLK_UART4>;
+	assigned-clock-parents = <&clk IMX8MM_SYS_PLL1_80M>;
+	status = "disabled";
+};
+
+&usdhc2 {
+	pinctrl-names = "default", "state_100mhz", "state_200mhz";
+	pinctrl-0 = <&pinctrl_usdhc2>, <&pinctrl_usdhc2_gpio>;
+	pinctrl-1 = <&pinctrl_usdhc2_100mhz>, <&pinctrl_usdhc2_gpio>;
+	pinctrl-2 = <&pinctrl_usdhc2_200mhz>, <&pinctrl_usdhc2_gpio>;
+	bus-width = <4>;
+	cd-gpios = <&gpio2 12 GPIO_ACTIVE_LOW>;
+	disable-wp;
+	no-mmc;
+	no-1-8-v;
+	vmmc-supply = <&reg_usdhc2_vmmc>;
+	status = "okay";
+};
