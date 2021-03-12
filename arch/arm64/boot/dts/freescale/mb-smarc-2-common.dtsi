@@ -1,0 +1,108 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright 2018-2021 TQ-Systems GmbH
+ */
+
+/ {
+	chosen {
+		bootargs = "console=ttyLP0,115200 earlycon=lpuart32,0x5a060000,115200";
+		stdout-path = &lpuart0;
+	};
+
+	reg_sdvmmc: regulator-sdvmmc {
+		status = "okay";
+	};
+
+	reg_1v5_vstby: regulator-1v5_vstby {
+		compatible = "regulator-fixed";
+		regulator-name = "1V5_VSTBY";
+		regulator-min-microvolt = <1500000>;
+		regulator-max-microvolt = <1500000>;
+		regulator-always-on;
+	};
+
+	reg_1v8: regulator-1v8 {
+		compatible = "regulator-fixed";
+		regulator-name = "1V8";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		regulator-always-on;
+	};
+
+	reg_3v3_vstby: regulator-3v3_vstby {
+		compatible = "regulator-fixed";
+		regulator-name = "3V3_VSTBY";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-always-on;
+	};
+
+	reg_3v3: regulator-3v3 {
+		compatible = "regulator-fixed";
+		regulator-name = "3V3";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-always-on;
+	};
+
+	reg_12v0: regulator-12v0 {
+		compatible = "regulator-fixed";
+		regulator-name = "12V0";
+		regulator-min-microvolt = <12000000>;
+		regulator-max-microvolt = <12000000>;
+		regulator-always-on;
+	};
+};
+
+&ethphy0 {
+	/* LED1: Link, LED2: activity */
+	ti,led-function = <0xc100>;
+	/* active high, LED1/2 driven by phy */
+	ti,led-ctrl = <0x1441>;
+};
+
+&ethphy3 {
+	/* LED1: Link, LED2: activity */
+	ti,led-function = <0xc100>;
+	/* active high, LED1/2 driven by phy */
+	ti,led-ctrl = <0x1441>;
+};
+
+&fec1 {
+	status = "okay";
+};
+
+&fec2 {
+	status = "okay";
+};
+
+&flexcan2 {
+	xceiver-supply = <&reg_3v3>;
+	status = "okay";
+};
+
+&flexcan3 {
+	xceiver-supply = <&reg_3v3>;
+	status = "okay";
+};
+
+&i2c0 {
+	eeprom2: eeprom@57 {
+		compatible = "st,24c32", "atmel,24c32";
+		reg = <0x57>;
+		pagesize = <32>;
+	};
+};
+
+&lpuart0 {
+	status = "okay";
+};
+
+&usdhc2 {
+	cd-gpios = <&lsio_gpio4 22 GPIO_ACTIVE_LOW>;
+	wp-gpios = <&lsio_gpio4 21 GPIO_ACTIVE_HIGH>;
+	vmmc-supply = <&reg_sdvmmc>;
+	no-mmc;
+	no-sdio;
+	status = "okay";
+};
