@@ -1,0 +1,94 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright 2018-2021 TQ-Systems GmbH
+ */
+
+#include <dt-bindings/net/ti-dp83867.h>
+
+/ {
+	model = "TQ Systems i.MX8QXP TQMa8XQP on MBa8Xx";
+	compatible = "tq,tqma8xqp-mba8xx", "tq,tqma8xqp", "fsl,imx8qxp";
+
+	chosen {
+		bootargs = "console=ttyLP1,115200 earlycon";
+		stdout-path = &lpuart1;
+	};
+
+	reg_usdhc2_vmmc: regulator-usdhc2-vmmc {
+		compatible = "regulator-fixed";
+		regulator-name = "SD1_PWR";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+	};
+};
+
+&iomuxc {
+	pinctrl_lpuart1: lpuart1grp {
+		fsl,pins = <
+			IMX8QXP_UART1_RX_ADMA_UART1_RX			0x06000020
+			IMX8QXP_UART1_TX_ADMA_UART1_TX			0x06000020
+		>;
+	};
+
+	pinctrl_usdhc2_gpio: usdhc2gpiogrp {
+		fsl,pins = <
+			IMX8QXP_USDHC1_RESET_B_LSIO_GPIO4_IO19		0x00000021
+			IMX8QXP_USDHC1_WP_LSIO_GPIO4_IO21		0x00000021
+			IMX8QXP_USDHC1_CD_B_LSIO_GPIO4_IO22		0x00000021
+		>;
+	};
+
+	pinctrl_usdhc2: usdhc2grp {
+		fsl,pins = <
+			IMX8QXP_USDHC1_CLK_CONN_USDHC1_CLK		0x06000041
+			IMX8QXP_USDHC1_CMD_CONN_USDHC1_CMD		0x00000021
+			IMX8QXP_USDHC1_DATA0_CONN_USDHC1_DATA0		0x00000021
+			IMX8QXP_USDHC1_DATA1_CONN_USDHC1_DATA1		0x00000021
+			IMX8QXP_USDHC1_DATA2_CONN_USDHC1_DATA2		0x00000021
+			IMX8QXP_USDHC1_DATA3_CONN_USDHC1_DATA3		0x00000021
+			IMX8QXP_USDHC1_VSELECT_CONN_USDHC1_VSELECT	0x00000021
+		>;
+	};
+
+	pinctrl_usdhc2_100mhz: usdhc2grp100mhz {
+		fsl,pins = <
+			IMX8QXP_USDHC1_CLK_CONN_USDHC1_CLK		0x06000040
+			IMX8QXP_USDHC1_CMD_CONN_USDHC1_CMD		0x00000020
+			IMX8QXP_USDHC1_DATA0_CONN_USDHC1_DATA0		0x00000020
+			IMX8QXP_USDHC1_DATA1_CONN_USDHC1_DATA1		0x00000020
+			IMX8QXP_USDHC1_DATA2_CONN_USDHC1_DATA2		0x00000020
+			IMX8QXP_USDHC1_DATA3_CONN_USDHC1_DATA3		0x00000020
+			IMX8QXP_USDHC1_VSELECT_CONN_USDHC1_VSELECT	0x00000020
+		>;
+	};
+
+	pinctrl_usdhc2_200mhz: usdhc2grp200mhz {
+		fsl,pins = <
+			IMX8QXP_USDHC1_CLK_CONN_USDHC1_CLK		0x06000040
+			IMX8QXP_USDHC1_CMD_CONN_USDHC1_CMD		0x00000020
+			IMX8QXP_USDHC1_DATA0_CONN_USDHC1_DATA0		0x00000020
+			IMX8QXP_USDHC1_DATA1_CONN_USDHC1_DATA1		0x00000020
+			IMX8QXP_USDHC1_DATA2_CONN_USDHC1_DATA2		0x00000020
+			IMX8QXP_USDHC1_DATA3_CONN_USDHC1_DATA3		0x00000020
+			IMX8QXP_USDHC1_VSELECT_CONN_USDHC1_VSELECT	0x00000020
+		>;
+	};
+};
+
+&lpuart1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_lpuart1>;
+	status = "okay";
+};
+
+&usdhc2 {
+	pinctrl-names = "default", "state_100mhz", "state_200mhz";
+	pinctrl-0 = <&pinctrl_usdhc2>, <&pinctrl_usdhc2_gpio>;
+	pinctrl-1 = <&pinctrl_usdhc2_100mhz>, <&pinctrl_usdhc2_gpio>;
+	pinctrl-2 = <&pinctrl_usdhc2_200mhz>, <&pinctrl_usdhc2_gpio>;
+	bus-width = <4>;
+	cd-gpios = <&lsio_gpio4 22 GPIO_ACTIVE_LOW>;
+	wp-gpios = <&lsio_gpio4 21 GPIO_ACTIVE_HIGH>;
+	vmmc-supply = <&reg_usdhc2_vmmc>;
+	status = "okay";
+};

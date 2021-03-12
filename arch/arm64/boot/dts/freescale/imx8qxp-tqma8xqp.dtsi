@@ -1,0 +1,137 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright 2018-2021 TQ-Systems GmbH
+ */
+
+#include "imx8qxp.dtsi"
+
+/ {
+	model = "TQ Systems i.MX8QXP TQMa8XQP";
+	compatible = "tq,tqma8xqp", "fsl,imx8qxp";
+
+	memory@80000000 {
+		device_type = "memory";
+		/*
+		 * DRAM base addr, size : 1024 MiB DRAM
+		 * should be corrected by bootloader
+		 */
+		reg = <0x00000000 0x80000000 0 0x40000000>;
+	};
+
+	reserved-memory {
+		/*
+		 * global autoconfigured region for contiguous allocations
+		 * must not exceed memory size and region
+		 */
+		linux,cma {
+			compatible = "shared-dma-pool";
+			reusable;
+			size = <0 0x20000000>;
+			alloc-ranges = <0 0x96000000 0 0x30000000>;
+			linux,cma-default;
+		};
+	};
+};
+
+&iomuxc {
+	pinctrl_usdhc1: usdhc1grp {
+		fsl,pins = <
+			IMX8QXP_EMMC0_CLK_CONN_EMMC0_CLK	0x06000041
+			IMX8QXP_EMMC0_CMD_CONN_EMMC0_CMD	0x00000021
+			IMX8QXP_EMMC0_DATA0_CONN_EMMC0_DATA0	0x00000021
+			IMX8QXP_EMMC0_DATA1_CONN_EMMC0_DATA1	0x00000021
+			IMX8QXP_EMMC0_DATA2_CONN_EMMC0_DATA2	0x00000021
+			IMX8QXP_EMMC0_DATA3_CONN_EMMC0_DATA3	0x00000021
+			IMX8QXP_EMMC0_DATA4_CONN_EMMC0_DATA4	0x00000021
+			IMX8QXP_EMMC0_DATA5_CONN_EMMC0_DATA5	0x00000021
+			IMX8QXP_EMMC0_DATA6_CONN_EMMC0_DATA6	0x00000021
+			IMX8QXP_EMMC0_DATA7_CONN_EMMC0_DATA7	0x00000021
+			IMX8QXP_EMMC0_STROBE_CONN_EMMC0_STROBE	0x00000041
+		>;
+	};
+
+	pinctrl_usdhc1_100mhz: usdhc1grp100mhz {
+		fsl,pins = <
+			IMX8QXP_EMMC0_CLK_CONN_EMMC0_CLK	0x06000040
+			IMX8QXP_EMMC0_CMD_CONN_EMMC0_CMD	0x00000020
+			IMX8QXP_EMMC0_DATA0_CONN_EMMC0_DATA0	0x00000020
+			IMX8QXP_EMMC0_DATA1_CONN_EMMC0_DATA1	0x00000020
+			IMX8QXP_EMMC0_DATA2_CONN_EMMC0_DATA2	0x00000020
+			IMX8QXP_EMMC0_DATA3_CONN_EMMC0_DATA3	0x00000020
+			IMX8QXP_EMMC0_DATA4_CONN_EMMC0_DATA4	0x00000020
+			IMX8QXP_EMMC0_DATA5_CONN_EMMC0_DATA5	0x00000020
+			IMX8QXP_EMMC0_DATA6_CONN_EMMC0_DATA6	0x00000020
+			IMX8QXP_EMMC0_DATA7_CONN_EMMC0_DATA7	0x00000020
+			IMX8QXP_EMMC0_STROBE_CONN_EMMC0_STROBE	0x00000040
+		>;
+	};
+
+	pinctrl_usdhc1_200mhz: usdhc1grp200mhz {
+		fsl,pins = <
+			IMX8QXP_EMMC0_CLK_CONN_EMMC0_CLK	0x06000040
+			IMX8QXP_EMMC0_CMD_CONN_EMMC0_CMD	0x00000020
+			IMX8QXP_EMMC0_DATA0_CONN_EMMC0_DATA0	0x00000020
+			IMX8QXP_EMMC0_DATA1_CONN_EMMC0_DATA1	0x00000020
+			IMX8QXP_EMMC0_DATA2_CONN_EMMC0_DATA2	0x00000020
+			IMX8QXP_EMMC0_DATA3_CONN_EMMC0_DATA3	0x00000020
+			IMX8QXP_EMMC0_DATA4_CONN_EMMC0_DATA4	0x00000020
+			IMX8QXP_EMMC0_DATA5_CONN_EMMC0_DATA5	0x00000020
+			IMX8QXP_EMMC0_DATA6_CONN_EMMC0_DATA6	0x00000020
+			IMX8QXP_EMMC0_DATA7_CONN_EMMC0_DATA7	0x00000020
+			IMX8QXP_EMMC0_STROBE_CONN_EMMC0_STROBE	0x00000040
+		>;
+	};
+
+	pinctrl_flexspi0: flexspi0grp {
+		fsl,pins = <
+			IMX8QXP_QSPI0A_DATA0_LSIO_QSPI0A_DATA0	0x0600004c
+			IMX8QXP_QSPI0A_DATA1_LSIO_QSPI0A_DATA1	0x0600004c
+			IMX8QXP_QSPI0A_DATA2_LSIO_QSPI0A_DATA2	0x0600004c
+			IMX8QXP_QSPI0A_DATA3_LSIO_QSPI0A_DATA3	0x0600004c
+			IMX8QXP_QSPI0A_DQS_LSIO_QSPI0A_DQS	0x0600004c
+			IMX8QXP_QSPI0A_SS0_B_LSIO_QSPI0A_SS0_B	0x0600004c
+			IMX8QXP_QSPI0A_SS1_B_LSIO_QSPI0A_SS1_B	0x0600004c
+			IMX8QXP_QSPI0A_SCLK_LSIO_QSPI0A_SCLK	0x0600004c
+			IMX8QXP_QSPI0B_SCLK_LSIO_QSPI0B_SCLK	0x0600004c
+			IMX8QXP_QSPI0B_DATA0_LSIO_QSPI0B_DATA0	0x0600004c
+			IMX8QXP_QSPI0B_DATA1_LSIO_QSPI0B_DATA1	0x0600004c
+			IMX8QXP_QSPI0B_DATA2_LSIO_QSPI0B_DATA2	0x0600004c
+			IMX8QXP_QSPI0B_DATA3_LSIO_QSPI0B_DATA3	0x0600004c
+			IMX8QXP_QSPI0B_DQS_LSIO_QSPI0B_DQS	0x0600004c
+			IMX8QXP_QSPI0B_SS0_B_LSIO_QSPI0B_SS0_B	0x0600004c
+			IMX8QXP_QSPI0B_SS1_B_LSIO_QSPI0B_SS1_B	0x0600004c
+		>;
+	};
+};
+
+&flexspi0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_flexspi0>;
+	status = "okay";
+	fsl,qspi-skip-dll-config;
+
+	flash0: flash@0 {
+		reg = <0>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "jedec,spi-nor";
+/* TODO: try increase. n.b: MEK doesn't have spi-nor,ddr-quad-read-dummy */
+/*		spi-max-frequency = <133000000>; */
+		spi-max-frequency = <66000000>;
+		spi-nor,ddr-quad-read-dummy = <8>;
+		spi-tx-bus-width = <4>;
+		spi-rx-bus-width = <4>;
+	};
+};
+
+&usdhc1 {
+	pinctrl-names = "default", "state_100mhz", "state_200mhz";
+	pinctrl-0 = <&pinctrl_usdhc1>;
+	pinctrl-1 = <&pinctrl_usdhc1_100mhz>;
+	pinctrl-2 = <&pinctrl_usdhc1_200mhz>;
+	bus-width = <8>;
+	no-sd;
+	no-sdio;
+	non-removable;
+	status = "okay";
+};
