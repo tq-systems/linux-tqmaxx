@@ -253,6 +253,16 @@ properties:
           - const: fsl,imx8qxp
 
       - description:
+          TQMa8Xx is a series of SOM featuring NXP i.MX8X system-on-chip
+          variants. It is designed to be clicked on different carrier boards
+          MBa8Xx is the starterkit
+        items:
+          - enum:
+              - tq,imx8qxp-mba8xx         # TQ-Systems GmbH TQMa8QXP SOM on MBa8Xx
+          - const: tq,imx8qxp-tqma8xqp    # TQ-Systems GmbH TQMa8XQP SOM
+          - const: fsl,imx8qxp
+
+      - description:
           Freescale Vybrid Platform Device Tree Bindings
 
           For the Vybrid SoC familiy all variants with DDR controller are supported,
