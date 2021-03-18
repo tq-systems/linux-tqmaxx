@@ -302,15 +302,18 @@ int stmmac_mdio_reset(struct mii_bus *bus)
 
 #ifdef CONFIG_OF
 	if (priv->device->of_node) {
-		struct gpio_desc *reset_gpio;
+		struct gpio_desc *reset_gpiod;
 		u32 delays[3] = { 0, 0, 0 };
 
-		reset_gpio = devm_gpiod_get_optional(priv->device,
-						     "snps,reset",
-						     GPIOD_OUT_LOW);
-		if (IS_ERR_OR_NULL(reset_gpio)) {
-			ret = PTR_ERR_OR_ZERO(reset_gpio);
-			goto mdio_gpio_reset_end;
+		if (IS_ERR_OR_NULL(bus->reset_gpiod)) {
+			reset_gpiod = devm_gpiod_get_optional(priv->device,
+							      "snps,reset",
+							      GPIOD_OUT_LOW);
+			if (IS_ERR_OR_NULL(reset_gpiod)) {
+				ret = PTR_ERR_OR_ZERO(reset_gpiod);
+				goto mdio_gpio_reset_end;
+			}
+			bus->reset_gpiod = reset_gpiod;
 		}
 
 		device_property_read_u32_array(priv->device,
@@ -322,15 +325,13 @@ int stmmac_mdio_reset(struct mii_bus *bus)
 		if (delays[0])
 			msleep(DIV_ROUND_UP(delays[0], 1000));
 
-		gpiod_set_value_cansleep(reset_gpio, 1);
+		gpiod_set_value_cansleep(bus->reset_gpiod, 1);
 		if (delays[1])
 			msleep(DIV_ROUND_UP(delays[1], 1000));
 
-		gpiod_set_value_cansleep(reset_gpio, 0);
+		gpiod_set_value_cansleep(bus->reset_gpiod, 0);
 		if (delays[2])
 			msleep(DIV_ROUND_UP(delays[2], 1000));
-
-		devm_gpiod_put(priv->device, reset_gpio);
 	}
 
 mdio_gpio_reset_end:
