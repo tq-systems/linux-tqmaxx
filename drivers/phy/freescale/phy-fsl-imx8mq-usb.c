@@ -10,6 +10,21 @@
 #include <linux/regulator/consumer.h>
 #include <linux/power_supply.h>
 
+/* USB non core registers */
+#define USB_CTRL0		0x00
+#define USB_CTRL1		0x04
+#define USB_STS0		0x20
+
+#define USB_CTRL0_PORTPWR_EN	BIT(12) /* 1 - PPC enabled (default) */
+#define USB_CTRL0_USB3_FIXED	BIT(22) /* 1 - USB3 permanent attached */
+#define USB_CTRL0_USB2_FIXED	BIT(23) /* 1 - USB2 permanent attached */
+#define USB_CTRL0_IDDIG_SEL	BIT(24) /* 0 - ID / 1 - GPIO */
+
+#define USB_CTRL1_OC_POLARITY	BIT(16) /* 0 - HIGH / 1 - LOW */
+#define USB_CTRL1_PWR_POLARITY	BIT(17) /* 0 - HIGH / 1 - LOW */
+
+#define USB_STS0_IDDIG		BIT(15) /* 0 - ID GND / 1 - ID float */
+
 #define PHY_CTRL0			0x0
 #define PHY_CTRL0_REF_CLKDIV2		BIT(1)
 #define PHY_CTRL0_REF_SSP_EN		BIT(2)
@@ -70,6 +85,7 @@ struct imx8mq_usb_phy {
 	struct phy *phy;
 	struct clk *clk;
 	void __iomem *base;
+	void __iomem *nc_base;
 	struct regulator *vbus;
 	struct notifier_block chg_det_nb;
 	struct power_supply *vbus_power_supply;
@@ -80,6 +96,10 @@ struct imx8mq_usb_phy {
 	u32	tx_rise_tune;
 	u32	tx_preemp_amp_tune;
 	u32	comp_dis_tune;
+	bool	permanent_attached;
+	bool	disable_port_power;
+	bool	oc_low_active;
+	bool	pwr_low_active;
 };
 
 static int imx8mq_usb_phy_init(struct phy *phy)
@@ -113,7 +133,47 @@ static int imx8mq_usb_phy_init(struct phy *phy)
 static int imx8mp_usb_phy_init(struct phy *phy)
 {
 	struct imx8mq_usb_phy *imx_phy = phy_get_drvdata(phy);
+	struct device *dev = &imx_phy->phy->dev;
 	u32 value;
+
+	if (imx_phy->nc_base) {
+		dev_info(dev, "read USB_CTRL0\n");
+		value = readl(imx_phy->nc_base + USB_CTRL0);
+
+		if (imx_phy->disable_port_power)
+			value &= ~(USB_CTRL0_PORTPWR_EN);
+		else
+			value |= USB_CTRL0_PORTPWR_EN;
+
+		if (imx_phy->permanent_attached)
+			value |= (USB_CTRL0_USB2_FIXED | USB_CTRL0_USB3_FIXED);
+		else
+			value &= ~(USB_CTRL0_USB2_FIXED | USB_CTRL0_USB3_FIXED);
+
+		dev_info(dev, "write USB_CTRL0 %x\n", value);
+		writel(value, imx_phy->nc_base + USB_CTRL0);
+
+		/*
+		 * Check the over current / power related properties.
+		 * Over current detection can not be disabled, but pin could
+		 * be muxed for other function.
+		 */
+		value = readl(imx_phy->nc_base + USB_CTRL1);
+		dev_info(dev, "read USB_CTRL1 %x\n", value);
+
+		if (imx_phy->oc_low_active)
+			value |= USB_CTRL1_OC_POLARITY;
+		else
+			value &= ~USB_CTRL1_OC_POLARITY;
+
+		if (imx_phy->pwr_low_active)
+			value |= USB_CTRL1_PWR_POLARITY;
+		else
+			value &= ~USB_CTRL1_PWR_POLARITY;
+
+		dev_info(dev, "write USB_CTRL1 %x\n", value);
+		writel(value, imx_phy->nc_base + USB_CTRL1);
+	}
 
 	/* USB3.0 PHY signal fsel for 24M ref */
 	value = readl(imx_phy->base + PHY_CTRL0);
@@ -519,6 +579,27 @@ static void imx8mp_get_phy_tuning_data(struct imx8mq_usb_phy *imx_phy)
 		imx_phy->pcs_tx_swing_full = PHY_TUNE_DEFAULT;
 }
 
+static void imx8mp_get_phy_nc_data(struct imx8mq_usb_phy *imx_phy)
+{
+	struct device *dev = imx_phy->phy->dev.parent;
+	struct platform_device *pdev = to_platform_device(dev);
+
+	imx_phy->nc_base = devm_platform_ioremap_resource(pdev, 1);
+	if (IS_ERR_OR_NULL(imx_phy->nc_base)) {
+		dev_warn(dev, "no nc register block, please update DT\n");
+		imx_phy->nc_base = NULL;
+	} else {
+		if (device_property_read_bool(dev, "permanent_attached"))
+			imx_phy->permanent_attached = true;
+		if (device_property_read_bool(dev, "disable-ppc"))
+			imx_phy->disable_port_power = true;
+		if (device_property_read_bool(dev, "oc_low_active"))
+			imx_phy->oc_low_active = true;
+		if (device_property_read_bool(dev, "pwr_low_active"))
+			imx_phy->pwr_low_active = true;
+	}
+}
+
 static int imx8mq_usb_phy_probe(struct platform_device *pdev)
 {
 	struct phy_provider *phy_provider;
@@ -558,6 +639,7 @@ static int imx8mq_usb_phy_probe(struct platform_device *pdev)
 	}
 
 	imx8mp_get_phy_tuning_data(imx_phy);
+	imx8mp_get_phy_nc_data(imx_phy);
 
 	phy_provider = devm_of_phy_provider_register(dev, of_phy_simple_xlate);
 
