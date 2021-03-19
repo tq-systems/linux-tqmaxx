@@ -498,6 +498,15 @@
 	};
 };
 
+/*
+ * SATA is _not_ defined on 'M' type CPUs!
+ */
+#ifdef sata
+&sata {
+	status = "okay";
+};
+#endif
+
 &ssi1 {
 	shared-pin;
 };
