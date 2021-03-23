@@ -208,6 +208,18 @@
 	};
 };
 
+&flexcan1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_flexcan1>;
+	status = "okay";
+};
+
+&flexcan2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_flexcan2>;
+	status = "okay";
+};
+
 &gpio1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_gpio1>, <&pinctrl_usbhub>;
@@ -324,6 +336,20 @@
 };
 
 &iomuxc {
+	pinctrl_flexcan1: flexcan1grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SAI5_RXD1__CAN1_TX	0x150
+			MX8MP_IOMUXC_SAI5_RXD2__CAN1_RX	0x150
+		>;
+	};
+
+	pinctrl_flexcan2: flexcan2grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SAI5_RXD3__CAN2_TX	0x150
+			MX8MP_IOMUXC_SAI5_MCLK__CAN2_RX	0x150
+		>;
+	};
+
 	pinctrl_eqos: eqosgrp {
 		fsl,pins = <
 			/* SION + ODE + DSE_X2 */
