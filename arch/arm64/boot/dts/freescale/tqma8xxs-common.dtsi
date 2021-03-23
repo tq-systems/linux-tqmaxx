@@ -270,8 +270,8 @@
 	pinctrl-names = "default", "gpio";
 	pinctrl-0 = <&pinctrl_lpi2c0>;
 	pinctrl-1 = <&pinctrl_lpi2c0_gpio>;
-	scl-gpios = <&lsio_gpio1 29 GPIO_ACTIVE_HIGH>;
-	sda-gpios = <&lsio_gpio1 30 GPIO_ACTIVE_HIGH>;
+	scl-gpios = <&lsio_gpio3 8 GPIO_ACTIVE_HIGH>;
+	sda-gpios = <&lsio_gpio3 7 GPIO_ACTIVE_HIGH>;
 	status = "okay";
 
 	/* NXP SE97BTP with temperature sensor + eeprom */
@@ -489,15 +489,15 @@
 
 	pinctrl_lpi2c0: lpi2c0grp {
 		fsl,pins = <
-			IMX8QXP_MIPI_DSI1_I2C0_SCL_MIPI_DSI1_I2C0_SCL	0x06000021
-			IMX8QXP_MIPI_DSI1_I2C0_SDA_MIPI_DSI1_I2C0_SDA	0x06000021
+			IMX8QXP_MIPI_CSI0_GPIO0_00_ADMA_I2C0_SCL	0x06000021
+			IMX8QXP_MIPI_CSI0_GPIO0_01_ADMA_I2C0_SDA	0x06000021
 		>;
 	};
 
 	pinctrl_lpi2c0_gpio: lpi2c0gpiogrp {
 		fsl,pins = <
-			IMX8QXP_MIPI_DSI1_I2C0_SCL_LSIO_GPIO1_IO29	0x00000021
-			IMX8QXP_MIPI_DSI1_I2C0_SDA_LSIO_GPIO1_IO30	0x00000021
+			IMX8QXP_MIPI_CSI0_GPIO0_00_LSIO_GPIO3_IO08	0x00000021
+			IMX8QXP_MIPI_CSI0_GPIO0_01_LSIO_GPIO3_IO07	0x00000021
 		>;
 	};
 
