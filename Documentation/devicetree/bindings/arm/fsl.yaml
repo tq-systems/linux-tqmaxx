@@ -344,4 +344,11 @@ properties:
               - fsl,lx2162a-qds
           - const: fsl,lx2160a 
 
+      - description: TQMLX2160A based Boards
+        items:
+          - enum:
+              - tq,mblx2160a            #TQ Systems GmbH TQMLX2160A on MBLX2160a
+          - const: tq,tqmlx2160a        #TQ Systems GmbH TQMLX2160A
+          - const: fsl,lx2160a
+
 ...
