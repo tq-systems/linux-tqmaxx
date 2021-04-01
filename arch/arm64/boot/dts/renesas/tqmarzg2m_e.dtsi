@@ -79,6 +79,9 @@
 
 &i2c_dvfs {
 	clock-frequency = <400000>;
+	/* DMA should be disabled according to FAE P. Furtner */
+	dmas = "";
+	dma-names = "";
 	status = "okay";
 
 	sensor1: sensor@1f {
