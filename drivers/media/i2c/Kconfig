@@ -801,6 +801,14 @@ source "drivers/media/i2c/ccs/Kconfig"
 source "drivers/media/i2c/et8ek8/Kconfig"
 source "drivers/media/i2c/m5mols/Kconfig"
 
+config VIDEO_VC_MIPI
+	tristate "Vision Components MIPI Module support"
+	depends on I2C
+	help
+	  This is a driver for the camera module controller found in the Vision
+	  Components MIPI modules. The controller controls the power supplies
+	  and reset signal to the actual camera sensor.
+
 endmenu
 
 menu "Lens drivers"
