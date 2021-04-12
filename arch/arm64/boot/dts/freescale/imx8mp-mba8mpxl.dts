@@ -26,6 +26,13 @@
 		stdout-path = &uart4;
 	};
 
+	extcon_usbotg: extcon-usbotg0 {
+		compatible = "linux,extcon-usb-gpio";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_usbcon0>;
+		id-gpio = <&gpio1 10 GPIO_ACTIVE_HIGH>;
+	};
+
 	gpio-keys {
 		compatible = "gpio-keys";
 		pinctrl-names = "default";
@@ -106,6 +113,17 @@
 			no-map;
 			reg = <0 0x92400000 0 0x2000000>;
 		};
+	};
+
+	reg_otg_vbus: regulator-otg-vbus {
+		compatible = "regulator-fixed";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_regotgvbus>;
+		regulator-name = "OTG_VBUS";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		gpio = <&gpio1 12 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
 	};
 
 	reg_usdhc2_vmmc: regulator-usdhc2 {
@@ -192,16 +210,23 @@
 
 &gpio1 {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_gpio1>;
+	pinctrl-0 = <&pinctrl_gpio1>, <&pinctrl_usbhub>;
 
 	gpio-line-names = "GPO0", "GPO1", "", "GPO2",
 			  "", "", "GPO3", "GPI0",
-			  "", "GPI1", "", "",
-			  "", "", "GPI2", "GPI3",
+			  "", "GPI1", "OTG_ID", "USB_HUB_RST#",
+			  "OTG_PWR", "", "GPI2", "GPI3",
 			  "", "", "", "",
 			  "", "", "", "",
 			  "", "", "", "",
 			  "", "", "", "";
+
+	usb-hub-reset {
+		gpio-hog;
+		gpios = <11 0>;
+		output-high;
+		line-name = "USB_HUB_RST#";
+	};
 };
 
 &gpio5 {
@@ -223,6 +248,51 @@
 	/* console */
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart4>;
+	status = "okay";
+};
+
+&usb3_phy0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usb0>;
+	/*
+	 * OC support needs special settings for low active polarity
+	 */
+	oc_low_active;
+	vbus-supply = <&reg_otg_vbus>;
+	status = "okay";
+};
+
+&usb3_0 {
+	status = "okay";
+};
+
+&usb_dwc3_0 {
+	/*
+	 * use extcon gpio OTG ID detection. Older versions of driver does not
+	 * support OTG ID signal. Unclear which difference is between muxable
+	 * and non muxable pin for ID
+	 */
+	extcon = <&extcon_usbotg>;
+	/* we implement dual role but not full featured OTG */
+	hnp-disable;
+	srp-disable;
+	adp-disable;
+	dr_mode = "otg";
+	status = "okay";
+};
+
+&usb3_phy1 {
+	disable-ppc;
+	permanent_attached;
+	status = "okay";
+};
+
+&usb3_1 {
+	status = "okay";
+};
+
+&usb_dwc3_1 {
+	dr_mode = "host";
 	status = "okay";
 };
 
@@ -330,10 +400,42 @@
 		>;
 	};
 
+	pinctrl_regotgvbus: reggotgvbusgrp {
+		fsl,pins = <
+			/* USB1 OTG PWR as GPIO */
+			MX8MP_IOMUXC_GPIO1_IO12__GPIO1_IO12	0x100
+		>;
+	};
+
 	pinctrl_uart4: uart4grp {
 		fsl,pins = <
 			MX8MP_IOMUXC_UART4_RXD__UART4_DCE_RX	0x140
 			MX8MP_IOMUXC_UART4_TXD__UART4_DCE_TX	0x140
+		>;
+	};
+
+	pinctrl_usbcon0: usb0congrp {
+		fsl,pins = <
+			/* ID: floating / high: device, low: host -> use PU */
+			MX8MP_IOMUXC_GPIO1_IO10__GPIO1_IO10	0x1c0
+		>;
+	};
+
+	pinctrl_usb0: usb0grp {
+		fsl,pins = <
+			/* ID -> via extcon, missing OTG IRQ handling */
+			/* PWR -> via regulator @phy */
+			/*
+			 * TODO: OC detection not functional in dwc3 on i.mx8mq,
+			 * pin mux will lead to non functional USB
+			 */
+			MX8MP_IOMUXC_GPIO1_IO13__USB1_OC	0x1C0
+		>;
+	};
+
+	pinctrl_usbhub: usbhubgrp {
+		fsl,pins = <
+			MX8MP_IOMUXC_GPIO1_IO11__GPIO1_IO11	0xc0
 		>;
 	};
 
