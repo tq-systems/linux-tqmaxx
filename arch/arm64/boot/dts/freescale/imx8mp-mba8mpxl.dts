@@ -26,6 +26,50 @@
 		stdout-path = &uart4;
 	};
 
+	gpio-keys {
+		compatible = "gpio-keys";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpiobutton>;
+		autorepeat;
+
+		switch1 {
+			label = "S12";
+			linux,code = <BTN_0>;
+			gpios = <&gpio5 26 GPIO_ACTIVE_LOW>;
+			wakeup-source;
+		};
+
+		switch2 {
+			label = "S13";
+			linux,code = <BTN_1>;
+			gpios = <&gpio5 27 GPIO_ACTIVE_LOW>;
+			wakeup-source;
+		};
+	};
+
+	gpio-leds {
+		compatible = "gpio-leds";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpioled>;
+
+		led0 {
+			label = "led0";
+			gpios = <&gpio5 5 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "default-on";
+		};
+
+		led1 {
+			label = "led1";
+			gpios = <&gpio5 4 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "heartbeat";
+		};
+
+		led2 {
+			label = "led2";
+			gpios = <&gpio5 3 GPIO_ACTIVE_HIGH>;
+		};
+	};
+
 	memory@40000000 {
 		device_type = "memory";
 		reg = <0x0 0x40000000 0 0x40000000>;
@@ -146,6 +190,31 @@
 	};
 };
 
+&gpio1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_gpio1>;
+
+	gpio-line-names = "GPO0", "GPO1", "", "GPO2",
+			  "", "", "GPO3", "GPI0",
+			  "", "GPI1", "", "",
+			  "", "", "GPI2", "GPI3",
+			  "", "", "", "",
+			  "", "", "", "",
+			  "", "", "", "",
+			  "", "", "", "";
+};
+
+&gpio5 {
+	gpio-line-names = "", "", "", "LED2",
+			  "LED1", "LED0", "", "",
+			  "", "", "", "",
+			  "", "", "", "",
+			  "", "", "", "",
+			  "", "", "", "",
+			  "", "", "SWITCH_A", "SWITCH_B",
+			  "", "", "", "";
+};
+
 &snvs_pwrkey {
 	status = "okay";
 };
@@ -230,6 +299,34 @@
 			MX8MP_IOMUXC_SAI1_RXFS__GPIO4_IO00		0x100
 			/* EVENT0_OUT / INT/PD -> PE + HYS + PUE */
 			MX8MP_IOMUXC_SAI1_RXC__GPIO4_IO01		0x1c0
+		>;
+	};
+
+	pinctrl_gpiobutton: gpiobuttongrp {
+		fsl,pins = <
+			MX8MP_IOMUXC_UART3_RXD__GPIO5_IO26	0x180
+			MX8MP_IOMUXC_UART3_TXD__GPIO5_IO27	0x180
+		>;
+	};
+
+	pinctrl_gpioled: gpioledgrp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SPDIF_EXT_CLK__GPIO5_IO05	0x100
+			MX8MP_IOMUXC_SPDIF_RX__GPIO5_IO04	0x100
+			MX8MP_IOMUXC_SPDIF_TX__GPIO5_IO03	0x100
+		>;
+	};
+
+	pinctrl_gpio1: gpio1grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_GPIO1_IO00__GPIO1_IO00	0x100
+			MX8MP_IOMUXC_GPIO1_IO01__GPIO1_IO01	0x100
+			MX8MP_IOMUXC_GPIO1_IO03__GPIO1_IO03	0x100
+			MX8MP_IOMUXC_GPIO1_IO06__GPIO1_IO06	0x100
+			MX8MP_IOMUXC_GPIO1_IO07__GPIO1_IO07	0x180
+			MX8MP_IOMUXC_GPIO1_IO09__GPIO1_IO09	0x180
+			MX8MP_IOMUXC_GPIO1_IO14__GPIO1_IO14	0x180
+			MX8MP_IOMUXC_GPIO1_IO15__GPIO1_IO15	0x180
 		>;
 	};
 
