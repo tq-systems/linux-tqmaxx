@@ -4,6 +4,7 @@ Required properties:
 - compatible:	Should be "fsl,imx8mq-usb-phy" or "fsl,imx8mp-usb-phy"
 - #phys-cells:	must be 0 (see phy-bindings.txt in this directory)
 - reg:		The base address and length of the registers
+		A second register region can be given for the non core registers
 - clocks:	phandles to the clocks for each clock listed in clock-names
 - clock-names:	must contain "phy"
 
@@ -53,6 +54,19 @@ Optional properties:
 - fsl,phy-pcs-tx-swing-full: This property sets the launch amplitude of the
 			     transmitter, default value is 120 (7b'1111000)
 			     on imx8mp.
+
+Following properties needs second register region configured:
+
+- permanent_attached: if present, bits USB_CTRL0_USB2_FIXED and
+		      USB_CTRL0_USB3_FIXED will be set, otherwise cleared
+		      (power up default)
+- disable-ppc: if present, port power control (USB_CTRL0_PORTPWR_EN) will be
+		cleared, otherwise set (power up default)
+- oc_low_active: if present, USB_CTRL1_OC_POLARITY will be set, otherwise
+		 cleared (power up default)
+- pwr_low_active: if present, USB_CTRL1_PWR_POLARITY will be set, otherwise
+		  cleared (power up default)
+
 Example:
 	usb3_phy0: phy@381f0040 {
 		compatible = "fsl,imx8mq-usb-phy";
