@@ -299,7 +299,6 @@
 		>;
 	};
 
-
 	pinctrl_sai3: sai3grp {
 		fsl,pins = <
 			MX8MM_IOMUXC_SAI3_MCLK_SAI3_MCLK	0x96

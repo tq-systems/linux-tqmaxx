@@ -33,6 +33,19 @@
 		regulator-always-on;
 	};
 
+	reg_usdhc2_vmmc: regulator-vmmc {
+		compatible = "regulator-fixed";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_reg_usdhc2_vmmc>;
+		regulator-name = "VSD_3V3";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		gpio = <&gpio2 19 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		startup-delay-us = <100>;
+		off-on-delay-us = <12000>;
+	};
+
 	reserved-memory {
 		#address-cells = <2>;
 		#size-cells = <2>;
@@ -177,6 +190,12 @@
 			MX8MN_IOMUXC_NAND_CLE_USDHC3_DATA7		0x1d6
 			MX8MN_IOMUXC_NAND_CE1_B_USDHC3_STROBE		0x84
 			MX8MN_IOMUXC_NAND_READY_B_USDHC3_RESET_B	0x84
+		>;
+	};
+
+	pinctrl_reg_usdhc2_vmmc: regusdhc2vmmc {
+		fsl,pins = <
+			MX8MN_IOMUXC_SD2_RESET_B_GPIO2_IO19		0x84
 		>;
 	};
 

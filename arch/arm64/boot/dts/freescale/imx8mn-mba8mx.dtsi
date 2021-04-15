@@ -115,13 +115,6 @@
 		enable-active-high;
 	};
 
-	reg_usdhc2_vmmc: regulator-vmmc {
-		compatible = "regulator-fixed";
-		regulator-name = "VSD_3V3";
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
-	};
-
 	reg_12v: regulator-12v {
 		compatible = "regulator-fixed";
 		regulator-name = "MBA8MQ_12V";
@@ -572,6 +565,7 @@
 	cd-gpios = <&gpio2 12 GPIO_ACTIVE_LOW>;
 	disable-wp;
 	no-mmc;
+	no-sdio;
 	vmmc-supply = <&reg_usdhc2_vmmc>;
 	status = "okay";
 };
