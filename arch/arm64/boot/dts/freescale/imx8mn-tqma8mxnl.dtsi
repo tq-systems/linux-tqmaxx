@@ -132,10 +132,11 @@
 
 	pinctrl_i2c1_gpio: i2c1gpiogrp {
 		fsl,pins = <
-			MX8MN_IOMUXC_I2C1_SCL_GPIO5_IO14	0x40000004
-			MX8MN_IOMUXC_I2C1_SDA_GPIO5_IO15	0x40000004
+			MX8MN_IOMUXC_I2C1_SCL_GPIO5_IO14	0x40000090
+			MX8MN_IOMUXC_I2C1_SDA_GPIO5_IO15	0x40000090
 		>;
 	};
+
 	pinctrl_pmic: pmicgrp {
 		fsl,pins = <
 			MX8MN_IOMUXC_GPIO1_IO08_GPIO1_IO8	0x84
@@ -388,6 +389,11 @@
 	status = "okay";
 };
 
+/*
+ * Attention:
+ * wdog reset is routed to PMIC, PMIC must be preconfigured to force POR
+ * without LDO for SNVS. GPIO1_IO02 must not be used as GPIO.
+ */
 &wdog1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_wdog>;
