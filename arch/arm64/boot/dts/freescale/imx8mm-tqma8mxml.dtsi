@@ -4,7 +4,7 @@
  */
 
 / {
-	model = "TQ Systems GmbH i.MX8MM TQMa8MxML";
+	model = "TQ-Systems GmbH i.MX8MM TQMa8MxML";
 	compatible = "tq,imx8mm-tqma8mxml", "fsl,imx8mm";
 
 	chosen {
@@ -32,6 +32,19 @@
 		regulator-min-microvolt = <1800000>;
 		regulator-max-microvolt = <1800000>;
 		regulator-always-on;
+	};
+
+	reg_usdhc2_vmmc: regulator-vmmc {
+		compatible = "regulator-fixed";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_reg_usdhc2_vmmc>;
+		regulator-name = "VSD_3V3";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		gpio = <&gpio2 19 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		startup-delay-us = <100>;
+		off-on-delay-us = <12000>;
 	};
 
 	reserved-memory {
@@ -188,6 +201,12 @@
 			MX8MM_IOMUXC_NAND_CE1_B_USDHC3_STROBE		0x84
 			/* option USDHC3_RESET_B not defined, only in RM */
 			MX8MM_IOMUXC_NAND_READY_B_GPIO3_IO16		0x84
+		>;
+	};
+
+	pinctrl_reg_usdhc2_vmmc: regusdhc2vmmc {
+		fsl,pins = <
+			MX8MM_IOMUXC_SD2_RESET_B_GPIO2_IO19		0x84
 		>;
 	};
 
@@ -387,7 +406,6 @@
 	no-sdio;
 	vmmc-supply = <&reg_vcc3v3>;
 	vqmmc-supply = <&reg_vcc1v8>;
-
 	status = "okay";
 };
 

@@ -6,7 +6,7 @@
 #include <dt-bindings/net/ti-dp83867.h>
 
 / {
-	model = "TQ Systems GmbH i.MX8MM TQMa8MxML on MBa8Mx";
+	model = "TQ-Systems GmbH i.MX8MM TQMa8MxML on MBa8Mx";
 	compatible = "tq,imx8mm-mba8mx", "tq,imx8mm-tqma8mxml", "fsl,imx8mm";
 
 	aliases {
@@ -126,13 +126,6 @@
 		regulator-name = "MBA8MQ_HUB_VBUS";
 		regulator-min-microvolt = <5000000>;
 		regulator-max-microvolt = <5000000>;
-	};
-
-	reg_usdhc2_vmmc: regulator-vmmc {
-		compatible = "regulator-fixed";
-		regulator-name = "VSD_3V3";
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
 	};
 
 	reg_12v: regulator-12v {
@@ -605,6 +598,7 @@
 	cd-gpios = <&gpio2 12 GPIO_ACTIVE_LOW>;
 	disable-wp;
 	no-mmc;
+	no-sdio;
 	vmmc-supply = <&reg_usdhc2_vmmc>;
 	status = "okay";
 };
