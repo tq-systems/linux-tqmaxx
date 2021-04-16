@@ -103,6 +103,13 @@
 		>;
 	};
 
+	pinctrl_i2c1_gpio: i2c1gpiogrp {
+		fsl,pins = <
+			MX8MQ_IOMUXC_I2C1_SCL_GPIO5_IO14	0x40000074
+			MX8MQ_IOMUXC_I2C1_SDA_GPIO5_IO15	0x40000074
+		>;
+	};
+
 	pinctrl_qspi: qspigrp {
 		fsl,pins = <
 			MX8MQ_IOMUXC_NAND_ALE_QSPI_A_SCLK		0x97
@@ -180,8 +187,11 @@
 
 &i2c1 {
 	clock-frequency = <100000>;
-	pinctrl-names = "default";
+	pinctrl-names = "default", "gpio";
 	pinctrl-0 = <&pinctrl_i2c1>;
+	pinctrl-1 = <&pinctrl_i2c1_gpio>;
+	scl-gpios = <&gpio5 14 GPIO_ACTIVE_HIGH>;
+	sda-gpios = <&gpio5 15 GPIO_ACTIVE_HIGH>;
 	status = "okay";
 
 	pfuze100: pmic@8 {
@@ -358,7 +368,6 @@
 	no-sdio;
 	vmmc-supply = <&reg_vcc3v3>;
 	vqmmc-supply = <&reg_vcc1v8>;
-
 	status = "okay";
 };
 
