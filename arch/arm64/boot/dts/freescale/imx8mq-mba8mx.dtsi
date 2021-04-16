@@ -6,7 +6,7 @@
 #include <dt-bindings/net/ti-dp83867.h>
 
 / {
-	model = "TQ Systems GmbH i.MX8MQ TQMa8MQ on MBa8Mx";
+	model = "TQ-Systems GmbH i.MX8MQ TQMa8MQ on MBa8Mx";
 	compatible = "tq,imx8mq-mba8mx", "tq,imx8mq-tqma8mq", "fsl,imx8mq";
 
 	aliases {
@@ -29,7 +29,6 @@
 		pwms = <&pwm4 0 250000 0>;
 		beeper-hz = <4000>;
 		amp-supply = <&reg_vcc_3v3>;
-		status = "okay";
 	};
 
 	chosen {
@@ -76,7 +75,6 @@
 		compatible = "gpio-leds";
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_gpioled>;
-		status = "okay";
 
 		led1 {
 			label = "led1";

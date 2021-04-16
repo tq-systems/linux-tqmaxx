@@ -4,7 +4,7 @@
  */
 
 / {
-	model = "TQ Systems GmbH i.MX8MQ TQMa8MQ";
+	model = "TQ-Systems GmbH i.MX8MQ TQMa8MQ";
 	compatible = "tq,imx8mq-tqma8mq", "fsl,imx8mq";
 
 	chosen {
