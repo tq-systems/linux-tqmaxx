@@ -1050,6 +1050,17 @@ config VIDEO_OV9650
 	  This is a V4L2 sensor driver for the Omnivision
 	  OV9650 and OV9652 camera sensors.
 
+config VIDEO_OV9281
+	tristate "OmniVision OV9281 sensor support"
+	depends on I2C && VIDEO_V4L2
+	depends on MEDIA_CAMERA_SUPPORT
+	help
+	  This is a Video4Linux2 sensor-level driver for the OmniVision
+	  OV9281 camera.
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called ov9281.
+
 config VIDEO_OV13858
 	tristate "OmniVision OV13858 sensor support"
 	depends on I2C && VIDEO_V4L2
