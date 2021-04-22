@@ -1170,4 +1170,6 @@ config VIDEO_ST_MIPID02
 
 endmenu
 
+source "drivers/media/i2c/vc/Kconfig"
+
 endif
