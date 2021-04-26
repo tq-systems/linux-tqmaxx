@@ -1,0 +1,38 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Copyright 2021 TQ-Systems GmbH
+ */
+
+&backlight_lvds {
+	pwms = <&pwm2 0 5000000>;
+	brightness-levels = <0 4 8 16 32 64 128 255>;
+	default-brightness-level = <7>;
+	status = "okay";
+};
+
+&lcdif2 {
+	status = "okay";
+};
+
+&ldb_phy {
+	status = "okay";
+};
+
+&ldb {
+	status = "okay";
+
+	lvds-channel@0 {
+		fsl,data-mapping = "spwg";
+		fsl,data-width = <24>;
+		status = "okay";
+	};
+};
+
+&lvdspanel {
+	compatible = "tianma,tm070jvhg33";
+	status = "okay";
+};
+
+&pwm2 {
+	status = "okay";
+};
