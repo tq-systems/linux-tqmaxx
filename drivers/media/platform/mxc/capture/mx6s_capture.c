@@ -661,7 +661,7 @@ static void csi_dmareq_rff_enable(struct mx6s_csi_dev *csi_dev)
 
 	cr3 |= BIT_DMA_REQ_EN_RFF;
 	cr3 |= BIT_HRESP_ERR_EN;
-	cr3 &= ~BIT_RXFF_LEVEL;
+	cr3 &= ~(BIT_RXFF_LEVEL | BIT_TWO_8BIT_SENSOR);
 	cr3 |= 0x2 << 4;
 	if (csi_dev->csi_two_8bit_sensor_mode)
 		cr3 |= BIT_TWO_8BIT_SENSOR;
@@ -882,6 +882,11 @@ static int mx6s_csi_enable(struct mx6s_csi_dev *csi_dev)
 	return 0;
 }
 
+static inline bool use_two_8bit_sensor_mode(void)
+{
+	return false;
+}
+
 static void mx6s_csi_disable(struct mx6s_csi_dev *csi_dev)
 {
 	struct v4l2_pix_format *pix = &csi_dev->pix;
@@ -925,6 +930,7 @@ static int mx6s_configure_csi(struct mx6s_csi_dev *csi_dev)
 	case V4L2_PIX_FMT_SGRBG8:
 	case V4L2_PIX_FMT_SGBRG8:
 	case V4L2_PIX_FMT_SRGGB8:
+		csi_dev->csi_two_8bit_sensor_mode = false;
 		width = pix->width;
 		break;
 
@@ -938,6 +944,7 @@ static int mx6s_configure_csi(struct mx6s_csi_dev *csi_dev)
 	case V4L2_PIX_FMT_SGRBG12:
 	case V4L2_PIX_FMT_SGBRG12:
 	case V4L2_PIX_FMT_SRGGB12:
+		csi_dev->csi_two_8bit_sensor_mode = use_two_8bit_sensor_mode();
 		if (csi_dev->csi_mipi_mode == true)
 			width = pix->width;
 		else
@@ -947,6 +954,7 @@ static int mx6s_configure_csi(struct mx6s_csi_dev *csi_dev)
 
 	case V4L2_PIX_FMT_UYVY:
 	case V4L2_PIX_FMT_YUYV:
+		csi_dev->csi_two_8bit_sensor_mode = false;
 		if (csi_dev->csi_mipi_mode == true)
 			width = pix->width;
 		else
@@ -986,7 +994,8 @@ static int mx6s_configure_csi(struct mx6s_csi_dev *csi_dev)
 		case V4L2_PIX_FMT_SRGGB10:
 		case V4L2_PIX_FMT_Y10:
 			cr18 |= BIT_MIPI_DATA_FORMAT_RAW10;
-			cr1  |= BIT_PIXEL_BIT;
+			if (!use_two_8bit_sensor_mode())
+				cr1  |= BIT_PIXEL_BIT;
 			break;
 		case V4L2_PIX_FMT_SBGGR12:
 		case V4L2_PIX_FMT_SGRBG12:
@@ -994,7 +1003,8 @@ static int mx6s_configure_csi(struct mx6s_csi_dev *csi_dev)
 		case V4L2_PIX_FMT_SRGGB12:
 		case V4L2_PIX_FMT_Y12:
 			cr18 |= BIT_MIPI_DATA_FORMAT_RAW12;
-			cr1  |= BIT_PIXEL_BIT;
+			if (!use_two_8bit_sensor_mode())
+				cr1  |= BIT_PIXEL_BIT;
 			break;
 		default:
 			pr_debug("   fmt not supported\n");
