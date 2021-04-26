@@ -521,7 +521,7 @@ static void csisw_reset(struct mx6s_csi_dev *csi_dev)
 	cr3 |= BIT_DMA_REFLASH_RFF | BIT_FRMCNT_RST;
 	csi_write(csi_dev, cr3, CSI_CSICR3);
 
-	msleep(2);
+	usleep_range(2000, 2500);
 
 	cr1 = csi_read(csi_dev, CSI_CSICR1);
 	csi_write(csi_dev, cr1 | BIT_FCC, CSI_CSICR1);
