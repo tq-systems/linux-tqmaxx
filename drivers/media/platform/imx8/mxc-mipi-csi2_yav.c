@@ -360,7 +360,7 @@ static int mipi_csis_enum_framesizes(struct v4l2_subdev *sd,
 	struct mxc_mipi_csi2_dev *csi2dev = sd_to_mxc_mipi_csi2_dev(sd);
 	struct v4l2_subdev *sensor_sd = csi2dev->sensor_sd;
 
-	return v4l2_subdev_call(sensor_sd, pad, enum_frame_size, NULL, fse);
+	return v4l2_subdev_call(sensor_sd, pad, enum_frame_size, cfg, fse);
 }
 
 static int mipi_csis_enum_frameintervals(struct v4l2_subdev *sd,
@@ -371,7 +371,7 @@ static int mipi_csis_enum_frameintervals(struct v4l2_subdev *sd,
 	struct mxc_mipi_csi2_dev *csi2dev = sd_to_mxc_mipi_csi2_dev(sd);
 	struct v4l2_subdev *sensor_sd = csi2dev->sensor_sd;
 
-	return v4l2_subdev_call(sensor_sd, pad, enum_frame_interval, NULL, fie);
+	return v4l2_subdev_call(sensor_sd, pad, enum_frame_interval, cfg, fie);
 }
 
 static int mipi_csis_enum_mbus_code(struct v4l2_subdev *sd,
@@ -381,7 +381,7 @@ static int mipi_csis_enum_mbus_code(struct v4l2_subdev *sd,
 	struct mxc_mipi_csi2_dev *csi2dev = sd_to_mxc_mipi_csi2_dev(sd);
 	struct v4l2_subdev *sensor_sd = csi2dev->sensor_sd;
 
-	return v4l2_subdev_call(sensor_sd, pad, enum_mbus_code, NULL, code);
+	return v4l2_subdev_call(sensor_sd, pad, enum_mbus_code, cfg, code);
 }
 
 static int mipi_csi2_get_fmt(struct v4l2_subdev *sd,
@@ -394,7 +394,7 @@ static int mipi_csi2_get_fmt(struct v4l2_subdev *sd,
 	if (fmt->pad)
 		return -EINVAL;
 
-	return v4l2_subdev_call(sensor_sd, pad, get_fmt, NULL, fmt);
+	return v4l2_subdev_call(sensor_sd, pad, get_fmt, cfg, fmt);
 }
 
 static int mipi_csi2_set_fmt(struct v4l2_subdev *sd,
@@ -414,7 +414,7 @@ static int mipi_csi2_set_fmt(struct v4l2_subdev *sd,
 	}
 	csi2dev->send_level = 64;
 
-	return v4l2_subdev_call(sensor_sd, pad, set_fmt, NULL, fmt);
+	return v4l2_subdev_call(sensor_sd, pad, set_fmt, cfg, fmt);
 }
 
 static int mipi_csis_s_parm(struct v4l2_subdev *sd, struct v4l2_streamparm *a)
