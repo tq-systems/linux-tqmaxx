@@ -167,6 +167,11 @@
 	};
 };
 
+&easrc {
+	fsl,asrc-rate  = <48000>;
+	status = "okay";
+};
+
 &eqos {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_eqos>;
@@ -321,6 +326,10 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_blpwm>;
 	status = "disabled";
+};
+
+&sdma2 {
+	status = "okay";
 };
 
 &snvs_pwrkey {
