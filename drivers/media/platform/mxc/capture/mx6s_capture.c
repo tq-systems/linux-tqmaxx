@@ -884,7 +884,7 @@ static int mx6s_csi_enable(struct mx6s_csi_dev *csi_dev)
 
 static inline bool use_two_8bit_sensor_mode(void)
 {
-	return false;
+	return true;
 }
 
 static void mx6s_csi_disable(struct mx6s_csi_dev *csi_dev)
