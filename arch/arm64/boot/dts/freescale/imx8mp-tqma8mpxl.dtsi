@@ -157,9 +157,12 @@
 				regulator-min-microvolt = <800000>;
 				regulator-max-microvolt = <1150000>;
 				/*
-				 * regulator-boot-on;
-				 * regulator-always-on;
+				 * NOTE:
+				 * even if this is an unused supply, it must not
+				 * disabled, otherwise the system hits an POR
 				 */
+				regulator-boot-on;
+				regulator-always-on;
 			};
 
 			ldo3_reg: regulator@8 {
