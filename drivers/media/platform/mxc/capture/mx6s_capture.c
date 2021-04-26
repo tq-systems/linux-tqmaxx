@@ -429,7 +429,7 @@ struct mx6s_csi_dev {
 
 static const struct of_device_id mx6s_csi_dt_ids[];
 
-static inline int csi_read(struct mx6s_csi_dev *csi, unsigned int offset)
+static inline uint32_t csi_read(struct mx6s_csi_dev *csi, unsigned int offset)
 {
 	return __raw_readl(csi->regbase + offset);
 }
@@ -1278,7 +1278,7 @@ static void mx6s_csi_frame_done(struct mx6s_csi_dev *csi_dev,
 static irqreturn_t mx6s_csi_irq_handler(int irq, void *data)
 {
 	struct mx6s_csi_dev *csi_dev =  data;
-	unsigned long status;
+	uint32_t status;
 	u32 cr3, cr18;
 
 	spin_lock(&csi_dev->slock);
