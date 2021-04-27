@@ -433,6 +433,13 @@
 		gpio-controller;
 		#gpio-cells = <2>;
 		vcc-supply = <&reg_vcc_3v3>;
+
+		mpcie-rst {
+			gpio-hog;
+			gpios = <13 0>;
+			output-high;
+			line-name = "MPCIE_RST#";
+		};
 	};
 };
 
