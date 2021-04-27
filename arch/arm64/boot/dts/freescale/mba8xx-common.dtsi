@@ -117,6 +117,7 @@
 		gpio = <&lsio_gpio0 31 GPIO_ACTIVE_HIGH>;
 		startup-delay-us = <1000>;
 		enable-active-high;
+		regulator-always-on;
 	};
 
 	reserved-memory {
