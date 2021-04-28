@@ -202,6 +202,8 @@ static int vc_mipi_s_power(struct v4l2_subdev *sd, int on)
 	int				rc;
 
 	mutex_lock(&sensor->v4l_lock);
+	trace_printk("%s(%d)\n", __func__, on);
+
 	if (on && !sensor->is_poweron) {
 		rc = _vc_mipi_s_power_on(sensor);
 	} else if (!on && sensor->is_poweron) {
@@ -412,6 +414,8 @@ static int vc_mipi_s_stream(struct v4l2_subdev *sd, int enable)
 	struct vc_sensor		*sensor = sd_to_sensor(sd);
 	int				rc;
 
+	trace_printk("%s(%d)\n", __func__, enable);
+
 	mutex_lock(&sensor->v4l_lock);
 	if (!enable && sensor->is_streaming) {
 		rc = _vc_mipi_s_stream_off(sensor);
@@ -470,6 +474,8 @@ static int vc_mipi_pm_power_on(struct device *dev)
 	int				rc;
 	unsigned int			cfg_code;
 
+	trace_printk("%s\n", __func__);
+
 	rc = info->fn_cfg(sensor, &cfg_code);
 	if (rc >= 0)
 		vc_fpga_cfg(sensor->fpga, cfg_code);
@@ -491,6 +497,8 @@ static int vc_mipi_pm_power_off(struct device *dev)
 {
 	struct v4l2_subdev	*sd = dev_get_drvdata(dev);
 	struct vc_sensor	*sensor = sd_to_sensor(sd);
+
+	trace_printk("%s\n", __func__);
 
 	return regulator_disable(sensor->reg_vdd);
 }
@@ -720,12 +728,17 @@ out:
 	return rc;
 }
 
+#include <linux/trace_events.h>
+
 static int vc_mipi_i2c_probe(struct i2c_client *i2c,
 			     struct i2c_device_id const *devid)
 {
 	struct device		*dev = &i2c->dev;
 	struct vc_sensor	*sensor;
 	int			rc;
+
+	trace_set_clr_event("i2c", "i2c_reply", 1);
+	trace_set_clr_event("i2c", "i2c_write", 1);
 
 	sensor = devm_kzalloc(dev, sizeof *sensor, GFP_KERNEL);
 	if (!sensor)
