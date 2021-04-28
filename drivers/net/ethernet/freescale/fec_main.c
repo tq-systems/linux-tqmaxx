@@ -2069,8 +2069,7 @@ static int fec_enet_mii_probe(struct net_device *ndev)
 #if !defined(CONFIG_M5272)
 		phy_support_sym_pause(phy_dev);
 #endif
-	}
-	else
+	} else
 		phy_set_max_speed(phy_dev, 100);
 
 	fep->link = 0;
@@ -3395,7 +3394,7 @@ fec_get_reset_phy(struct platform_device *pdev, int *msec, int *phy_reset,
 	int err;
 	struct device_node *np = pdev->dev.of_node;
 
-	if (!np|| !of_device_is_available(np))
+	if (!np || !of_device_is_available(np))
 		return 0;
 
 	err = of_property_read_u32(np, "phy-reset-duration", msec);
@@ -3665,7 +3664,7 @@ fec_probe(struct platform_device *pdev)
 	pm_runtime_enable(&pdev->dev);
 
 	ret = fec_get_reset_phy(pdev, &fep->phy_reset_msec, &fep->phy_reset,
-				&fep->phy_reset_active_high, 
+				&fep->phy_reset_active_high,
 				&fep->phy_post_delay);
 
 	if (ret)
