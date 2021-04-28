@@ -622,6 +622,7 @@ static int imx290_set_fmt(struct v4l2_subdev *sd,
 
 	fmt->format.code = imx290_formats[i].code;
 	fmt->format.field = V4L2_FIELD_NONE;
+	fmt->format.colorspace = V4L2_COLORSPACE_SRGB;
 
 	if (fmt->which == V4L2_SUBDEV_FORMAT_TRY) {
 		format = v4l2_subdev_get_try_format(sd, cfg, fmt->pad);
