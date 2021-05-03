@@ -248,6 +248,14 @@
 			  "", "", "", "";
 };
 
+&gpu_2d {
+	status = "okay";
+};
+
+&gpu_3d {
+	status = "okay";
+};
+
 &i2c1 {
 	/* NXP SE97BTP with temperature sensor + eeprom */
 	se97_1c: temperature-sensor-eeprom@1c {
@@ -260,6 +268,10 @@
 		reg = <0x54>;
 		pagesize = <16>;
 	};
+};
+
+&mix_gpu_ml {
+	status = "okay";
 };
 
 &snvs_pwrkey {
@@ -354,6 +366,18 @@
 	no-mmc;
 	no-sdio;
 	bus-width = <4>;
+	status = "okay";
+};
+
+&vpu_g1 {
+	status = "okay";
+};
+
+&vpu_g2 {
+	status = "okay";
+};
+
+&vpu_vc8000e {
 	status = "okay";
 };
 
