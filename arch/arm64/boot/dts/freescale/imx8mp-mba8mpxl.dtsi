@@ -248,6 +248,20 @@
 			  "", "", "", "";
 };
 
+&i2c1 {
+	/* NXP SE97BTP with temperature sensor + eeprom */
+	se97_1c: temperature-sensor-eeprom@1c {
+		compatible = "nxp,se97", "jedec,jc-42.4-temp";
+		reg = <0x1c>;
+	};
+
+	at24c02_54: eeprom@54 {
+		compatible = "nxp,se97b", "atmel,24c02";
+		reg = <0x54>;
+		pagesize = <16>;
+	};
+};
+
 &snvs_pwrkey {
 	status = "okay";
 };
@@ -341,20 +355,6 @@
 	no-sdio;
 	bus-width = <4>;
 	status = "okay";
-};
-
-&i2c1 {
-	/* NXP SE97BTP with temperature sensor + eeprom */
-	se97_1c: temperature-sensor-eeprom@1c {
-		compatible = "nxp,se97", "jedec,jc-42.4-temp";
-		reg = <0x1c>;
-	};
-
-	at24c02_54: eeprom@54 {
-		compatible = "nxp,se97b", "atmel,24c02";
-		reg = <0x54>;
-		pagesize = <16>;
-	};
 };
 
 &iomuxc {
