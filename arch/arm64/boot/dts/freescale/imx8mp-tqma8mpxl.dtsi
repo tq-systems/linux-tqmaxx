@@ -95,8 +95,8 @@
 				 * TODO:
 				 * V_0V85_SOC min = 850.000 max = 950.000
 				 */
-				regulator-min-microvolt = <600000>;
-				regulator-max-microvolt = <2187500>;
+				regulator-min-microvolt = <850000>;
+				regulator-max-microvolt = <950000>;
 				regulator-boot-on;
 				regulator-always-on;
 				regulator-ramp-delay = <3125>;
@@ -109,8 +109,8 @@
 				 * TODO:
 				 *  V_0V85_ARM min = 850.000 max = 950.000
 				 */
-				regulator-min-microvolt = <600000>;
-				regulator-max-microvolt = <2187500>;
+				regulator-min-microvolt = <850000>;
+				regulator-max-microvolt = <950000>;
 				regulator-boot-on;
 				regulator-always-on;
 				regulator-ramp-delay = <3125>;
@@ -119,9 +119,9 @@
 			buck4_reg: regulator@3 {
 				reg = <3>;
 				regulator-compatible = "buck4";
-				/* TODO: V_3V3 min = max = 3.300.000 */
-				regulator-min-microvolt = <600000>;
-				regulator-max-microvolt = <3400000>;
+				/* V_3V3 min = max = 3.300.000 */
+				regulator-min-microvolt = <3300000>;
+				regulator-max-microvolt = <3300000>;
 				regulator-boot-on;
 				regulator-always-on;
 			};
@@ -129,9 +129,9 @@
 			buck5_reg: regulator@4 {
 				reg = <4>;
 				regulator-compatible = "buck5";
-				/* TODO: V_1V8 min = max = 1.800.000 */
-				regulator-min-microvolt = <600000>;
-				regulator-max-microvolt = <3400000>;
+				/* V_1V8 min = max = 1.800.000 */
+				regulator-min-microvolt = <1800000>;
+				regulator-max-microvolt = <1800000>;
 				regulator-boot-on;
 				regulator-always-on;
 			};
@@ -139,9 +139,9 @@
 			buck6_reg: regulator@5 {
 				reg = <5>;
 				regulator-compatible = "buck6";
-				/* TODO: V_1V1 min = max = 1.100.000 */
-				regulator-min-microvolt = <600000>;
-				regulator-max-microvolt = <3400000>;
+				/* V_1V1 min = max = 1.100.000 */
+				regulator-min-microvolt = <1100000>;
+				regulator-max-microvolt = <1100000>;
 				regulator-boot-on;
 				regulator-always-on;
 			};
@@ -149,9 +149,9 @@
 			ldo1_reg: regulator@6 {
 				reg = <6>;
 				regulator-compatible = "ldo1";
-				/* TODO: V_1V8_SNVS min = max = 1.800.000 */
-				regulator-min-microvolt = <1600000>;
-				regulator-max-microvolt = <3300000>;
+				/* V_1V8_SNVS min = max = 1.800.000 */
+				regulator-min-microvolt = <1800000>;
+				regulator-max-microvolt = <1800000>;
 				regulator-boot-on;
 				regulator-always-on;
 			};
@@ -173,28 +173,25 @@
 			ldo3_reg: regulator@8 {
 				reg = <8>;
 				regulator-compatible = "ldo3";
-				/* TODO: V_1V8_ANA min = max = 1.800.000 */
-				regulator-min-microvolt = <800000>;
-				regulator-max-microvolt = <3300000>;
+				/* V_1V8_ANA min = max = 1.800.000 */
+				regulator-min-microvolt = <1800000>;
+				regulator-max-microvolt = <1800000>;
 				regulator-boot-on;
 				regulator-always-on;
 			};
 
 			ldo4_reg: regulator@9 {
 				reg = <9>;
+				/* unused */
 				regulator-compatible = "ldo4";
 				regulator-min-microvolt = <800000>;
 				regulator-max-microvolt = <3300000>;
-				/*
-				 * regulator-boot-on;
-				 * regulator-always-on;
-				 */
 			};
 
 			ldo5_reg: regulator@10 {
 				reg = <10>;
 				regulator-compatible = "ldo5";
-				/* TODO: V_SD2 */
+				/* V_SD2 */
 				regulator-min-microvolt = <1800000>;
 				regulator-max-microvolt = <3300000>;
 			};
