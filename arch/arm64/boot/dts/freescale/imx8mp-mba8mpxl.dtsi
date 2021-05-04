@@ -165,6 +165,20 @@
 		regulator-min-microvolt = <12000000>;
 		regulator-max-microvolt = <12000000>;
 	};
+
+	reg_vcc_3v3: regulator-3v3 {
+		compatible = "regulator-fixed";
+		regulator-name = "VCC_3V3";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+	};
+
+	sound {
+		compatible = "fsl,imx-audio-tlv320aic32x4";
+		model = "tqm-tlv320aic32";
+		ssi-controller = <&sai2>;
+		audio-codec = <&codec>;
+	};
 };
 
 &easrc {
@@ -293,6 +307,15 @@
 };
 
 &i2c1 {
+	codec: codec@18 {
+		compatible = "ti,tlv320aic32x4";
+		reg = <0x18>;
+		clocks = <&audiomix_clk IMX8MP_CLK_AUDIOMIX_SAI2_MCLK1>;
+		clock-names = "mclk";
+		iov-supply = <&reg_vcc_3v3>;
+		ldoin-supply = <&reg_vcc_3v3>;
+	};
+
 	/* NXP SE97BTP with temperature sensor + eeprom */
 	se97_1c: temperature-sensor-eeprom@1c {
 		compatible = "nxp,se97", "jedec,jc-42.4-temp";
@@ -326,6 +349,25 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_blpwm>;
 	status = "disabled";
+};
+
+&sai2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_sai2>;
+
+	assigned-clocks = <&clk IMX8MP_CLK_SAI2>;
+	assigned-clock-parents = <&clk IMX8MP_AUDIO_PLL1_OUT>;
+/* TODO: select better of the two rates */
+/*	assigned-clock-rates = <49152000>; */
+	assigned-clock-rates = <12288000>;
+	clocks = <&audiomix_clk IMX8MP_CLK_AUDIOMIX_SAI2_IPG>,
+		 <&clk IMX8MP_CLK_DUMMY>,
+		 <&audiomix_clk IMX8MP_CLK_AUDIOMIX_SAI2_MCLK1>,
+		 <&clk IMX8MP_CLK_DUMMY>,
+		 <&clk IMX8MP_CLK_DUMMY>;
+	clock-names = "bus", "mclk0", "mclk1", "mclk2", "mclk3";
+	fsl,sai-mclk-direction-output;
+	status = "okay";
 };
 
 &sdma2 {
@@ -577,6 +619,18 @@
 			MX8MP_IOMUXC_SD1_DATA7__UART3_DTE_TX	0x140
 			MX8MP_IOMUXC_SD1_RESET_B__UART3_DTE_CTS	0x140
 			MX8MP_IOMUXC_SD1_STROBE__UART3_DTE_RTS	0x140
+		>;
+	};
+
+	pinctrl_sai2: sai2grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SAI2_MCLK__AUDIOMIX_SAI2_MCLK	0x96
+			MX8MP_IOMUXC_SAI2_RXC__AUDIOMIX_SAI2_RX_BCLK	0x96
+			MX8MP_IOMUXC_SAI2_RXFS__AUDIOMIX_SAI2_RX_SYNC	0x96
+			MX8MP_IOMUXC_SAI2_RXD0__AUDIOMIX_SAI2_RX_DATA00	0x96
+			MX8MP_IOMUXC_SAI2_TXFS__AUDIOMIX_SAI2_TX_SYNC	0x96
+			MX8MP_IOMUXC_SAI2_TXC__AUDIOMIX_SAI2_TX_BCLK	0x96
+			MX8MP_IOMUXC_SAI2_TXD0__AUDIOMIX_SAI2_TX_DATA00	0x96
 		>;
 	};
 
