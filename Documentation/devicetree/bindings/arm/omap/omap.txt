@@ -166,6 +166,9 @@ Boards:
 - AM335X UC-8100-ME-T: Communication-centric industrial computing platform
   compatible = "moxa,uc-8100-me-t", "ti,am33xx";
 
+- AM335x MBa335x: TQ-Systems GmbH MBa335x with TQMa335x[L] SoM
+  compatible = "tq,mba335x", "tq,tqma335x", "ti,am33xx"
+
 - OMAP5 EVM : Evaluation Module
   compatible = "ti,omap5-evm", "ti,omap5"
 
