@@ -924,8 +924,7 @@ static int imx290_power_on(struct device *dev)
 	ret = regulator_bulk_enable(IMX290_NUM_SUPPLIES, imx290->supplies);
 	if (ret) {
 		dev_err(dev, "Failed to enable regulators\n");
-		clk_disable_unprepare(imx290->xclk);
-		return ret;
+		goto err_clk;
 	}
 
 	usleep_range(1, 2);
@@ -936,6 +935,15 @@ static int imx290_power_on(struct device *dev)
 	imx290_set_data_lanes(imx290);
 
 	return 0;
+
+err_regulator:
+	gpiod_set_value_cansleep(imx290->rst_gpio, 1);
+	regulator_bulk_disable(IMX290_NUM_SUPPLIES, imx290->supplies);
+
+err_clk:
+	clk_disable_unprepare(imx290->xclk);
+
+	return ret;
 }
 
 static int imx290_power_off(struct device *dev)
