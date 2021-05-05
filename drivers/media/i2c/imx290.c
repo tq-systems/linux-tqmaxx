@@ -146,7 +146,17 @@ static const char * const imx290_test_pattern_menu[] = {
 };
 
 static const struct imx290_regval imx290_global_init_settings[] = {
-	{ 0x3007, 0x00 },
+	/* frsel */
+	{ 0x3009, 0x01, COND_50_60_FPS },
+	{ 0x3009, 0x02, COND_25_30_FPS },
+
+	/* repetition */
+	{ 0x3405, 0x10, COND_25_30_FPS | COND_2_LANES },
+	{ 0x3405, 0x00, COND_50_60_FPS | COND_2_LANES },
+	{ 0x3405, 0x20, COND_25_30_FPS | COND_4_LANES },
+	{ 0x3405, 0x10, COND_50_60_FPS | COND_4_LANES },
+
+	/* vmax */
 	{ 0x3018, 0x65 },
 	{ 0x3019, 0x04 },
 	{ 0x301a, 0x00 },
@@ -206,12 +216,27 @@ static const struct imx290_regval imx290_global_init_settings[] = {
 static const struct imx290_regval imx290_1080p_settings[] = {
 	/* mode settings */
 	{ 0x3007, 0x00 },
+
+	/* hmax */
+	{ 0x301c, 0xa0, COND_25_FPS },
+	{ 0x301d, 0x14, COND_25_FPS },
+
+	{ 0x301c, 0x30, COND_30_FPS },
+	{ 0x301d, 0x11, COND_30_FPS },
+
+	{ 0x301c, 0x50, COND_50_FPS },
+	{ 0x301d, 0x0a, COND_50_FPS },
+
+	{ 0x301c, 0x98, COND_60_FPS },
+	{ 0x301d, 0x08, COND_60_FPS },
+
 	{ 0x303a, 0x0c },
 	{ 0x3414, 0x0a },
 	{ 0x3472, 0x80 },
 	{ 0x3473, 0x07 },
 	{ 0x3418, 0x38 },
 	{ 0x3419, 0x04 },
+
 	{ 0x3012, 0x64 },
 	{ 0x3013, 0x00 },
 
@@ -236,34 +261,104 @@ static const struct imx290_regval imx290_1080p_settings[] = {
 	{ 0x3480, 0x92, COND_INCK_74 },
 
 	/* data rate settings */
-	{ 0x3405, 0x10 },
-	{ 0x3446, 0x57 },
-	{ 0x3447, 0x00 },
-	{ 0x3448, 0x37 },
-	{ 0x3449, 0x00 },
-	{ 0x344a, 0x1f },
-	{ 0x344b, 0x00 },
-	{ 0x344c, 0x1f },
-	{ 0x344d, 0x00 },
-	{ 0x344e, 0x1f },
-	{ 0x344f, 0x00 },
-	{ 0x3450, 0x77 },
-	{ 0x3451, 0x00 },
-	{ 0x3452, 0x1f },
-	{ 0x3453, 0x00 },
-	{ 0x3454, 0x17 },
-	{ 0x3455, 0x00 },
+
+	/* mipi timing - 2 lane, 25/30 fps */
+	{ 0x3446, 0x57, COND_25_30_FPS | COND_2_LANES },
+	{ 0x3447, 0x00, COND_25_30_FPS | COND_2_LANES },
+	{ 0x3448, 0x37, COND_25_30_FPS | COND_2_LANES },
+	{ 0x3449, 0x00, COND_25_30_FPS | COND_2_LANES },
+	{ 0x344a, 0x1f, COND_25_30_FPS | COND_2_LANES },
+	{ 0x344b, 0x00, COND_25_30_FPS | COND_2_LANES },
+	{ 0x344c, 0x1f, COND_25_30_FPS | COND_2_LANES },
+	{ 0x344d, 0x00, COND_25_30_FPS | COND_2_LANES },
+	{ 0x344e, 0x1f, COND_25_30_FPS | COND_2_LANES },
+	{ 0x344f, 0x00, COND_25_30_FPS | COND_2_LANES },
+	{ 0x3450, 0x77, COND_25_30_FPS | COND_2_LANES },
+	{ 0x3451, 0x00, COND_25_30_FPS | COND_2_LANES },
+	{ 0x3452, 0x1f, COND_25_30_FPS | COND_2_LANES },
+	{ 0x3453, 0x00, COND_25_30_FPS | COND_2_LANES },
+	{ 0x3454, 0x17, COND_25_30_FPS | COND_2_LANES },
+	{ 0x3455, 0x00, COND_25_30_FPS | COND_2_LANES },
+
+	/* mipi timing - 2 lane, 50/60 fps */
+	{ 0x3446, 0x77, COND_50_60_FPS | COND_2_LANES },
+	{ 0x3447, 0x00, COND_50_60_FPS | COND_2_LANES },
+	{ 0x3448, 0x67, COND_50_60_FPS | COND_2_LANES },
+	{ 0x3449, 0x00, COND_50_60_FPS | COND_2_LANES },
+	{ 0x344a, 0x47, COND_50_60_FPS | COND_2_LANES },
+	{ 0x344b, 0x00, COND_50_60_FPS | COND_2_LANES },
+	{ 0x344c, 0x37, COND_50_60_FPS | COND_2_LANES },
+	{ 0x344d, 0x00, COND_50_60_FPS | COND_2_LANES },
+	{ 0x344e, 0x3f, COND_50_60_FPS | COND_2_LANES },
+	{ 0x344f, 0x00, COND_50_60_FPS | COND_2_LANES },
+	{ 0x3450, 0xff, COND_50_60_FPS | COND_2_LANES },
+	{ 0x3451, 0x00, COND_50_60_FPS | COND_2_LANES },
+	{ 0x3452, 0x3f, COND_50_60_FPS | COND_2_LANES },
+	{ 0x3453, 0x00, COND_50_60_FPS | COND_2_LANES },
+	{ 0x3454, 0x37, COND_50_60_FPS | COND_2_LANES },
+	{ 0x3455, 0x00, COND_50_60_FPS | COND_2_LANES },
+
+	/* mipi timing - 4 lane, 25/30 fps */
+	{ 0x3446, 0x47, COND_25_30_FPS | COND_4_LANES },
+	{ 0x3447, 0x00, COND_25_30_FPS | COND_4_LANES },
+	{ 0x3448, 0x1f, COND_25_30_FPS | COND_4_LANES },
+	{ 0x3449, 0x00, COND_25_30_FPS | COND_4_LANES },
+	{ 0x344a, 0x17, COND_25_30_FPS | COND_4_LANES },
+	{ 0x344b, 0x00, COND_25_30_FPS | COND_4_LANES },
+	{ 0x344c, 0x0f, COND_25_30_FPS | COND_4_LANES },
+	{ 0x344d, 0x00, COND_25_30_FPS | COND_4_LANES },
+	{ 0x344e, 0x17, COND_25_30_FPS | COND_4_LANES },
+	{ 0x344f, 0x00, COND_25_30_FPS | COND_4_LANES },
+	{ 0x3450, 0x47, COND_25_30_FPS | COND_4_LANES },
+	{ 0x3451, 0x00, COND_25_30_FPS | COND_4_LANES },
+	{ 0x3452, 0x0f, COND_25_30_FPS | COND_4_LANES },
+	{ 0x3453, 0x00, COND_25_30_FPS | COND_4_LANES },
+	{ 0x3454, 0x0f, COND_25_30_FPS | COND_4_LANES },
+	{ 0x3455, 0x00, COND_25_30_FPS | COND_4_LANES },
+
+	/* mipi timing - 2 lane, 50/60 fps */
+	{ 0x3446, 0x57, COND_50_60_FPS | COND_4_LANES },
+	{ 0x3447, 0x00, COND_50_60_FPS | COND_4_LANES },
+	{ 0x3448, 0x37, COND_50_60_FPS | COND_4_LANES },
+	{ 0x3449, 0x00, COND_50_60_FPS | COND_4_LANES },
+	{ 0x344a, 0x1f, COND_50_60_FPS | COND_4_LANES },
+	{ 0x344b, 0x00, COND_50_60_FPS | COND_4_LANES },
+	{ 0x344c, 0x1f, COND_50_60_FPS | COND_4_LANES },
+	{ 0x344d, 0x00, COND_50_60_FPS | COND_4_LANES },
+	{ 0x344e, 0x1f, COND_50_60_FPS | COND_4_LANES },
+	{ 0x344f, 0x00, COND_50_60_FPS | COND_4_LANES },
+	{ 0x3450, 0x77, COND_50_60_FPS | COND_4_LANES },
+	{ 0x3451, 0x00, COND_50_60_FPS | COND_4_LANES },
+	{ 0x3452, 0x1f, COND_50_60_FPS | COND_4_LANES },
+	{ 0x3453, 0x00, COND_50_60_FPS | COND_4_LANES },
+	{ 0x3454, 0x17, COND_50_60_FPS | COND_4_LANES },
+	{ 0x3455, 0x00, COND_50_60_FPS | COND_4_LANES },
 };
 
 static const struct imx290_regval imx290_720p_settings[] = {
 	/* mode settings */
 	{ 0x3007, 0x10 },
+
+	/* hmax */
+	{ 0x301c, 0xf0, COND_25_FPS },
+	{ 0x301d, 0x1e, COND_25_FPS },
+
+	{ 0x301c, 0xc8, COND_30_FPS },
+	{ 0x301d, 0x19, COND_30_FPS },
+
+	{ 0x301c, 0x78, COND_50_FPS },
+	{ 0x301d, 0x0f, COND_50_FPS },
+
+	{ 0x301c, 0xe4, COND_60_FPS },
+	{ 0x301d, 0x0c, COND_60_FPS },
+
 	{ 0x303a, 0x06 },
 	{ 0x3414, 0x04 },
 	{ 0x3472, 0x00 },
 	{ 0x3473, 0x05 },
 	{ 0x3418, 0xd0 },
 	{ 0x3419, 0x02 },
+
 	{ 0x3012, 0x64 },
 	{ 0x3013, 0x00 },
 
@@ -288,23 +383,77 @@ static const struct imx290_regval imx290_720p_settings[] = {
 	{ 0x3480, 0x92, COND_INCK_74 },
 
 	/* data rate settings */
-	{ 0x3405, 0x10 },
-	{ 0x3446, 0x4f },
-	{ 0x3447, 0x00 },
-	{ 0x3448, 0x2f },
-	{ 0x3449, 0x00 },
-	{ 0x344a, 0x17 },
-	{ 0x344b, 0x00 },
-	{ 0x344c, 0x17 },
-	{ 0x344d, 0x00 },
-	{ 0x344e, 0x17 },
-	{ 0x344f, 0x00 },
-	{ 0x3450, 0x57 },
-	{ 0x3451, 0x00 },
-	{ 0x3452, 0x17 },
-	{ 0x3453, 0x00 },
-	{ 0x3454, 0x17 },
-	{ 0x3455, 0x00 },
+	/* mipi timing - 2 lane, 25/30 fps */
+	{ 0x3446, 0x4f, COND_25_30_FPS | COND_2_LANES },
+	{ 0x3447, 0x00, COND_25_30_FPS | COND_2_LANES },
+	{ 0x3448, 0x2f, COND_25_30_FPS | COND_2_LANES },
+	{ 0x3449, 0x00, COND_25_30_FPS | COND_2_LANES },
+	{ 0x344a, 0x17, COND_25_30_FPS | COND_2_LANES },
+	{ 0x344b, 0x00, COND_25_30_FPS | COND_2_LANES },
+	{ 0x344c, 0x17, COND_25_30_FPS | COND_2_LANES },
+	{ 0x344d, 0x00, COND_25_30_FPS | COND_2_LANES },
+	{ 0x344e, 0x17, COND_25_30_FPS | COND_2_LANES },
+	{ 0x344f, 0x00, COND_25_30_FPS | COND_2_LANES },
+	{ 0x3450, 0x57, COND_25_30_FPS | COND_2_LANES },
+	{ 0x3451, 0x00, COND_25_30_FPS | COND_2_LANES },
+	{ 0x3452, 0x17, COND_25_30_FPS | COND_2_LANES },
+	{ 0x3453, 0x00, COND_25_30_FPS | COND_2_LANES },
+	{ 0x3454, 0x17, COND_25_30_FPS | COND_2_LANES },
+	{ 0x3455, 0x00, COND_25_30_FPS | COND_2_LANES },
+
+	/* mipi timing - 2 lane, 50/60 fps */
+	{ 0x3446, 0x67, COND_50_60_FPS | COND_2_LANES },
+	{ 0x3447, 0x00, COND_50_60_FPS | COND_2_LANES },
+	{ 0x3448, 0x57, COND_50_60_FPS | COND_2_LANES },
+	{ 0x3449, 0x00, COND_50_60_FPS | COND_2_LANES },
+	{ 0x344a, 0x2f, COND_50_60_FPS | COND_2_LANES },
+	{ 0x344b, 0x00, COND_50_60_FPS | COND_2_LANES },
+	{ 0x344c, 0x27, COND_50_60_FPS | COND_2_LANES },
+	{ 0x344d, 0x00, COND_50_60_FPS | COND_2_LANES },
+	{ 0x344e, 0x2f, COND_50_60_FPS | COND_2_LANES },
+	{ 0x344f, 0x00, COND_50_60_FPS | COND_2_LANES },
+	{ 0x3450, 0xbf, COND_50_60_FPS | COND_2_LANES },
+	{ 0x3451, 0x00, COND_50_60_FPS | COND_2_LANES },
+	{ 0x3452, 0x2f, COND_50_60_FPS | COND_2_LANES },
+	{ 0x3453, 0x00, COND_50_60_FPS | COND_2_LANES },
+	{ 0x3454, 0x27, COND_50_60_FPS | COND_2_LANES },
+	{ 0x3455, 0x00, COND_50_60_FPS | COND_2_LANES },
+
+	/* mipi timing - 4 lane, 25/30 fps */
+	{ 0x3446, 0x47, COND_25_30_FPS | COND_4_LANES },
+	{ 0x3447, 0x00, COND_25_30_FPS | COND_4_LANES },
+	{ 0x3448, 0x17, COND_25_30_FPS | COND_4_LANES },
+	{ 0x3449, 0x00, COND_25_30_FPS | COND_4_LANES },
+	{ 0x344a, 0x0f, COND_25_30_FPS | COND_4_LANES },
+	{ 0x344b, 0x00, COND_25_30_FPS | COND_4_LANES },
+	{ 0x344c, 0x0f, COND_25_30_FPS | COND_4_LANES },
+	{ 0x344d, 0x00, COND_25_30_FPS | COND_4_LANES },
+	{ 0x344e, 0x0f, COND_25_30_FPS | COND_4_LANES },
+	{ 0x344f, 0x00, COND_25_30_FPS | COND_4_LANES },
+	{ 0x3450, 0x2b, COND_25_30_FPS | COND_4_LANES },
+	{ 0x3451, 0x00, COND_25_30_FPS | COND_4_LANES },
+	{ 0x3452, 0x0b, COND_25_30_FPS | COND_4_LANES },
+	{ 0x3453, 0x00, COND_25_30_FPS | COND_4_LANES },
+	{ 0x3454, 0x0f, COND_25_30_FPS | COND_4_LANES },
+	{ 0x3455, 0x00, COND_25_30_FPS | COND_4_LANES },
+
+	/* mipi timing - 2 lane, 50/60 fps */
+	{ 0x3446, 0x4f, COND_50_60_FPS | COND_4_LANES },
+	{ 0x3447, 0x00, COND_50_60_FPS | COND_4_LANES },
+	{ 0x3448, 0x2f, COND_50_60_FPS | COND_4_LANES },
+	{ 0x3449, 0x00, COND_50_60_FPS | COND_4_LANES },
+	{ 0x344a, 0x17, COND_50_60_FPS | COND_4_LANES },
+	{ 0x344b, 0x00, COND_50_60_FPS | COND_4_LANES },
+	{ 0x344c, 0x17, COND_50_60_FPS | COND_4_LANES },
+	{ 0x344d, 0x00, COND_50_60_FPS | COND_4_LANES },
+	{ 0x344e, 0x17, COND_50_60_FPS | COND_4_LANES },
+	{ 0x344f, 0x00, COND_50_60_FPS | COND_4_LANES },
+	{ 0x3450, 0x57, COND_50_60_FPS | COND_4_LANES },
+	{ 0x3451, 0x00, COND_50_60_FPS | COND_4_LANES },
+	{ 0x3452, 0x17, COND_50_60_FPS | COND_4_LANES },
+	{ 0x3453, 0x00, COND_50_60_FPS | COND_4_LANES },
+	{ 0x3454, 0x17, COND_50_60_FPS | COND_4_LANES },
+	{ 0x3455, 0x00, COND_50_60_FPS | COND_4_LANES },
 };
 
 static const struct imx290_regval imx290_10bit_settings[] = {
