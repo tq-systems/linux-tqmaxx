@@ -52,6 +52,10 @@ enum {
 	COND_2_LANES = BIT(4),
 	COND_4_LANES = BIT(5),
 	COND_LANES_msk = COND_2_LANES | COND_4_LANES,
+
+	COND_INCK_37 = BIT(6),
+	COND_INCK_74 = BIT(7),
+	COND_INCK_msk = COND_INCK_37 | COND_INCK_74,
 };
 
 enum imx290_fps {
@@ -59,6 +63,11 @@ enum imx290_fps {
 	FPS_30,
 	FPS_50,
 	FPS_60,
+};
+
+enum imx290_inck {
+	INCK_37,
+	INCK_74,
 };
 
 static const char * const imx290_supply_name[] = {
@@ -92,6 +101,7 @@ struct imx290 {
 	u8 nlanes;
 	u8 bpp;
 	enum imx290_fps fps;
+	enum imx290_inck inck;
 
 	struct v4l2_subdev sd;
 	struct media_pad pad;
@@ -140,8 +150,6 @@ static const struct imx290_regval imx290_global_init_settings[] = {
 	{ 0x3018, 0x65 },
 	{ 0x3019, 0x04 },
 	{ 0x301a, 0x00 },
-	{ 0x3444, 0x20 },
-	{ 0x3445, 0x25 },
 	{ 0x303a, 0x0c },
 	{ 0x3040, 0x00 },
 	{ 0x3041, 0x00 },
@@ -206,13 +214,27 @@ static const struct imx290_regval imx290_1080p_settings[] = {
 	{ 0x3419, 0x04 },
 	{ 0x3012, 0x64 },
 	{ 0x3013, 0x00 },
-	{ 0x305c, 0x18 },
-	{ 0x305d, 0x03 },
-	{ 0x305e, 0x20 },
-	{ 0x305f, 0x01 },
-	{ 0x315e, 0x1a },
-	{ 0x3164, 0x1a },
-	{ 0x3480, 0x49 },
+
+	{ 0x305c, 0x18, COND_INCK_37 },
+	{ 0x305d, 0x03, COND_INCK_37 },
+	{ 0x305e, 0x20, COND_INCK_37 },
+	{ 0x305f, 0x01, COND_INCK_37 },
+	{ 0x315e, 0x1a, COND_INCK_37 },
+	{ 0x3164, 0x1a, COND_INCK_37 },
+	{ 0x3444, 0x20, COND_INCK_37 },
+	{ 0x3445, 0x25, COND_INCK_37 },
+	{ 0x3480, 0x49, COND_INCK_37 },
+
+	{ 0x305c, 0x0c, COND_INCK_74 },
+	{ 0x305d, 0x03, COND_INCK_74 },
+	{ 0x305e, 0x10, COND_INCK_74 },
+	{ 0x305f, 0x01, COND_INCK_74 },
+	{ 0x315e, 0x1b, COND_INCK_74 },
+	{ 0x3164, 0x1b, COND_INCK_74 },
+	{ 0x3444, 0x40, COND_INCK_74 },
+	{ 0x3445, 0x4a, COND_INCK_74 },
+	{ 0x3480, 0x92, COND_INCK_74 },
+
 	/* data rate settings */
 	{ 0x3405, 0x10 },
 	{ 0x3446, 0x57 },
@@ -244,13 +266,27 @@ static const struct imx290_regval imx290_720p_settings[] = {
 	{ 0x3419, 0x02 },
 	{ 0x3012, 0x64 },
 	{ 0x3013, 0x00 },
-	{ 0x305c, 0x20 },
-	{ 0x305d, 0x00 },
-	{ 0x305e, 0x20 },
-	{ 0x305f, 0x01 },
-	{ 0x315e, 0x1a },
-	{ 0x3164, 0x1a },
-	{ 0x3480, 0x49 },
+
+	{ 0x305c, 0x20, COND_INCK_37 },
+	{ 0x305d, 0x00, COND_INCK_37 },
+	{ 0x305e, 0x20, COND_INCK_37 },
+	{ 0x305f, 0x01, COND_INCK_37 },
+	{ 0x315e, 0x1a, COND_INCK_37 },
+	{ 0x3164, 0x1a, COND_INCK_37 },
+	{ 0x3444, 0x20, COND_INCK_37 },
+	{ 0x3445, 0x25, COND_INCK_37 },
+	{ 0x3480, 0x49, COND_INCK_37 },
+
+	{ 0x305c, 0x10, COND_INCK_74 },
+	{ 0x305d, 0x00, COND_INCK_74 },
+	{ 0x305e, 0x10, COND_INCK_74 },
+	{ 0x305f, 0x01, COND_INCK_74 },
+	{ 0x315e, 0x1b, COND_INCK_74 },
+	{ 0x3164, 0x1b, COND_INCK_74 },
+	{ 0x3444, 0x40, COND_INCK_74 },
+	{ 0x3445, 0x4a, COND_INCK_74 },
+	{ 0x3480, 0x92, COND_INCK_74 },
+
 	/* data rate settings */
 	{ 0x3405, 0x10 },
 	{ 0x3446, 0x4f },
@@ -298,13 +334,22 @@ static const struct imx290_regval imx290_12bit_settings[] = {
 /* supported link frequencies */
 #define FREQ_INDEX_1080P	0
 #define FREQ_INDEX_720P		1
-static const s64 imx290_link_freq_2lanes[] = {
+static const s64 imx290_link_freq_2lanes_37mhz[] = {
 	[FREQ_INDEX_1080P] = 445500000,
 	[FREQ_INDEX_720P] = 297000000,
 };
-static const s64 imx290_link_freq_4lanes[] = {
+static const s64 imx290_link_freq_4lanes_37mhz[] = {
 	[FREQ_INDEX_1080P] = 222750000,
 	[FREQ_INDEX_720P] = 148500000,
+};
+
+static const s64 imx290_link_freq_2lanes_74mhz[] = {
+	[FREQ_INDEX_1080P] = 891000000,
+	[FREQ_INDEX_720P] = 594000000,
+};
+static const s64 imx290_link_freq_4lanes_74mhz[] = {
+	[FREQ_INDEX_1080P] = 445500000,
+	[FREQ_INDEX_720P] = 297000000,
 };
 
 /*
@@ -313,18 +358,28 @@ static const s64 imx290_link_freq_4lanes[] = {
  */
 static inline const s64 *imx290_link_freqs_ptr(const struct imx290 *imx290)
 {
-	if (imx290->nlanes == 2)
-		return imx290_link_freq_2lanes;
-	else
-		return imx290_link_freq_4lanes;
+	switch (((imx290->nlanes == 4) ? BIT(4) : 0) |
+		((imx290->inck == INCK_74) ? BIT(0) : 0)) {
+	case 0x00:	return imx290_link_freq_2lanes_37mhz;
+	case 0x01:	return imx290_link_freq_2lanes_74mhz;
+	case 0x10:	return imx290_link_freq_4lanes_37mhz;
+	case 0x11:	return imx290_link_freq_4lanes_74mhz;
+	default:
+		BUG();
+	}
 }
 
 static inline int imx290_link_freqs_num(const struct imx290 *imx290)
 {
-	if (imx290->nlanes == 2)
-		return ARRAY_SIZE(imx290_link_freq_2lanes);
-	else
-		return ARRAY_SIZE(imx290_link_freq_4lanes);
+	switch (((imx290->nlanes == 4) ? BIT(4) : 0) |
+		((imx290->inck == INCK_74) ? BIT(0) : 0)) {
+	case 0x00:	return ARRAY_SIZE(imx290_link_freq_2lanes_37mhz);
+	case 0x01:	return ARRAY_SIZE(imx290_link_freq_2lanes_74mhz);
+	case 0x10:	return ARRAY_SIZE(imx290_link_freq_4lanes_37mhz);
+	case 0x11:	return ARRAY_SIZE(imx290_link_freq_4lanes_74mhz);
+	default:
+		BUG();
+	}
 }
 
 /* Mode configs */
@@ -447,6 +502,20 @@ static bool imx290_settings_match(struct imx290 *imx290, uint8_t cond)
 			break;
 		case 4:
 			reject |= !(cond & COND_4_LANES);
+			break;
+		default:
+			reject |= true;
+			break;
+		}
+	}
+
+	if (cond & COND_INCK_msk) {
+		switch (imx290->inck) {
+		case INCK_37:
+			reject |= !(cond & COND_INCK_74);
+			break;
+		case INCK_74:
+			reject |= !(cond & COND_INCK_37);
 			break;
 		default:
 			reject |= true;
@@ -1055,20 +1124,6 @@ static int imx290_probe(struct i2c_client *client)
 
 	dev_dbg(dev, "Using %u data lanes\n", imx290->nlanes);
 
-	if (!ep.nr_of_link_frequencies) {
-		dev_err(dev, "link-frequency property not found in DT\n");
-		ret = -EINVAL;
-		goto free_err;
-	}
-
-	/* Check that link frequences for all the modes are in device tree */
-	fq = imx290_check_link_freqs(imx290, &ep);
-	if (fq) {
-		dev_err(dev, "Link frequency of %lld is not supported\n", fq);
-		ret = -EINVAL;
-		goto free_err;
-	}
-
 	/* get system clock (xclk) */
 	imx290->xclk = devm_clk_get(dev, "xclk");
 	if (IS_ERR(imx290->xclk)) {
@@ -1084,10 +1139,36 @@ static int imx290_probe(struct i2c_client *client)
 		goto free_err;
 	}
 
-	/* external clock must be 37.125 MHz */
-	if (xclk_freq != 37125000) {
+	switch (xclk_freq) {
+	case 37125000:
+		imx290->inck = INCK_37;
+		imx290->fps = FPS_30;
+		break;
+	case 74250000:
+		imx290->inck = INCK_74;
+		imx290->fps = FPS_60;
+		break;
+	default:
 		dev_err(dev, "External clock frequency %u is not supported\n",
 			xclk_freq);
+		ret = -EINVAL;
+		goto free_err;
+	}
+
+	/*
+	 *NOTE: imx290_check_link_freqs() must be called after setting
+	 * imx290->inck
+	 */
+	if (!ep.nr_of_link_frequencies) {
+		dev_err(dev, "link-frequency property not found in DT\n");
+		ret = -EINVAL;
+		goto free_err;
+	}
+
+	/* Check that link frequences for all the modes are in device tree */
+	fq = imx290_check_link_freqs(imx290, &ep);
+	if (fq) {
+		dev_err(dev, "Link frequency of %lld is not supported\n", fq);
 		ret = -EINVAL;
 		goto free_err;
 	}
