@@ -1041,6 +1041,20 @@ unlock_and_return:
 	return ret;
 }
 
+static int imx290_s_power(struct v4l2_subdev *sd, int on)
+{
+	struct imx290 *imx290 = to_imx290(sd);
+
+	if (on)
+		pm_runtime_get_sync(imx290->dev);
+	else {
+		pm_runtime_put_noidle(imx290->dev);
+		pm_schedule_suspend(imx290->dev, 2000);
+	}
+
+	return 0;
+}
+
 static int imx290_get_regulators(struct device *dev, struct imx290 *imx290)
 {
 	unsigned int i;
@@ -1114,9 +1128,14 @@ static const struct v4l2_subdev_pad_ops imx290_pad_ops = {
 	.set_fmt = imx290_set_fmt,
 };
 
+static struct v4l2_subdev_core_ops const imx290_core_ops = {
+	.s_power = imx290_s_power,
+};
+
 static const struct v4l2_subdev_ops imx290_subdev_ops = {
 	.video = &imx290_video_ops,
 	.pad = &imx290_pad_ops,
+	.core = &imx290_core_ops,
 };
 
 static const struct media_entity_operations imx290_subdev_entity_ops = {
