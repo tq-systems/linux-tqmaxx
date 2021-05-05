@@ -39,6 +39,28 @@
 #define IMX290_PGCTRL_THRU BIT(1)
 #define IMX290_PGCTRL_MODE(n) ((n) << 4)
 
+enum {
+	COND_25_FPS = BIT(0),
+	COND_30_FPS = BIT(1),
+	COND_50_FPS = BIT(2),
+	COND_60_FPS = BIT(3),
+	COND_25_30_FPS = COND_25_FPS | COND_30_FPS,
+	COND_50_60_FPS = COND_50_FPS | COND_60_FPS,
+	COND_FPS_msk = (COND_25_FPS | COND_30_FPS |
+			COND_50_FPS | COND_60_FPS),
+
+	COND_2_LANES = BIT(4),
+	COND_4_LANES = BIT(5),
+	COND_LANES_msk = COND_2_LANES | COND_4_LANES,
+};
+
+enum imx290_fps {
+	FPS_25,
+	FPS_30,
+	FPS_50,
+	FPS_60,
+};
+
 static const char * const imx290_supply_name[] = {
 	"vdda",
 	"vddd",
@@ -50,6 +72,7 @@ static const char * const imx290_supply_name[] = {
 struct imx290_regval {
 	u16 reg;
 	u8 val;
+	u8 cond;
 };
 
 struct imx290_mode {
@@ -68,6 +91,7 @@ struct imx290 {
 	struct regmap *regmap;
 	u8 nlanes;
 	u8 bpp;
+	enum imx290_fps fps;
 
 	struct v4l2_subdev sd;
 	struct media_pad pad;
@@ -392,6 +416,47 @@ static int imx290_write_reg(struct imx290 *imx290, u16 addr, u8 value)
 	return ret;
 }
 
+static bool imx290_settings_match(struct imx290 *imx290, uint8_t cond)
+{
+	bool	reject = false;
+
+	if (cond & COND_FPS_msk) {
+		switch (imx290->fps) {
+		case FPS_25:
+			reject |= !(cond & COND_25_FPS);
+			break;
+		case FPS_30:
+			reject |= !(cond & COND_30_FPS);
+			break;
+		case FPS_50:
+			reject |= !(cond & COND_50_FPS);
+			break;
+		case FPS_60:
+			reject |= !(cond & COND_60_FPS);
+			break;
+		default:
+			reject |= true;
+			break;
+		}
+	}
+
+	if (cond & COND_LANES_msk) {
+		switch (imx290->nlanes) {
+		case 2:
+			reject |= !(cond & COND_2_LANES);
+			break;
+		case 4:
+			reject |= !(cond & COND_4_LANES);
+			break;
+		default:
+			reject |= true;
+			break;
+		}
+	}
+
+	return !reject;
+}
+
 static int imx290_set_register_array(struct imx290 *imx290,
 				     const struct imx290_regval *settings,
 				     unsigned int num_settings)
@@ -400,6 +465,9 @@ static int imx290_set_register_array(struct imx290 *imx290,
 	int ret;
 
 	for (i = 0; i < num_settings; ++i, ++settings) {
+		if (!imx290_settings_match(imx290, settings->cond))
+			continue;
+
 		ret = imx290_write_reg(imx290, settings->reg, settings->val);
 		if (ret < 0)
 			return ret;
