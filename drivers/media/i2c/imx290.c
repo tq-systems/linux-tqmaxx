@@ -25,13 +25,10 @@
 #define IMX290_STANDBY 0x3000
 #define IMX290_REGHOLD 0x3001
 #define IMX290_XMSTA 0x3002
-#define IMX290_FR_FDG_SEL 0x3009
 #define IMX290_BLKLEVEL_LOW 0x300a
 #define IMX290_BLKLEVEL_HIGH 0x300b
 #define IMX290_GAIN 0x3014
 #define IMX290_PGCTRL 0x308c
-#define IMX290_PHY_LANE_NUM 0x3407
-#define IMX290_CSI_LANE_MODE 0x3443
 
 #define IMX290_PGCTRL_REGEN BIT(0)
 #define IMX290_PGCTRL_THRU BIT(1)
@@ -1055,49 +1052,6 @@ static int imx290_get_regulators(struct device *dev, struct imx290 *imx290)
 				       imx290->supplies);
 }
 
-static int imx290_set_data_lanes(struct imx290 *imx290)
-{
-	int ret = 0, laneval, frsel;
-
-	switch (imx290->nlanes) {
-	case 2:
-		laneval = 0x01;
-		frsel = 0x02;
-		break;
-	case 4:
-		laneval = 0x03;
-		frsel = 0x01;
-		break;
-	default:
-		/*
-		 * We should never hit this since the data lane count is
-		 * validated in probe itself
-		 */
-		dev_err(imx290->dev, "Lane configuration not supported\n");
-		ret = -EINVAL;
-		goto exit;
-	}
-
-	ret = imx290_write_reg(imx290, IMX290_PHY_LANE_NUM, laneval);
-	if (ret) {
-		dev_err(imx290->dev, "Error setting Physical Lane number register\n");
-		goto exit;
-	}
-
-	ret = imx290_write_reg(imx290, IMX290_CSI_LANE_MODE, laneval);
-	if (ret) {
-		dev_err(imx290->dev, "Error setting CSI Lane mode register\n");
-		goto exit;
-	}
-
-	ret = imx290_write_reg(imx290, IMX290_FR_FDG_SEL, frsel);
-	if (ret)
-		dev_err(imx290->dev, "Error setting FR/FDG SEL register\n");
-
-exit:
-	return ret;
-}
-
 static int imx290_power_on(struct device *dev)
 {
 	struct v4l2_subdev *sd = dev_get_drvdata(dev);
@@ -1119,9 +1073,6 @@ static int imx290_power_on(struct device *dev)
 	usleep_range(1, 2);
 	gpiod_set_value_cansleep(imx290->rst_gpio, 0);
 	usleep_range(30000, 31000);
-
-	/* Set data lane count */
-	imx290_set_data_lanes(imx290);
 
 	return 0;
 
