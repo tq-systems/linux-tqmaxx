@@ -65,6 +65,10 @@ enum imx290_inck {
 	INCK_74,
 };
 
+enum imx290_type {
+	IMX290_TYPE_290,
+};
+
 static const char * const imx290_supply_name[] = {
 	"vdda",
 	"vddd",
@@ -96,6 +100,7 @@ struct imx290 {
 	u8 bpp;
 	enum imx290_fps fps;
 	enum imx290_inck inck;
+	enum imx290_type type;
 
 	struct v4l2_subdev sd;
 	struct media_pad pad;
@@ -115,6 +120,10 @@ struct imx290 {
 struct imx290_pixfmt {
 	u32 code;
 	u8 bpp;
+};
+
+struct imx290_driver_data {
+	enum imx290_type type;
 };
 
 static const struct imx290_pixfmt imx290_formats[] = {
@@ -164,47 +173,6 @@ static const struct imx290_regval imx290_global_init_settings[] = {
 	{ 0x303e, 0x49 },
 	{ 0x303f, 0x04 },
 	{ 0x304b, 0x0a },
-	{ 0x300f, 0x00 },
-	{ 0x3010, 0x21 },
-	{ 0x3012, 0x64 },
-	{ 0x3016, 0x09 },
-	{ 0x3070, 0x02 },
-	{ 0x3071, 0x11 },
-	{ 0x309b, 0x10 },
-	{ 0x309c, 0x22 },
-	{ 0x30a2, 0x02 },
-	{ 0x30a6, 0x20 },
-	{ 0x30a8, 0x20 },
-	{ 0x30aa, 0x20 },
-	{ 0x30ac, 0x20 },
-	{ 0x30b0, 0x43 },
-	{ 0x3119, 0x9e },
-	{ 0x311c, 0x1e },
-	{ 0x311e, 0x08 },
-	{ 0x3128, 0x05 },
-	{ 0x313d, 0x83 },
-	{ 0x3150, 0x03 },
-	{ 0x317e, 0x00 },
-	{ 0x32b8, 0x50 },
-	{ 0x32b9, 0x10 },
-	{ 0x32ba, 0x00 },
-	{ 0x32bb, 0x04 },
-	{ 0x32c8, 0x50 },
-	{ 0x32c9, 0x10 },
-	{ 0x32ca, 0x00 },
-	{ 0x32cb, 0x04 },
-	{ 0x332c, 0xd3 },
-	{ 0x332d, 0x10 },
-	{ 0x332e, 0x0d },
-	{ 0x3358, 0x06 },
-	{ 0x3359, 0xe1 },
-	{ 0x335a, 0x11 },
-	{ 0x3360, 0x1e },
-	{ 0x3361, 0x61 },
-	{ 0x3362, 0x10 },
-	{ 0x33b0, 0x50 },
-	{ 0x33b2, 0x1a },
-	{ 0x33b3, 0x04 },
 };
 
 static const struct imx290_regval imx290_1080p_settings[] = {
@@ -448,6 +416,51 @@ static const struct imx290_regval imx290_720p_settings[] = {
 	{ 0x3453, 0x00, COND_50_60_FPS | COND_4_LANES },
 	{ 0x3454, 0x17, COND_50_60_FPS | COND_4_LANES },
 	{ 0x3455, 0x00, COND_50_60_FPS | COND_4_LANES },
+};
+
+/* The red "Set to" values in reference manual v0.5.0 (2018-07-22) */
+static const struct imx290_regval imx290_model_290_settings[] = {
+	{ 0x300f, 0x00 },
+	{ 0x3010, 0x21 },
+	{ 0x3012, 0x64 },
+	{ 0x3016, 0x09 },
+	{ 0x3070, 0x02 },
+	{ 0x3071, 0x11 },
+	{ 0x309b, 0x10 },
+	{ 0x309c, 0x22 },
+	{ 0x30a2, 0x02 },
+	{ 0x30a6, 0x20 },
+	{ 0x30a8, 0x20 },
+	{ 0x30aa, 0x20 },
+	{ 0x30ac, 0x20 },
+	{ 0x30b0, 0x43 },
+	{ 0x3119, 0x9e },
+	{ 0x311c, 0x1e },
+	{ 0x311e, 0x08 },
+	{ 0x3128, 0x05 },
+	{ 0x313d, 0x83 },
+	{ 0x3150, 0x03 },
+	{ 0x317e, 0x00 },
+	{ 0x32b8, 0x50 },
+	{ 0x32b9, 0x10 },
+	{ 0x32ba, 0x00 },
+	{ 0x32bb, 0x04 },
+	{ 0x32c8, 0x50 },
+	{ 0x32c9, 0x10 },
+	{ 0x32ca, 0x00 },
+	{ 0x32cb, 0x04 },
+	{ 0x332c, 0xd3 },
+	{ 0x332d, 0x10 },
+	{ 0x332e, 0x0d },
+	{ 0x3358, 0x06 },
+	{ 0x3359, 0xe1 },
+	{ 0x335a, 0x11 },
+	{ 0x3360, 0x1e },
+	{ 0x3361, 0x61 },
+	{ 0x3362, 0x10 },
+	{ 0x33b0, 0x50 },
+	{ 0x33b2, 0x1a },
+	{ 0x33b3, 0x04 },
 };
 
 static const struct imx290_regval imx290_10bit_settings[] = {
@@ -1088,6 +1101,16 @@ static int imx290_power_on(struct device *dev)
 	gpiod_set_value_cansleep(imx290->rst_gpio, 0);
 	usleep_range(30000, 31000);
 
+	switch (imx290->type) {
+	case IMX290_TYPE_290:
+		ret = imx290_set_register_array(imx290, imx290_model_290_settings,
+						ARRAY_SIZE(imx290_model_290_settings));
+		break;
+	}
+
+	if (ret < 0)
+		goto err_regulator;
+
 	return 0;
 
 err_regulator:
@@ -1172,15 +1195,25 @@ static int imx290_probe(struct i2c_client *client)
 	struct v4l2_fwnode_endpoint ep = {
 		.bus_type = V4L2_MBUS_CSI2_DPHY
 	};
+	struct imx290_driver_data const *drv_data = NULL;
 	struct imx290 *imx290;
 	u32 xclk_freq;
 	s64 fq;
 	int ret;
 
+	if (dev_fwnode(&client->dev))
+		drv_data = device_get_match_data(&client->dev);
+
+	if (!drv_data) {
+		dev_err(dev, "missing driver data\n");
+		return -EINVAL;
+	}
+
 	imx290 = devm_kzalloc(dev, sizeof(*imx290), GFP_KERNEL);
 	if (!imx290)
 		return -ENOMEM;
 
+	imx290->type = drv_data->type;
 	imx290->dev = dev;
 	imx290->regmap = devm_regmap_init_i2c(client, &imx290_regmap_config);
 	if (IS_ERR(imx290->regmap)) {
@@ -1388,8 +1421,12 @@ static int imx290_remove(struct i2c_client *client)
 	return 0;
 }
 
+static const struct imx290_driver_data ixm290_driver_data_imx290 = {
+	.type		= IMX290_TYPE_290,
+};
+
 static const struct of_device_id imx290_of_match[] = {
-	{ .compatible = "sony,imx290" },
+	{ .compatible = "sony,imx290", .data = &ixm290_driver_data_imx290 },
 	{ /* sentinel */ }
 };
 MODULE_DEVICE_TABLE(of, imx290_of_match);
