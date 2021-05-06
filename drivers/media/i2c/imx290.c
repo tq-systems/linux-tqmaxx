@@ -67,6 +67,7 @@ enum imx290_inck {
 
 enum imx290_type {
 	IMX290_TYPE_290,
+	IMX290_TYPE_327,
 };
 
 static const char * const imx290_supply_name[] = {
@@ -461,6 +462,15 @@ static const struct imx290_regval imx290_model_290_settings[] = {
 	{ 0x33b0, 0x50 },
 	{ 0x33b2, 0x1a },
 	{ 0x33b3, 0x04 },
+};
+
+/* The red "Set to" values in reference manual v0.2 (2017-05-25) */
+static const struct imx290_regval imx290_model_327_settings[] = {
+	{ 0x3011, 0x0a },
+	{ 0x309e, 0x4a },
+	{ 0x309f, 0x4a },
+	{ 0x3128, 0x04 },
+	{ 0x313b, 0x41 },
 };
 
 static const struct imx290_regval imx290_10bit_settings[] = {
@@ -1106,6 +1116,10 @@ static int imx290_power_on(struct device *dev)
 		ret = imx290_set_register_array(imx290, imx290_model_290_settings,
 						ARRAY_SIZE(imx290_model_290_settings));
 		break;
+	case IMX290_TYPE_327:
+		ret = imx290_set_register_array(imx290, imx290_model_327_settings,
+						ARRAY_SIZE(imx290_model_327_settings));
+		break;
 	}
 
 	if (ret < 0)
@@ -1425,8 +1439,13 @@ static const struct imx290_driver_data ixm290_driver_data_imx290 = {
 	.type		= IMX290_TYPE_290,
 };
 
+static const struct imx290_driver_data ixm290_driver_data_imx327 = {
+	.type		= IMX290_TYPE_327,
+};
+
 static const struct of_device_id imx290_of_match[] = {
 	{ .compatible = "sony,imx290", .data = &ixm290_driver_data_imx290 },
+	{ .compatible = "sony,imx327", .data = &ixm290_driver_data_imx327 },
 	{ /* sentinel */ }
 };
 MODULE_DEVICE_TABLE(of, imx290_of_match);
