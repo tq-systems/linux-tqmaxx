@@ -160,7 +160,6 @@ static const struct imx290_regval imx290_global_init_settings[] = {
 	{ 0x3405, 0x20, COND_25_30_FPS | COND_4_LANES },
 	{ 0x3405, 0x10, COND_50_60_FPS | COND_4_LANES },
 
-	{ 0x303a, 0x0c },
 	{ 0x3040, 0x00 },
 	{ 0x3041, 0x00 },
 	{ 0x303c, 0x00 },
