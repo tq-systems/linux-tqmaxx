@@ -399,6 +399,24 @@ static int mipi_csis_enum_frameintervals(struct v4l2_subdev *sd,
 	return v4l2_subdev_call(sensor_sd, pad, enum_frame_interval, cfg, fie);
 }
 
+static int mipi_csis_g_frame_interval(struct v4l2_subdev *sd,
+				      struct v4l2_subdev_frame_interval *interval)
+{
+	struct mxc_mipi_csi2_dev *csi2dev = sd_to_mxc_mipi_csi2_dev(sd);
+	struct v4l2_subdev *sensor_sd = csi2dev->sensor_sd;
+
+	return v4l2_subdev_call(sensor_sd, video, g_frame_interval, interval);
+}
+
+static int mipi_csis_s_frame_interval(struct v4l2_subdev *sd,
+				      struct v4l2_subdev_frame_interval *interval)
+{
+	struct mxc_mipi_csi2_dev *csi2dev = sd_to_mxc_mipi_csi2_dev(sd);
+	struct v4l2_subdev *sensor_sd = csi2dev->sensor_sd;
+
+	return v4l2_subdev_call(sensor_sd, video, s_frame_interval, interval);
+}
+
 static int mipi_csis_enum_mbus_code(struct v4l2_subdev *sd,
 				    struct v4l2_subdev_pad_config *cfg,
 				    struct v4l2_subdev_mbus_code_enum *code)
@@ -509,6 +527,9 @@ static struct v4l2_subdev_video_ops mipi_csi2_video_ops = {
 
 	.s_parm = mipi_csis_s_parm,
 	.g_parm = mipi_csis_g_parm,
+
+	.g_frame_interval = mipi_csis_g_frame_interval,
+	.s_frame_interval = mipi_csis_s_frame_interval,
 };
 
 static struct v4l2_subdev_ops mipi_csi2_subdev_ops = {
