@@ -985,6 +985,118 @@ static int imx290_enum_frame_size(struct v4l2_subdev *sd,
 	return 0;
 }
 
+/*
+ * TODO: this should be improved; we can setup non-discrete frame rates by
+ * modifying vmax
+ *
+ * NOTE: this list must be ordered!
+ */
+static struct v4l2_fract const imx290_intervals[] = {
+	[FPS_25] = { 1, 25 },
+	[FPS_30] = { 1, 30 },
+	[FPS_50] = { 1, 50 },
+	[FPS_60] = { 1, 60 },
+};
+
+static int imx290_enum_frame_interval(struct v4l2_subdev *sd,
+				      struct v4l2_subdev_pad_config *cfg,
+				      struct v4l2_subdev_frame_interval_enum *fie)
+{
+	const struct imx290 *imx290 = to_imx290(sd);
+	const struct imx290_mode *imx290_modes = imx290_modes_ptr(imx290);
+	size_t i;
+
+	if (fie->index >= ARRAY_SIZE(imx290_intervals))
+		return -EINVAL;
+
+	if (fie->code != MEDIA_BUS_FMT_SRGGB10_1X10 &&
+	    fie->code != MEDIA_BUS_FMT_SRGGB12_1X12)
+		return -EINVAL;
+
+	for (i = imx290_modes_num(imx290); i > 0; --i) {
+		const struct imx290_mode *mode = &imx290_modes[i - 1];
+
+		if (mode->width == fie->width &&
+		    mode->height == fie->height) {
+			fie->interval = imx290_intervals[fie->index];
+			return 0;
+		}
+
+	}
+
+	return -EINVAL;
+}
+
+static int mipi_csis_g_frame_interval(struct v4l2_subdev *sd,
+				      struct v4l2_subdev_frame_interval *interval)
+{
+	const struct imx290 *imx290 = to_imx290(sd);
+
+	interval->interval = imx290_intervals[imx290->fps];
+
+	return 0;
+}
+
+static int mipi_csis_s_frame_interval(struct v4l2_subdev *sd,
+				      struct v4l2_subdev_frame_interval *interval)
+{
+	struct imx290 *imx290 = to_imx290(sd);
+	enum imx290_fps match = 0;
+	size_t i;
+
+	unsigned long a = interval->interval.numerator;
+	unsigned long b = interval->interval.denominator;
+
+	for (i = 0; i < ARRAY_SIZE(imx290_intervals); ++i) {
+		match = i;
+
+		if (a * imx290_intervals[i].denominator >=
+		    b * imx290_intervals[i].numerator)
+			break;
+	}
+
+	interval->interval = imx290_intervals[match];
+	imx290->fps = match;
+
+	return 0;
+}
+
+static int imx290_g_parm(struct v4l2_subdev *sd,
+			 struct v4l2_streamparm *a)
+{
+	struct v4l2_subdev_frame_interval interval;
+	int rc;
+
+	rc = mipi_csis_g_frame_interval(sd, &interval);
+	if (rc < 0)
+		return rc;
+
+	memset(a->parm.capture.reserved, 0, sizeof(a->parm.capture.reserved));
+	a->parm.capture.capability   = V4L2_CAP_TIMEPERFRAME;
+	a->parm.capture.timeperframe = interval.interval;
+
+	return 0;
+}
+
+static int imx290_s_parm(struct v4l2_subdev *sd,
+			 struct v4l2_streamparm *a)
+{
+	struct v4l2_subdev_frame_interval interval = {
+		.interval = a->parm.capture.timeperframe,
+	};
+	int rc;
+
+	memset(a->parm.capture.reserved, 0, sizeof(a->parm.capture.reserved));
+	rc = mipi_csis_s_frame_interval(sd, &interval);
+	if (rc < 0)
+		return rc;
+
+	a->parm.capture.capability   = V4L2_CAP_TIMEPERFRAME;
+	a->parm.capture.timeperframe = interval.interval;
+
+	return 0;
+}
+
 static int imx290_get_fmt(struct v4l2_subdev *sd,
 			  struct v4l2_subdev_pad_config *cfg,
 			  struct v4l2_subdev_format *fmt)
@@ -1310,13 +1422,18 @@ static const struct dev_pm_ops imx290_pm_ops = {
 };
 
 static const struct v4l2_subdev_video_ops imx290_video_ops = {
+	.g_parm = imx290_g_parm,
+	.s_parm = imx290_s_parm,
 	.s_stream = imx290_set_stream,
+	.s_frame_interval = mipi_csis_s_frame_interval,
+	.g_frame_interval = mipi_csis_g_frame_interval,
 };
 
 static const struct v4l2_subdev_pad_ops imx290_pad_ops = {
 	.init_cfg = imx290_entity_init_cfg,
 	.enum_mbus_code = imx290_enum_mbus_code,
 	.enum_frame_size = imx290_enum_frame_size,
+	.enum_frame_interval = imx290_enum_frame_interval,
 	.get_fmt = imx290_get_fmt,
 	.set_fmt = imx290_set_fmt,
 };
