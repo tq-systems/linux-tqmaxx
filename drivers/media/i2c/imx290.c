@@ -34,6 +34,8 @@
 #define IMX290_PGCTRL_THRU BIT(1)
 #define IMX290_PGCTRL_MODE(n) ((n) << 4)
 
+#define V4L2_CID_IMX290_CG_SWITCH	(V4L2_CID_USER_BASE | 0x1000)
+
 enum {
 	COND_25_FPS = BIT(0),
 	COND_30_FPS = BIT(1),
@@ -785,6 +787,94 @@ static int imx290_stop_streaming(struct imx290 *imx290)
 	return imx290_write_reg(imx290, IMX290_XMSTA, 0x01);
 }
 
+static uint8_t imx290_get_winmode(struct imx290 const *imx290)
+{
+	if (!imx290->current_mode)
+		return 0;
+
+	switch (imx290->current_mode->height) {
+	case 1080:
+		return (0u << 4);
+	case 720:
+		return (1u << 4);
+	default:
+		/* TODO: this is unsupported; emit an error? */
+		return 0;
+	}
+}
+
+static int imx290_set_exposure(struct imx290 *imx290, struct v4l2_ctrl *ctrl)
+{
+	unsigned int val = ctrl->val;
+
+	if (imx290->vmax == 0)
+		return 0;
+
+	/*
+	 * TODO: this just ensures that we stay within the 1..(h-1) range.
+	 * This should be changed so that exposure time can be expressed in ms
+	 * or so
+	 */
+
+	val *= imx290->vmax - 2;
+	val /= ctrl->maximum;
+
+	if (val == 0)
+		val = 1;
+
+	val  = imx290->vmax - 2 - val;
+
+	{
+		struct imx290_regval const regs[] = {
+			{ 0x3001, 0x01 },	/* reghold */
+			{ 0x3020, (val >>  0) & 0xff },
+			{ 0x3021, (val >>  8) & 0xff },
+			{ 0x3022, (val >> 16) & 0x01 },
+			{ 0x3001, 0x00 },	/* reghold */
+		};
+
+		return imx290_set_register_array(imx290, regs, ARRAY_SIZE(regs));
+	}
+}
+
+static int imx290_set_flip(struct imx290 *imx290, struct v4l2_ctrl *ctrl)
+{
+	uint8_t		msk = ctrl->id == V4L2_CID_HFLIP ? BIT(1) : BIT(0);
+	uint8_t		r3007;
+	int		rc;
+
+	mutex_lock(&imx290->lock);
+
+	r3007 = imx290->reg_3007;
+	if (ctrl->val)
+		r3007 |=  msk;
+	else
+		r3007 &= ~msk;
+
+	{
+		struct imx290_regval const regs[] = {
+			{ 0x3001, 0x01 },	/* reghold */
+			{ 0x3007, r3007 },
+			{ 0x3001, 0x00 },	/* reghold */
+		};
+
+		rc = imx290_set_register_array(imx290,
+					       regs, ARRAY_SIZE(regs));
+	}
+
+	if (rc < 0)
+		goto out;
+
+	imx290->reg_3007 = r3007;
+
+	rc = 0;
+
+out:
+	mutex_unlock(&imx290->lock);
+
+	return rc;
+}
+
 static int imx290_set_ctrl(struct v4l2_ctrl *ctrl)
 {
 	struct imx290 *imx290 = container_of(ctrl->handler,
@@ -820,6 +910,30 @@ static int imx290_set_ctrl(struct v4l2_ctrl *ctrl)
 			imx290_write_reg(imx290, IMX290_BLKLEVEL_HIGH, 0x00);
 		}
 		break;
+
+	case V4L2_CID_EXPOSURE:
+		ret = imx290_set_exposure(imx290, ctrl);
+		break;
+
+	case V4L2_CID_VFLIP:
+	case V4L2_CID_HFLIP:
+		ret = imx290_set_flip(imx290, ctrl);
+		break;
+
+	case V4L2_CID_IMX290_CG_SWITCH: {
+		uint8_t	v = ctrl->val == 0 ? 0 : BIT(4);
+
+		struct imx290_regval const regs[] = {
+			{ 0x3001, 0x01 },	/* reghold */
+			{ 0x3009, 0x01 | v, COND_50_60_FPS },
+			{ 0x3009, 0x02 | v, COND_25_30_FPS },
+			{ 0x3001, 0x00 },	/* reghold */
+		};
+
+		ret = imx290_set_register_array(imx290, regs, ARRAY_SIZE(regs));
+		break;
+	}
+
 	default:
 		ret = -EINVAL;
 		break;
@@ -1204,8 +1318,34 @@ static const struct media_entity_operations imx290_subdev_entity_ops = {
 	.link_validate = v4l2_subdev_link_validate,
 };
 
+static char const * const imx290_cg_switching_menu[] = {
+	"HCG",
+	"LCG",
+};
+
 static const struct v4l2_ctrl_config imx290_ctrls[] = {
 	{
+		.id	= V4L2_CID_IMX290_CG_SWITCH,
+		.name	= "Conversion Gain Switching",
+		.type	= V4L2_CTRL_TYPE_MENU,
+		.ops	= &imx290_ctrl_ops,
+		.qmenu	= imx290_cg_switching_menu,
+		.max	= ARRAY_SIZE(imx290_cg_switching_menu) - 1,
+	}, {
+		.name	= "hflip",
+		.id	= V4L2_CID_HFLIP,
+		.type	= V4L2_CTRL_TYPE_BOOLEAN,
+		.ops	= &imx290_ctrl_ops,
+		.step	= 1,
+		.max	= 1,
+	}, {
+		.name	= "vflip",
+		.id	= V4L2_CID_VFLIP,
+		.type	= V4L2_CTRL_TYPE_BOOLEAN,
+		.ops	= &imx290_ctrl_ops,
+		.step	= 1,
+		.max	= 1,
+	}, {
 		.id	= V4L2_CID_TEST_PATTERN,
 		.name	= "test pattern",
 		.type	= V4L2_CTRL_TYPE_MENU,
@@ -1217,6 +1357,15 @@ static const struct v4l2_ctrl_config imx290_ctrls[] = {
 		.name	= "gain",
 		.type	= V4L2_CTRL_TYPE_INTEGER,
 		.ops	= &imx290_ctrl_ops,
+		.step	= 1,
+	}, {
+		.id	= V4L2_CID_EXPOSURE,
+		.name	= "exposure",
+		.type	= V4L2_CTRL_TYPE_INTEGER,
+		.ops	= &imx290_ctrl_ops,
+		.min	= 0,
+		.max	= 10000,
+		.def	= 10000,
 		.step	= 1,
 	}, {
 		.id	= V4L2_CID_LINK_FREQ,
