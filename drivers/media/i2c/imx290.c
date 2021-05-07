@@ -1204,6 +1204,106 @@ static const struct media_entity_operations imx290_subdev_entity_ops = {
 	.link_validate = v4l2_subdev_link_validate,
 };
 
+static const struct v4l2_ctrl_config imx290_ctrls[] = {
+	{
+		.id	= V4L2_CID_TEST_PATTERN,
+		.name	= "test pattern",
+		.type	= V4L2_CTRL_TYPE_MENU,
+		.ops	= &imx290_ctrl_ops,
+		.qmenu	= imx290_test_pattern_menu,
+		.max	= ARRAY_SIZE(imx290_test_pattern_menu) - 1,
+	}, {
+		.id	= V4L2_CID_GAIN,
+		.name	= "gain",
+		.type	= V4L2_CTRL_TYPE_INTEGER,
+		.ops	= &imx290_ctrl_ops,
+		.step	= 1,
+	}, {
+		.id	= V4L2_CID_LINK_FREQ,
+		.name	= "link freq",
+		.type	= V4L2_CTRL_TYPE_INTEGER_MENU,
+		.ops	= &imx290_ctrl_ops,
+		.flags	= V4L2_CTRL_FLAG_READ_ONLY,
+	}, {
+		.id	= V4L2_CID_PIXEL_RATE,
+		.name	= "pixel rate",
+		.type	= V4L2_CTRL_TYPE_INTEGER64,
+		.ops	= &imx290_ctrl_ops,
+		.flags	= V4L2_CTRL_FLAG_READ_ONLY,
+		.min	= 0,
+		.max	= INT_MAX,
+		.step	= 1,
+	},
+};
+
+static int imx290_init_ctrls(struct imx290 *imx290,
+			     struct imx290_driver_data const *drv_data)
+{
+	struct device *dev = imx290->dev;
+	int ret;
+	struct v4l2_ctrl_handler *hdl;
+	size_t i;
+	struct v4l2_ctrl_config tmp_config;
+
+	v4l2_ctrl_handler_init(&imx290->ctrls, ARRAY_SIZE(imx290_ctrls));
+
+	hdl = &imx290->ctrls;
+
+	for (i = 0; i < ARRAY_SIZE(imx290_ctrls); ++i) {
+		const struct v4l2_ctrl_config *config = &imx290_ctrls[i];
+		struct v4l2_ctrl **res_ctrl = NULL;
+		struct v4l2_ctrl *ctrl;
+
+		switch (config->id) {
+		case V4L2_CID_GAIN:
+			tmp_config = *config;
+			tmp_config.max = drv_data->max_gain;
+			config = &tmp_config;
+			break;
+
+		case V4L2_CID_LINK_FREQ:
+			tmp_config = *config;
+			tmp_config.qmenu_int = imx290_link_freqs_ptr(imx290);
+			tmp_config.max = imx290_link_freqs_num(imx290) - 1;
+			config = &tmp_config;
+			res_ctrl = &imx290->link_freq;
+			break;
+
+		case V4L2_CID_PIXEL_RATE:
+			tmp_config = *config;
+			tmp_config.def = imx290_calc_pixel_rate(imx290);
+			config = &tmp_config;
+			res_ctrl = &imx290->pixel_rate;
+			break;
+
+		default:
+			break;
+		}
+
+		ctrl = v4l2_ctrl_new_custom(hdl, config, NULL);
+		ret = imx290->ctrls.error;
+		if (ret) {
+			dev_err(dev, "initialization error of control '%s': %d\n",
+				config->name, ret);
+
+			v4l2_ctrl_handler_free(&imx290->ctrls);
+			goto out;
+		}
+
+		if (res_ctrl) {
+			WARN_ON(!ctrl);
+			*res_ctrl = ctrl;
+		}
+	}
+
+	imx290->sd.ctrl_handler = hdl;
+
+	ret = 0;
+
+out:
+	return ret;
+}
+
 /*
  * Returns 0 if all link frequencies used by the driver for the given number
  * of MIPI data lanes are mentioned in the device tree, or the value of the
@@ -1265,6 +1365,8 @@ static int imx290_probe(struct i2c_client *client)
 		dev_err(dev, "Endpoint node not found\n");
 		return -EINVAL;
 	}
+
+	mutex_init(&imx290->lock);
 
 	ret = v4l2_fwnode_endpoint_alloc_parse(endpoint, &ep);
 	fwnode_handle_put(endpoint);
@@ -1355,8 +1457,6 @@ static int imx290_probe(struct i2c_client *client)
 		goto free_err;
 	}
 
-	mutex_init(&imx290->lock);
-
 	/*
 	 * Initialize the frame format. In particular, imx290->current_mode
 	 * and imx290->bpp are set to defaults: imx290_calc_pixel_rate() call
@@ -1364,37 +1464,9 @@ static int imx290_probe(struct i2c_client *client)
 	 */
 	imx290_entity_init_cfg(&imx290->sd, NULL);
 
-	v4l2_ctrl_handler_init(&imx290->ctrls, 4);
-
-	v4l2_ctrl_new_std(&imx290->ctrls, &imx290_ctrl_ops,
-			  V4L2_CID_GAIN, 0, 72, 1, 0);
-
-	imx290->link_freq =
-		v4l2_ctrl_new_int_menu(&imx290->ctrls, &imx290_ctrl_ops,
-				       V4L2_CID_LINK_FREQ,
-				       imx290_link_freqs_num(imx290) - 1, 0,
-				       imx290_link_freqs_ptr(imx290));
-	if (imx290->link_freq)
-		imx290->link_freq->flags |= V4L2_CTRL_FLAG_READ_ONLY;
-
-	imx290->pixel_rate = v4l2_ctrl_new_std(&imx290->ctrls, &imx290_ctrl_ops,
-					       V4L2_CID_PIXEL_RATE,
-					       1, INT_MAX, 1,
-					       imx290_calc_pixel_rate(imx290));
-
-	v4l2_ctrl_new_std_menu_items(&imx290->ctrls, &imx290_ctrl_ops,
-				     V4L2_CID_TEST_PATTERN,
-				     ARRAY_SIZE(imx290_test_pattern_menu) - 1,
-				     0, 0, imx290_test_pattern_menu);
-
-	imx290->sd.ctrl_handler = &imx290->ctrls;
-
-	if (imx290->ctrls.error) {
-		dev_err(dev, "Control initialization error %d\n",
-			imx290->ctrls.error);
-		ret = imx290->ctrls.error;
-		goto free_ctrl;
-	}
+	ret = imx290_init_ctrls(imx290, drv_data);
+	if (ret <  0)
+		goto free_err;
 
 	v4l2_i2c_subdev_init(&imx290->sd, client, &imx290_subdev_ops);
 	imx290->sd.flags |= V4L2_SUBDEV_FL_HAS_DEVNODE;
@@ -1434,8 +1506,8 @@ free_entity:
 	media_entity_cleanup(&imx290->sd.entity);
 free_ctrl:
 	v4l2_ctrl_handler_free(&imx290->ctrls);
-	mutex_destroy(&imx290->lock);
 free_err:
+	mutex_destroy(&imx290->lock);
 	v4l2_fwnode_endpoint_free(&ep);
 
 	return ret;
