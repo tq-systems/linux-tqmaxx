@@ -419,6 +419,20 @@ static const struct imx290_regval imx290_720p_settings[] = {
 	{ 0x3455, 0x00, COND_50_60_FPS | COND_4_LANES },
 };
 
+static const struct imx290_regval imx290_poweron_settings[] = {
+	{ 0x3000, 0x01 },
+	{ 0x3001, 0x00 },
+	{ 0x3002, 0x01 },
+
+	/* physical-lane-num */
+	{ 0x3407, 0x01, COND_2_LANES },
+	{ 0x3407, 0x03, COND_4_LANES },
+
+	/* csi-lane-num */
+	{ 0x3443, 0x01, COND_2_LANES },
+	{ 0x3443, 0x03, COND_4_LANES },
+};
+
 /* The red "Set to" values in reference manual v0.5.0 (2018-07-22) */
 static const struct imx290_regval imx290_model_290_settings[] = {
 	{ 0x300f, 0x00 },
@@ -1110,6 +1124,11 @@ static int imx290_power_on(struct device *dev)
 	usleep_range(1, 2);
 	gpiod_set_value_cansleep(imx290->rst_gpio, 0);
 	usleep_range(30000, 31000);
+
+	ret = imx290_set_register_array(imx290, imx290_poweron_settings,
+						ARRAY_SIZE(imx290_poweron_settings));
+	if (ret < 0)
+		goto err_regulator;
 
 	switch (imx290->type) {
 	case IMX290_TYPE_290:
