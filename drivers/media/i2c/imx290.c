@@ -117,6 +117,9 @@ struct imx290 {
 	struct v4l2_ctrl *link_freq;
 	struct v4l2_ctrl *pixel_rate;
 
+	uint8_t reg_3007;
+	unsigned int vmax;
+
 	struct mutex lock;
 };
 
@@ -1152,6 +1155,20 @@ static int imx290_start_streaming(struct imx290 *imx290)
 		dev_err(imx290->dev, "Could not set current mode\n");
 		return ret;
 	}
+
+	mutex_lock(&imx290->lock);
+	imx290->reg_3007 &= ~(7 << 4);	/* mask out WINMODE */
+	imx290->reg_3007 |= imx290_get_winmode(imx290);
+
+	/*
+	 * TODO: solve this somehow else... vmax can be changed but modifies
+	 * frame rate in turn
+	 */
+	if (imx290->current_mode->height == 1080)
+		imx290->vmax = 1125;
+	else
+		imx290->vmax =  750;
+	mutex_unlock(&imx290->lock);
 
 	/* Apply customized values from user */
 	ret = v4l2_ctrl_handler_setup(imx290->sd.ctrl_handler);
