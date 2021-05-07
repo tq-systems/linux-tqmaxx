@@ -1728,15 +1728,17 @@ static int imx290_probe(struct i2c_client *client)
 
 	ret = imx290_get_regulators(dev, imx290);
 	if (ret < 0) {
-		dev_err(dev, "Cannot get regulators\n");
+		if (ret != -EPROBE_DEFER)
+			dev_err(dev, "Cannot get regulators\n");
 		goto free_err;
 	}
 
 	imx290->rst_gpio = devm_gpiod_get_optional(dev, "reset",
 						   GPIOD_OUT_HIGH);
 	if (IS_ERR(imx290->rst_gpio)) {
-		dev_err(dev, "Cannot get reset gpio\n");
 		ret = PTR_ERR(imx290->rst_gpio);
+		if (ret != -EPROBE_DEFER)
+			dev_err(dev, "Cannot get reset gpio\n");
 		goto free_err;
 	}
 
