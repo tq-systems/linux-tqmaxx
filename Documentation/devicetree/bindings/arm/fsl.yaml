@@ -318,8 +318,11 @@ properties:
         items:
           - enum:
               - tq,imx8qxp-mb-smarc-2     # TQ Systems GmbH TQMa8QXPS SOM on MB-SMARC-2
+              - tq,imx8dxp-mb-smarc-2     # TQ Systems GmbH TQMa8DXPS SOM on MB-SMARC-2
           - const: tq,imx8qxp-tqma8xqps   # TQ Systems GmbH TQMa8XQPS SOM
+          - const: tq,imx8dxp-tqma8xdps   # TQ Systems GmbH TQMa8XDPS SOM
           - const: fsl,imx8qxp
+          - const: fsl,imx8dxp
 
       - description:
           Freescale Vybrid Platform Device Tree Bindings
