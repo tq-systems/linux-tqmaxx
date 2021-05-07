@@ -125,6 +125,7 @@ struct imx290_pixfmt {
 
 struct imx290_driver_data {
 	enum imx290_type type;
+	unsigned int max_gain;
 };
 
 static const struct imx290_pixfmt imx290_formats[] = {
@@ -1461,10 +1462,12 @@ static int imx290_remove(struct i2c_client *client)
 
 static const struct imx290_driver_data ixm290_driver_data_imx290 = {
 	.type		= IMX290_TYPE_290,
+	.max_gain	= 240,
 };
 
 static const struct imx290_driver_data ixm290_driver_data_imx327 = {
 	.type		= IMX290_TYPE_327,
+	.max_gain	= 230,
 };
 
 static const struct of_device_id imx290_of_match[] = {
