@@ -39,6 +39,13 @@
 		id-gpio = <&gpio1 10 GPIO_ACTIVE_HIGH>;
 	};
 
+	fan0: pwm-fan {
+		compatible = "pwm-fan";
+		#cooling-cells = <2>;
+		pwms = <&pwm3 0 10000 0>;
+		cooling-levels = <0 102 170 230>;
+	};
+
 	gpio-keys {
 		compatible = "gpio-keys";
 		pinctrl-names = "default";
@@ -178,6 +185,17 @@
 		model = "tqm-tlv320aic32";
 		ssi-controller = <&sai2>;
 		audio-codec = <&codec>;
+	};
+
+	thermal-zones {
+		soc-thermal {
+			cooling-maps {
+				map0 {
+					trip = <&soc_alert0>;
+					cooling-device = <&fan0 0 1>;
+				};
+			};
+		};
 	};
 };
 
@@ -332,6 +350,20 @@
 	};
 };
 
+&gpio4 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_gpio4>;
+
+	gpio-line-names = "ENET1_RST#", "", "ENET0_RST#", "",
+			  "", "", "", "",
+			  "", "", "", "",
+			  "", "", "", "",
+			  "", "", "", "",
+			  "HDMI_OC#", "", "", "",
+			  "", "", "", "",
+			  "", "", "", "";
+};
+
 &gpio5 {
 	gpio-line-names = "", "", "", "LED2",
 			  "LED1", "LED0", "", "",
@@ -432,7 +464,7 @@
 &pwm3 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pwm3>;
-	status = "disabled";
+	status = "okay";
 };
 
 &pwm4 {
@@ -692,6 +724,25 @@
 			MX8MP_IOMUXC_GPIO1_IO09__GPIO1_IO09	0x180
 			MX8MP_IOMUXC_GPIO1_IO14__GPIO1_IO14	0x180
 			MX8MP_IOMUXC_GPIO1_IO15__GPIO1_IO15	0x180
+		>;
+	};
+
+	pinctrl_gpio4: gpio4grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SAI1_MCLK__GPIO4_IO20	0x180
+		>;
+	};
+
+	pinctrl_gpt1: gpt1grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_UART3_RXD__GPT1_CAPTURE2	0x14
+			MX8MP_IOMUXC_UART3_TXD__GPT1_CLK	0x14
+		>;
+	};
+
+	pinctrl_gpt2: gpt2grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_I2C3_SCL__GPT2_CLK		0x14
 		>;
 	};
 
