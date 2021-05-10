@@ -186,6 +186,51 @@
 	status = "okay";
 };
 
+&ecspi1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_ecspi1>;
+	cs-gpios = <&gpio5 9 GPIO_ACTIVE_LOW>;
+	fsl,spi-num-chipselects = <1>;
+	num-cs = <1>;
+	status = "okay";
+
+	spidev1_0: spidev@0 {
+		reg = <0>;
+		compatible = "tq,testdev";
+		spi-max-frequency = <5000000>;
+	};
+};
+
+&ecspi2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_ecspi2>;
+	cs-gpios = <&gpio5 13 GPIO_ACTIVE_LOW>;
+	fsl,spi-num-chipselects = <1>;
+	num-cs = <1>;
+	status = "okay";
+
+	spidev2_0: spidev@0 {
+		reg = <0>;
+		compatible = "tq,testdev";
+		spi-max-frequency = <5000000>;
+	};
+};
+
+&ecspi3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_ecspi3>;
+	cs-gpios = <&gpio5 25 GPIO_ACTIVE_LOW>;
+	fsl,spi-num-chipselects = <1>;
+	num-cs = <1>;
+	status = "okay";
+
+	spidev3_0: spidev@0 {
+		reg = <0>;
+		compatible = "tq,testdev";
+		spi-max-frequency = <5000000>;
+	};
+};
+
 &eqos {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_eqos>;
@@ -290,10 +335,10 @@
 &gpio5 {
 	gpio-line-names = "", "", "", "LED2",
 			  "LED1", "LED0", "", "",
+			  "", "ECSPI1_SS0", "", "",
+			  "", "ECSPI2_SS0", "", "",
 			  "", "", "", "",
-			  "", "", "", "",
-			  "", "", "", "",
-			  "", "", "", "",
+			  "ECSPI3_S0", "", "", "",
 			  "", "", "SWITCH_A", "SWITCH_B",
 			  "", "", "", "";
 };
@@ -544,6 +589,33 @@
 		fsl,pins = <
 			MX8MP_IOMUXC_SAI5_RXD3__CAN2_TX	0x150
 			MX8MP_IOMUXC_SAI5_MCLK__CAN2_RX	0x150
+		>;
+	};
+
+	pinctrl_ecspi1: ecspi1grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_ECSPI1_MISO__ECSPI1_MISO	0x1c0
+			MX8MP_IOMUXC_ECSPI1_MOSI__ECSPI1_MOSI	0x1c0
+			MX8MP_IOMUXC_ECSPI1_SCLK__ECSPI1_SCLK	0x1c0
+			MX8MP_IOMUXC_ECSPI1_SS0__GPIO5_IO09	0x1c0
+		>;
+	};
+
+	pinctrl_ecspi2: ecspi2grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_ECSPI2_MISO__ECSPI2_MISO	0x1c0
+			MX8MP_IOMUXC_ECSPI2_MOSI__ECSPI2_MOSI	0x1c0
+			MX8MP_IOMUXC_ECSPI2_SCLK__ECSPI2_SCLK	0x1c0
+			MX8MP_IOMUXC_ECSPI2_SS0__GPIO5_IO13	0x1c0
+		>;
+	};
+
+	pinctrl_ecspi3: ecspi3grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_UART1_TXD__ECSPI3_MOSI	0x1c0
+			MX8MP_IOMUXC_UART1_RXD__ECSPI3_SCLK	0x1c0
+			MX8MP_IOMUXC_UART2_RXD__ECSPI3_MISO	0x1c0
+			MX8MP_IOMUXC_UART2_TXD__GPIO5_IO25	0x1c0
 		>;
 	};
 
