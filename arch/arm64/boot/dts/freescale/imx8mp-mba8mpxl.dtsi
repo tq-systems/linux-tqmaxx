@@ -380,8 +380,20 @@
 
 &pwm2 {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_blpwm>;
+	pinctrl-0 = <&pinctrl_pwm2>;
 	status = "disabled";
+};
+
+&pwm3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm3>;
+	status = "disabled";
+};
+
+&pwm4 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm4>;
+	status = "okay";
 };
 
 &sai2 {
@@ -515,12 +527,6 @@
 };
 
 &iomuxc {
-	pinctrl_blpwm: blpwmgrp {
-		fsl,pins = <
-			MX8MP_IOMUXC_SAI5_RXD0__PWM2_OUT	0x14
-		>;
-	};
-
 	pinctrl_bllvds: bllvdsgrp {
 		fsl,pins = <
 			MX8MP_IOMUXC_SAI5_RXFS__GPIO3_IO19	0x14
@@ -662,6 +668,24 @@
 	pinctrl_lvdspanel: lvdspanelgrp {
 		fsl,pins = <
 			MX8MP_IOMUXC_SAI5_RXC__GPIO3_IO20	0x14
+		>;
+	};
+
+	pinctrl_pwm2: pwm2grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SAI5_RXD0__PWM2_OUT	0x14
+		>;
+	};
+
+	pinctrl_pwm3: pwm3grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_I2C3_SDA__PWM3_OUT		0x14
+		>;
+	};
+
+	pinctrl_pwm4: pwm4grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SAI3_MCLK__PWM4_OUT	0x14
 		>;
 	};
 
