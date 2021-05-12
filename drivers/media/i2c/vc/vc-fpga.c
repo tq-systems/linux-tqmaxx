@@ -320,12 +320,7 @@ static int _vc_fpga_regulator_set(struct regulator_dev *rdev, bool enable)
 	uint8_t			r100_clr;
 	uint8_t			r100_set;
 
-	trace_printk("%s(%d)\n", __func__, enable);
-
 	mutex_lock(&fpga->mode_lock);
-	trace_printk("%s(%d); r100=%02x\n", __func__, enable,
-		     fpga->shadow_r100);
-
 	if (enable) {
 		rc = _vc_fpga_write_cfg(fpga);
 		if (rc < 0)
@@ -489,8 +484,6 @@ static int vc_fpga_reset_reset(struct reset_controller_dev *rdev,
 	struct vc_fpga		*fpga = reset_to_fpga(rdev);
 	int			rc;
 
-	trace_printk("%s\n", __func__);
-
 	mutex_lock(&fpga->mode_lock);
 	rc = _vc_fpga_reset_assert(fpga);
 	if (rc < 0)
@@ -588,8 +581,6 @@ static void vc_fpga_gpioc_set(struct gpio_chip *chip,
 	struct vc_fpga			*fpga = gpioc_to_fpga(chip);
 	int				rc;
 
-	trace_printk("%s(%u, %d)\n", __func__, ofs, val);
-
 	if (WARN_ON(ofs) > 0)
 		return;
 
@@ -675,19 +666,12 @@ static int vc_fpga_init_gpio_chip(struct vc_fpga *fpga)
 	return rc;
 }
 
-#include <linux/trace_events.h>
-
 static int vc_fpga_i2c_probe(struct i2c_client *i2c,
 			     struct i2c_device_id const *devid)
 {
 	struct vc_fpga	*fpga;
 	int		rc;
 	size_t		i;
-
-	trace_printk("%s\n", __func__);
-
-	trace_set_clr_event("i2c", "i2c_reply", 1);
-	trace_set_clr_event("i2c", "i2c_write", 1);
 
 	fpga = devm_kzalloc(&i2c->dev, sizeof *fpga, GFP_KERNEL);
 	if (!fpga)
