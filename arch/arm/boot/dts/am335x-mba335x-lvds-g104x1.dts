@@ -1,0 +1,90 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Copyright (C) 2021 TQ-Systems GmbH - http://www.tq-group.com/
+ *
+ * Based on:
+ * Copyright (C) 2012 Texas Instruments Incorporated - http://www.ti.com/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+/dts-v1/;
+
+#include "am335x-tqma335x.dtsi"
+#include "am335x-mba335x.dtsi"
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/interrupt-controller/irq.h>
+#include <dt-bindings/pwm/pwm.h>
+
+/ {
+	backlight: backlight {
+		compatible = "pwm-backlight";
+
+		power-supply = <&reg_mba335x_12v>;
+		enable-gpios = <&expander1 4 GPIO_ACTIVE_HIGH>;
+
+		pwms = <&ecap2 0 50000 0>;
+		brightness-levels = <0 58 61 66 75 90 125 170 255>;
+		default-brightness-level = <7>;
+	};
+
+	panel {
+		compatible = "ti,tilcdc,panel";
+		status = "okay";
+
+		enable-gpios = <&expander1 3 GPIO_ACTIVE_HIGH>;
+		backlight = <&backlight>;
+
+		panel-info {
+			ac-bias           = <255>;
+			ac-bias-intrpt    = <0>;
+			dma-burst-sz      = <16>;
+			bpp               = <32>;
+			fdd               = <0x80>;
+			sync-edge         = <0>;
+			sync-ctrl         = <0>;
+			raster-order      = <0>;
+			fifo-th           = <0>;
+		};
+
+		display-timings {
+			native-mode = <&chimei>;
+
+			/* CHIMEI G104X1-L04 */
+			chimei: 1024x768p60 {
+				clock-frequency = <55000000 65000000 75000000>;
+				hactive = <1024>;
+				vactive = <768>;
+				hback-porch = <10>;
+				hfront-porch = <75>;
+				vback-porch = <100>;
+				vfront-porch = <10>;
+				hsync-len = <76 255 776>;
+				vsync-len = <2 38 182>;
+				de-active = <1>;
+				hsync-active = <0>;
+				vsync-active = <0>;
+			};
+		};
+	};
+};
+
+&epwmss2 {
+	status = "okay";
+};
+
+&ecap2 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&ecap2_pins>;
+};
+
+&lcdc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&lcd_pins>;
+
+	blue-and-red-wiring = "crossed";
+
+	status = "okay";
+};
