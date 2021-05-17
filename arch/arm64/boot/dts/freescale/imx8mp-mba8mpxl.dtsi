@@ -32,6 +32,13 @@
 		stdout-path = &uart4;
 	};
 
+	edp_refclk: edp-refclk {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <26000000>;
+		status = "disabled";
+	};
+
 	extcon_usbotg: extcon-usbotg0 {
 		compatible = "linux,extcon-usb-gpio";
 		pinctrl-names = "default";
@@ -373,7 +380,7 @@
 			  "", "", "", "",
 			  "", "", "", "",
 			  "", "", "", "",
-			  "", "", "", "",
+			  "", "", "DP_IRQ", "DSI_EN",
 			  "HDMI_OC#", "", "", "",
 			  "", "", "", "",
 			  "", "", "", "";
@@ -402,6 +409,36 @@
 };
 
 &i2c1 {
+	dsi2dp: bridge@f {
+		compatible = "toshiba,tc358767";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_edpbridge>;
+		reg = <0xf>;
+		reset-gpios = <&gpio4 19 GPIO_ACTIVE_LOW>;
+		clock-names = "ref";
+		clocks = <&edp_refclk>;
+		toshiba,hpd-pin = <0>;
+
+		interrupt-names = "irq";
+		interrupt-parent = <&gpio4>;
+		interrupts = <18 IRQ_TYPE_LEVEL_HIGH>;
+
+		status = "disabled";
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+
+				tc358767_from_dsim: endpoint {
+					remote-endpoint = <&dsim_to_tc358767>;
+				};
+			};
+		};
+	};
+
 	codec: codec@18 {
 		compatible = "ti,tlv320aic32x4";
 		reg = <0x18>;
@@ -465,6 +502,15 @@
 			lvds_out: endpoint {
 				remote-endpoint = <&panel_in_lvds0>;
 			};
+		};
+	};
+};
+
+&mipi_dsi {
+	port@1 {
+		dsim_to_tc358767: endpoint {
+			remote-endpoint = <&tc358767_from_dsim>;
+			attach-bridge;
 		};
 	};
 };
@@ -687,6 +733,13 @@
 			MX8MP_IOMUXC_UART1_RXD__ECSPI3_SCLK	0x1c0
 			MX8MP_IOMUXC_UART2_RXD__ECSPI3_MISO	0x1c0
 			MX8MP_IOMUXC_UART2_TXD__GPIO5_IO25	0x1c0
+		>;
+	};
+
+	pinctrl_edpbridge: edpbridgegrp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SAI1_TXD6__GPIO4_IO18	0x1c0
+			MX8MP_IOMUXC_SAI1_TXD7__GPIO4_IO19	0x1c0
 		>;
 	};
 
