@@ -354,6 +354,17 @@
 	};
 };
 
+&gpio2 {
+	gpio-line-names = "", "", "", "",
+			  "", "", "", "",
+			  "", "", "", "",
+			  "USDHC2_CD", "", "", "",
+			  "", "", "", "",
+			  "", "", "", "",
+			  "", "", "", "",
+			  "", "", "", "";
+};
+
 &gpio4 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_gpio4>;
@@ -369,6 +380,9 @@
 };
 
 &gpio5 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_gpio5>;
+
 	gpio-line-names = "", "", "", "LED2",
 			  "LED1", "LED0", "", "",
 			  "", "ECSPI1_SS0", "", "",
@@ -755,6 +769,26 @@
 	pinctrl_gpio4: gpio4grp {
 		fsl,pins = <
 			MX8MP_IOMUXC_SAI1_MCLK__GPIO4_IO20	0x180
+
+			MX8MP_IOMUXC_SAI2_RXFS__GPIO4_IO21	0x180
+			MX8MP_IOMUXC_SAI2_RXC__GPIO4_IO22	0x180
+			MX8MP_IOMUXC_SAI2_RXD0__GPIO4_IO23	0x180
+			MX8MP_IOMUXC_SAI2_TXFS__GPIO4_IO24	0x180
+			MX8MP_IOMUXC_SAI2_TXC__GPIO4_IO25	0x180
+			MX8MP_IOMUXC_SAI2_TXD0__GPIO4_IO26	0x180
+			MX8MP_IOMUXC_SAI2_MCLK__GPIO4_IO27	0x180
+
+			MX8MP_IOMUXC_SAI3_RXFS__GPIO4_IO28	0x180
+			MX8MP_IOMUXC_SAI3_RXC__GPIO4_IO29	0x180
+			MX8MP_IOMUXC_SAI3_RXD__GPIO4_IO30	0x180
+			MX8MP_IOMUXC_SAI3_TXFS__GPIO4_IO31	0x180
+		>;
+	};
+
+	pinctrl_gpio5: gpio5grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SAI3_TXC__GPIO5_IO00	0x180
+			MX8MP_IOMUXC_SAI3_TXD__GPIO5_IO01	0x180
 		>;
 	};
 
