@@ -688,6 +688,18 @@
 	status = "okay";
 };
 
+&mipi_csi_0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_mipicsi0>;
+	status = "disabled";
+};
+
+&mipi_csi_1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_mipicsi1>;
+	status = "disabled";
+};
+
 &iomuxc {
 	pinctrl_bllvds: bllvdsgrp {
 		fsl,pins = <
@@ -903,6 +915,32 @@
 	pinctrl_lvdspanel: lvdspanelgrp {
 		fsl,pins = <
 			MX8MP_IOMUXC_SAI5_RXC__GPIO3_IO20	0x14
+		>;
+	};
+
+	pinctrl_mipicsi0: mipicsi0grp {
+		fsl,pins = <
+			/* TRIGGER */
+			MX8MP_IOMUXC_ECSPI1_MISO__GPIO5_IO08	0x1c0
+			/* SYNC */
+			MX8MP_IOMUXC_ECSPI1_MOSI__GPIO5_IO07	0x1c0
+			/* RESET# */
+			MX8MP_IOMUXC_ECSPI1_SCLK__GPIO5_IO06	0x1c0
+			/* ENABLE */
+			MX8MP_IOMUXC_ECSPI1_SS0__GPIO5_IO09	0x1c0
+		>;
+	};
+
+	pinctrl_mipicsi1: mipicsi1grp {
+		fsl,pins = <
+			/* TRIGGER */
+			MX8MP_IOMUXC_ECSPI2_MISO__GPIO5_IO12	0x1c0
+			/* SYNC */
+			MX8MP_IOMUXC_ECSPI2_MOSI__GPIO5_IO11	0x1c0
+			/* RESET# */
+			MX8MP_IOMUXC_ECSPI2_SCLK__GPIO5_IO10	0x1c0
+			/* ENABLE */
+			MX8MP_IOMUXC_ECSPI2_SS0__GPIO5_IO13	0x1c0
 		>;
 	};
 
