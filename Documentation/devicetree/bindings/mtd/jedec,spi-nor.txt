@@ -84,6 +84,12 @@ Optional properties:
 		   initialisation to prevent violating the electrical limits
 		   of host cpu SPI data input line[s]. For the exact values see
 		   data sheets of the used flash.
+- micron,dsr : Micron chips support changing the drive strength via enhanced
+		   volatile configuration register (EVCR) bits. This u32
+		   property allows setting the field in the EVCR during flash
+		   initialisation to prevent violating the electrical limits
+		   of host cpu SPI data input line[s]. For the exact values see
+		   data sheets of the used flash.
 
 Example:
 
