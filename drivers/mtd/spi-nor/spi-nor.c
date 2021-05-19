@@ -1813,6 +1813,87 @@ static void macronix_init_dsr(struct spi_nor *nor)
 	}
 }
 
+/*
+ * Read Micron enhanced volatile configuration register
+ * Return negative if error occurred or configuration register value
+ */
+static int micron_read_evcr(struct spi_nor *nor)
+{
+	int ret;
+
+	if (nor->spimem) {
+		struct spi_mem_op op =
+			SPI_MEM_OP(SPI_MEM_OP_CMD(SPINOR_OP_RD_EVCR, 1),
+				   SPI_MEM_OP_NO_ADDR,
+				   SPI_MEM_OP_NO_DUMMY,
+				   SPI_MEM_OP_DATA_IN(1, nor->bouncebuf, 1));
+
+		ret = spi_mem_exec_op(nor->spimem, &op);
+	} else {
+		ret = nor->read_reg(nor, SPINOR_OP_RD_EVCR, nor->bouncebuf, 1);
+	}
+
+	if (ret < 0) {
+		dev_err(nor->dev, "error %d reading EVCR\n", ret);
+		return ret;
+	}
+
+	return nor->bouncebuf[0];
+}
+
+/*
+ * Write Micron enhanced volatile configuration register
+ * Return negative if error occurred or configuration register value
+ */
+static int micron_write_evcr(struct spi_nor *nor, u8 evcr)
+{
+	nor->bouncebuf[0] = evcr;
+
+	write_enable(nor);
+
+	if (nor->spimem) {
+		struct spi_mem_op op =
+			SPI_MEM_OP(SPI_MEM_OP_CMD(SPINOR_OP_WD_EVCR, 1),
+				   SPI_MEM_OP_NO_ADDR,
+				   SPI_MEM_OP_NO_DUMMY,
+				   SPI_MEM_OP_DATA_OUT(1, nor->bouncebuf, 1));
+
+		return spi_mem_exec_op(nor->spimem, &op);
+	}
+
+	return nor->write_reg(nor, SPINOR_OP_WD_EVCR, nor->bouncebuf, 1);
+}
+
+static void micron_init_dsr(struct spi_nor *nor)
+{
+	struct device_node *np = spi_nor_get_flash_node(nor);
+	u32 val = 0x7;
+	int evcrr;
+	u8 evcr;
+
+	/*
+	 * read from DT, if we should change the DSR value.
+	 * If yes, RMW the EVCR register. Bit[2:0] is the DSR mask
+	 * in all Micron SPI NOR we've seen
+	 */
+	if (!of_property_read_u32(np, "micron,dsr", &val)) {
+		if (val < 0x8) {
+			evcrr = micron_read_evcr(nor);
+			if (evcrr >= 0) {
+				evcr = (u8)(evcrr & 0xf8) | (u8)val;
+				micron_write_evcr(nor, evcr);
+				dev_info(nor->dev, "%s: EVCR %x\n", __func__,
+					 (u32)micron_read_evcr(nor));
+			} else {
+				dev_dbg(nor->dev, "read EVCR failed %d\n",
+					evcrr);
+			}
+		} else {
+			dev_warn(nor->dev, "invalid DSR %x in dt\n", val);
+		}
+	}
+}
+
 /**
  * spansion_quad_enable() - set QE bit in Configuraiton Register.
  * @nor:	pointer to a 'struct spi_nor'
@@ -4767,6 +4848,12 @@ static int spi_nor_init(struct spi_nor *nor)
 
 	if (JEDEC_MFR(nor->info) == SNOR_MFR_MACRONIX)
 		macronix_init_dsr(nor);
+	/*
+	 * Micron flashes uses to show ST Micro ID, since TT's flash business
+	 * was acquired by micron some years ago. See also spi_nor_ids above
+	 */
+	else if (JEDEC_MFR(nor->info) == SNOR_MFR_ST)
+		micron_init_dsr(nor);
 
 	if (nor->clear_sr_bp) {
 		if (nor->params.quad_enable == spansion_quad_enable)
