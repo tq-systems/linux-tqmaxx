@@ -53,6 +53,8 @@
 		spi-rx-bus-width = <4>;
 		/* used for macronix flash only */
 		macronix,dsr = <0x3>;
+		/* used for micron flash only */
+		micron,dsr = <0x3>;
 	};
 };
 
