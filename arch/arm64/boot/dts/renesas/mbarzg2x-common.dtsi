@@ -321,6 +321,14 @@
 
 };
 
+&i2c6 {
+	pinctrl-0 = <&i2c6_pins>;
+	pinctrl-names = "default";
+
+	clock-frequency = <400000>;
+	status = "okay";
+};
+
 &ohci0 {
 	status = "okay";
 };
