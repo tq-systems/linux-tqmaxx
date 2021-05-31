@@ -590,6 +590,7 @@
 	pinctrl-0 = <&pinctrl_uart1>;
 	assigned-clocks = <&clk IMX8MP_CLK_UART1>;
 	assigned-clock-parents = <&clk IMX8MP_SYS_PLL1_80M>;
+	fsl,dte-mode;
 	status = "okay";
 };
 
@@ -599,6 +600,7 @@
 	assigned-clocks = <&clk IMX8MP_CLK_UART2>;
 	assigned-clock-parents = <&clk IMX8MP_SYS_PLL1_80M>;
 	fsl,uart-has-rtscts;
+	fsl,dte-mode;
 	status = "okay";
 };
 
@@ -608,6 +610,7 @@
 	assigned-clocks = <&clk IMX8MP_CLK_UART3>;
 	assigned-clock-parents = <&clk IMX8MP_SYS_PLL1_80M>;
 	fsl,uart-has-rtscts;
+	fsl,dte-mode;
 	status = "okay";
 };
 
