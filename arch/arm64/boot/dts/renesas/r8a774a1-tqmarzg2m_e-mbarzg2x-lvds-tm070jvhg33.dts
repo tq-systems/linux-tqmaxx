@@ -1,9 +1,9 @@
-// SPDX-License-Identifier: GPL-2.0
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
 /*
  * Device Tree Source for the TQMaRZG2M-E on a MBaRZG2X
  * with a TM070VJHG33 LVDS panel
  *
- * Copyright (C) 2020 TQ-Systems GmbH
+ * Copyright (C) 2021 TQ-Systems GmbH
  */
 
 #include <dt-bindings/gpio/gpio.h>
