@@ -1,0 +1,88 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Copyright 2021 TQ-Systems GmbH
+ */
+
+/ {
+	reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		vdev0vring0: vdev0vring0@55000000 {
+			compatible = "shared-dma-pool";
+			reg = <0 0x55000000 0 0x8000>;
+			no-map;
+		};
+
+		vdev0vring1: vdev0vring1@55008000 {
+			compatible = "shared-dma-pool";
+			reg = <0 0x55008000 0 0x8000>;
+			no-map;
+		};
+
+		vdevbuffer: vdevbuffer@55400000 {
+			compatible = "shared-dma-pool";
+			reg = <0 0x55400000 0 0x100000>;
+			no-map;
+		};
+
+		rsc-table {
+			reg = <0 0x550ff000 0 0x1000>;
+			no-map;
+		};
+
+		/* TODO: actually no kwown, why this is needed */
+		rpmsg_reserved: rpmsg@0x55800000 {
+			no-map;
+			reg = <0 0x55800000 0 0x800000>;
+		};
+
+		/*
+		 * TODO: needed for M7 to run from DDR, must match linker
+		 * settings for M7
+		 */
+		m7_reserved: m7@0x80000000 {
+			no-map;
+			reg = <0 0x80000000 0 0x1000000>;
+		};
+	};
+
+	imx8mp-cm7 {
+		compatible = "fsl,imx8mn-cm7";
+		/* TODO: should we use rsc-table address here? */
+		rsc-da = <0x55000000>;
+		clocks = <&clk IMX8MP_CLK_M7_DIV>;
+		mbox-names = "tx", "rx", "rxdb";
+		mboxes = <&mu 0 1
+			  &mu 1 1
+			  &mu 3 1>;
+		memory-region = <&vdev0vring0>, <&vdev0vring1>, <&vdevbuffer>;
+		status = "okay";
+	};
+};
+
+/*
+ * TODO: this seems to be the old rpmsg based implementation still present
+ * in CPU part of dtb. We use the new remoteproc based implementation,
+ * so disable the node.
+ */
+&rpmsg{
+	/*
+	 * 64K for one rpmsg instance:
+	 * --0x55000000~0x5500ffff: pingpong
+	 */
+	vdev-nums = <1>;
+	reg = <0x0 0x55000000 0x0 0x10000>;
+	memory-region = <&vdevbuffer>;
+	status = "disabled";
+};
+
+/*
+ * ATTENTION: M7 may use IPs SPI, CAN, GPIO, GPT, I2C, I2S3, UART,
+ * PWM, SDMA1/SDMA2. These needs to be disabled to prevent resource conflicts
+ */
+&uart3 {
+	status = "disabled";
+};
+

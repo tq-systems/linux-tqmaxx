@@ -128,7 +128,7 @@
 
 /*
  *		Memory reserved for optee usage. Please do not use.
- *		This will be automaticky added to dtb if OP-TEE is installed.
+ *		This will be automatically added to dtb if OP-TEE is installed.
  *		optee@56000000 {
  *			reg = <0 0x56000000 0 0x2000000>;
  *			no-map;
