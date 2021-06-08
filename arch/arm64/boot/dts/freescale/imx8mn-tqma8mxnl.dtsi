@@ -360,6 +360,7 @@
 
 	eeprom1: eeprom@53 {
 		compatible = "nxp,se97b", "atmel,24c02";
+		read-only;
 		reg = <0x53>;
 		pagesize = <16>;
 	};
