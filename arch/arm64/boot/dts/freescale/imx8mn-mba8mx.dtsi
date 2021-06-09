@@ -538,7 +538,6 @@
 		<&clk IMX8MN_CLK_DUMMY>, <&clk IMX8MN_AUDIO_PLL1_OUT>,
 		<&clk IMX8MN_AUDIO_PLL2_OUT>;
 	clock-names = "bus", "mclk0", "mclk1", "mclk2", "mclk3", "pll8k", "pll11k";
-	fsl,sai-asynchronous;
 	status = "okay";
 };
 
