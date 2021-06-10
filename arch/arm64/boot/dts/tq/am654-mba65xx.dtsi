@@ -48,6 +48,17 @@
 		};
 	};
 
+	leds {
+		compatible = "gpio-leds";
+		led0 {
+			gpios = <&pca9555_D24 11 GPIO_ACTIVE_LOW>;
+		};
+
+		led1 {
+			gpios = <&pca9555_D25 14 GPIO_ACTIVE_HIGH>;
+		};
+	};
+
 	clk_ov5640_fixed: fixed-clock-ov5640 {
 		compatible = "fixed-clock";
 		#clock-cells = <0>;
