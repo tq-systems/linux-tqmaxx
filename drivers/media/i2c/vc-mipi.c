@@ -173,7 +173,8 @@ static const struct regmap_config vc_mipi_regmap_config = {
 static int vc_mipi_i2c_probe(struct i2c_client *i2c)
 {
 	struct vc_mipi_ctrl *ctrl;
-	char data[12];
+	unsigned int val;
+	char data[0xa7];
 	int ret;
 
 	ctrl = devm_kzalloc(&i2c->dev, sizeof(*ctrl), GFP_KERNEL);
@@ -211,13 +212,23 @@ static int vc_mipi_i2c_probe(struct i2c_client *i2c)
 		goto error;
 	}
 
-	if (memcmp(data, "mmipi-module", sizeof(data))) {
+	if (memcmp(data+1, "mipi-module", 12)) {
 		dev_err(ctrl->dev, "Invalid ROM magic value\n");
 		print_hex_dump(KERN_INFO, "rom: ", DUMP_PREFIX_OFFSET, 16, 1,
 			       data, sizeof(data), true);
 		ret = -EINVAL;
 		goto error;
 	}
+
+	print_hex_dump(KERN_INFO, "rom: ", DUMP_PREFIX_OFFSET, 16, 1, data+1, sizeof(data)-1, true);
+
+	ret = regmap_read(ctrl->regmap, VC_MIPI_REG_SENSOR_ADDR, &val);
+	if (ret < 0) {
+		dev_err(ctrl->dev, "Failed to read sensor address: %d\n", ret);
+		return ret;
+	}
+
+	dev_info(ctrl->dev, "%s: sensor address 0x%02x\n", __func__, val);
 
 	ret = vc_mipi_regulator_init(ctrl);
 	if (ret < 0) {
