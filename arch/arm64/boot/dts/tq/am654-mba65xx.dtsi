@@ -25,7 +25,8 @@
 	};
 
 	gpio-keys {
-		compatible = "gpio-keys";
+		compatible = "gpio-keys-polled";
+		poll-interval = <100>;
 		autorepeat;
 		pinctrl-names = "default";
 		pinctrl-0 = <&push_button_pins_default>;
