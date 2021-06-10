@@ -69,18 +69,6 @@
 	cpu-supply = <&buck2_reg>;
 };
 
-&A53_1 {
-	cpu-supply = <&buck2_reg>;
-};
-
-&A53_2 {
-	cpu-supply = <&buck2_reg>;
-};
-
-&A53_3 {
-	cpu-supply = <&buck2_reg>;
-};
-
 &gpu {
 	status = "okay";
 };
