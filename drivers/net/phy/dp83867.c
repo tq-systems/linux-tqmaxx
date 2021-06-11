@@ -22,6 +22,7 @@
 #define MII_DP83867_MICR	0x12
 #define MII_DP83867_ISR		0x13
 #define DP83867_CTRL		0x1f
+#define DP83867_CFG1		0x09
 #define DP83867_CFG3		0x1e
 
 /* Extended Registers */
@@ -100,6 +101,9 @@
 #define DP83867_IO_MUX_CFG_CLK_O_SEL_MASK	(0x1f << 8)
 #define DP83867_IO_MUX_CFG_CLK_O_SEL_SHIFT	8
 
+#define DP83867_CFG1_MASTER_CONFIG_EN		BIT(12)
+#define DP83867_CFG1_MASTER_SETTING		BIT(11)
+
 /* CFG3 bits */
 #define DP83867_CFG3_INT_OE			BIT(7)
 #define DP83867_CFG3_ROBUST_AUTO_MDIX		BIT(9)
@@ -126,6 +130,7 @@ struct dp83867_private {
 	bool set_clk_output;
 	u32 clk_output_sel;
 	bool sgmii_ref_clk_en;
+	bool force_master;
 };
 
 static int dp83867_ack_interrupt(struct phy_device *phydev)
@@ -287,6 +292,12 @@ static int dp83867_of_init(struct phy_device *phydev)
 			   dp83867->fifo_depth);
 		return -EINVAL;
 	}
+
+	if (of_property_read_bool(of_node, "ti,force-master"))
+		dp83867->force_master = true;
+	else
+		dp83867->force_master = false;
+
 	return 0;
 }
 #else
@@ -461,6 +472,14 @@ static int dp83867_config_init(struct phy_device *phydev)
 
 		phy_modify_mmd(phydev, DP83867_DEVADDR, DP83867_IO_MUX_CFG,
 			       mask, val);
+	}
+
+	if (dp83867->force_master) {
+		phydev_info(phydev, "Force gigabit master mode\n");
+		val = phy_read(phydev, DP83867_CFG1);
+		val |= DP83867_CFG1_MASTER_CONFIG_EN |
+			DP83867_CFG1_MASTER_SETTING;
+		phy_write(phydev, DP83867_CFG1, val);
 	}
 
 	return 0;
