@@ -29,6 +29,15 @@
 
 #define VC_MIPI_REG_ROM				0x1000
 
+struct vc_mipi_ctrl {
+	struct device *dev;
+	struct regmap *regmap;
+};
+
+/* -----------------------------------------------------------------------------
+ * Regulator
+ */
+
 static int vc_mipi_regulator_enable(struct regulator_dev *rdev)
 {
 	unsigned int val;
@@ -85,6 +94,27 @@ static const struct regulator_desc vc_mipi_regulator = {
 	.owner = THIS_MODULE,
 };
 
+static int vc_mipi_regulator_init(struct vc_mipi_ctrl *ctrl)
+{
+	struct regulator_config config = { };
+	struct regulator_dev *rdev;
+
+	config.dev = ctrl->dev;
+	config.of_node = ctrl->dev->of_node;
+	config.regmap = ctrl->regmap;
+
+	rdev = devm_regulator_register(ctrl->dev, &vc_mipi_regulator, &config);
+	if (IS_ERR(rdev)) {
+		return PTR_ERR(rdev);
+	}
+
+	return 0;
+}
+
+/* -----------------------------------------------------------------------------
+ * Probe & Remove
+ */
+
 static const struct regmap_config vc_mipi_regmap_config = {
 	.reg_bits = 16,
 	.val_bits = 8,
@@ -93,40 +123,43 @@ static const struct regmap_config vc_mipi_regmap_config = {
 
 static int vc_mipi_i2c_probe(struct i2c_client *i2c)
 {
-	struct regulator_config config = { };
-	struct regulator_dev *rdev;
-	struct regmap *regmap;
+	struct vc_mipi_ctrl *ctrl;
 	char data[12];
 	int ret;
 
-	regmap = devm_regmap_init_i2c(i2c, &vc_mipi_regmap_config);
-	if (IS_ERR(regmap)) {
-		ret = PTR_ERR(regmap);
-		dev_err(&i2c->dev, "Failed to init regmap: %d\n", ret);
+	ctrl = devm_kzalloc(&i2c->dev, sizeof(*ctrl), GFP_KERNEL);
+	if (!ctrl)
+		return -ENOMEM;
+
+	ctrl->dev = &i2c->dev;
+
+	i2c_set_clientdata(i2c, ctrl);
+
+	ctrl->regmap = devm_regmap_init_i2c(i2c, &vc_mipi_regmap_config);
+	if (IS_ERR(ctrl->regmap)) {
+		ret = PTR_ERR(ctrl->regmap);
+		dev_err(ctrl->dev, "Failed to init regmap: %d\n", ret);
 		return ret;
 	}
 
-	ret = regmap_raw_read(regmap, VC_MIPI_REG_ROM, data, sizeof(data));
+	ret = regmap_raw_read(ctrl->regmap, VC_MIPI_REG_ROM, data,
+			      sizeof(data));
 	if (ret < 0) {
-		dev_err(&i2c->dev, "Failed to read ROM: %d\n", ret);
+		dev_err(ctrl->dev, "Failed to read ROM: %d\n", ret);
 		return ret;
 	}
 
 	if (memcmp(data, "mmipi-module", sizeof(data))) {
-		dev_err(&i2c->dev, "Invalid ROM magic value\n");
+		dev_err(ctrl->dev, "Invalid ROM magic value\n");
 		print_hex_dump(KERN_INFO, "rom: ", DUMP_PREFIX_OFFSET, 16, 1,
 			       data, sizeof(data), true);
 		return -EINVAL;
 	}
 
-	config.dev = &i2c->dev;
-	config.of_node = i2c->dev.of_node;
-	config.regmap = regmap;
-
-	rdev = devm_regulator_register(&i2c->dev, &vc_mipi_regulator, &config);
-	if (IS_ERR(rdev)) {
-		dev_err(&i2c->dev, "Failed to register vc-mipi regulator\n");
-		return PTR_ERR(rdev);
+	ret = vc_mipi_regulator_init(ctrl);
+	if (ret < 0) {
+		dev_err(ctrl->dev, "Failed to register regulator\n");
+		return ret;
 	}
 
 	return 0;
