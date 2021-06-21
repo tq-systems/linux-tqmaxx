@@ -5,6 +5,7 @@
  * Copyright 2021 Laurent Pinchart <laurent.pinchart@ideasonboard.com>
  */
 
+#include <linux/clk-provider.h>
 #include <linux/delay.h>
 #include <linux/err.h>
 #include <linux/i2c.h>
@@ -29,9 +30,12 @@
 
 #define VC_MIPI_REG_ROM				0x1000
 
+#define VC_MIPI_CLK_FREQUENCY			54000000UL
+
 struct vc_mipi_ctrl {
 	struct device *dev;
 	struct regmap *regmap;
+	struct clk_hw *clk_hw;
 };
 
 /* -----------------------------------------------------------------------------
@@ -112,6 +116,34 @@ static int vc_mipi_regulator_init(struct vc_mipi_ctrl *ctrl)
 }
 
 /* -----------------------------------------------------------------------------
+ * Clock
+ */
+
+static int vc_mipi_clk_init(struct vc_mipi_ctrl *ctrl)
+{
+	int ret;
+
+	ctrl->clk_hw = clk_hw_register_fixed_rate(ctrl->dev, "clk", NULL, 0,
+						  VC_MIPI_CLK_FREQUENCY);
+	if (IS_ERR(ctrl->clk_hw))
+		return PTR_ERR(ctrl->clk_hw);
+
+	ret = devm_of_clk_add_hw_provider(ctrl->dev, of_clk_hw_simple_get,
+					  ctrl->clk_hw);
+	if (ret < 0) {
+		clk_hw_unregister_fixed_rate(ctrl->clk_hw);
+		return ret;
+	}
+
+	return 0;
+}
+
+static void vc_mipi_clk_cleanup(struct vc_mipi_ctrl *ctrl)
+{
+	clk_hw_unregister_fixed_rate(ctrl->clk_hw);
+}
+
+/* -----------------------------------------------------------------------------
  * Probe & Remove
  */
 
@@ -162,6 +194,21 @@ static int vc_mipi_i2c_probe(struct i2c_client *i2c)
 		return ret;
 	}
 
+	ret = vc_mipi_clk_init(ctrl);
+	if (ret < 0) {
+		dev_err(ctrl->dev, "Failed to register clock\n");
+		return ret;
+	}
+
+	return 0;
+}
+
+static int vc_mipi_i2c_remove(struct i2c_client *i2c)
+{
+	struct vc_mipi_ctrl *ctrl = i2c_get_clientdata(i2c);
+
+	vc_mipi_clk_cleanup(ctrl);
+
 	return 0;
 }
 
@@ -177,6 +224,7 @@ static struct i2c_driver vc_mipi_driver = {
 		.of_match_table = of_match_ptr(vc_mipi_dt_ids),
 	},
 	.probe_new = vc_mipi_i2c_probe,
+	.remove = vc_mipi_i2c_remove,
 };
 
 module_i2c_driver(vc_mipi_driver);
