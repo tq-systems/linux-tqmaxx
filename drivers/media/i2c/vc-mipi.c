@@ -11,6 +11,7 @@
 #include <linux/i2c.h>
 #include <linux/module.h>
 #include <linux/regmap.h>
+#include <linux/regulator/consumer.h>
 #include <linux/regulator/driver.h>
 #include <linux/regulator/machine.h>
 
@@ -35,6 +36,7 @@
 struct vc_mipi_ctrl {
 	struct device *dev;
 	struct regmap *regmap;
+	struct regulator *supply;
 	struct clk_hw *clk_hw;
 };
 
@@ -167,40 +169,58 @@ static int vc_mipi_i2c_probe(struct i2c_client *i2c)
 
 	i2c_set_clientdata(i2c, ctrl);
 
+	ctrl->supply = devm_regulator_get(ctrl->dev, "vcc");
+	if (IS_ERR(ctrl->supply)) {
+		ret = PTR_ERR(ctrl->supply);
+		dev_err(ctrl->dev, "Failed to get vcc supply: %d\n", ret);
+		return ret;
+	}
+
+	ret = regulator_enable(ctrl->supply);
+	if (ret < 0) {
+		dev_err(ctrl->dev, "Failed to enable vcc supply: %d\n", ret);
+		return ret;
+	}
+
 	ctrl->regmap = devm_regmap_init_i2c(i2c, &vc_mipi_regmap_config);
 	if (IS_ERR(ctrl->regmap)) {
 		ret = PTR_ERR(ctrl->regmap);
 		dev_err(ctrl->dev, "Failed to init regmap: %d\n", ret);
-		return ret;
+		goto error;
 	}
 
 	ret = regmap_raw_read(ctrl->regmap, VC_MIPI_REG_ROM, data,
 			      sizeof(data));
 	if (ret < 0) {
 		dev_err(ctrl->dev, "Failed to read ROM: %d\n", ret);
-		return ret;
+		goto error;
 	}
 
 	if (memcmp(data, "mmipi-module", sizeof(data))) {
 		dev_err(ctrl->dev, "Invalid ROM magic value\n");
 		print_hex_dump(KERN_INFO, "rom: ", DUMP_PREFIX_OFFSET, 16, 1,
 			       data, sizeof(data), true);
-		return -EINVAL;
+		ret = -EINVAL;
+		goto error;
 	}
 
 	ret = vc_mipi_regulator_init(ctrl);
 	if (ret < 0) {
 		dev_err(ctrl->dev, "Failed to register regulator\n");
-		return ret;
+		goto error;
 	}
 
 	ret = vc_mipi_clk_init(ctrl);
 	if (ret < 0) {
 		dev_err(ctrl->dev, "Failed to register clock\n");
-		return ret;
+		goto error;
 	}
 
 	return 0;
+
+error:
+	regulator_disable(ctrl->supply);
+	return ret;
 }
 
 static int vc_mipi_i2c_remove(struct i2c_client *i2c)
@@ -208,6 +228,7 @@ static int vc_mipi_i2c_remove(struct i2c_client *i2c)
 	struct vc_mipi_ctrl *ctrl = i2c_get_clientdata(i2c);
 
 	vc_mipi_clk_cleanup(ctrl);
+	regulator_disable(ctrl->supply);
 
 	return 0;
 }
