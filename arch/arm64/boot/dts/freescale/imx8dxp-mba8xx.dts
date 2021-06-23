@@ -9,7 +9,7 @@
 #include "mba8xx-common.dtsi"
 
 / {
-	model = "TQ-Systems i.MX8QXP TQMa8XQP on MBa8Xx";
+	model = "TQ-Systems i.MX8DXP TQMa8XDP on MBa8Xx";
 	compatible = "tq,imx8dxp-mba8xx", "tq,imx8dxp-tqma8xdp", "fsl,imx8dxp",
 		     "fsl,imx8qxp";
 };
