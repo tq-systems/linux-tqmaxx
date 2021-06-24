@@ -31,8 +31,6 @@
 
 #define VC_MIPI_REG_ROM				0x1000
 
-#define VC_MIPI_CLK_FREQUENCY			54000000UL
-
 struct vc_mipi_ctrl {
 	struct device *dev;
 	struct regmap *regmap;
@@ -123,10 +121,19 @@ static int vc_mipi_regulator_init(struct vc_mipi_ctrl *ctrl)
 
 static int vc_mipi_clk_init(struct vc_mipi_ctrl *ctrl)
 {
+	u32 freq;
 	int ret;
 
+	ret = of_property_read_u32(ctrl->dev->of_node, "clock-frequency",
+				   &freq);
+	if (ret < 0) {
+		dev_err(ctrl->dev, "Failed to retrieve clock frequency: %d\n",
+			ret);
+		return ret;
+	}
+
 	ctrl->clk_hw = clk_hw_register_fixed_rate(ctrl->dev, "clk", NULL, 0,
-						  VC_MIPI_CLK_FREQUENCY);
+						  freq);
 	if (IS_ERR(ctrl->clk_hw))
 		return PTR_ERR(ctrl->clk_hw);
 
