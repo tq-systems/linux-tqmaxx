@@ -121,6 +121,7 @@ static int vc_mipi_regulator_init(struct vc_mipi_ctrl *ctrl)
 
 static int vc_mipi_clk_init(struct vc_mipi_ctrl *ctrl)
 {
+	char name[20];
 	u32 freq;
 	int ret;
 
@@ -132,7 +133,14 @@ static int vc_mipi_clk_init(struct vc_mipi_ctrl *ctrl)
 		return ret;
 	}
 
-	ctrl->clk_hw = clk_hw_register_fixed_rate(ctrl->dev, "clk", NULL, 0,
+	/*
+	 * As this is an I2C device, the device name will be in the form
+	 * 'bus-addr', where bus is an integer and addr a 4 characters hex
+	 * value. 20 bytes should be enough as there shouldn't be more than 100
+	 * I2C buses.
+	 */
+	snprintf(name, sizeof(name), "vc-mipi-%s-clk", dev_name(ctrl->dev));
+	ctrl->clk_hw = clk_hw_register_fixed_rate(ctrl->dev, name, NULL, 0,
 						  freq);
 	if (IS_ERR(ctrl->clk_hw))
 		return PTR_ERR(ctrl->clk_hw);
