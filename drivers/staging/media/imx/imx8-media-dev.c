@@ -337,7 +337,7 @@ static int mxc_md_create_links(struct mxc_md *mxc_md)
 		/* Notify capture subdev entity ,ISI cap link setup */
 		ret = media_entity_call(source, link_setup, &source->pads[source_pad],
 					&sink->pads[sink_pad], flags);
-		if (ret) {
+		if (ret && ret != -ENOIOCTLCMD) {
 			v4l2_err(&mxc_md->v4l2_dev,
 				 "failed call link_setup [%s] %c> [%s]\n",
 				 source->name, flags ? '=' : '-', sink->name);
@@ -436,14 +436,14 @@ static int mxc_md_create_links(struct mxc_md *mxc_md)
 		ret = media_entity_call(sink, link_setup,
 					&sink->pads[sink_pad],
 					&source->pads[source_pad], 0);
-		if (ret)
+		if (ret && ret != -ENOIOCTLCMD)
 			break;
 
 		/* Notify MIPI/HDMI entity */
 		ret = media_entity_call(source, link_setup,
 					&source->pads[source_pad],
 					&sink->pads[sink_pad], 0);
-		if (ret)
+		if (ret && ret != -ENOIOCTLCMD)
 			break;
 
 		v4l2_info(&mxc_md->v4l2_dev, "created link [%s] %c> [%s]\n",
@@ -479,7 +479,7 @@ static int mxc_md_create_links(struct mxc_md *mxc_md)
 			ret = media_entity_call(sink, link_setup,
 						&sink->pads[sink_pad],
 						&source->pads[source_pad], 0);
-			if (ret)
+			if (ret && ret != -ENOIOCTLCMD)
 				return ret;
 
 			/* Notify MIPI sensor subdev entity */
@@ -487,7 +487,7 @@ static int mxc_md_create_links(struct mxc_md *mxc_md)
 						&source->pads[source_pad],
 						&sink->pads[sink_pad],
 						0);
-			if (ret)
+			if (ret && ret != -ENOIOCTLCMD)
 				return ret;
 			v4l2_info(&mxc_md->v4l2_dev,
 				  "created link [%s] => [%s]\n",
@@ -516,7 +516,7 @@ static int mxc_md_create_links(struct mxc_md *mxc_md)
 							&sink->pads[sink_pad + j],
 							&source->pads[source_pad + j],
 							0);
-				if (ret)
+				if (ret && ret != -ENOIOCTLCMD)
 					return ret;
 
 				/* Notify MIPI sensor subdev entity */
@@ -524,7 +524,7 @@ static int mxc_md_create_links(struct mxc_md *mxc_md)
 							&source->pads[source_pad + j],
 							&sink->pads[sink_pad + j],
 							0);
-				if (ret)
+				if (ret && ret != -ENOIOCTLCMD)
 					return ret;
 			}
 			v4l2_info(&mxc_md->v4l2_dev,
