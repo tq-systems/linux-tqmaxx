@@ -337,6 +337,11 @@ static int mxc_isi_pipeline_enable(struct mxc_isi_cap_dev *isi_cap, bool enable)
 			continue;
 		}
 
+		if (subdev->entity.function == MEDIA_ENT_F_CAM_SENSOR) {
+			dev_dbg(dev, "%s subdev is sensor\n", entity->name);
+			continue;
+		}
+
 		ret = v4l2_subdev_call(subdev, video, s_stream, enable);
 		if (ret < 0 && ret != -ENOIOCTLCMD) {
 			dev_err(dev, "subdev %s s_stream failed\n", subdev->name);

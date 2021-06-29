@@ -1043,17 +1043,34 @@ static int mipi_csis_s_power(struct v4l2_subdev *mipi_sd, int on)
 static int mipi_csis_s_stream(struct v4l2_subdev *mipi_sd, int enable)
 {
 	struct csi_state *state = mipi_sd_to_csi_state(mipi_sd);
+	struct v4l2_subdev *sen_sd;
+	int ret;
 
 	v4l2_dbg(1, debug, mipi_sd, "%s: %d, state: 0x%x\n",
 		 __func__, enable, state->flags);
+
+	sen_sd = csis_get_remote_subdev(state, __func__);
+	if (!sen_sd) {
+		v4l2_err(&state->sd, "%s, No remote subdev found!\n", __func__);
+		return -EINVAL;
+	}
 
 	if (enable) {
 		pm_runtime_get_sync(state->dev);
 		mipi_csis_clear_counters(state);
 		mipi_csis_start_stream(state);
+
+		ret = v4l2_subdev_call(sen_sd, video, s_stream, enable);
+		if (ret) {
+			mipi_csis_stop_stream(state);
+			pm_runtime_put(state->dev);
+			return ret;
+		}
+
 		dump_csis_regs(state, __func__);
 		dump_gasket_regs(state, __func__);
 	} else {
+		ret = v4l2_subdev_call(sen_sd, video, s_stream, enable);
 		mipi_csis_stop_stream(state);
 		if (debug > 0)
 			mipi_csis_log_counters(state, true);
