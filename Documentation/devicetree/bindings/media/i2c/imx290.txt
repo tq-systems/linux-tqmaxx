@@ -1,0 +1,39 @@
+* Sony IMX290 Digital Image Sensor
+
+Required Properties:
+- compatible: value should be "sony,imx290" for imx290 sensor
+- reg: I2C bus address of the device
+- clocks: reference to the xclk input clock.
+- clock-names: Must include the following entry: "xclk"
+- clock-frequency: must be 37125000
+- vdda-supply: Analog voltage supply
+- vdddo-supply: Digital I/O voltage supply
+- vddd-supply: Digital core voltage supply
+
+
+Optional Properties:
+- reset-gpios: Sensor reset GPIO
+
+The imx274 device node should contain one 'port' child node with
+an 'endpoint' subnode. For further reading on port node refer to
+Documentation/devicetree/bindings/media/video-interfaces.txt.
+
+Example:
+	sensor@1a {
+		compatible = "sony,imx274";
+		reg = <0x1a>;
+		reset-gpios = <&gpio_sensor 0 0>;
+
+		vdda-supply = <&pp2800_cam>;
+		vdddo-supply = <&pp1800>;
+		vddd-supply = <&pp1800>;
+
+		clocks = <&cru SCLK_TESTCLKOUT1>;
+		clock-names = "xvclk";
+
+		port {
+			sensor_out: endpoint {
+				remote-endpoint = <&csiss_in>;
+			};
+		};
+	};
