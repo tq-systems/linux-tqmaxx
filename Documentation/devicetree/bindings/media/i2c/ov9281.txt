@@ -1,0 +1,45 @@
+* Omnivision OV9281 CMOS sensor
+
+Required Properties:
+- compatible: shall be one of
+	"ovti,ov9281"
+- clocks: reference to the xvclk input clock.
+- clock-names: Must include the following entry: "xvclk"
+- avdd-supply: Analog voltage supply
+- dovdd-supply: Digital I/O voltage supply
+- dvdd-supply: Digital core voltage supply
+
+Optional Properties:
+- reset-gpios: reference to the GPIO connected to the resetb pin, if any.
+  Active is high.
+- pwdn-gpios: reference to the GPIO connected to the pwdn pin, if any.
+  Active is high.
+
+The device node shall contain one 'port' child node with one child 'endpoint'
+subnode for its digital output video port, in accordance with the video
+interface bindings defined in Documentation/devicetree/bindings/media/
+video-interfaces.txt.
+
+Example:
+
+&i2c0 {
+	ov9281: camera@30 {
+		compatible = "ovti,ov9281";
+		reg = <0x30>;
+		reset-gpios = <&axi_gpio_0 0 GPIO_ACTIVE_HIGH>;
+		pwdn-gpios = <&axi_gpio_0 1 GPIO_ACTIVE_HIGH>;
+
+		avdd-supply = <&pp2800_cam>;
+		dovdd-supply = <&pp1800>;
+		dvdd-supply = <&pp1800>;
+
+		clocks = <&cru SCLK_TESTCLKOUT1>;
+		clock-names = "xvclk";
+
+		port {
+			ov9281: endpoint {
+				remote-endpoint = <&vcap1_in0>;
+			};
+		};
+	};
+};
