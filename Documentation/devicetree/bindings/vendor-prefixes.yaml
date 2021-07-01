@@ -1011,6 +1011,8 @@ patternProperties:
     description: Vamrs Ltd.
   "^variscite,.*":
     description: Variscite Ltd.
+  "^vc,.*":
+    description: Vision Components GmbH
   "^via,.*":
     description: VIA Technologies, Inc.
   "^virtio,.*":
