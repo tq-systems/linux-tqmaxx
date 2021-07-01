@@ -8,6 +8,7 @@
 
 /dts-v1/;
 #include "r8a774b1.dtsi"
+#define TQMARZG2N
 
 / {
 	model = "TQ-Systems TQMaRZG2N-B on a MBaRZG2X main board";

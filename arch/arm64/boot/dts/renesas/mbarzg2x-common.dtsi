@@ -509,7 +509,13 @@
 /*
  * SATA is _not_ defined on 'M' type CPUs!
  */
-#ifdef sata
+#ifdef TQMARZG2H
+	#define HAS_SATA
+#endif
+#ifdef TQMARZG2N
+	#define HAS_SATA
+#endif
+#ifdef HAS_SATA
 &sata {
 	status = "okay";
 };
