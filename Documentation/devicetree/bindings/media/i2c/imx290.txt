@@ -1,7 +1,9 @@
-* Sony IMX290 Digital Image Sensor
+* Sony IMX290 / IMX327 Digital Image Sensor
 
 Required Properties:
-- compatible: value should be "sony,imx290" for imx290 sensor
+- compatible: value should be
+  -  "sony,imx290" for imx290 sensor
+  -  "sony,imx327" for imx327 sensor
 - reg: I2C bus address of the device
 - clocks: reference to the xclk input clock.
 - clock-names: Must include the following entry: "xclk"
