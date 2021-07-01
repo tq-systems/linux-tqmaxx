@@ -1,0 +1,38 @@
+* Vision Components GmbH MIPI-CSI cameras
+
+Required Properties:
+- compatible: shall be one of
+	"vc,mipi-cam"
+
+* Vision Components GmbH MIPI-CSI camera FPGA
+
+Required Properties:
+- compatible: shall be one of
+	"vc,fpga"
+- reg: I2C address
+
+Required child nodes:
+- regulator: node of camera supply regulator
+- reset: node of camera reset controller
+- gpio-chip: node for gpio chip implemented by the fpga
+
+i2c3 {
+	vc_fpga: fpga@10 {
+		reg = <0x10>;
+		compatible = "vc,fpga";
+		status = "okay";
+
+		vc_fpga_reg: regulator {
+			regulator-name = "CAM_VCC";
+		};
+
+		vc_fpga_reset: reset {
+			#reset-cells = <0>;
+		};
+
+		vc_fpga_gpio: gpio-chip {
+			gpio-controller;
+			#gpio-cells = <2>;
+		};
+	};
+};
