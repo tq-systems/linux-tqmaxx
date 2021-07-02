@@ -1,0 +1,4 @@
+# SPDX-License-Identifier: GPL-2.0
+
+obj-${CONFIG_VIDEO_VC_SENSORS_FPGA} += vc-fpga.o
+obj-${CONFIG_VIDEO_VC_SENSORS} += vc-mipi.o

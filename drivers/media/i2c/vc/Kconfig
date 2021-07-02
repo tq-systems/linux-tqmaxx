@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: GPL-2.0
+
+config VIDEO_HAVE_VC_SENSORS
+	bool
+
+config VIDEO_VC_SENSORS_FPGA
+	tristate "Vision Components FPGA"
+	depends on REGULATOR
+	depends on RESET_CONTROLLER
+	depends on GPIOLIB
+	select VIDEO_HAVE_VC_SENSORS
+
+config VIDEO_VC_SENSORS
+	tristate "Vision Components sensors"
+	depends on I2C
+	depends on VIDEO_VC_SENSORS_FPGA
+	select VIDEO_HAVE_VC_SENSORS
