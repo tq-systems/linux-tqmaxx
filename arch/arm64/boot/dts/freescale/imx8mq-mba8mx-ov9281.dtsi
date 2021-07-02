@@ -1,0 +1,126 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright 2021 TQ-Systems GmbH
+ */
+
+/ {
+	sensor_clk: sensor-clk {
+		#clock-cells = <0>;
+		compatible = "fixed-clock";
+		clock-frequency = <24000000>;
+	};
+};
+
+&csi1_bridge {
+	fsl,mipi-mode;
+	dma-coherent;
+	status = "okay";
+
+	port {
+		csi1_ep: endpoint {
+			remote-endpoint = <&csi1_mipi_ep>;
+		};
+	};
+};
+
+&csi2_bridge {
+	fsl,mipi-mode;
+	dma-coherent;
+
+	port {
+		csi2_ep: endpoint {
+			remote-endpoint = <&csi2_mipi_ep>;
+		};
+	};
+};
+
+&mipi_csi_1 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	port {
+		mipi1_sensor_ep: endpoint@0 {
+			data-lanes = <1 2>;
+			remote-endpoint = <&ov9281_ep0>;
+		};
+
+		csi1_mipi_ep: endpoint@1 {
+			remote-endpoint = <&csi1_ep>;
+		};
+	};
+};
+
+&mipi_csi_2 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	port {
+		mipi2_sensor_ep: endpoint@0 {
+		};
+
+		csi2_mipi_ep: endpoint@1 {
+			remote-endpoint = <&csi2_ep>;
+		};
+	};
+};
+
+&i2c3 {
+	vc_fpga: fpga@10 {
+		reg = <0x10>;
+		compatible = "vc,fpga";
+
+		vc_fpga_reg: regulator {
+			regulator-name = "CAM_VCC";
+		};
+
+		vc_fpga_reset: reset {
+			#reset-cells = <0>;
+		};
+
+		vc_fpga_gpio: gpio-chip {
+			gpio-controller;
+			#gpio-cells = <2>;
+		};
+	};
+
+	ov9281: camera@60 {
+		#address-cells = <0x1>;
+		#size-cells = <0x0>;
+		reg = <0x60>;
+
+		compatible = "ovti,ov9281";
+
+		clock-names = "xvclk";
+		clocks = <&sensor_clk>;
+
+		avdd-supply = <&vc_fpga_reg>;
+		dovdd-supply = <&vc_fpga_reg>;
+		dvdd-supply = <&vc_fpga_reg>;
+
+		/* NOTE: driver implements a wrong logic! */
+		reset-gpios = <&vc_fpga_gpio 0 GPIO_ACTIVE_LOW>;
+
+		port@0 {
+			reg = <0>;
+
+			ov9281_ep0: endpoint {
+				remote-endpoint = <&mipi1_sensor_ep>;
+				data-lanes = <1 2>;
+				clock-lanes = <0>;
+				clock-noncontinuous = <1>;
+				link-frequencies = /bits/ 64 <400000000>;
+			};
+		};
+	};
+};
+
+&mipi_csi_1 {
+	status = "okay";
+
+	// https://community.nxp.com/t5/i-MX-Processors/Fixing-base-address-switching-Change-Err-which-occurs-randomly/m-p/902311
+	assigned-clock-rates = <
+		200000000			/* > mipi bandwidth/8 */
+		333000000			/* > pixclk */
+		66000000
+	>;
+};
