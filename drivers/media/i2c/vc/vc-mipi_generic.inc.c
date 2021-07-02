@@ -1,0 +1,16 @@
+// SPDX-License-Identifier: GPL-2.0
+
+static uint32_t const VC_MBUS_Y8_10[] = {
+	MEDIA_BUS_FMT_Y8_1X8,
+	MEDIA_BUS_FMT_Y10_1X10,
+};
+
+static uint32_t const VC_MBUS_SGRBG10_12[] = {
+	MEDIA_BUS_FMT_SGRBG10_1X10,
+	MEDIA_BUS_FMT_SGRBG12_1X12
+};
+
+static uint32_t const VC_MBUS_SRGGB10_12[] = {
+	MEDIA_BUS_FMT_SRGGB10_1X10,
+	MEDIA_BUS_FMT_SRGGB12_1X12
+};

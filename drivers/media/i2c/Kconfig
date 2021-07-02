@@ -1336,3 +1336,5 @@ config VIDEO_LM3646
 endmenu
 
 endif # VIDEO_V4L2
+
+source "drivers/media/i2c/vc/Kconfig"
