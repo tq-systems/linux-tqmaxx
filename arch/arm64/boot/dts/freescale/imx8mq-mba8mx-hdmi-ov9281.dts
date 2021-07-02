@@ -1,0 +1,7 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright 2021 TQ-Systems GmbH
+ */
+
+#include "imx8mq-mba8mx-hdmi.dts"
+#include "imx8mq-mba8mx-ov9281.dtsi"
