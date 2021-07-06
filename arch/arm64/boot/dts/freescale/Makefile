@@ -62,6 +62,8 @@ dtb-$(CONFIG_ARCH_MXC) += imx8mm-ab2.dtb imx8mm-ab2-m4.dtb imx8mm-ddr4-ab2.dtb i
 			  imx8mm-ddr4-ab2-revb.dtb imx8mm-ddr4-ab2-m4-revb.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8mm-mba8mx.dtb \
 			  imx8mm-mba8mx-lcdif-lvds-tm070jvhg33.dtb \
+			  imx8mm-mba8mx-lcdif-lvds-tm070jvhg33-imx327.dtb \
+			  imx8mm-mba8mx-lcdif-lvds-tm070jvhg33-ov9281.dtb \
 			  imx8mm-mba8mx-rpmsg.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8mn-evk.dtb imx8mn-evk-rm67191.dtb imx8mn-ddr4-evk.dtb imx8mn-ddr4-evk-ak5558.dtb \
 			  imx8mn-ddr4-evk-rm67191.dtb imx8mn-ddr4-evk-rpmsg.dtb imx8mn-ddr4-evk-usd-wifi.dtb \
