@@ -288,27 +288,6 @@ static void mipi_csi2_clk_disable(struct mxc_mipi_csi2_dev *csi2dev)
 	clk_disable_unprepare(csi2dev->clk_pxl);
 }
 
-static int mipi_csi2_open(struct v4l2_subdev *sd, struct v4l2_subdev_fh *fh)
-{
-	return 0;
-}
-
-static int mipi_csi2_registered(struct v4l2_subdev *sd)
-{
-	struct mxc_mipi_csi2_dev *csi2dev = sd_to_mxc_mipi_csi2_dev(sd);
-
-	return v4l2_ctrl_add_handler(sd->v4l2_dev->ctrl_handler,
-				     &csi2dev->ctrl_handler, NULL, true);
-}
-
-static void mipi_csi2_unregistered(struct v4l2_subdev *sd)
-{
-	struct mxc_mipi_csi2_dev *csi2dev = sd_to_mxc_mipi_csi2_dev(sd);
-
-	v4l2_ctrl_handler_free(&csi2dev->ctrl_handler);
-	v4l2_ctrl_handler_init(&csi2dev->ctrl_handler, 0);
-}
-
 /*
  * V4L2 subdev operations
  */
@@ -501,12 +480,6 @@ static int mipi_csis_g_parm(struct v4l2_subdev *sd, struct v4l2_streamparm *a)
 
 	return v4l2_subdev_call(sensor_sd, video, g_parm, a);
 }
-
-static const struct v4l2_subdev_internal_ops mipi_csi2_sd_internal_ops = {
-	.open = mipi_csi2_open,
-	.registered = mipi_csi2_registered,
-	.unregistered = mipi_csi2_unregistered,
-};
 
 static struct v4l2_subdev_pad_ops mipi_csi2_pad_ops = {
 	.enum_frame_size = mipi_csis_enum_framesizes,
