@@ -822,16 +822,21 @@ static int mipi_csis_set_fmt(struct v4l2_subdev *mipi_sd,
 	struct v4l2_subdev *sensor_sd = state->sensor_sd;
 	struct csis_pix_format const *csis_fmt;
 	struct v4l2_mbus_framefmt *mf  = &format->format;
+	int rc;
 
 	if (format->pad)
 		return -EINVAL;
 
 	csis_fmt = find_csis_format(mf->code);
 	if (csis_fmt == NULL)
-		csis_fmt = &mipi_csis_formats[0];
+		return -EINVAL;
 
-	v4l2_subdev_call(sensor_sd, pad, set_fmt, cfg, format);
+	rc = v4l2_subdev_call(sensor_sd, pad, set_fmt, cfg, format);
+	if (rc)
+		return rc;
 
+	v4l2_info(&state->v4l2_dev, "%s returned bus fmt %x local %x\n",
+		  __func__, mf->code, csis_fmt->code);
 	mf->code = csis_fmt->code;
 	v4l_bound_align_image(&mf->width, 1, CSIS_MAX_PIX_WIDTH,
 			      csis_fmt->pix_width_alignment,
