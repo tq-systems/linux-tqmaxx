@@ -1010,6 +1010,9 @@ static int subdev_notifier_bound(struct v4l2_async_notifier *notifier,
 			    struct v4l2_async_connection *asd)
 {
 	struct csi_state *state = notifier_to_mipi_dev(notifier);
+	struct media_entity *source = &subdev->entity;
+	struct media_entity *sink = &state->mipi_sd.entity;
+	int rc;
 
 	if (subdev == NULL)
 		return -EINVAL;
@@ -1018,10 +1021,58 @@ static int subdev_notifier_bound(struct v4l2_async_notifier *notifier,
 	if (state->fwnode == dev_fwnode(subdev->dev))
 		state->sensor_sd = subdev;
 
+	if (subdev == NULL)
+		return -EINVAL;
+
+	rc = media_entity_call(source, link_setup, &source->pads[0],
+			       &sink->pads[0], MEDIA_LNK_FL_ENABLED);
+	if (rc < 0 && rc != -ENOIOCTLCMD) {
+		v4l2_err(&state->v4l2_dev, "failed to link pads: %d\n", rc);
+		state->sensor_sd = NULL;
+		goto out;
+	}
+
 	v4l2_info(&state->v4l2_dev, "Registered sensor subdevice: %s\n",
 		  subdev->name);
 
-	return 0;
+	rc = 0;
+
+out:
+	return rc;
+}
+
+static int subdev_notifier_complete(struct v4l2_async_notifier *notifier)
+{
+	struct csi_state *state = notifier_to_mipi_dev(notifier);
+	int ret;
+
+	ret = mipi_csis_entity_init_cfg(&state->mipi_sd, NULL);
+
+	return ret;
+}
+
+static void subdev_notifier_unbind(struct v4l2_async_notifier *notifier,
+				   struct v4l2_subdev *subdev,
+				   struct v4l2_async_connection *asc)
+{
+	struct csi_state *state = notifier_to_mipi_dev(notifier);
+	struct media_entity *source = &subdev->entity;
+	struct media_entity *sink = &state->mipi_sd.entity;
+	int rc;
+
+	if (state->sensor_sd != subdev)
+		return;
+
+	rc = media_entity_call(source, link_setup, &source->pads[0],
+			       &sink->pads[0], 0);
+	if (rc < 0 && rc != -ENOIOCTLCMD)
+		v4l2_warn(&state->v4l2_dev, "failed to unlink pads: %d\n",
+			  rc);
+
+	state->sensor_sd = NULL;
+
+	v4l2_info(&state->v4l2_dev, "Unregistered sensor subdevice: %s\n",
+		  subdev->name);
 }
 
 static int mipi_csis_parse_dt(struct platform_device *pdev,
@@ -1064,6 +1115,8 @@ static const struct of_device_id mipi_csis_of_match[];
 
 static const struct v4l2_async_notifier_operations mxc_mipi_csi_subdev_ops = {
 	.bound = subdev_notifier_bound,
+	.unbind = subdev_notifier_unbind,
+	.complete = subdev_notifier_complete,
 };
 
 /* register parent dev */
