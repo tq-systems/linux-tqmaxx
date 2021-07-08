@@ -233,9 +233,6 @@ struct mxc_mipi_csi2_dev {
 	struct v4l2_subdev		*sensor_sd;
 	struct v4l2_ctrl_handler	ctrl_handler;
 
-	struct media_pad pads[MXC_MIPI_CSI2_VCX_PADS_NUM];
-	struct v4l2_mbus_framefmt format;
-
 	void __iomem *csr_regs;
 	void __iomem *base_regs;
 	struct platform_device *pdev;
