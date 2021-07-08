@@ -49,8 +49,10 @@ MODULE_PARM_DESC(debug, "Debug level (0-2)");
 #define CSIS0_MAX_LANES		4
 #define CSIS1_MAX_LANES		2
 
+/*
 #define MIPI_CSIS_DEF_PIX_WIDTH		640
 #define MIPI_CSIS_DEF_PIX_HEIGHT	480
+*/
 
 /* Register map definition */
 
@@ -1221,10 +1223,13 @@ static int mipi_csis_subdev_init(struct v4l2_subdev *mipi_sd,
 	mipi_sd->flags |= V4L2_SUBDEV_FL_HAS_DEVNODE;
 	mipi_sd->dev = &pdev->dev;
 
+/*
 	state->csis_fmt = &mipi_csis_formats[0];
 	state->format.code = mipi_csis_formats[0].code;
 	state->format.width = MIPI_CSIS_DEF_PIX_WIDTH;
 	state->format.height = MIPI_CSIS_DEF_PIX_HEIGHT;
+	state->format.field = V4L2_FIELD_NONE;
+*/
 
 	/* This allows to retrieve the platform device id by the host driver */
 	v4l2_set_subdevdata(mipi_sd, pdev);
