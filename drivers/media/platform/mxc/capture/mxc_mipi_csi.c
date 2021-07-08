@@ -375,7 +375,7 @@ static inline struct csi_state
 
 static const struct csis_pix_format *find_csis_format(u32 code)
 {
-	int i;
+	unsigned int i;
 
 	for (i = 0; i < ARRAY_SIZE(mipi_csis_formats); i++)
 		if (code == mipi_csis_formats[i].code)
@@ -398,7 +398,7 @@ static void mipi_csis_sw_reset(struct csi_state *state)
 	u32 val = mipi_csis_read(state, MIPI_CSIS_CMN_CTRL);
 
 	mipi_csis_write(state, MIPI_CSIS_CMN_CTRL, val | MIPI_CSIS_CMN_CTRL_RESET);
-	udelay(10);
+	usleep_range(10, 20);
 }
 
 static int mipi_csis_phy_init(struct csi_state *state)
@@ -669,7 +669,7 @@ static void mipi_csis_stop_stream(struct csi_state *state)
 static void mipi_csis_clear_counters(struct csi_state *state)
 {
 	unsigned long flags;
-	int i;
+	unsigned int i;
 
 	spin_lock_irqsave(&state->slock, flags);
 	for (i = 0; i < MIPI_CSIS_NUM_EVENTS; i++)
