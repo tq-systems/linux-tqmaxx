@@ -1145,7 +1145,7 @@ static u64 imx290_calc_pixel_rate(struct imx290 *imx290)
 
 static int imx290_set_fmt(struct v4l2_subdev *sd,
 			  struct v4l2_subdev_pad_config *cfg,
-		      struct v4l2_subdev_format *fmt)
+			  struct v4l2_subdev_format *fmt)
 {
 	struct imx290 *imx290 = to_imx290(sd);
 	const struct imx290_mode *mode;
