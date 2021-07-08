@@ -748,6 +748,24 @@ unlock:
 	return ret == 1 ? 0 : ret;
 }
 
+static int mipi_csis_g_frame_interval(struct v4l2_subdev *sd,
+				      struct v4l2_subdev_frame_interval *fi)
+{
+	struct csi_state *state = mipi_sd_to_csi_state(sd);
+	struct v4l2_subdev *sensor_sd = state->sensor_sd;
+
+	return v4l2_subdev_call(sensor_sd, video, g_frame_interval, fi);
+}
+
+static int mipi_csis_s_frame_interval(struct v4l2_subdev *sd,
+				      struct v4l2_subdev_frame_interval *fi)
+{
+	struct csi_state *state = mipi_sd_to_csi_state(sd);
+	struct v4l2_subdev *sensor_sd = state->sensor_sd;
+
+	return v4l2_subdev_call(sensor_sd, video, s_frame_interval, fi);
+}
+
 static int mipi_csis_enum_mbus_code(struct v4l2_subdev *mipi_sd,
 				    struct v4l2_subdev_pad_config *cfg,
 				    struct v4l2_subdev_mbus_code_enum *code)
@@ -896,6 +914,9 @@ static struct v4l2_subdev_video_ops mipi_csis_video_ops = {
 
 	.s_parm = mipi_csis_s_parm,
 	.g_parm = mipi_csis_g_parm,
+
+	.g_frame_interval = mipi_csis_g_frame_interval,
+	.s_frame_interval = mipi_csis_s_frame_interval,
 };
 
 static const struct v4l2_subdev_pad_ops mipi_csis_pad_ops = {
