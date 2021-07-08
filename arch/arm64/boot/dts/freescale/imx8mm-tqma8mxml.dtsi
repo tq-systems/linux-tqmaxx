@@ -363,9 +363,11 @@
 	};
 };
 
-/* disable until we fix it */
 &pcie0 {
+	/* remove until we fix it */
 	/delete-property/ reserved-region;
+	/* WAKE / CLKREQ not implemented */
+	l1ss-disabled;
 };
 
 &rpmsg{
