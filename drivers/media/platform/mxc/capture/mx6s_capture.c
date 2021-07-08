@@ -1996,10 +1996,10 @@ static int mx6sx_register_subdevs(struct mx6s_csi_dev *csi_dev)
 	csi_dev->subdev_notifier.ops = &mx6s_capture_async_ops;
 
 	ret = v4l2_async_notifier_register(&csi_dev->v4l2_dev,
-					&csi_dev->subdev_notifier);
+					   &csi_dev->subdev_notifier);
 	if (ret)
 		dev_err(csi_dev->dev,
-					"Error register async notifier regoster\n");
+			"Error register async notifier\n");
 
 	return ret;
 }
