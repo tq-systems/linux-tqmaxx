@@ -325,10 +325,16 @@
 /* disable until we fix it */
 &pcie0 {
 	/delete-property/ reserved-region;
+	/* 3.3V supply, only way to switch on internal 1.8V supply using GPR */
+	vph-supply = <&vgen5_reg>;
+	l1ss-disabled;
 };
 
 &pcie1 {
 	/delete-property/ reserved-region;
+	/* 3.3V supply, only way to switch on internal 1.8V supply using GPR */
+	vph-supply = <&vgen5_reg>;
+	l1ss-disabled;
 };
 
 /*
