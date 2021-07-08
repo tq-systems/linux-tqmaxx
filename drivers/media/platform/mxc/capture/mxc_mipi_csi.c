@@ -775,7 +775,7 @@ static int mipi_csis_enum_mbus_code(struct v4l2_subdev *mipi_sd,
 	struct csis_pix_format const *csis_fmt;
 	int ret;
 
-	ret = v4l2_subdev_call(sensor_sd, pad, enum_mbus_code, NULL, code);
+	ret = v4l2_subdev_call(sensor_sd, pad, enum_mbus_code, cfg, code);
 	if (ret < 0)
 		return -EINVAL;
 
@@ -830,7 +830,7 @@ static int mipi_csis_set_fmt(struct v4l2_subdev *mipi_sd,
 	if (csis_fmt == NULL)
 		csis_fmt = &mipi_csis_formats[0];
 
-	v4l2_subdev_call(sensor_sd, pad, set_fmt, NULL, format);
+	v4l2_subdev_call(sensor_sd, pad, set_fmt, cfg, format);
 
 	mf->code = csis_fmt->code;
 	v4l_bound_align_image(&mf->width, 1, CSIS_MAX_PIX_WIDTH,
@@ -862,7 +862,7 @@ static int mipi_csis_get_fmt(struct v4l2_subdev *mipi_sd,
 	if (format->pad)
 		return -EINVAL;
 
-	return v4l2_subdev_call(sensor_sd, pad, get_fmt, NULL, format);
+	return v4l2_subdev_call(sensor_sd, pad, get_fmt, cfg, format);
 }
 
 static int mipi_csis_s_rx_buffer(struct v4l2_subdev *mipi_sd, void *buf,
@@ -904,7 +904,7 @@ static int mipi_csis_enum_framesizes(struct v4l2_subdev *mipi_sd,
 	struct csi_state *state = mipi_sd_to_csi_state(mipi_sd);
 	struct v4l2_subdev *sensor_sd = state->sensor_sd;
 
-	return v4l2_subdev_call(sensor_sd, pad, enum_frame_size, NULL, fse);
+	return v4l2_subdev_call(sensor_sd, pad, enum_frame_size, cfg, fse);
 }
 
 static int mipi_csis_enum_frameintervals(struct v4l2_subdev *mipi_sd,
@@ -914,7 +914,7 @@ static int mipi_csis_enum_frameintervals(struct v4l2_subdev *mipi_sd,
 	struct csi_state *state = mipi_sd_to_csi_state(mipi_sd);
 	struct v4l2_subdev *sensor_sd = state->sensor_sd;
 
-	return v4l2_subdev_call(sensor_sd, pad, enum_frame_interval, NULL, fie);
+	return v4l2_subdev_call(sensor_sd, pad, enum_frame_interval, cfg, fie);
 }
 
 static int mipi_csis_log_status(struct v4l2_subdev *mipi_sd)
