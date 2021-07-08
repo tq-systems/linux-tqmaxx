@@ -49,7 +49,7 @@ MODULE_PARM_DESC(debug, "Debug level (0-2)");
 #define CSIS0_MAX_LANES		4
 #define CSIS1_MAX_LANES		2
 
-#define MIPI_CSIS_DEF_PIX_WIDTH	640
+#define MIPI_CSIS_DEF_PIX_WIDTH		640
 #define MIPI_CSIS_DEF_PIX_HEIGHT	480
 
 /* Register map definition */
@@ -513,7 +513,7 @@ static void __mipi_csis_set_format(struct csi_state *state)
 }
 
 static void mipi_csis_set_hsync_settle(struct csi_state *state,
-								int hs_settle, int clk_settle)
+				       int hs_settle, int clk_settle)
 {
 	u32 val = mipi_csis_read(state, MIPI_CSIS_DPHYCTRL);
 
