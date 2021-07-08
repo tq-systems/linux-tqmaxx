@@ -755,6 +755,32 @@ static int mipi_csis_enum_mbus_code(struct v4l2_subdev *mipi_sd,
 	return ret;
 }
 
+static int mipi_csis_get_selection(struct v4l2_subdev *mipi_sd,
+				   struct v4l2_subdev_state *sd_state,
+				   struct v4l2_subdev_selection *s)
+{
+	struct csi_state *state = mipi_sd_to_csi_state(mipi_sd);
+	struct v4l2_subdev *sensor_sd = state->sensor_sd;
+
+	if (s->pad)
+		return -EINVAL;
+
+	return v4l2_subdev_call(sensor_sd, pad, get_selection, sd_state, s);
+}
+
+static int mipi_csis_set_selection(struct v4l2_subdev *mipi_sd,
+				   struct v4l2_subdev_state *sd_state,
+				   struct v4l2_subdev_selection *s)
+{
+	struct csi_state *state = mipi_sd_to_csi_state(mipi_sd);
+	struct v4l2_subdev *sensor_sd = state->sensor_sd;
+
+	if (s->pad)
+		return -EINVAL;
+
+	return v4l2_subdev_call(sensor_sd, pad, set_selection, sd_state, s);
+}
+
 static int mipi_csis_set_fmt(struct v4l2_subdev *mipi_sd,
 			     struct v4l2_subdev_state *sd_state,
 			     struct v4l2_subdev_format *format)
@@ -892,6 +918,8 @@ static const struct v4l2_subdev_pad_ops mipi_csis_pad_ops = {
 	.enum_mbus_code        = mipi_csis_enum_mbus_code,
 	.get_fmt               = mipi_csis_get_fmt,
 	.set_fmt               = mipi_csis_set_fmt,
+	.get_selection         = mipi_csis_get_selection,
+	.set_selection         = mipi_csis_set_selection,
 };
 
 static struct v4l2_subdev_ops mipi_csis_subdev_ops = {
