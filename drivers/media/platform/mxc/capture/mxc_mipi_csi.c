@@ -897,6 +897,36 @@ static int mipi_csis_g_parm(struct v4l2_subdev *mipi_sd, struct v4l2_streamparm 
 	return v4l2_subdev_call(sensor_sd, video, g_parm, a);
 }
 
+static int mipi_csis_entity_init_cfg(struct v4l2_subdev *mipi_sd,
+				     struct v4l2_subdev_pad_config *cfg)
+{
+	struct csi_state *state = mipi_sd_to_csi_state(mipi_sd);
+	struct v4l2_subdev *sensor_sd = state->sensor_sd;
+	struct v4l2_subdev_format fmt = { 0 };
+	int rc;
+
+	fmt.which = cfg ? V4L2_SUBDEV_FORMAT_TRY : V4L2_SUBDEV_FORMAT_ACTIVE;
+	rc = v4l2_subdev_call(sensor_sd, pad, get_fmt, cfg, &fmt);
+	if (rc)
+		return rc;
+
+	if (cfg) {
+		v4l2_dbg(2, debug, &state->v4l2_dev, "init_cfg format %x\n",
+			 fmt.format.code);
+
+		state->csis_fmt = find_csis_format(fmt.format.code);
+		if (!state->csis_fmt)
+			return -EINVAL;
+
+		state->format.code = fmt.format.code;
+		state->format.width = fmt.format.width;
+		state->format.height = fmt.format.height;
+		state->format.field = fmt.format.field;
+	}
+
+	return 0;
+}
+
 static int mipi_csis_enum_framesizes(struct v4l2_subdev *mipi_sd,
 		struct v4l2_subdev_pad_config *cfg,
 		struct v4l2_subdev_frame_size_enum *fse)
@@ -946,6 +976,8 @@ static struct v4l2_subdev_video_ops mipi_csis_video_ops = {
 };
 
 static const struct v4l2_subdev_pad_ops mipi_csis_pad_ops = {
+	.init_cfg              = mipi_csis_entity_init_cfg,
+
 	.enum_frame_size       = mipi_csis_enum_framesizes,
 	.enum_frame_interval   = mipi_csis_enum_frameintervals,
 	.enum_mbus_code        = mipi_csis_enum_mbus_code,
