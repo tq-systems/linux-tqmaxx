@@ -91,6 +91,8 @@ dtb-$(CONFIG_ARCH_MXC) += imx8mq-evk.dtb imx8mq-evk-rpmsg.dtb imx8mq-evk-pcie1-m
 dtb-$(CONFIG_ARCH_MXC) += imx8mn-mba8mx.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8mn-mba8mx.dtb \
 			  imx8mn-mba8mx-lcdif-lvds-tm070jvhg33.dtb \
+			  imx8mn-mba8mx-lcdif-lvds-tm070jvhg33-imx327.dtb \
+			  imx8mn-mba8mx-lcdif-lvds-tm070jvhg33-ov9281.dtb \
 			  imx8mn-mba8mx-rpmsg.dtb \
 			  imx8mn-mba8mx-usb0otg.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8mq-evk-ak4497.dtb imx8mq-evk-audio-tdm.dtb imx8mq-evk-pdm.dtb
