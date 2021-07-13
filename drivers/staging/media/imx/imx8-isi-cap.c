@@ -1049,7 +1049,7 @@ static int mxc_isi_source_fmt_init(struct mxc_isi_cap_dev *isi_cap)
 
 	src_fmt.pad = source_pad->index;
 	src_fmt.which = V4L2_SUBDEV_FORMAT_ACTIVE;
-	src_fmt.format.code = MEDIA_BUS_FMT_UYVY8_2X8;
+	src_fmt.format.code = dst_f->fmt->mbus_code;
 	src_fmt.format.width = dst_f->width;
 	src_fmt.format.height = dst_f->height;
 	ret = v4l2_subdev_call(src_sd, pad, set_fmt, NULL, &src_fmt);
