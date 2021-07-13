@@ -1101,6 +1101,13 @@ static int mipi_csis_set_fmt(struct v4l2_subdev *mipi_sd,
 		mf->code = csis_fmt->code;
 	}
 
+	/*
+	 * Store the CSIS format descriptor for active formats.
+	 * needed during __mipi_csis_set_format (start stream)
+	 */
+	if (format->which == V4L2_SUBDEV_FORMAT_ACTIVE)
+		state->csis_fmt = csis_fmt;
+
 	return 0;
 }
 
