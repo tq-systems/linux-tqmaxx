@@ -896,6 +896,38 @@ static const struct v4l2_file_operations mxc_isi_capture_fops = {
 /*
  * The video node ioctl operations
  */
+static int mxc_isi_cap_vidioc_enum_input(struct file *file, void *priv,
+					 struct v4l2_input *inp)
+{
+	if (inp->index != 0)
+		return -EINVAL;
+
+	*inp = (struct v4l2_input) {
+		.index	= inp->index,
+		.type	= V4L2_INPUT_TYPE_CAMERA,
+		.name	= "Camera",
+	};
+
+	return 0;
+}
+
+static int mxc_isi_cap_vidioc_g_input(struct file *file, void *priv,
+				      unsigned int *i)
+{
+	*i = 0;
+
+	return 0;
+}
+
+static int mxc_isi_cap_vidioc_s_input(struct file *file, void *priv,
+				      unsigned int i)
+{
+	if (i > 0)
+		return -EINVAL;
+
+	return 0;
+}
+
 static int mxc_isi_cap_querycap(struct file *file, void *priv,
 				struct v4l2_capability *cap)
 {
@@ -1443,6 +1475,10 @@ static const struct v4l2_ioctl_ops mxc_isi_capture_ioctl_ops = {
 
 	.vidioc_enum_framesizes = mxc_isi_cap_enum_framesizes,
 	.vidioc_enum_frameintervals = mxc_isi_cap_enum_frameintervals,
+
+	.vidioc_g_input			= mxc_isi_cap_vidioc_g_input,
+	.vidioc_s_input			= mxc_isi_cap_vidioc_s_input,
+	.vidioc_enum_input		= mxc_isi_cap_vidioc_enum_input,
 };
 
 /* Capture subdev media entity operations */
