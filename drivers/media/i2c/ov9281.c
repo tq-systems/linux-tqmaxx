@@ -1150,6 +1150,7 @@ static int ov9281_probe(struct i2c_client *client,
 
 	ov9281->client = client;
 	ov9281->cur_mode = &supported_modes[0];
+	ov9281->code = MEDIA_BUS_FMT_Y10_1X10;
 
 	ov9281->xvclk = devm_clk_get(dev, "xvclk");
 	if (IS_ERR(ov9281->xvclk)) {
