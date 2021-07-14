@@ -802,47 +802,61 @@ static int mxc_isi_capture_open(struct file *file)
 	struct v4l2_subdev *sd;
 	int ret = -EBUSY;
 
-	mutex_lock(&isi_cap->lock);
+	if (mutex_lock_interruptible(&isi_cap->lock))
+		return -ERESTARTSYS;
+
 	isi_cap->is_link_setup = is_entity_link_setup(isi_cap);
 	if (!isi_cap->is_link_setup) {
-		mutex_unlock(&isi_cap->lock);
-		return 0;
+		ret = 0;
+		goto unlock;
 	}
-	mutex_unlock(&isi_cap->lock);
 
 	if (mxc_isi->m2m_enabled) {
 		dev_err(dev, "ISI channel[%d] is busy\n", isi_cap->id);
-		return ret;
+		goto unlock;
 	}
 
 	sd = mxc_get_remote_subdev(&isi_cap->sd, __func__);
-	if (!sd)
-		return -ENODEV;
-
-	mutex_lock(&isi_cap->lock);
-	ret = v4l2_fh_open(file);
-	if (ret) {
-		mutex_unlock(&isi_cap->lock);
-		return ret;
+	if (!sd) {
+		ret = -ENODEV;
+		goto unlock;
 	}
+
+	ret = v4l2_fh_open(file);
+	if (ret)
+		goto unlock;
+
+	if (v4l2_fh_is_singular_file(file)) {
+		pr_info("%s - do init\n", __func__);
+		pm_runtime_get_sync(dev);
+		ret = v4l2_subdev_call(sd, core, s_power, 1);
+		if (ret < 0 && ret != -ENOIOCTLCMD) {
+			v4l2_err(sd, "failed to power on %s: %d\n", sd->name,
+				 ret);
+			pm_runtime_put(dev);
+			goto unlock;
+		} else if (ret == -ENOIOCTLCMD) {
+			ret = 0;
+		}
+	}
+
+	if (ret < 0) {
+		v4l2_fh_release(file);
+		goto unlock;
+	}
+
+unlock:
 	mutex_unlock(&isi_cap->lock);
 
-	pm_runtime_get_sync(dev);
-
-	ret = v4l2_subdev_call(sd, core, s_power, 1);
-	if (ret) {
-		dev_err(dev, "Call subdev s_power fail!\n");
-		pm_runtime_put(dev);
-		return ret;
+	if (!ret) {
+		/* increase usage count for ISI channel */
+		mutex_lock(&mxc_isi->lock);
+		atomic_inc(&mxc_isi->usage_count);
+		mxc_isi->m2m_enabled = false;
+		mutex_unlock(&mxc_isi->lock);
 	}
 
-	/* increase usage count for ISI channel */
-	mutex_lock(&mxc_isi->lock);
-	atomic_inc(&mxc_isi->usage_count);
-	mxc_isi->m2m_enabled = false;
-	mutex_unlock(&mxc_isi->lock);
-
-	return 0;
+	return ret;
 }
 
 static int mxc_isi_capture_release(struct file *file)
@@ -851,37 +865,34 @@ static int mxc_isi_capture_release(struct file *file)
 	struct mxc_isi_dev *mxc_isi = mxc_isi_get_hostdata(isi_cap->pdev);
 	struct device *dev = &isi_cap->pdev->dev;
 	struct v4l2_subdev *sd;
-	int ret = -1;
+	bool do_release;
 
 	if (!isi_cap->is_link_setup)
 		return 0;
 
 	sd = mxc_get_remote_subdev(&isi_cap->sd, __func__);
 	if (!sd)
-		goto label;
+		return 0;
 
-	mutex_lock(&isi_cap->lock);
-	ret = _vb2_fop_release(file, NULL);
-	if (ret) {
-		dev_err(dev, "%s fail\n", __func__);
-		mutex_unlock(&isi_cap->lock);
-		goto label;
-	}
-	mutex_unlock(&isi_cap->lock);
-
+	mutex_lock(&mxc_isi->lock);
 	if (atomic_read(&mxc_isi->usage_count) > 0 &&
 	    atomic_dec_and_test(&mxc_isi->usage_count))
 		mxc_isi_channel_deinit(mxc_isi);
+	mutex_unlock(&mxc_isi->lock);
 
-	ret = v4l2_subdev_call(sd, core, s_power, 0);
-	if (ret < 0 && ret != -ENOIOCTLCMD) {
-		dev_err(dev, "%s s_power fail\n", __func__);
-		goto label;
+	mutex_lock(&isi_cap->lock);
+
+	_vb2_fop_release(file, NULL);
+	do_release = v4l2_fh_is_singular_file(file);
+	if (do_release) {
+		pr_info("%s - do release\n", __func__);
+		v4l2_subdev_call(sd, core, s_power, 0);
+		pm_runtime_put(dev);
 	}
 
-label:
-	pm_runtime_put(dev);
-	return (ret) ? ret : 0;
+	mutex_unlock(&isi_cap->lock);
+
+	return 0;
 }
 
 static const struct v4l2_file_operations mxc_isi_capture_fops = {
