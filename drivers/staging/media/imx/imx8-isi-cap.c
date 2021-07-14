@@ -1781,7 +1781,7 @@ static int mxc_isi_register_cap_device(struct mxc_isi_cap_dev *isi_cap,
 	vdev->release	= video_device_release_empty;
 	vdev->queue	= q;
 	vdev->lock	= &isi_cap->lock;
-
+	vdev->vfl_dir	= VFL_DIR_RX,
 	vdev->device_caps = V4L2_CAP_STREAMING | V4L2_CAP_VIDEO_CAPTURE_MPLANE;
 	video_set_drvdata(vdev, isi_cap);
 
