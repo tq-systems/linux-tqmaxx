@@ -270,8 +270,8 @@
 	pinctrl-names = "default", "gpio";
 	pinctrl-0 = <&pinctrl_lpi2c0>;
 	pinctrl-1 = <&pinctrl_lpi2c0_gpio>;
-	scl-gpios = <&lsio_gpio3 8 GPIO_ACTIVE_HIGH>;
-	sda-gpios = <&lsio_gpio3 7 GPIO_ACTIVE_HIGH>;
+	scl-gpios = <&lsio_gpio3 8 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
+	sda-gpios = <&lsio_gpio3 7 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
 	status = "okay";
 
 	/* NXP SE97BTP with temperature sensor + eeprom */
@@ -316,8 +316,8 @@
 	pinctrl-names = "default", "gpio";
 	pinctrl-0 = <&pinctrl_i2c0_mipi_lvds0>;
 	pinctrl-1 = <&pinctrl_i2c0_gpio_mipi_lvds0>;
-	scl-gpios = <&lsio_gpio1 25 GPIO_ACTIVE_HIGH>;
-	sda-gpios = <&lsio_gpio1 26 GPIO_ACTIVE_HIGH>;
+	scl-gpios = <&lsio_gpio1 25 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
+	sda-gpios = <&lsio_gpio1 26 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
 	/*
 	 * clocks near 100kHz: too short high time (I2C standard violation)
 	 * clocks > 100kHz: too short fall time (I2C standard violation)
