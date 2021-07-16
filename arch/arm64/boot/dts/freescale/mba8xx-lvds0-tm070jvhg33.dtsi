@@ -35,6 +35,10 @@
 	status = "okay";
 };
 
+&adma_pwm_lpcg {
+	status = "okay";
+};
+
 &iomuxc {
 	pinctrl_admapwm: admapwmgrp {
 		fsl,pins = <
