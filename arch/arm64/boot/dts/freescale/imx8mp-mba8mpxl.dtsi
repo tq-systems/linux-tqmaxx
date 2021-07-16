@@ -51,6 +51,7 @@
 		#cooling-cells = <2>;
 		pwms = <&pwm3 0 10000 0>;
 		cooling-levels = <0 102 170 230>;
+		status = "disabled";
 	};
 
 	gpio-keys {
