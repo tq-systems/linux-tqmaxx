@@ -283,8 +283,8 @@
 	pinctrl-names = "default", "gpio";
 	pinctrl-0 = <&pinctrl_lpi2c2>;
 	pinctrl-1 = <&pinctrl_lpi2c2gpio>;
-	scl-gpios = <&lsio_gpio1 31 GPIO_ACTIVE_HIGH>;
-	sda-gpios = <&lsio_gpio2 0 GPIO_ACTIVE_HIGH>;
+	scl-gpios = <&lsio_gpio1 31 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
+	sda-gpios = <&lsio_gpio2 0 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
 	status = "okay";
 };
 

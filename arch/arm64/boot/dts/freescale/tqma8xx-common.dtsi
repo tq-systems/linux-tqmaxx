@@ -152,8 +152,8 @@
 	pinctrl-names = "default", "gpio";
 	pinctrl-0 = <&pinctrl_lpi2c1>;
 	pinctrl-1 = <&pinctrl_lpi2c1gpio>;
-	scl-gpios = <&lsio_gpio1 27 GPIO_ACTIVE_HIGH>;
-	sda-gpios = <&lsio_gpio1 28 GPIO_ACTIVE_HIGH>;
+	scl-gpios = <&lsio_gpio1 27 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
+	sda-gpios = <&lsio_gpio1 28 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
 	status = "okay";
 
 	/* NXP SE97BTP with temperature sensor + eeprom */
