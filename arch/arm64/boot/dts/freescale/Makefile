@@ -82,6 +82,8 @@ dtb-$(CONFIG_ARCH_MXC) += imx8mp-evk.dtb imx8mp-evk-root.dtb imx8mp-evk-inmate.d
 dtb-$(CONFIG_ARCH_MXC) += imx8mp-ddr4-evk.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8mp-mba8mpxl.dtb \
 			  imx8mp-mba8mpxl-hdmi.dtb \
+			  imx8mp-mba8mpxl-hdmi-imx327.dtb \
+			  imx8mp-mba8mpxl-hdmi-ov9281.dtb \
 			  imx8mp-mba8mpxl-lvds-tm070jvhg33.dtb \
 			  imx8mp-mba8mpxl-rpmsg.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8mq-evk.dtb imx8mq-evk-rpmsg.dtb imx8mq-evk-pcie1-m2.dtb imx8mq-evk-usd-wifi.dtb \
