@@ -307,6 +307,7 @@
 		compatible = "nxp,se97b", "atmel,24c02";
 		reg = <0x53>;
 		pagesize = <16>;
+		read-only;
 	};
 };
 
