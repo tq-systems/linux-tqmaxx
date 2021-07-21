@@ -880,6 +880,20 @@ static int mipi_csi2_s_stream(struct v4l2_subdev *sd, int enable)
 	return ret;
 }
 
+static int mipi_csi2_enum_mbus_code(struct v4l2_subdev *sd,
+				    struct v4l2_subdev_pad_config *cfg,
+				    struct v4l2_subdev_mbus_code_enum *code)
+{
+	struct mxc_mipi_csi2_dev *csi2dev = sd_to_mxc_mipi_csi2_dev(sd);
+	struct v4l2_subdev *sen_sd;
+
+	sen_sd = mxc_get_remote_subdev(csi2dev, __func__);
+	if (!sen_sd)
+		return -EINVAL;
+
+	return v4l2_subdev_call(sen_sd, pad, enum_mbus_code, cfg, code);
+}
+
 static int mipi_csi2_enum_framesizes(struct v4l2_subdev *sd,
 				     struct v4l2_subdev_pad_config *cfg,
 				     struct v4l2_subdev_frame_size_enum *fse)
@@ -958,6 +972,7 @@ static const struct v4l2_subdev_internal_ops mipi_csi2_sd_internal_ops = {
 static struct v4l2_subdev_pad_ops mipi_csi2_pad_ops = {
 	.enum_frame_size = mipi_csi2_enum_framesizes,
 	.enum_frame_interval = mipi_csi2_enum_frame_interval,
+	.enum_mbus_code = mipi_csi2_enum_mbus_code,
 	.get_fmt = mipi_csi2_get_fmt,
 	.set_fmt = mipi_csi2_set_fmt,
 };
