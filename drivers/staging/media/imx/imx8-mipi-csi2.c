@@ -891,7 +891,7 @@ static int mipi_csi2_enum_framesizes(struct v4l2_subdev *sd,
 	if (!sen_sd)
 		return -EINVAL;
 
-	return v4l2_subdev_call(sen_sd, pad, enum_frame_size, NULL, fse);
+	return v4l2_subdev_call(sen_sd, pad, enum_frame_size, cfg, fse);
 }
 
 static int mipi_csi2_enum_frame_interval(struct v4l2_subdev *sd,
@@ -905,7 +905,7 @@ static int mipi_csi2_enum_frame_interval(struct v4l2_subdev *sd,
 	if (!sen_sd)
 		return -EINVAL;
 
-	return v4l2_subdev_call(sen_sd, pad, enum_frame_interval, NULL, fie);
+	return v4l2_subdev_call(sen_sd, pad, enum_frame_interval, cfg, fie);
 }
 
 static int mipi_csi2_get_fmt(struct v4l2_subdev *sd,
@@ -944,7 +944,7 @@ static int mipi_csi2_set_fmt(struct v4l2_subdev *sd,
 		return -EINVAL;
 
 	fmt->pad = source_pad->index;
-	ret = v4l2_subdev_call(sen_sd, pad, set_fmt, NULL, fmt);
+	ret = v4l2_subdev_call(sen_sd, pad, set_fmt, cfg, fmt);
 	if (ret < 0 && ret != -ENOIOCTLCMD)
 		return ret;
 
