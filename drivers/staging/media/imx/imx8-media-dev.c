@@ -28,6 +28,7 @@
 #include <media/v4l2-async.h>
 #include <media/v4l2-ctrls.h>
 #include <media/media-device.h>
+#include <media/v4l2-mc.h>
 
 #include "imx8-common.h"
 
@@ -608,6 +609,18 @@ void mxc_sensor_notify(struct v4l2_subdev *sd, unsigned int notification,
 static int mxc_md_link_notify(struct media_link *link, unsigned int flags,
 			      unsigned int notification)
 {
+	int ret;
+
+	ret = v4l2_pipeline_link_notify(link, flags, notification);
+	if (ret)
+		return ret;
+
+	/*
+	 * TODO:
+	 * see implementation in imx-media-dev-common.c
+	 * reset / refresh controls for all devices reachable from the link
+	 */
+
 	return 0;
 }
 
