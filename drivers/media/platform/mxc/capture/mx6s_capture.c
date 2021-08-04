@@ -1203,6 +1203,11 @@ static int mx6s_csi_open(struct file *file)
 		request_bus_freq(BUS_FREQ_HIGH);
 
 		v4l2_subdev_call(sd, core, s_power, 1);
+		if (ret < 0) {
+			v4l2_err(sd, "failed to power on device: %d\n", ret);
+			vb2_queue_release(&csi_dev->vb2_vidq);
+			goto unlock;
+		}
 		mx6s_csi_init(csi_dev);
 
 	}
