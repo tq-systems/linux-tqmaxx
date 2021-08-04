@@ -1536,11 +1536,17 @@ static int _mx6s_vidioc_try_fmt_vid_cap(struct file *file, void *priv,
 	struct mx6s_csi_dev *csi_dev = video_drvdata(file);
 	struct v4l2_subdev *sd = csi_dev->sd;
 	struct v4l2_pix_format *pix = &f->fmt.pix;
+	struct v4l2_subdev_pad_config cfg;
+	struct v4l2_subdev_state state = {
+		.pads = &cfg
+	};
 	struct v4l2_subdev_format format = {
 		.which = which,
 	};
 	struct mx6s_fmt *fmt;
 	int ret;
+
+	memset(&cfg, 0, sizeof(cfg));
 
 	fmt = format_by_fourcc(f->fmt.pix.pixelformat);
 	if (!fmt) {
@@ -1556,7 +1562,7 @@ static int _mx6s_vidioc_try_fmt_vid_cap(struct file *file, void *priv,
 	}
 
 	v4l2_fill_mbus_format(&format.format, pix, fmt->mbus_code);
-	ret = v4l2_subdev_call(sd, pad, set_fmt, NULL, &format);
+	ret = v4l2_subdev_call(sd, pad, set_fmt, &state, &format);
 	v4l2_fill_pix_format(pix, &format.format);
 
 	if (pix->field != V4L2_FIELD_INTERLACED)
