@@ -294,14 +294,25 @@ static int mipi_csi2_s_power(struct v4l2_subdev *sd, int on)
 {
 	struct mxc_mipi_csi2_dev *csi2dev = sd_to_mxc_mipi_csi2_dev(sd);
 	struct v4l2_subdev *sensor_sd = csi2dev->sensor_sd;
+	struct device *dev = &csi2dev->pdev->dev;
+	int ret;
 
-	return v4l2_subdev_call(sensor_sd, core, s_power, on);
+	if (on)
+		pm_runtime_get_sync(dev);
+
+	ret = v4l2_subdev_call(sensor_sd, core, s_power, on);
+	if (ret < 0)
+		on = 0;
+
+	if (!on)
+		pm_runtime_put_sync(dev);
+
+	return ret;
 }
 
 static int mipi_csi2_s_stream(struct v4l2_subdev *sd, int enable)
 {
 	struct mxc_mipi_csi2_dev *csi2dev = sd_to_mxc_mipi_csi2_dev(sd);
-	struct device *dev = &csi2dev->pdev->dev;
 	struct v4l2_subdev *sensor_sd = csi2dev->sensor_sd;
 	int ret = 0;
 
@@ -309,26 +320,36 @@ static int mipi_csi2_s_stream(struct v4l2_subdev *sd, int enable)
 		__func__, enable, csi2dev->flags);
 
 	if (enable) {
-		if (!csi2dev->running) {
-			pm_runtime_get_sync(dev);
-			mxc_mipi_csi2_phy_reset(csi2dev);
-			mxc_mipi_csi2_hc_config(csi2dev);
-			mxc_mipi_csi2_enable(csi2dev);
-			mxc_mipi_csi2_reg_dump(csi2dev);
+		if (csi2dev->running) {
+			ret = -EBUSY;
+			goto out;
 		}
-		v4l2_subdev_call(sensor_sd, video, s_stream, true);
-		csi2dev->running++;
 
-	} else {
+		mxc_mipi_csi2_phy_reset(csi2dev);
+		mxc_mipi_csi2_hc_config(csi2dev);
+		mxc_mipi_csi2_enable(csi2dev);
+		mxc_mipi_csi2_reg_dump(csi2dev);
 
-		v4l2_subdev_call(sensor_sd, video, s_stream, false);
-		csi2dev->running--;
-		if (!csi2dev->running) {
-			pm_runtime_put(dev);
+		ret = v4l2_subdev_call(sensor_sd, video, s_stream, true);
+		if (ret < 0) {
 			mxc_mipi_csi2_disable(csi2dev);
+			goto out;
 		}
+
+		csi2dev->running = true;
+	} else {
+		if (!csi2dev->running) {
+			ret = -EPIPE;
+			goto out;
+		}
+
+		ret = v4l2_subdev_call(sensor_sd, video, s_stream, false);
+
+		mxc_mipi_csi2_disable(csi2dev);
+		csi2dev->running = false;
 	}
 
+out:
 	return ret;
 }
 
