@@ -1081,6 +1081,13 @@ static int mx6s_start_streaming(struct vb2_queue *vq, unsigned int count)
 	if (rc < 0) {
 		spin_lock_irqsave(&csi_dev->slock, flags);
 
+		dma_free_coherent(csi_dev->v4l2_dev.dev,
+				  csi_dev->discard_size,
+				  csi_dev->discard_buffer,
+				  csi_dev->discard_buffer_dma);
+
+		csi_dev->discard_buffer = NULL;
+
 		mx6s_release_bufs(&csi_dev->active_bufs, VB2_BUF_STATE_QUEUED);
 		mx6s_release_bufs(&csi_dev->capture, VB2_BUF_STATE_QUEUED);
 
@@ -1354,6 +1361,7 @@ static int mx6s_csi_open(struct file *file)
 		if (ret < 0) {
 			v4l2_err(sd, "failed to power on device: %d\n", ret);
 			vb2_queue_release(&csi_dev->vb2_vidq);
+			pm_runtime_put(csi_dev->dev);
 			goto unlock;
 		}
 		mx6s_csi_init(csi_dev);
