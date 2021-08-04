@@ -573,6 +573,7 @@ static int subdev_notifier_bound(struct v4l2_async_notifier *notifier,
 			       &sink->pads[0], MEDIA_LNK_FL_ENABLED);
 	if (rc < 0 && rc != -ENOIOCTLCMD) {
 		v4l2_err(&csi2dev->v4l2_dev, "failed to link pads: %d\n", rc);
+		csi2dev->sensor_sd = NULL;
 		goto out;
 	}
 
