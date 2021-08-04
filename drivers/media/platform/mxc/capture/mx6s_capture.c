@@ -1681,13 +1681,17 @@ static int mx6s_vidioc_streamon(struct file *file, void *priv,
 	if (i != V4L2_BUF_TYPE_VIDEO_CAPTURE)
 		return -EINVAL;
 
-	ret = vb2_streamon(&csi_dev->vb2_vidq, i);
+	ret = v4l2_subdev_call(sd, video, s_stream, 1);
 	if (ret < 0)
 		goto out;
 
-	ret = v4l2_subdev_call(sd, video, s_stream, 1);
-	if (ret < 0)
-		vb2_streamoff(&csi_dev->vb2_vidq, i);
+	ret = vb2_streamon(&csi_dev->vb2_vidq, i);
+	if (ret < 0) {
+		v4l2_subdev_call(sd, video, s_stream, 0);
+		goto out;
+	}
+
+	ret = 0;
 
 out:
 	return ret;
