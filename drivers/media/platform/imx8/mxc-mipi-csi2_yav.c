@@ -597,6 +597,12 @@ static int mipi_csi2_probe(struct platform_device *pdev)
 	csi2dev->sd.flags |= V4L2_SUBDEV_FL_HAS_DEVNODE;
 	csi2dev->sd.dev = &pdev->dev;
 
+	/* This allows to retrieve the platform device id by the host driver */
+	v4l2_set_subdevdata(&csi2dev->sd, pdev);
+
+	/* .. and a pointer to the subdev. */
+	platform_set_drvdata(pdev, csi2dev);
+
 	/* First register a v4l2 device */
 	ret = v4l2_device_register(dev, &csi2dev->v4l2_dev);
 	if (ret) {
@@ -613,12 +619,6 @@ static int mipi_csi2_probe(struct platform_device *pdev)
 	ret = mipi_csis_subdev_host(csi2dev);
 	if (ret < 0)
 		goto e_clkdis;
-
-	/* This allows to retrieve the platform device id by the host driver */
-	v4l2_set_subdevdata(&csi2dev->sd, pdev);
-
-	/* .. and a pointer to the subdev. */
-	platform_set_drvdata(pdev, csi2dev);
 
 	ret = mipi_csi2_clk_enable(csi2dev);
 	if (ret < 0)
