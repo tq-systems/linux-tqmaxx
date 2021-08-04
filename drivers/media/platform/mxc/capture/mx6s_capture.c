@@ -956,7 +956,7 @@ static int mx6s_configure_csi(struct mx6s_csi_dev *csi_dev)
 	if (csi_dev->csi_mipi_mode == true) {
 		cr1 = csi_read(csi_dev, CSI_CSICR1);
 		cr1 &= ~BIT_GCLK_MODE;
-		csi_write(csi_dev, cr1, CSI_CSICR1);
+		cr1 &= ~BIT_PIXEL_BIT;
 
 		cr18 = csi_read(csi_dev, CSI_CSICR18);
 		cr18 &= ~BIT_MIPI_DATA_FORMAT_MASK;
@@ -980,6 +980,7 @@ static int mx6s_configure_csi(struct mx6s_csi_dev *csi_dev)
 		case V4L2_PIX_FMT_SRGGB10:
 		case V4L2_PIX_FMT_Y10:
 			cr18 |= BIT_MIPI_DATA_FORMAT_RAW10;
+			cr1  |= BIT_PIXEL_BIT;
 			break;
 		case V4L2_PIX_FMT_SBGGR12:
 		case V4L2_PIX_FMT_SGRBG12:
@@ -987,12 +988,14 @@ static int mx6s_configure_csi(struct mx6s_csi_dev *csi_dev)
 		case V4L2_PIX_FMT_SRGGB12:
 		case V4L2_PIX_FMT_Y12:
 			cr18 |= BIT_MIPI_DATA_FORMAT_RAW12;
+			cr1  |= BIT_PIXEL_BIT;
 			break;
 		default:
 			pr_debug("   fmt not supported\n");
 			return -EINVAL;
 		}
 
+		csi_write(csi_dev, cr1, CSI_CSICR1);
 		csi_write(csi_dev, cr18, CSI_CSICR18);
 	}
 	return 0;
