@@ -465,7 +465,7 @@ static int mipi_csi2_set_fmt(struct v4l2_subdev *sd,
 	}
 	csi2dev->send_level = 64;
 
-	return v4l2_subdev_call(sensor_sd, pad, set_fmt, NULL, fmt);
+	return v4l2_subdev_call(sensor_sd, pad, set_fmt, cfg, fmt);
 }
 
 static int mipi_csis_s_parm(struct v4l2_subdev *sd, struct v4l2_streamparm *a)
