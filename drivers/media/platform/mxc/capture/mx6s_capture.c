@@ -998,6 +998,18 @@ static int mx6s_configure_csi(struct mx6s_csi_dev *csi_dev)
 	return 0;
 }
 
+static void mx6s_release_bufs(struct list_head *bufs,
+			      enum vb2_buffer_state state)
+{
+	while (!list_empty(bufs)) {
+		struct mx6s_buffer	*buf =
+			list_first_entry(bufs, struct mx6s_buffer, internal.queue);
+
+		list_del_init(&buf->internal.queue);
+		vb2_buffer_done(&buf->vb.vb2_buf, state);
+	}
+}
+
 static int mx6s_start_streaming(struct vb2_queue *vq, unsigned int count)
 {
 	struct mx6s_csi_dev *csi_dev = vb2_get_drv_priv(vq);
@@ -1005,6 +1017,7 @@ static int mx6s_start_streaming(struct vb2_queue *vq, unsigned int count)
 	struct mx6s_buffer *buf;
 	unsigned long phys;
 	unsigned long flags;
+	int rc;
 
 	if (count < 2)
 		return -ENOBUFS;
@@ -1061,7 +1074,22 @@ static int mx6s_start_streaming(struct vb2_queue *vq, unsigned int count)
 
 	spin_unlock_irqrestore(&csi_dev->slock, flags);
 
-	return mx6s_csi_enable(csi_dev);
+	rc = mx6s_csi_enable(csi_dev);
+	if (rc < 0) {
+		spin_lock_irqsave(&csi_dev->slock, flags);
+
+		mx6s_release_bufs(&csi_dev->active_bufs, VB2_BUF_STATE_QUEUED);
+		mx6s_release_bufs(&csi_dev->capture, VB2_BUF_STATE_QUEUED);
+
+		spin_unlock_irqrestore(&csi_dev->slock, flags);
+
+		goto out;
+	}
+
+	rc = 0;
+
+out:
+	return rc;
 }
 
 static void mx6s_stop_streaming(struct vb2_queue *vq)
