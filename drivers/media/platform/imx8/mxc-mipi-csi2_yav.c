@@ -513,6 +513,9 @@ static int subdev_notifier_bound(struct v4l2_async_notifier *notifier,
 				 struct v4l2_async_connection *asd)
 {
 	struct mxc_mipi_csi2_dev *csi2dev = notifier_to_mipi_dev(notifier);
+	struct media_entity *source = &subdev->entity;
+	struct media_entity *sink = &csi2dev->sd.entity;
+	int rc;
 
 	if (subdev == NULL)
 		return -EINVAL;
@@ -521,10 +524,20 @@ static int subdev_notifier_bound(struct v4l2_async_notifier *notifier,
 	if (csi2dev->fwnode == of_fwnode_handle(subdev->dev->of_node))
 		csi2dev->sensor_sd = subdev;
 
+	rc = media_entity_call(source, link_setup, &source->pads[0],
+			       &sink->pads[0], MEDIA_LNK_FL_ENABLED);
+	if (rc < 0 && rc != -ENOIOCTLCMD) {
+		v4l2_err(&csi2dev->v4l2_dev, "failed to link pads: %d\n", rc);
+		goto out;
+	}
+
 	v4l2_info(&csi2dev->v4l2_dev, "Registered sensor subdevice: %s\n",
 		  subdev->name);
 
-	return 0;
+	rc = 0;
+
+out:
+	return rc;
 }
 
 static void subdev_notifier_unbind(struct v4l2_async_notifier *notifier,
@@ -532,9 +545,17 @@ static void subdev_notifier_unbind(struct v4l2_async_notifier *notifier,
 				   struct v4l2_async_connection *asc)
 {
 	struct mxc_mipi_csi2_dev *csi2dev = notifier_to_mipi_dev(notifier);
+	struct media_entity *source = &subdev->entity;
+	struct media_entity *sink = &csi2dev->sd.entity;
+	int rc;
 
 	if (csi2dev->sensor_sd != subdev)
 		return;
+
+	rc = media_entity_call(source, link_setup, &source->pads[0],
+			       &sink->pads[0], 0);
+	if (rc < 0 && rc != -ENOIOCTLCMD)
+		v4l2_warn(&csi2dev->v4l2_dev, "failed to unlink pads: %d\n", rc);
 
 	csi2dev->sensor_sd = NULL;
 
