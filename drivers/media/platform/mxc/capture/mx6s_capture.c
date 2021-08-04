@@ -131,6 +131,7 @@
 #define BIT_CSI_ENABLE			(0x1 << 31)
 #define BIT_MIPI_DATA_FORMAT_RAW8		(0x2a << 25)
 #define BIT_MIPI_DATA_FORMAT_RAW10		(0x2b << 25)
+#define BIT_MIPI_DATA_FORMAT_RAW12		(0x2c << 25)
 #define BIT_MIPI_DATA_FORMAT_YUV422_8B	(0x1e << 25)
 #define BIT_MIPI_DATA_FORMAT_MASK	(0x3F << 25)
 #define BIT_MIPI_DATA_FORMAT_OFFSET	25
@@ -266,6 +267,24 @@ static struct mx6s_fmt formats[] = {
 		.pixelformat	= V4L2_PIX_FMT_SBGGR8,
 		.mbus_code	= MEDIA_BUS_FMT_SBGGR8_1X8,
 		.bpp		= 1,
+	}, {
+		.name		= "Grey8 (Y8)",
+		.fourcc		= V4L2_PIX_FMT_GREY,
+		.pixelformat	= V4L2_PIX_FMT_GREY,
+		.mbus_code	= MEDIA_BUS_FMT_Y8_1X8,
+		.bpp		= 1,
+	}, {
+		.name		= "Grey10 (Y10)",
+		.fourcc		= V4L2_PIX_FMT_Y10,
+		.pixelformat	= V4L2_PIX_FMT_Y10,
+		.mbus_code	= MEDIA_BUS_FMT_Y10_1X10,
+		.bpp		= 2,
+	}, {
+		.name		= "Grey12 (Y12)",
+		.fourcc		= V4L2_PIX_FMT_Y12,
+		.pixelformat	= V4L2_PIX_FMT_Y12,
+		.mbus_code	= MEDIA_BUS_FMT_Y12_1X12,
+		.bpp		= 2,
 	}
 };
 
@@ -836,10 +855,13 @@ static int mx6s_configure_csi(struct mx6s_csi_dev *csi_dev)
 	}
 
 	switch (csi_dev->fmt->pixelformat) {
+	case V4L2_PIX_FMT_GREY:
 	case V4L2_PIX_FMT_YUV32:
 	case V4L2_PIX_FMT_SBGGR8:
 		width = pix->width;
 		break;
+	case V4L2_PIX_FMT_Y10:
+	case V4L2_PIX_FMT_Y12:
 	case V4L2_PIX_FMT_UYVY:
 	case V4L2_PIX_FMT_YUYV:
 		if (csi_dev->csi_mipi_mode == true)
@@ -869,7 +891,14 @@ static int mx6s_configure_csi(struct mx6s_csi_dev *csi_dev)
 			cr18 |= BIT_MIPI_DATA_FORMAT_YUV422_8B;
 			break;
 		case V4L2_PIX_FMT_SBGGR8:
+		case V4L2_PIX_FMT_GREY:
 			cr18 |= BIT_MIPI_DATA_FORMAT_RAW8;
+			break;
+		case V4L2_PIX_FMT_Y10:
+			cr18 |= BIT_MIPI_DATA_FORMAT_RAW10;
+			break;
+		case V4L2_PIX_FMT_Y12:
+			cr18 |= BIT_MIPI_DATA_FORMAT_RAW12;
 			break;
 		default:
 			pr_debug("   fmt not supported\n");
