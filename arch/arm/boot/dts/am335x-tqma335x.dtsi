@@ -12,6 +12,8 @@
 
 #include "am33xx.dtsi"
 
+#include "dt-bindings/interrupt-controller/irq.h"
+
 / {
 	model = "TQ-Systems GmbH TQMa335x";
 	compatible = "tq,tqma335x", "ti,am33xx";
@@ -100,7 +102,7 @@
 		compatible = "ti,tps65910";
 		reg = <0x2d>;
 		interrupt-parent = <&expander2>;
-		interrupts = <4 0>;
+		interrupts = <4 IRQ_TYPE_EDGE_RISING>;
 		ti,en-ck32k-xtal;
 	};
 
