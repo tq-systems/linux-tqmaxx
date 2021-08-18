@@ -1537,6 +1537,11 @@ static int _mx6s_vidioc_try_fmt_vid_cap(struct file *file, void *priv,
 	struct v4l2_subdev *sd = csi_dev->sd;
 	struct v4l2_pix_format *pix = &f->fmt.pix;
 	struct v4l2_subdev_pad_config cfg;
+	struct v4l2_subdev_selection sel = {
+		.which = V4L2_SUBDEV_FORMAT_ACTIVE,
+		.pad = 0,
+		.target = V4L2_SEL_TGT_CROP,
+	};
 	struct v4l2_subdev_format format = {
 		.which = which,
 	};
@@ -1557,6 +1562,18 @@ static int _mx6s_vidioc_try_fmt_vid_cap(struct file *file, void *priv,
 			f->fmt.pix.width, f->fmt.pix.height);
 		return -EINVAL;
 	}
+
+	if (which == V4L2_SUBDEV_FORMAT_TRY) {
+		ret = v4l2_subdev_call(sd, pad, get_selection, &cfg, &sel);
+		if (ret < 0 && ret != -ENOIOCTLCMD)
+			return ret;
+
+		sel.which = V4L2_SUBDEV_FORMAT_TRY;
+
+		ret = v4l2_subdev_call(sd, pad, set_selection, &cfg, &sel);
+		if (ret < 0 && ret != -ENOIOCTLCMD)
+			return ret;
+	};
 
 	v4l2_fill_mbus_format(&format.format, pix, fmt->mbus_code);
 	ret = v4l2_subdev_call(sd, pad, set_fmt, &cfg, &format);
