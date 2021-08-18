@@ -410,7 +410,7 @@ static int mipi_csi2_get_selection(struct v4l2_subdev *sd,
 	if (s->pad)
 		return -EINVAL;
 
-	return v4l2_subdev_call(sensor_sd, pad, get_selection, NULL, s);
+	return v4l2_subdev_call(sensor_sd, pad, get_selection, sd_state, s);
 }
 
 static int mipi_csi2_set_selection(struct v4l2_subdev *sd,
@@ -423,7 +423,7 @@ static int mipi_csi2_set_selection(struct v4l2_subdev *sd,
 	if (s->pad)
 		return -EINVAL;
 
-	return v4l2_subdev_call(sensor_sd, pad, set_selection, NULL, s);
+	return v4l2_subdev_call(sensor_sd, pad, set_selection, sd_state, s);
 }
 
 static int mipi_csi2_set_fmt(struct v4l2_subdev *sd,
