@@ -112,4 +112,12 @@
 		resets = <&k3_reset 9 1>;
 		firmware-name = "am64-mcu-m4f0_0-fw";
 	};
+
+	mcu_pmx0: pinctrl@4084000 {
+		compatible = "pinctrl-single";
+		reg = <0x00 0x4084000 0x00 0x84>;
+		#pinctrl-cells = <1>;
+		pinctrl-single,register-width = <32>;
+		pinctrl-single,function-mask = <0xffffffff>;
+	};
 };
