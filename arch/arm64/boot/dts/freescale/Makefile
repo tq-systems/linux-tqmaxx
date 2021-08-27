@@ -209,10 +209,12 @@ dtb-$(CONFIG_ARCH_MXC) += imx8dxp-mb-smarc-2.dtb \
 			  imx8dxp-mb-smarc-2-lvds0-g133han01.dtb \
 			  imx8dxp-mb-smarc-2-lvds0-tm070jvhg33.dtb \
 			  imx8dxp-mb-smarc-2-lvds1-tm070jvhg33.dtb \
+			  imx8dxp-mb-smarc-2-rpmsg.dtb \
 			  imx8qxp-mb-smarc-2.dtb \
 			  imx8qxp-mb-smarc-2-lvds0-g133han01.dtb \
 			  imx8qxp-mb-smarc-2-lvds0-tm070jvhg33.dtb \
 			  imx8qxp-mb-smarc-2-lvds1-tm070jvhg33.dtb \
+			  imx8qxp-mb-smarc-2-rpmsg.dtb \
 			  imx8qxp-mb-smarc-2-r0200.dtb \
 			  imx8qxp-mb-smarc-2-r0200-lvds0-g133han01.dtb \
 			  imx8qxp-mb-smarc-2-r0200-lvds0-tm070jvhg33.dtb
