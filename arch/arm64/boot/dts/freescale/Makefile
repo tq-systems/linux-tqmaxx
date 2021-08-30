@@ -197,10 +197,12 @@ dtb-$(CONFIG_ARCH_MXC) += imx8dxl-evk.dtb imx8dxl-evk-rpmsg.dtb \
 dtb-$(CONFIG_ARCH_MXC) += imx8dxp-mba8xx.dtb \
 			  imx8dxp-mba8xx-lvds0-tm070jvhg33.dtb \
 			  imx8dxp-mba8xx-lvds1-tm070jvhg33.dtb \
+			  imx8dxp-mba8xx-rpmsg.dtb \
 			  imx8dxp-mba8xx-sd-uhs.dtb \
 			  imx8qxp-mba8xx.dtb \
 			  imx8qxp-mba8xx-lvds0-tm070jvhg33.dtb \
 			  imx8qxp-mba8xx-lvds1-tm070jvhg33.dtb \
+			  imx8qxp-mba8xx-rpmsg.dtb \
 			  imx8qxp-mba8xx-sd-uhs.dtb
 
 dtb-$(CONFIG_ARCH_MXC) += imx8dxp-mb-smarc-2.dtb \
