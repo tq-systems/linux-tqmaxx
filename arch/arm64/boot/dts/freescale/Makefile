@@ -138,7 +138,8 @@ dtb-$(CONFIG_ARCH_MXC) += imx8qm-mba8x.dtb \
 			  imx8qm-mba8x-lvds0-tm070jvhg33.dtb \
 			  imx8qm-mba8x-lvds1-tm070jvhg33.dtb \
 			  imx8qm-mba8x-dp.dtb \
-			  imx8qm-mba8x-mikrobus-rtc5.dtb
+			  imx8qm-mba8x-mikrobus-rtc5.dtb \
+			  imx8qm-mba8x-rpmsg.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8qxp-ai_ml.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8dxl-phantom-mek.dtb \
 			  imx8dxl-phantom-mek-rpmsg.dtb
