@@ -17,6 +17,7 @@ cm40_subsys: bus@34000000 {
 		#clock-cells = <0>;
 		clock-frequency = <132000000>;
 		clock-output-names = "cm40_ipg_clk";
+		status = "disabled";
 	};
 
 	cm40_i2c: i2c@37230000 {
@@ -43,6 +44,7 @@ cm40_subsys: bus@34000000 {
 		clock-output-names = "cm40_lpcg_i2c_clk",
 				     "cm40_lpcg_i2c_ipg_clk";
 		power-domains = <&pd IMX_SC_R_M4_0_I2C>;
+		status = "disabled";
 	};
 
 	cm40_intmux: intmux@37400000 {
@@ -88,5 +90,6 @@ cm40_subsys: bus@34000000 {
 		clock-output-names = "cm40_lpcg_uart_clk",
 				     "cm40_lpcg_uart_ipg_clk";
 		power-domains = <&pd IMX_SC_R_M4_0_UART>;
+		status = "disabled";
 	};
 };
