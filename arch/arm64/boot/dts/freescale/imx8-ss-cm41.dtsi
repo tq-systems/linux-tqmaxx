@@ -43,6 +43,7 @@ cm41_subsys: bus@38000000 {
 		clock-output-names = "cm41_lpcg_i2c_clk",
 				     "cm41_lpcg_i2c_ipg_clk";
 		power-domains = <&pd IMX_SC_R_M4_1_I2C>;
+		status = "disabled";
 	};
 
 	cm41_intmux: intmux@3b400000 {
