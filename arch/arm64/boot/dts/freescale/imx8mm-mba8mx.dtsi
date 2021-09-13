@@ -87,7 +87,6 @@
 
 	panel0: panel_lvds0 {
 		backlight = <&backlight_lvds0>;
-		/* power-supply = <&reg_mba8mq_12v>; */
 		status = "disabled";
 
 		port {
