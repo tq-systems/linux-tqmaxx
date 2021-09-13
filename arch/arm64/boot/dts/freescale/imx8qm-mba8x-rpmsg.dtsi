@@ -44,14 +44,14 @@
 
 	reserved-memory {
 		/*
-		 * 0x8000_0000 ~ 0x8FFF_FFFF is reserved for M4
+		 * 0x8800_0000 ~ 0x8FFF_FFFF is reserved for M4
 		 * Should not be used at A core and Linux side, when M4 running
 		 * from RAM. Needs to be the same as reserved in
 		 * board_system_config of SCU FW
 		 */
-		m4_reserved: m4@80000000 {
+		m4_reserved: m4@88000000 {
 			no-map;
-			reg = <0 0x80000000 0 0x10000000>;
+			reg = <0 0x88000000 0 0x8000000>;
 		};
 
 		rpmsg_reserved: rpmsg@90000000 {
