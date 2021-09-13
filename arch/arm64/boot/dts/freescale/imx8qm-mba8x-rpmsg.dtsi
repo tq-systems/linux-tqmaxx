@@ -49,12 +49,12 @@
 		 * from RAM. Needs to be the same as reserved in
 		 * board_system_config of SCU FW
 		 */
-		m4_reserved: m4@0x80000000 {
+		m4_reserved: m4@80000000 {
 			no-map;
 			reg = <0 0x80000000 0 0x10000000>;
 		};
 
-		rpmsg_reserved: rpmsg@0x90000000 {
+		rpmsg_reserved: rpmsg@90000000 {
 			no-map;
 			reg = <0 0x90000000 0 0x200000>;
 		};
