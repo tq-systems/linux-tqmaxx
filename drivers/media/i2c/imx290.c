@@ -937,6 +937,11 @@ static int imx290_set_ctrl(struct v4l2_ctrl *ctrl)
 		break;
 	}
 
+	case V4L2_CID_LINK_FREQ:
+	case V4L2_CID_PIXEL_RATE:
+		/* read-only, index always valid */
+		ret = 0;
+		break;
 	default:
 		ret = -EINVAL;
 		break;
