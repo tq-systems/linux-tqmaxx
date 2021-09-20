@@ -299,6 +299,8 @@ img_subsys: bus@58000000 {
 	i2c_mipi_csi0: i2c@58226000 {
 		compatible = "fsl,imx8qxp-lpi2c", "fsl,imx7ulp-lpi2c";
 		reg = <0x58226000 0x1000>;
+		#address-cells = <1>;
+		#size-cells = <0>;
 		interrupts = <8>;
 		interrupt-parent = <&irqsteer_csi0>;
 		clocks = <&clk IMX_SC_R_CSI_0_I2C_0 IMX_SC_PM_CLK_PER>,
@@ -341,6 +343,8 @@ img_subsys: bus@58000000 {
 	i2c_mipi_csi1: i2c@58246000 {
 		compatible = "fsl,imx8qxp-lpi2c", "fsl,imx7ulp-lpi2c";
 		reg = <0x58246000 0x1000>;
+		#address-cells = <1>;
+		#size-cells = <0>;
 		interrupts = <8>;
 		interrupt-parent = <&irqsteer_csi1>;
 		clocks = <&clk IMX_SC_R_CSI_1_I2C_0 IMX_SC_PM_CLK_PER>,
