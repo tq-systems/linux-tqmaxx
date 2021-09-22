@@ -23,6 +23,7 @@ struct mxsfb_devdata {
 	unsigned int	hs_wdth_shift;
 	bool		has_overlay;
 	unsigned int	ipversion;
+	bool		has_ctrl2;
 };
 
 struct mxsfb_drm_private {
