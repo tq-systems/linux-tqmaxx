@@ -342,6 +342,7 @@ struct phy_c45_device_ids {
  * suspended_by_mdio_bus: Set to true if this phy was suspended by MDIO bus.
  * sysfs_links: Internal boolean tracking sysfs symbolic links setup/removal.
  * loopback_enabled: Set true if this phy has been loopbacked successfully.
+ * mac_managed_pm: Set true if MAC driver takes of suspending/resuming PHY
  * state: state of the PHY for management purposes
  * dev_flags: Device-specific flags used by the PHY driver.
  * irq: IRQ number of the PHY's interrupt (-1 if none)
@@ -379,6 +380,7 @@ struct phy_device {
 	unsigned suspended_by_mdio_bus:1;
 	unsigned sysfs_links:1;
 	unsigned loopback_enabled:1;
+	unsigned mac_managed_pm:1;
 
 	unsigned autoneg:1;
 	/* The most recently read link state */
