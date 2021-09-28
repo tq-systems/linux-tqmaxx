@@ -118,6 +118,18 @@ properties:
       Transmitt FIFO depth- see dt-bindings/net/ti-dp83867.h for applicable
       values.
 
+  ti,led-function:
+    $ref: /schemas/types.yaml#definitions/uint32
+    description: |
+      Value of LED configuration register 1, controlling the triggers for
+      the PHY LED GPIOs.
+
+  ti,led-ctrl:
+    $ref: /schemas/types.yaml#definitions/uint32
+    description: |
+      Value of LED configuration register 2, controlling polarity and
+      related settings for the PHY LED GPIOs.
+
 required:
   - reg
 
