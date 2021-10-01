@@ -90,6 +90,7 @@ config PCI_EXYNOS
 
 config PCI_IMX6
 	tristate "Freescale i.MX6/7/8 PCIe driver"
+	select PCIE_DW
 
 config PCI_IMX6_HOST
 	bool "Freescale i.MX6/7/8 PCIe controller host mode"

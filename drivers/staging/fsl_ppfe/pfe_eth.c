@@ -1136,7 +1136,13 @@ static void pfe_eth_adjust_link(struct net_device *ndev)
 			gemac_set_speed(priv->EMAC_baseaddr,
 					pfe_get_phydev_speed(phydev));
 			if (priv->einfo->mii_config ==
-					PHY_INTERFACE_MODE_RGMII_ID)
+			    PHY_INTERFACE_MODE_RGMII ||
+			    priv->einfo->mii_config ==
+			    PHY_INTERFACE_MODE_RGMII_ID ||
+			    priv->einfo->mii_config ==
+			    PHY_INTERFACE_MODE_RGMII_RXID ||
+			    priv->einfo->mii_config ==
+			    PHY_INTERFACE_MODE_RGMII_TXID)
 				pfe_set_rgmii_speed(phydev);
 			priv->oldspeed = phydev->speed;
 		}
@@ -2008,10 +2014,10 @@ static void pfe_eth_set_multi(struct net_device *ndev)
 		netdev_for_each_mc_addr(ha, ndev) {
 			addr = ha->addr;
 
-			netif_info(priv, drv, ndev,
-				   "adding multicast address %X:%X:%X:%X:%X:%X to gem filter\n",
-				addr[0], addr[1], addr[2],
-				addr[3], addr[4], addr[5]);
+			netif_dbg(priv, drv, ndev,
+				  "adding multicast address %X:%X:%X:%X:%X:%X to gem filter\n",
+				  addr[0], addr[1], addr[2],
+				  addr[3], addr[4], addr[5]);
 
 			result = pfe_eth_get_hash(addr);
 
@@ -2030,18 +2036,18 @@ static void pfe_eth_set_multi(struct net_device *ndev)
 			addr = ha->addr;
 
 			if (++uc_count < MAX_UC_SPEC_ADDR_REG)   {
-				netdev_info(ndev,
-					    "adding unicast address %02x:%02x:%02x:%02x:%02x:%02x to gem filter\n",
-					    addr[0], addr[1], addr[2],
-					    addr[3], addr[4], addr[5]);
+				netdev_dbg(ndev,
+					   "adding unicast address %02x:%02x:%02x:%02x:%02x:%02x to gem filter\n",
+					   addr[0], addr[1], addr[2],
+					   addr[3], addr[4], addr[5]);
 				pfe_eth_enet_addr_byte_mac(addr, &spec_addr);
 				gemac_set_laddrN(priv->EMAC_baseaddr,
 						 &spec_addr, uc_count + 2);
 			} else {
-				netif_info(priv, drv, ndev,
-					   "adding unicast address %02x:%02x:%02x:%02x:%02x:%02x to gem hash\n",
-					   addr[0], addr[1], addr[2],
-					   addr[3], addr[4], addr[5]);
+				netif_dbg(priv, drv, ndev,
+					  "adding unicast address %02x:%02x:%02x:%02x:%02x:%02x to gem hash\n",
+					  addr[0], addr[1], addr[2],
+					  addr[3], addr[4], addr[5]);
 
 				result = pfe_eth_get_hash(addr);
 				if (result >= EMAC_HASH_REG_BITS) {
@@ -2381,6 +2387,7 @@ static int pfe_eth_init_one(struct pfe *pfe,
 	priv->phy_node = einfo[id].phy_node;
 
 	SET_NETDEV_DEV(priv->ndev, priv->pfe->dev);
+	priv->ndev->dev.of_node = einfo[id].of_node;
 
 	pfe->eth.eth_priv[id] = priv;
 

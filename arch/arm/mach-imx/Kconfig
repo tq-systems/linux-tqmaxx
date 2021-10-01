@@ -156,6 +156,7 @@ config SOC_IMX6
 	select ARM_CPU_SUSPEND if (PM || CPU_IDLE)
 	select ARM_GIC
 	select HAVE_IMX_ANATOP
+	select HAVE_IMX_BUSFREQ
 	select HAVE_IMX_GPC
 	select HAVE_IMX_MMDC
 	select HAVE_IMX_SRC
@@ -203,6 +204,7 @@ config SOC_IMX6SX
 	select HAVE_IMX_AMP
 	select SOC_IMX6
 	select HAVE_IMX_MU
+	select MAILBOX
 	select IMX_MBOX
 	select HAVE_IMX_RPMSG
 	select IMX_SEMA4
@@ -244,6 +246,7 @@ config SOC_IMX7D_CA7
 	select IMX_GPCV2
 	select HAVE_IMX_DDRC
 	select HAVE_IMX_MU
+	select MAILBOX
 	select IMX_MBOX
 	select HAVE_IMX_RPMSG
 	select HAVE_IMX_GPCV2
