@@ -2014,7 +2014,8 @@ int sec_mipi_dsim_bind(struct device *dev, struct device *master, void *data,
 	/* attach sec dsim bridge and its next bridge if exists */
 	ret = drm_bridge_attach(encoder, bridge, NULL, 0);
 	if (ret) {
-		dev_err(dev, "Failed to attach bridge: %s\n", dev_name(dev));
+		if (ret != -EPROBE_DEFER)
+			dev_err(dev, "Failed to attach bridge: %s\n", dev_name(dev));
 
 		/* no bridge exists, so defer probe to wait
 		 * panel driver loading
