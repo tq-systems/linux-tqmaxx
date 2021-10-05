@@ -1,0 +1,19 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright (c) 2021-2023 TQ-Systems GmbH <linux@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Alexander Stein
+ */
+
+#include "imx8mn-tqma8mqnl-mba8mx.dts"
+#include "mba8mx-lvds-tm070jvhg33.dtsi"
+
+&display_subsystem {
+	status = "okay";
+};
+
+&panel {
+	/* specific Video PLL frequency required */
+	assigned-clocks = <&clk IMX8MN_VIDEO_PLL1>;
+	assigned-clock-rates = <594000000>;
+};
