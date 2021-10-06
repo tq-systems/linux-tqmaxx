@@ -301,7 +301,7 @@ static void sn65dsi83_atomic_pre_enable(struct drm_bridge *bridge,
 	gpiod_set_value_cansleep(ctx->enable_gpio, 0);
 	usleep_range(10000, 11000);
 	gpiod_set_value_cansleep(ctx->enable_gpio, 1);
-	usleep_range(1000, 1100);
+	usleep_range(400000, 500000);
 }
 
 static u8 sn65dsi83_get_lvds_range(struct sn65dsi83 *ctx,
