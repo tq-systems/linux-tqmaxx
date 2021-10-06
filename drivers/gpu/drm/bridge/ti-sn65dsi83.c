@@ -298,9 +298,9 @@ static void sn65dsi83_atomic_pre_enable(struct drm_bridge *bridge,
 	 * then high for t_en=1ms.
 	 */
 	regcache_mark_dirty(ctx->regmap);
-	gpiod_set_value(ctx->enable_gpio, 0);
+	gpiod_set_value_cansleep(ctx->enable_gpio, 0);
 	usleep_range(10000, 11000);
-	gpiod_set_value(ctx->enable_gpio, 1);
+	gpiod_set_value_cansleep(ctx->enable_gpio, 1);
 	usleep_range(1000, 1100);
 }
 
@@ -538,7 +538,7 @@ static void sn65dsi83_atomic_post_disable(struct drm_bridge *bridge,
 	struct sn65dsi83 *ctx = bridge_to_sn65dsi83(bridge);
 
 	/* Put the chip in reset, pull EN line low. */
-	gpiod_set_value(ctx->enable_gpio, 0);
+	gpiod_set_value_cansleep(ctx->enable_gpio, 0);
 }
 
 static enum drm_mode_status
