@@ -52,7 +52,6 @@
 #include <linux/of_address.h>
 #include <linux/of.h>
 #include <linux/of_device.h>
-#include <linux/libata.h>
 
 /* This will be the driver name the kernel reports */
 #define DRIVER_NAME "imx-i2c"
@@ -686,10 +685,6 @@ static int i2c_imx_start(struct imx_i2c_struct *i2c_imx, bool atomic)
 	int result;
 
 	dev_dbg(&i2c_imx->adapter.dev, "<%s>\n", __func__);
-
-	result = i2c_imx_set_clk(i2c_imx, clk_get_rate(i2c_imx->clk));
-	if (result)
-		return result;
 
 	imx_i2c_write_reg(i2c_imx->ifdr, i2c_imx, IMX_I2C_IFDR);
 	/* Enable I2C controller */
@@ -1749,7 +1744,7 @@ static int __maybe_unused i2c_imx_runtime_suspend(struct device *dev)
 {
 	struct imx_i2c_struct *i2c_imx = dev_get_drvdata(dev);
 
-	clk_disable_unprepare(i2c_imx->clk);
+	clk_disable(i2c_imx->clk);
 	pinctrl_pm_select_sleep_state(dev);
 
 	return 0;
@@ -1761,7 +1756,7 @@ static int __maybe_unused i2c_imx_runtime_resume(struct device *dev)
 	int ret;
 
 	pinctrl_pm_select_default_state(dev);
-	ret = clk_prepare_enable(i2c_imx->clk);
+	ret = clk_enable(i2c_imx->clk);
 	if (ret)
 		dev_err(dev, "can't enable I2C clock, ret=%d\n", ret);
 

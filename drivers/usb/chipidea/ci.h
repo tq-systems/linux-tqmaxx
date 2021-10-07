@@ -13,6 +13,7 @@
 #include <linux/list.h>
 #include <linux/irqreturn.h>
 #include <linux/usb.h>
+#include <linux/usb/chipidea.h>
 #include <linux/usb/gadget.h>
 #include <linux/usb/otg-fsm.h>
 #include <linux/usb/otg.h>
