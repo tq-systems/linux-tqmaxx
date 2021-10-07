@@ -1284,6 +1284,62 @@ static int mipi_csis_g_frame_interval(struct v4l2_subdev *mipi_sd,
 	return v4l2_subdev_call(sen_sd, video, g_frame_interval, interval);
 }
 
+static struct v4l2_mbus_framefmt *
+mipi_csis_get_mbusformat(struct csi_state *state,
+			 struct v4l2_subdev_state *sd_state,
+			 enum v4l2_subdev_format_whence which,
+			 unsigned int pad)
+{
+	struct v4l2_subdev *sen_sd;
+
+	sen_sd = csis_get_remote_subdev(state, __func__);
+	if (!sen_sd) {
+		v4l2_err(&state->sd, "%s, No remote subdev found!\n", __func__);
+		return NULL;
+	}
+
+	if (which == V4L2_SUBDEV_FORMAT_TRY)
+		return v4l2_subdev_get_try_format(sen_sd, sd_state, pad);
+
+	return &state->format;
+}
+
+static int mipi_csis_enum_mbus_code(struct v4l2_subdev *sd,
+				    struct v4l2_subdev_state *sd_state,
+				    struct v4l2_subdev_mbus_code_enum *code)
+{
+	struct csi_state *state = mipi_sd_to_csi_state(sd);
+
+	/*
+	 * We can't transcode in any way, the source format is identical
+	 * to the sink format.
+	*/
+	if (code->pad == MIPI_CSIS_VC3_PAD_SOURCE) {
+		struct v4l2_mbus_framefmt *fmt;
+
+		if (code->index > 0)
+			return -EINVAL;
+
+		fmt = mipi_csis_get_mbusformat(state, sd_state, code->which,
+					       code->pad);
+		if (!fmt)
+			return -EINVAL;
+
+		code->code = fmt->code;
+		return 0;
+	}
+
+	if (code->pad != MIPI_CSIS_VC3_PAD_SINK)
+		return -EINVAL;
+
+	if (code->index >= ARRAY_SIZE(mipi_csis_formats))
+		return -EINVAL;
+
+	code->code = mipi_csis_formats[code->index].code;
+
+	return 0;
+}
+
 static int mipi_csis_enum_framesizes(struct v4l2_subdev *mipi_sd,
 		struct v4l2_subdev_state *sd_state,
 		struct v4l2_subdev_frame_size_enum *fse)
@@ -1497,6 +1553,7 @@ static struct v4l2_subdev_video_ops mipi_csis_video_ops = {
 static const struct v4l2_subdev_pad_ops mipi_csis_pad_ops = {
 	.enum_frame_size       = mipi_csis_enum_framesizes,
 	.enum_frame_interval   = mipi_csis_enum_frameintervals,
+	.enum_mbus_code        = mipi_csis_enum_mbus_code,
 	.get_fmt               = mipi_csis_get_fmt,
 	.set_fmt               = mipi_csis_set_fmt,
 };
