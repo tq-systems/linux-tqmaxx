@@ -1,0 +1,84 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright (c) 2021-2023 TQ-Systems GmbH <linux@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Alexander Stein
+ */
+
+#include "imx8mm-tqma8mqml-mba8mx-lcdif-lvds-tm070jvhg33.dts"
+
+/ {
+	/* This voltage converter is located on the adapter board MBaxCA */
+	reg_mipi_csi_v3v3: regulator-mipi-csi-v3v3 {
+		compatible = "regulator-fixed";
+		regulator-name = "MIPI_CSI_V_3V3";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		vin-supply = <&reg_vcc_5v0>;
+	};
+};
+
+&csi1_bridge {
+	fsl,mipi-mode;
+	status = "okay";
+
+	port {
+		csi1: endpoint {
+			remote-endpoint = <&csi1_mipi>;
+		};
+	};
+};
+
+&mipi_csi_1 {
+	status = "okay";
+
+	port {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		mipi1_sensor: endpoint@1 {
+			reg = <1>;
+			remote-endpoint = <&sony_imx327>;
+			data-lanes = <2>;
+			csis-hs-settle = <13>;
+			csis-clk-settle = <2>;
+		};
+
+		csi1_mipi: endpoint@2 {
+			reg = <2>;
+			remote-endpoint = <&csi1>;
+		};
+	};
+};
+
+&i2c3 {
+	vc_ctrl: controller@10 {
+		compatible = "vision-components,mipi-module";
+		reg = <0x10>;
+		#clock-cells = <0>;
+		vcc-supply = <&reg_mipi_csi_v3v3>;
+		clock-frequency = <37125000>;
+	};
+
+	camera@1a {
+		compatible = "sony,imx327", "sony,imx290";
+		reg = <0x1a>;
+		clocks = <&vc_ctrl>;
+		clock-names = "xclk";
+		clock-frequency = <37125000>;
+		vdda-supply = <&vc_ctrl>;
+		vddd-supply = <&vc_ctrl>;
+		vdddo-supply = <&vc_ctrl>;
+		orientation = <2>;
+
+		port {
+			sony_imx327: endpoint {
+				remote-endpoint = <&mipi1_sensor>;
+				data-lanes = <1 2>;
+				clock-lanes = <0>;
+				clock-noncontinuous = <1>;
+				link-frequencies = /bits/ 64 <445500000 297000000>;
+			};
+		};
+	};
+};
