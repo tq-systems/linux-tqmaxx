@@ -280,7 +280,9 @@ dtb-$(CONFIG_ARCH_MXC) += imx8mq-wevk.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8mq-tqma8mq-mba8mx.dtb
 
 imx8mq-tqma8mq-mba8mx-lcdif-lvds-tm070jvhg33-dtbs += imx8mq-tqma8mq-mba8mx.dtb imx8mq-tqma8mq-mba8mx-lvds-tm070jvhg33.dtbo  imx8mq-tqma8mq-mba8mx-lcdif-lvds.dtbo
+imx8mq-tqma8mq-mba8mx-dcss-lvds-tm070jvhg33-dtbs += imx8mq-tqma8mq-mba8mx.dtb imx8mq-tqma8mq-mba8mx-lvds-tm070jvhg33.dtbo imx8mq-tqma8mq-mba8mx-dcss-lvds.dtbo
 dtb-$(CONFIG_ARCH_MXC) += imx8mq-tqma8mq-mba8mx-lcdif-lvds-tm070jvhg33.dtb
+dtb-$(CONFIG_ARCH_MXC) += imx8mq-tqma8mq-mba8mx-dcss-lvds-tm070jvhg33.dtb
 
 #dtb-$(CONFIG_ARCH_MXC) += imx8qm-apalis-eval.dtb
 #dtb-$(CONFIG_ARCH_MXC) += imx8qm-apalis-ixora-v1.1.dtb
