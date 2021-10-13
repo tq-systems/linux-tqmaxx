@@ -1,0 +1,47 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright (c) 2021-2023 TQ-Systems GmbH <linux@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Alexander Stein
+ */
+
+#include "imx8mq-tqma8mq-mba8mx.dts"
+#include "mba8mx-lvds-tm070jvhg33.dtsi"
+
+&dphy {
+	status = "okay";
+};
+
+&irqsteer {
+	status = "disabled";
+};
+
+&lcdif {
+	max-memory-bandwidth = <314676293>; /* 1280x1024-32@60 */
+
+	assigned-clocks = <&clk IMX8MQ_CLK_LCDIF_PIXEL>,
+			  <&clk IMX8MQ_VIDEO_PLL1_BYPASS>,
+			  <&clk IMX8MQ_VIDEO_PLL1_REF_SEL>,
+			  <&clk IMX8MQ_VIDEO_PLL1>;
+	assigned-clock-parents = <&clk IMX8MQ_VIDEO_PLL1_OUT>,
+				 <&clk IMX8MQ_VIDEO_PLL1>,
+				 <&clk IMX8MQ_CLK_27M>;
+	assigned-clock-rate = <126000000>, <0>, <0>, <1134000000>;
+	status = "okay";
+};
+
+&mipi_dsi {
+	/*
+	 * Unfortunately the imx8mq mipi_dsi uses slightly different bindings
+	 */
+	/delete-node/ port@1;
+
+	ports {
+		port@1 {
+			reg = <1>;
+			mipi_dsi_out: endpoint {
+				remote-endpoint = <&lvds_bridge_in>;
+			};
+		};
+	};
+};
