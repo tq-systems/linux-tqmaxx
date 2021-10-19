@@ -88,6 +88,12 @@
 		};
 	};
 
+	pcie0_refclk: pcie0-refclk {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <100000000>;
+	};
+
 	reg_12v: regulator-12v {
 		compatible = "regulator-fixed";
 		regulator-name = "MBA8MX_12V";
