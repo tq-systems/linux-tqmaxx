@@ -45,7 +45,7 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usb0hub_sel>;
 
-	sel-usb-hub-hog {
+	sel_usb_hub_hog: sel-usb-hub-hog {
 		gpio-hog;
 		gpios = <1 GPIO_ACTIVE_HIGH>;
 		output-high;
