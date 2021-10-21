@@ -20,6 +20,7 @@
 #include <sound/sof/xtensa.h>
 #include <linux/firmware/imx/ipc.h>
 #include <linux/firmware/imx/dsp.h>
+#include <linux/arm-smccc.h>
 
 #include <linux/firmware/imx/svc/misc.h>
 #include <dt-bindings/firmware/imx/rsrc.h>
