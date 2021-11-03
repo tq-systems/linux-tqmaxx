@@ -757,8 +757,11 @@ static u8 ath10k_usb_get_logical_pipe_num(u8 ep_address, int *urb_count)
 		*urb_count = RX_URB_COUNT;
 		break;
 	case ATH10K_USB_EP_ADDR_APP_CTRL_OUT:
+		/* During initialization, many WMI commands are queued.
+		 * the default count of 32 is not enough
+		 */
 		pipe_num = ATH10K_USB_PIPE_TX_CTRL;
-		*urb_count = TX_URB_COUNT;
+		*urb_count = TX_URB_COUNT * 2;
 		break;
 	case ATH10K_USB_EP_ADDR_APP_DATA_LP_OUT:
 		pipe_num = ATH10K_USB_PIPE_TX_DATA_LP;
