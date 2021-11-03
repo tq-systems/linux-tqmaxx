@@ -13,6 +13,9 @@
 #define RX_URB_COUNT               32
 #define ATH10K_USB_RX_BUFFER_SIZE  4096
 
+#define ATH10K_USB_RX_RATELIMIT_COUNT   256
+#define ATH10K_USB_RX_RATELIMIT_DELAY   0 // in jiffies
+
 #define ATH10K_USB_PIPE_INVALID ATH10K_USB_PIPE_MAX
 
 /* USB endpoint definitions */
@@ -99,6 +102,7 @@ struct ath10k_usb {
 	u8 *diag_cmd_buffer;
 	u8 *diag_resp_buffer;
 	struct ath10k *ar;
+	struct delayed_work rx_delayed_work;
 };
 
 /* usb urb object */
