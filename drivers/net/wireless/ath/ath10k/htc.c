@@ -1013,6 +1013,9 @@ int ath10k_htc_connect_service(struct ath10k_htc *htc,
 	u16 message_id, service_id, flags = 0;
 	u8 tx_alloc = 0;
 
+	if (ar->hif.bus == ATH10K_BUS_USB)
+		disable_credit_flow_ctrl = true;
+
 	/* special case for HTC pseudo control service */
 	if (conn_req->service_id == ATH10K_HTC_SVC_ID_RSVD_CTRL) {
 		disable_credit_flow_ctrl = true;
