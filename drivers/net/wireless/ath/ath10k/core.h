@@ -1294,6 +1294,7 @@ struct ath10k {
 
 	bool coex_support;
 	int coex_gpio_pin;
+	bool is_started;
 
 	s32 tx_power_2g_limit;
 	s32 tx_power_5g_limit;

@@ -614,6 +614,7 @@ static const struct ath10k_hw_params ath10k_hw_params_list[] = {
 		.ast_skid_limit = 0x10,
 		.num_wds_entries = 0x20,
 		.uart_pin_workaround = true,
+		.start_once = true,
 		.tx_chain_mask = 0x3,
 		.rx_chain_mask = 0x3,
 	},
@@ -2811,6 +2812,9 @@ int ath10k_core_start(struct ath10k *ar, enum ath10k_firmware_mode mode,
 	int status;
 	u32 val;
 
+	if (ar->is_started && ar->hw_params.start_once)
+		return 0;
+
 	lockdep_assert_held(&ar->conf_mutex);
 
 	clear_bit(ATH10K_FLAG_CRASH_FLUSH, &ar->dev_flags);
@@ -3115,6 +3119,8 @@ int ath10k_core_start(struct ath10k *ar, enum ath10k_firmware_mode mode,
 		goto err_hif_stop;
 	}
 
+	ar->is_started = true;
+
 	return 0;
 
 err_hif_stop:
@@ -3169,6 +3175,7 @@ void ath10k_core_stop(struct ath10k *ar)
 	ath10k_wmi_detach(ar);
 
 	ar->id.bmi_ids_valid = false;
+	ar->is_started = false;
 }
 EXPORT_SYMBOL(ath10k_core_stop);
 
@@ -3308,12 +3315,16 @@ static int ath10k_core_probe_fw(struct ath10k *ar)
 		goto err_unlock;
 	}
 
-	ath10k_debug_print_boot_info(ar);
-	ath10k_core_stop(ar);
+	/* Leave target running if hw_params.start_once is set */
+	if (ar->hw_params.start_once) {
+		mutex_unlock(&ar->conf_mutex);
+	} else {
+		ath10k_debug_print_boot_info(ar);
+		ath10k_core_stop(ar);
+		mutex_unlock(&ar->conf_mutex);
+		ath10k_hif_power_down(ar);
+	}
 
-	mutex_unlock(&ar->conf_mutex);
-
-	ath10k_hif_power_down(ar);
 	return 0;
 
 err_unlock:
