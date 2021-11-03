@@ -1281,6 +1281,7 @@ struct ath10k {
 
 	bool coex_support;
 	int coex_gpio_pin;
+	bool is_started;
 
 	/* must be last */
 	u8 drv_priv[] __aligned(sizeof(void *));
