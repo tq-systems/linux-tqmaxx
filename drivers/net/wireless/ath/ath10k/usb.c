@@ -175,7 +175,14 @@ cleanup_recv_urb:
 	if (status == 0 &&
 	    pipe->urb_cnt >= pipe->urb_cnt_thresh) {
 		/* our free urbs are piling up, post more transfers */
-		ath10k_usb_post_recv_transfers(ar, pipe);
+		if (skb_queue_len(&pipe->io_comp_queue) >
+		    ATH10K_USB_RX_RATELIMIT_COUNT) {
+			schedule_delayed_work(&pipe->ar_usb->rx_delayed_work,
+					      ATH10K_USB_RX_RATELIMIT_DELAY);
+		} else {
+			cancel_delayed_work(&pipe->ar_usb->rx_delayed_work);
+			ath10k_usb_post_recv_transfers(ar, pipe);
+		}
 	}
 }
 
@@ -266,6 +273,7 @@ static void ath10k_usb_flush_all(struct ath10k *ar)
 			cancel_work_sync(&ar_usb->pipes[i].io_complete_work);
 		}
 	}
+	cancel_delayed_work_sync(&ar_usb->rx_delayed_work);
 }
 
 static void ath10k_usb_start_recv_pipes(struct ath10k *ar)
@@ -370,6 +378,15 @@ static void ath10k_usb_io_comp_work(struct work_struct *work)
 		else
 			ath10k_usb_rx_complete(ar, skb);
 	}
+}
+
+static void ath10k_usb_rx_delayed_work(struct work_struct *work)
+{
+	struct ath10k_usb *ar_usb = container_of(work, struct ath10k_usb,
+						 rx_delayed_work.work);
+	struct ath10k *ar = ar_usb->ar;
+	ath10k_usb_post_recv_transfers(ar,
+				       &ar_usb->pipes[ATH10K_USB_PIPE_RX_DATA]);
 }
 
 #define ATH10K_USB_MAX_DIAG_CMD (sizeof(struct ath10k_usb_ctrl_diag_cmd_write))
@@ -945,6 +962,7 @@ static int ath10k_usb_create(struct ath10k *ar,
 	spin_lock_init(&ar_usb->cs_lock);
 	ar_usb->udev = dev;
 	ar_usb->interface = interface;
+	INIT_DELAYED_WORK(&ar_usb->rx_delayed_work, ath10k_usb_rx_delayed_work);
 
 	for (i = 0; i < ATH10K_USB_PIPE_MAX; i++) {
 		pipe = &ar_usb->pipes[i];
