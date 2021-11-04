@@ -612,6 +612,8 @@ static const struct ath10k_hw_params ath10k_hw_params_list[] = {
 		.ast_skid_limit = 0x10,
 		.num_wds_entries = 0x20,
 		.uart_pin_workaround = true,
+		.tx_chain_mask = 0x3,
+		.rx_chain_mask = 0x3,
 	},
 	{
 		.id = QCA4019_HW_1_0_DEV_VERSION,
