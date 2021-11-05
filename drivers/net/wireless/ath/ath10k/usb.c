@@ -344,8 +344,11 @@ static void ath10k_usb_rx_complete(struct ath10k *ar, struct sk_buff *skb)
 	skb_pull(skb, sizeof(*htc_hdr));
 	ep->ep_ops.ep_rx_complete(ar, skb);
 	/* The RX complete handler now owns the skb... */
-	if (ep->service_id == ATH10K_HTC_SVC_ID_HTT_DATA_MSG)
+	if (ep->service_id == ATH10K_HTC_SVC_ID_HTT_DATA_MSG) {
+		local_bh_disable();
 		napi_schedule(&ar->napi);
+		local_bh_enable();
+	}
 
 	return;
 
