@@ -190,23 +190,23 @@
 };
 
 &lpuart0 {
-	compatible = "fsl,imx8qm-lpuart", "fsl,imx8qxp-lpuart";
+	compatible = "fsl,imx8qm-lpuart", "fsl,imx8qxp-lpuart", "fsl,imx7ulp-lpuart";
 };
 
 &lpuart1 {
-	compatible = "fsl,imx8qm-lpuart", "fsl,imx8qxp-lpuart";
+	compatible = "fsl,imx8qm-lpuart", "fsl,imx8qxp-lpuart", "fsl,imx7ulp-lpuart";
 	dmas = <&edma2 15 0 0>,
 	       <&edma2 14 0 1>;
 };
 
 &lpuart2 {
-	compatible = "fsl,imx8qm-lpuart", "fsl,imx8qxp-lpuart";
+	compatible = "fsl,imx8qm-lpuart", "fsl,imx8qxp-lpuart", "fsl,imx7ulp-lpuart";
 	dmas = <&edma2 17 0 0>,
 	       <&edma2 16 0 1>;
 };
 
 &lpuart3 {
-	compatible = "fsl,imx8qm-lpuart", "fsl,imx8qxp-lpuart";
+	compatible = "fsl,imx8qm-lpuart", "fsl,imx8qxp-lpuart", "fsl,imx7ulp-lpuart";
 	dmas = <&edma2 19 0 0>,
 	       <&edma2 18 0 1>;
 };
