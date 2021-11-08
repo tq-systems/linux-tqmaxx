@@ -291,6 +291,7 @@ img_subsys: bus@58000000 {
 		#interrupt-cells = <2>;
 		power-domains = <&pd IMX_SC_R_CSI_0>, <&pd IMX_SC_R_ISI_CH0>;
 		power-domain-names = "pd_csi", "pd_isi_ch0";
+		status = "disabled";
 	};
 
 	i2c_mipi_csi0: i2c@58226000 {
@@ -332,6 +333,7 @@ img_subsys: bus@58000000 {
 		#interrupt-cells = <2>;
 		power-domains = <&pd IMX_SC_R_CSI_1>, <&pd IMX_SC_R_ISI_CH0>;
 		power-domain-names = "pd_csi", "pd_isi_ch0";
+		status = "disabled";
 	};
 
 	i2c_mipi_csi1: i2c@58246000 {
