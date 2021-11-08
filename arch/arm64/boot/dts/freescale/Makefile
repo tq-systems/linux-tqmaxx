@@ -360,6 +360,8 @@ dtb-$(CONFIG_ARCH_MXC) += imx8qm-mek-revd-dsi-rm67191.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8qm-mek-revd-dsi-rm67199.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8qm-pcieax2pciebx1-revd.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8qm-mek-revd-root.dtb
+dtb-$(CONFIG_ARCH_MXC) += imx8qm-tqma8qm-mba8x.dtb
+
 #dtb-$(CONFIG_ARCH_MXC) += imx8qxp-ai_ml.dtb
 #dtb-$(CONFIG_ARCH_MXC) += imx8qxp-colibri-aster.dtb
 #dtb-$(CONFIG_ARCH_MXC) += imx8qxp-colibri-eval-v3.dtb
