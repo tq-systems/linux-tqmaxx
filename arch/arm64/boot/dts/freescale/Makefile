@@ -362,6 +362,11 @@ dtb-$(CONFIG_ARCH_MXC) += imx8qm-pcieax2pciebx1-revd.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8qm-mek-revd-root.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8qm-tqma8qm-mba8x.dtb
 
+imx8qm-tqma8qm-mba8x-lvds0-tm070jvhg33-dtbs += imx8qm-tqma8qm-mba8x.dtb imx8qm-tqma8qm-mba8x-lvds0-tm070jvhg33.dtbo
+imx8qm-tqma8qm-mba8x-lvds1-tm070jvhg33-dtbs += imx8qm-tqma8qm-mba8x.dtb imx8qm-tqma8qm-mba8x-lvds1-tm070jvhg33.dtbo
+dtb-$(CONFIG_ARCH_MXC) += imx8qm-tqma8qm-mba8x-lvds0-tm070jvhg33.dtb
+dtb-$(CONFIG_ARCH_MXC) += imx8qm-tqma8qm-mba8x-lvds1-tm070jvhg33.dtb
+
 #dtb-$(CONFIG_ARCH_MXC) += imx8qxp-ai_ml.dtb
 #dtb-$(CONFIG_ARCH_MXC) += imx8qxp-colibri-aster.dtb
 #dtb-$(CONFIG_ARCH_MXC) += imx8qxp-colibri-eval-v3.dtb
