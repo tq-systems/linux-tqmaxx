@@ -1190,16 +1190,14 @@ static int seco_mu_probe(struct platform_device *pdev)
 
 	ret = seco_mu_request_channel(dev, &priv->tx_chan, "txdb");
 	if (ret) {
-		if (ret != -EPROBE_DEFER)
-			dev_err(dev, "Failed to request txdb channel\n");
+		dev_err_probe(dev, ret, "Failed to request txdb channel\n");
 
 		goto exit;
 	}
 
 	ret = seco_mu_request_channel(dev, &priv->rx_chan, "rxdb");
 	if (ret) {
-		if (ret != -EPROBE_DEFER)
-			dev_err(dev, "Failed to request rxdb channel\n");
+		dev_err_probe(dev, ret, "Failed to request rxdb channel\n");
 
 		goto exit;
 	}
