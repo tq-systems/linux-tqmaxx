@@ -285,6 +285,13 @@
 		clock-output-names = "sai3_mclk";
 	};
 
+	sai4_mclk: sai-mclk4 {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency= <0>;
+		clock-output-names = "sai4_mclk";
+	};
+
 	sai5_mclk: sai-mclk5 {
 		compatible = "fixed-clock";
 		#clock-cells = <0>;
