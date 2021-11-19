@@ -1368,12 +1368,9 @@ static int fsl_sai_probe(struct platform_device *pdev)
 	/* Compatible with old DTB cases */
 	if (IS_ERR(sai->bus_clk) && PTR_ERR(sai->bus_clk) != -EPROBE_DEFER)
 		sai->bus_clk = devm_clk_get(dev, "sai");
-	if (IS_ERR(sai->bus_clk)) {
-		dev_err(dev, "failed to get bus clock: %ld\n",
-				PTR_ERR(sai->bus_clk));
-		/* -EPROBE_DEFER */
-		return PTR_ERR(sai->bus_clk);
-	}
+	if (IS_ERR(sai->bus_clk))
+		return dev_err_probe(dev, PTR_ERR(sai->bus_clk),
+				     "failed to get bus clock\n");
 
 	for (i = 1; i < FSL_SAI_MCLK_MAX; i++) {
 		sprintf(tmp, "mclk%d", i);
