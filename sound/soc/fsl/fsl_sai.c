@@ -1313,7 +1313,7 @@ static int fsl_sai_probe(struct platform_device *pdev)
 	if (IS_ERR(sai->bus_clk) && PTR_ERR(sai->bus_clk) != -EPROBE_DEFER)
 		sai->bus_clk = devm_clk_get(&pdev->dev, "sai");
 	if (IS_ERR(sai->bus_clk)) {
-		dev_err(&pdev->dev, "failed to get bus clock: %ld\n",
+		dev_err_probe(&pdev->dev, PTR_ERR(sai->bus_clk), "failed to get bus clock: %ld\n",
 				PTR_ERR(sai->bus_clk));
 		/* -EPROBE_DEFER */
 		return PTR_ERR(sai->bus_clk);
