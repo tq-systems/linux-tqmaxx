@@ -1343,7 +1343,7 @@ static int fsl_sai_probe(struct platform_device *pdev)
 	/* No error out for old DTB cases but only mark the clock NULL */
 	sai->bus_clk = devm_clk_get(&pdev->dev, "bus");
 	if (IS_ERR(sai->bus_clk)) {
-		dev_err(&pdev->dev, "failed to get bus clock: %ld\n",
+		dev_err_probe(&pdev->dev, PTR_ERR(sai->bus_clk), "failed to get bus clock: %ld\n",
 				PTR_ERR(sai->bus_clk));
 		return PTR_ERR(sai->bus_clk);
 		sai->bus_clk = NULL;
