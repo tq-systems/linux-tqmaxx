@@ -796,9 +796,13 @@
 				reg = <0x30380000 0x10000>;
 				#clock-cells = <1>;
 				clocks = <&osc_32k>, <&osc_24m>, <&clk_ext1>, <&clk_ext2>,
-					 <&clk_ext3>, <&clk_ext4>;
+					 <&clk_ext3>, <&clk_ext4>, <&sai1_mclk>,
+					 <&sai2_mclk>, <&sai3_mclk>, <&sai4_mclk>,
+					 <&sai5_mclk>, <&sai6_mclk>, <&sai7_mclk>;
 				clock-names = "osc_32k", "osc_24m", "clk_ext1", "clk_ext2",
-					      "clk_ext3", "clk_ext4";
+					      "clk_ext3", "clk_ext4", "sai1_mclk",
+					      "sai2_mclk", "sai3_mclk", "sai4_mclk",
+					      "sai5_mclk", "sai6_mclk", "sai7_mclk";
 				assigned-clocks = <&clk IMX8MP_CLK_A53_SRC>,
 						  <&clk IMX8MP_CLK_A53_CORE>,
 						  <&clk IMX8MP_CLK_NOC>,
