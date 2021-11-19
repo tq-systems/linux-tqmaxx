@@ -1915,7 +1915,9 @@ static int fsl_easrc_probe(struct platform_device *pdev)
 
 	easrc->mem_clk = devm_clk_get(dev, "mem");
 	if (IS_ERR(easrc->mem_clk)) {
-		dev_err(dev, "failed to get mem clock\n");
+		dev_err_probe(dev, PTR_ERR(easrc->mem_clk),
+			      "failed to get mem clock: %ld\n",
+			      PTR_ERR(easrc->mem_clk));
 		return PTR_ERR(easrc->mem_clk);
 	}
 
