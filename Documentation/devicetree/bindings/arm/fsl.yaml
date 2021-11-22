@@ -172,6 +172,20 @@ properties:
           - const: phytec,imx6q-pfla02    # PHYTEC phyFLEX-i.MX6 Quad
           - const: fsl,imx6q
 
+      - description: TQ-Systems TQMa6Q SoM (variant A) on MBa6x
+        items:
+          - const: tq,imx6q-mba6x-a
+          - const: tq,mba6a               # Expected by bootloader, to be removed in the future
+          - const: tq,imx6q-tqma6q-a
+          - const: fsl,imx6q
+
+      - description: TQ-Systems TQMa6Q SoM (variant B) on MBa6x
+        items:
+          - const: tq,imx6q-mba6x-b
+          - const: tq,mba6b               # Expected by bootloader, to be removed in the future
+          - const: tq,imx6q-tqma6q-b
+          - const: fsl,imx6q
+
       - description: i.MX6QP based Boards
         items:
           - enum:
@@ -184,6 +198,13 @@ properties:
           - const: phytec,imx6qp-pbac06-nand
           - const: phytec,imx6qp-pbac06   # PHYTEC phyBOARD-Mira
           - const: phytec,imx6qdl-pcm058  # PHYTEC phyCORE-i.MX6
+          - const: fsl,imx6qp
+
+      - description: TQ-Systems TQMa6QP SoM on MBa6x
+        items:
+          - const: tq,imx6qp-mba6x-b
+          - const: tq,mba6b               # Expected by bootloader, to be removed in the future
+          - const: tq,imx6qp-tqma6qp-b
           - const: fsl,imx6qp
 
       - description: i.MX6DL based Boards
@@ -248,6 +269,20 @@ properties:
         items:
           - const: phytec,imx6dl-pbab01   # PHYTEC phyFLEX carrier board
           - const: phytec,imx6dl-pfla02   # PHYTEC phyFLEX-i.MX6 Quad
+          - const: fsl,imx6dl
+
+      - description: TQ-Systems TQMa6DL SoM (variant A) on MBa6x
+        items:
+          - const: tq,imx6dl-mba6x-a
+          - const: tq,mba6a               # Expected by bootloader, to be removed in the future
+          - const: tq,imx6dl-tqma6dl-a
+          - const: fsl,imx6dl
+
+      - description: TQ-Systems TQMa6DL SoM (variant B) on MBa6x
+        items:
+          - const: tq,imx6dl-mba6x-b
+          - const: tq,mba6b               # Expected by bootloader, to be removed in the future
+          - const: tq,imx6dl-tqma6dl-b
           - const: fsl,imx6dl
 
       - description: i.MX6SL based Boards
