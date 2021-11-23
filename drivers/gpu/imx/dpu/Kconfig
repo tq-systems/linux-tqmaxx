@@ -1,5 +1,5 @@
 config IMX_DPU_CORE
-	tristate "i.MX DPU core support"
+	bool "i.MX DPU core support"
 	depends on ARCH_MXC
 	select GENERIC_IRQ_CHIP
 	help
