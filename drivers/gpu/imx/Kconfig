@@ -6,14 +6,11 @@ source "drivers/gpu/imx/lcdifv3/Kconfig"
 config IMX8_PC
 	tristate
 	default y if IMX_DPU_CORE=y
-	default m if IMX_DPU_CORE=m
 
 config IMX8_PRG
 	tristate
 	default y if IMX_DPU_CORE=y
-	default m if IMX_DPU_CORE=m
 
 config IMX8_DPRC
 	tristate
 	default y if IMX_DPU_CORE=y
-	default m if IMX_DPU_CORE=m
