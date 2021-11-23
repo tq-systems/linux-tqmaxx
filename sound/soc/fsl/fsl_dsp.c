@@ -68,6 +68,7 @@
 #include <linux/arm-smccc.h>
 
 #include "fsl_dsp.h"
+#include "fsl_dsp_cpu.h"
 #include "fsl_dsp_pool.h"
 #include "fsl_dsp_xaf_api.h"
 
@@ -1741,7 +1742,33 @@ static struct platform_driver fsl_dsp_driver = {
 		.pm = &fsl_dsp_pm,
 	},
 };
-module_platform_driver(fsl_dsp_driver);
+
+static int __init fsl_dsp_init(void)
+{
+	int ret;
+
+	ret = platform_driver_register(&fsl_dsp_driver);
+	if (ret != 0)
+		return ret;
+
+	ret = platform_driver_register(&dsp_audio_driver);
+	if (ret != 0)
+		goto unregister_dsp_driver;
+
+	return 0;
+
+unregister_dsp_driver:
+	platform_driver_unregister(&fsl_dsp_driver);
+	return ret;
+}
+module_init(fsl_dsp_init);
+
+static void __exit fsl_dsp_exit(void)
+{
+	platform_driver_unregister(&dsp_audio_driver);
+	platform_driver_unregister(&fsl_dsp_driver);
+}
+module_exit(fsl_dsp_exit);
 
 MODULE_DESCRIPTION("Freescale DSP driver");
 MODULE_ALIAS("platform:fsl-dsp");

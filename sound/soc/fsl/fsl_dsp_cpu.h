@@ -12,5 +12,7 @@ struct fsl_dsp_audio {
 	struct platform_device *pdev;
 };
 
+extern struct platform_driver dsp_audio_driver;
+
 #endif /*__FSL_DSP_CPU_H*/
 

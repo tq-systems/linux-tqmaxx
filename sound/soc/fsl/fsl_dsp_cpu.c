@@ -86,7 +86,7 @@ static const struct of_device_id dsp_audio_ids[] = {
 };
 MODULE_DEVICE_TABLE(of, dsp_audio_ids);
 
-static struct platform_driver dsp_audio_driver = {
+struct platform_driver dsp_audio_driver = {
 	.driver = {
 		.name = "dsp-audio",
 		.of_match_table = dsp_audio_ids,
@@ -94,4 +94,3 @@ static struct platform_driver dsp_audio_driver = {
 	.probe = dsp_audio_probe,
 	.remove = dsp_audio_remove,
 };
-module_platform_driver(dsp_audio_driver);
