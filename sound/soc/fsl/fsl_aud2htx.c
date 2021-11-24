@@ -258,10 +258,10 @@ static int fsl_aud2htx_probe(struct platform_device *pdev)
 	}
 
 	aud2htx->bus_clk = devm_clk_get(&pdev->dev, "bus");
-	if (IS_ERR(aud2htx->bus_clk)) {
-		dev_err(&pdev->dev, "failed to get mem clock\n");
-		return PTR_ERR(aud2htx->bus_clk);
-	}
+	if (IS_ERR(aud2htx->bus_clk))
+		return dev_err_probe(&pdev->dev, PTR_ERR(aud2htx->bus_clk),
+				     "failed to get mem clock: %li\n",
+				     PTR_ERR(aud2htx->bus_clk));
 
 	aud2htx->dma_params_tx.chan_name = "tx";
 	aud2htx->dma_params_tx.maxburst = 16;
@@ -282,7 +282,8 @@ static int fsl_aud2htx_probe(struct platform_device *pdev)
 
 	ret = imx_pcm_dma_init(pdev, IMX_DEFAULT_DMABUF_SIZE);
 	if (ret)
-		dev_err(&pdev->dev, "failed to init imx pcm dma: %d\n", ret);
+		dev_err_probe(&pdev->dev, ret,
+			      "failed to init imx pcm dma: %d\n", ret);
 
 	return ret;
 }
