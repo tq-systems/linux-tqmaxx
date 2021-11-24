@@ -214,15 +214,14 @@ static int fsl_aud2htx_probe(struct platform_device *pdev)
 	ret = devm_request_irq(&pdev->dev, irq, fsl_aud2htx_isr, 0,
 			       dev_name(&pdev->dev), aud2htx);
 	if (ret) {
-		dev_err(&pdev->dev, "failed to claim irq %u: %d\n", irq, ret);
-		return ret;
+		return dev_err_probe(&pdev->dev, ret, "failed to claim irq %u\n", irq);
 	}
 
 	aud2htx->bus_clk = devm_clk_get(&pdev->dev, "bus");
-	if (IS_ERR(aud2htx->bus_clk)) {
-		dev_err(&pdev->dev, "failed to get mem clock\n");
-		return PTR_ERR(aud2htx->bus_clk);
-	}
+	if (IS_ERR(aud2htx->bus_clk))
+		return dev_err_probe(&pdev->dev, PTR_ERR(aud2htx->bus_clk),
+				     "failed to get mem clock: %li\n",
+				     PTR_ERR(aud2htx->bus_clk));
 
 	aud2htx->dma_params_tx.chan_name = "tx";
 	aud2htx->dma_params_tx.maxburst = AUD2HTX_MAXBURST;
@@ -239,7 +238,7 @@ static int fsl_aud2htx_probe(struct platform_device *pdev)
 	 */
 	ret = devm_snd_dmaengine_pcm_register(&pdev->dev, NULL, 0);
 	if (ret) {
-		dev_err(&pdev->dev, "failed to pcm register\n");
+		dev_err_probe(&pdev->dev, ret, "failed to pcm register\n");
 		pm_runtime_disable(&pdev->dev);
 		return ret;
 	}
