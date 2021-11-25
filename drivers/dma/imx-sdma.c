@@ -644,7 +644,6 @@ static struct sdma_driver_data sdma_imx8mp = {
 	.check_ratio = 1,
 	.ecspi_fixed = true,
 	.has_done0 = true,
-	.pm_runtime = true,
 };
 
 static const struct platform_device_id sdma_devtypes[] = {
