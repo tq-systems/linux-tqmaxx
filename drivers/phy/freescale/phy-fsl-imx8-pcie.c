@@ -252,10 +252,10 @@ static int imx8_pcie_phy_probe(struct platform_device *pdev)
 		dev_info(dev, "invalid clk mode %d.\n", val);
 
 	imx8_phy->clk = devm_clk_get(dev, "phy");
-	if (IS_ERR(imx8_phy->clk)) {
-		dev_err(dev, "failed to get imx pcie phy clock\n");
-		return PTR_ERR(imx8_phy->clk);
-	}
+	if (IS_ERR(imx8_phy->clk))
+		return dev_err_probe(dev, PTR_ERR(imx8_phy->clk),
+				     "failed to get imx pcie phy clock: %li\n",
+				     PTR_ERR(imx8_phy->clk));
 
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
 	imx8_phy->base = devm_ioremap_resource(dev, res);
