@@ -1,0 +1,72 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright 2021-2024 TQ-Systems GmbH <linux@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Alexander Stein
+ */
+
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/clock/imx8mp-clock.h>
+
+&{/} {
+	imx8mp_cm7: imx8mp-cm7 {
+		compatible = "fsl,imx8mp-cm7";
+		mbox-names = "tx", "rx", "rxdb";
+		mboxes = <&mu 0 1
+			  &mu 1 1
+			  &mu 3 1>;
+		clocks = <&clk IMX8MP_CLK_M7_DIV>;
+		memory-region = <&vdevbuffer>, <&vdev0vring0>,
+				<&vdev0vring1>, <&rsc_table>;
+	};
+};
+
+/*
+ * ATTENTION: M7 may use other IPs like SPI, CAN, GPIO, GPT, I2C, I2S, UART,
+ * PWM, SDMA1/SDMA2. All IP used solely by M7 needs to be disabled to prevent
+ * resource conflicts.
+ * Keep in mind to configure the RDC according to the real product design to
+ * enforce hardware based isolation.
+ */
+
+&ecspi3 {
+	status = "disabled";
+};
+
+&flexcan2 {
+	status = "disabled";
+};
+
+&flexspi {
+	status = "disabled";
+};
+
+&i2c2 {
+	status = "disabled";
+};
+
+&m7_reserved {
+	status = "okay";
+};
+
+&rsc_table {
+	status = "okay";
+};
+
+&uart3 {
+	status = "disabled";
+};
+
+&vdev0vring0 {
+	status = "okay";
+};
+
+&vdev0vring1 {
+	status = "okay";
+};
+
+&vdevbuffer {
+	status = "okay";
+};
