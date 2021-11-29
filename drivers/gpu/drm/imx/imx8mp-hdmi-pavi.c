@@ -161,28 +161,28 @@ static int imx8mp_hdmi_pavi_probe(struct platform_device *pdev)
 		return PTR_ERR(pavi->base);
 
 	pavi->clk_pvi = devm_clk_get(dev, "pvi_clk");
-	if (IS_ERR(pavi->clk_pvi)) {
-		dev_err(dev, "No pvi clock get\n");
-		return -EPROBE_DEFER;
-	}
+	if (IS_ERR(pavi->clk_pvi))
+		return dev_err_probe(dev, PTR_ERR(pavi->clk_pvi),
+				     "No pvi clock get: %li\n",
+				     PTR_ERR(pavi->clk_pvi));
 
 	pavi->clk_pai = devm_clk_get(dev, "pai_clk");
-	if (IS_ERR(pavi->clk_pai)) {
-		dev_err(dev, "No pai clock get\n");
-		return -EPROBE_DEFER;
-	}
+	if (IS_ERR(pavi->clk_pai))
+		return dev_err_probe(dev, PTR_ERR(pavi->clk_pai),
+				     "No pai clock get: %li\n",
+				     PTR_ERR(pavi->clk_pai));
 
 	pavi->reset_pai = devm_reset_control_get(dev, "pai_rst");
-	if (IS_ERR(pavi->reset_pai)) {
-		dev_err(pavi->dev, "No PAI reset\n");
-		return -EPROBE_DEFER;
-	}
+	if (IS_ERR(pavi->reset_pai))
+		return dev_err_probe(dev, PTR_ERR(pavi->reset_pai),
+				     "No PAI reset: %li\n",
+				     PTR_ERR(pavi->reset_pai));
 
 	pavi->reset_pvi = devm_reset_control_get(dev, "pvi_rst");
-	if (IS_ERR(pavi->reset_pvi)) {
-		dev_err(pavi->dev, "No PVI reset\n");
-		return -EPROBE_DEFER;
-	}
+	if (IS_ERR(pavi->reset_pvi))
+		return dev_err_probe(dev, PTR_ERR(pavi->reset_pvi),
+				     "No PVI reset: %li\n",
+				     PTR_ERR(pavi->reset_pvi));
 
 	platform_set_drvdata(pdev, pavi);
 
