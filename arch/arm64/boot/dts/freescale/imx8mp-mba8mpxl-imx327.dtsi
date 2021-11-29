@@ -1,0 +1,99 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright 2021 TQ-Systems GmbH
+ */
+
+/ {
+	sensor_clk: sensor-clk {
+		#clock-cells = <0>;
+		compatible = "fixed-clock";
+		clock-frequency = <37125000>;
+	};
+};
+
+&cameradev {
+	status = "okay";
+};
+
+/*
+ * Dual use: Trigger / Sync / Enable for mipi_csi_0
+ */
+&ecspi1 {
+	status = "disabled";
+};
+
+&mipi_csi_0 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+	port@0 {
+		reg = <0>;
+		mipi0_sensor_ep: endpoint {
+			remote-endpoint = <&sony_imx327_ep0>;
+			data-lanes = <2>;
+			csis-hs-settle = <13>;
+			csis-clk-settle = <2>;
+			csis-wclk;
+		};
+	};
+};
+
+&isi_0 {
+	status = "okay";
+	cap_device {
+		status = "okay";
+	};
+};
+
+&i2c4 {
+	vc_fpga: fpga@10 {
+		reg = <0x10>;
+		compatible = "vc,fpga";
+
+		vc_fpga_reg: regulator {
+			regulator-name = "CAM_VCC";
+		};
+
+		vc_fpga_reset: reset {
+			#reset-cells = <0>;
+		};
+
+		vc_fpga_gpio: gpio-chip {
+			gpio-controller;
+			#gpio-cells = <2>;
+		};
+	};
+
+	sony_imx327: camera@1a {
+		#address-cells = <0x1>;
+		#size-cells = <0x0>;
+		reg = <0x1a>;
+
+		compatible = "sony,imx327", "sony,imx290";
+
+		clock-names = "xclk";
+		clocks = <&sensor_clk>;
+		clock-frequency = <37125000>;
+
+		vdd-supply = <&vc_fpga_reg>;
+
+		vdda-supply = <&vc_fpga_reg>;
+		vddd-supply = <&vc_fpga_reg>;
+		vdddo-supply = <&vc_fpga_reg>;
+
+		reset-gpios = <&vc_fpga_gpio 0 GPIO_ACTIVE_HIGH>;
+
+		port@0 {
+			reg = <0>;
+
+			sony_imx327_ep0: endpoint {
+				remote-endpoint = <&mipi0_sensor_ep>;
+				data-lanes = <1 2>;
+				clock-lanes = <0>;
+				clock-noncontinuous = <1>;
+				link-frequencies = /bits/ 64 <445500000 297000000>;
+			};
+		};
+	};
+};
+
