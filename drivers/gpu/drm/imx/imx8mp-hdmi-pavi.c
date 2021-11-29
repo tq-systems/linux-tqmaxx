@@ -130,10 +130,8 @@ static int imx8mp_hdmi_pavi_probe(struct platform_device *pdev)
 		return PTR_ERR(pavi->base);
 
 	pavi->clk_apb = devm_clk_get(dev, NULL);
-	if (IS_ERR(pavi->clk_apb)) {
-		dev_err(dev, "No pai clock get\n");
-		return -EPROBE_DEFER;
-	}
+	if (IS_ERR(pavi->clk_apb))
+		return dev_err_probe(dev, -EPROBE_DEFER, "No pai clock get\n");
 
 	platform_set_drvdata(pdev, pavi);
 
