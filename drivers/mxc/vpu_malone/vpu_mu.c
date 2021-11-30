@@ -92,9 +92,9 @@ static int vpu_rtx_channel_request(struct vpu_sc_chan *sc_chan, bool block, stru
 	sc_chan->ch = mbox_request_channel_byname(cl, sc_chan->name);
 	if (IS_ERR(sc_chan->ch)) {
 		ret = PTR_ERR(sc_chan->ch);
-		if (ret != -EPROBE_DEFER)
-			vpu_err("Failed to request mbox chan %s ret %d\n",
-				sc_chan->name, ret);
+		return dev_err_probe(dev, ret,
+				     "[VPU Encoder] Failed to request mbox chan %s ret %d\n",
+				     sc_chan->name, ret);
 	}
 
 	return ret;
@@ -142,8 +142,9 @@ int vpu_mu_request(struct vpu_dev *dev)
 		if (!ret)
 			dev->vpu_mu_init = TRUE;
 		else
-			vpu_dbg(LVL_WARN, "init rtx channel failed, ret: %d\n",
-				ret);
+			return dev_err_probe(dev->generic_dev, ret,
+					    "[VPU Decoder] init rtx channel failed, ret: %d\n",
+					    ret);
 	}
 
 	return ret;
