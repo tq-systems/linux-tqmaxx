@@ -5999,7 +5999,7 @@ static int vpu_enc_probe(struct platform_device *pdev)
 	pm_runtime_enable(&pdev->dev);
 	ret = pm_runtime_get_sync(&pdev->dev);
 	if (ret < 0) {
-		vpu_err("fail to request mailbox, ret = %d\n", ret);
+		dev_err_probe(&pdev->dev, ret, "fail to request mailbox, ret = %d\n", ret);
 		pm_runtime_put_noidle(&pdev->dev);
 		pm_runtime_set_suspended(&pdev->dev);
 		goto error_pm_runtime_get_sync;
