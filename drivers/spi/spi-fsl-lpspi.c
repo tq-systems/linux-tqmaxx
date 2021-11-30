@@ -825,6 +825,7 @@ static int fsl_lpspi_probe(struct platform_device *pdev)
 	struct spi_controller *controller;
 	struct resource *res;
 	int ret, irq;
+	u32 num_cs;
 	u32 temp;
 	bool is_slave;
 
@@ -840,6 +841,11 @@ static int fsl_lpspi_probe(struct platform_device *pdev)
 		return -ENOMEM;
 
 	platform_set_drvdata(pdev, controller);
+
+	if (!device_property_read_u32(&pdev->dev, "num-cs", &num_cs))
+		controller->num_chipselect = num_cs;
+	else
+		controller->num_chipselect = 1;
 
 	fsl_lpspi = spi_controller_get_devdata(controller);
 	fsl_lpspi->dev = &pdev->dev;
