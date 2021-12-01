@@ -68,9 +68,11 @@ dtb-$(CONFIG_ARCH_MXC) += imx8dxp-tqma8xdp-mba8xx.dtb
 imx8dxp-tqma8xdp-mba8xx-lvds-g133han01-dtbs = imx8dxp-tqma8xdp-mba8xx.dtb tqma8xx-display.dtbo mba8xx-lvds-g133han01.dtbo
 imx8dxp-tqma8xdp-mba8xx-lvds0-tm070jvhg33-dtbs = imx8dxp-tqma8xdp-mba8xx.dtb tqma8xx-display.dtbo mba8xx-lvds0-tm070jvhg33.dtbo
 imx8dxp-tqma8xdp-mba8xx-lvds1-tm070jvhg33-dtbs = imx8dxp-tqma8xdp-mba8xx.dtb tqma8xx-display.dtbo mba8xx-lvds1-tm070jvhg33.dtbo
+imx8dxp-tqma8xdp-mba8xx-rpmsg-dtbs = imx8dxp-tqma8xdp-mba8xx.dtb tqma8xx-rpmsg.dtbo
 dtb-$(CONFIG_ARCH_MXC) += imx8dxp-tqma8xdp-mba8xx-lvds-g133han01.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8dxp-tqma8xdp-mba8xx-lvds0-tm070jvhg33.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8dxp-tqma8xdp-mba8xx-lvds1-tm070jvhg33.dtb
+dtb-$(CONFIG_ARCH_MXC) += imx8dxp-tqma8xdp-mba8xx-rpmsg.dtb
 
 dtb-$(CONFIG_ARCH_MXC) += imx8mm-ab2.dtb imx8mm-ab2-m4.dtb imx8mm-ddr4-ab2.dtb imx8mm-ddr4-ab2-m4.dtb \
 			  imx8mm-ddr4-ab2-revb.dtb imx8mm-ddr4-ab2-m4-revb.dtb
