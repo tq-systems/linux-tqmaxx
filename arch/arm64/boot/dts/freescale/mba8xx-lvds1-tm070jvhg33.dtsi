@@ -1,0 +1,60 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright 2021 TQ-Systems GmbH
+ */
+
+/ {
+	panel-lvds1 {
+		compatible = "tianma,tm070jvhg33";
+		backlight = <&backlight_lvds>;
+		status = "okay";
+
+		port {
+			panel_in_lvds1: endpoint {
+				remote-endpoint = <&lvds1_out>;
+			};
+		};
+	};
+};
+
+&adma_pwm {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_admapwm>;
+	status = "okay";
+};
+
+&adma_pwm_lpcg {
+	status = "okay";
+};
+
+&backlight_lvds {
+	status = "okay";
+};
+
+&ldb2_phy {
+	status = "okay";
+};
+
+&ldb2 {
+	status = "okay";
+
+	lvds-channel@0 {
+		status = "okay";
+
+		port@1 {
+			reg = <1>;
+
+			lvds1_out: endpoint {
+				remote-endpoint = <&panel_in_lvds1>;
+			};
+		};
+	};
+};
+
+&iomuxc {
+	pinctrl_admapwm: admapwmgrp {
+		fsl,pins = <
+			IMX8QXP_SPI0_CS1_ADMA_LCD_PWM0_OUT		0x00000021
+		>;
+	};
+};
