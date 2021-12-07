@@ -441,7 +441,14 @@ static int fsl_sai_set_bclk(struct snd_soc_dai *dai, bool tx, u32 freq)
 	if (sai->slave_mode[tx])
 		return 0;
 
-	for (id = 0; id < FSL_SAI_MCLK_MAX; id++) {
+	/*
+	 * There is no point in polling MCLK0 if it is identical to MCLK1.
+	 * And given that MQS use case has to use MCLK1 though two clocks
+	 * are the same, we simply skip MCLK0 and start to find from MCLK1.
+	 */
+	id = sai->soc_data->mclk0_is_mclk1 ? 1 : 0;
+
+	for (; id < FSL_SAI_MCLK_MAX; id++) {
 		clk_rate = clk_get_rate(sai->mclk_clk[id]);
 		if (!clk_rate)
 			continue;
@@ -1349,7 +1356,7 @@ static int fsl_sai_probe(struct platform_device *pdev)
 		sai->bus_clk = NULL;
 	}
 
-	for (i = 0; i < FSL_SAI_MCLK_MAX; i++) {
+	for (i = 1; i < FSL_SAI_MCLK_MAX; i++) {
 		sprintf(tmp, "mclk%d", i);
 		sai->mclk_clk[i] = devm_clk_get(&pdev->dev, tmp);
 		if (IS_ERR(sai->mclk_clk[i])) {
@@ -1358,6 +1365,11 @@ static int fsl_sai_probe(struct platform_device *pdev)
 			sai->mclk_clk[i] = NULL;
 		}
 	}
+
+	if (sai->soc_data->mclk0_is_mclk1)
+		sai->mclk_clk[0] = sai->mclk_clk[1];
+	else
+		sai->mclk_clk[0] = sai->bus_clk;
 
 	sai->pll8k_clk = devm_clk_get(&pdev->dev, "pll8k");
 	if (IS_ERR(sai->pll8k_clk))
@@ -1554,6 +1566,7 @@ static const struct fsl_sai_soc_data fsl_sai_vf610_data = {
 	.fifos = 1,
 	.flags = 0,
 	.max_register = FSL_SAI_RMR,
+	.mclk0_is_mclk1 = false,
 };
 
 static const struct fsl_sai_soc_data fsl_sai_imx6sx_data = {
@@ -1565,6 +1578,7 @@ static const struct fsl_sai_soc_data fsl_sai_imx6sx_data = {
 	.fifos = 1,
 	.flags = 0,
 	.max_register = FSL_SAI_RMR,
+	.mclk0_is_mclk1 = true,
 };
 
 static const struct fsl_sai_soc_data fsl_sai_imx7ulp_data = {
@@ -1576,6 +1590,7 @@ static const struct fsl_sai_soc_data fsl_sai_imx7ulp_data = {
 	.fifos = 2,
 	.flags = SAI_FLAG_PMQOS,
 	.max_register = FSL_SAI_RMR,
+	.mclk0_is_mclk1 = false,
 };
 
 static const struct fsl_sai_soc_data fsl_sai_imx8mq_data = {
@@ -1587,6 +1602,7 @@ static const struct fsl_sai_soc_data fsl_sai_imx8mq_data = {
 	.fifos = 8,
 	.flags = 0,
 	.max_register = FSL_SAI_RMR,
+	.mclk0_is_mclk1 = false,
 };
 
 static const struct fsl_sai_soc_data fsl_sai_imx8qm_data = {
@@ -1598,6 +1614,7 @@ static const struct fsl_sai_soc_data fsl_sai_imx8qm_data = {
 	.fifos = 1,
 	.flags = 0,
 	.max_register = FSL_SAI_RMR,
+	.mclk0_is_mclk1 = false,
 };
 
 static const struct fsl_sai_soc_data fsl_sai_imx8mm_data = {
@@ -1609,6 +1626,7 @@ static const struct fsl_sai_soc_data fsl_sai_imx8mm_data = {
 	.fifos = 8,
 	.flags = 0,
 	.max_register = FSL_SAI_MCTL,
+	.mclk0_is_mclk1 = false,
 };
 
 static const struct fsl_sai_soc_data fsl_sai_imx8mp_data = {
@@ -1620,6 +1638,7 @@ static const struct fsl_sai_soc_data fsl_sai_imx8mp_data = {
 	.fifos = 8,
 	.flags = 0,
 	.max_register = FSL_SAI_MDIV,
+	.mclk0_is_mclk1 = false,
 };
 
 static const struct fsl_sai_soc_data fsl_sai_imx8ulp_data = {
@@ -1631,6 +1650,7 @@ static const struct fsl_sai_soc_data fsl_sai_imx8ulp_data = {
 	.fifos = 4,
 	.flags = SAI_FLAG_PMQOS,
 	.max_register = FSL_SAI_RTCAP,
+	.mclk0_is_mclk1 = false,
 };
 
 static const struct of_device_id fsl_sai_ids[] = {
