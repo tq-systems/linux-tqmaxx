@@ -191,8 +191,8 @@
 			ti,dp83867-rxctrl-strap-quirk;
 			ti,clk-output-sel = <DP83867_CLK_O_SEL_OFF>;
 			reset-gpios = <&lsio_gpio2 6 GPIO_ACTIVE_LOW>;
-			reset-duration-us = <500000>;
-			reset-post-delay-us = <50000>;
+			reset-assert-us = <500000>;
+			reset-deassert-us = <50000>;
 			enet-phy-lane-no-swap;
 			/* LED0: Link, LED2: activity */
 			ti,led-function = <0x0100>;
@@ -226,8 +226,8 @@
 			ti,dp83867-rxctrl-strap-quirk;
 			ti,clk-output-sel = <DP83867_CLK_O_SEL_OFF>;
 			reset-gpios = <&lsio_gpio2 4 GPIO_ACTIVE_LOW>;
-			reset-duration-us = <500000>;
-			reset-post-delay-us = <50000>;
+			reset-assert-us = <500000>;
+			reset-deassert-us = <50000>;
 			enet-phy-lane-no-swap;
 			/* LED0: Link, LED2: activity */
 			ti,led-function = <0x0100>;
