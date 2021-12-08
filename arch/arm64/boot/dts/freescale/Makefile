@@ -70,6 +70,10 @@ imx8dxp-tqma8xdp-mba8xx-lvds-g133han01-dtbs = imx8dxp-tqma8xdp-mba8xx.dtb tqma8x
 imx8dxp-tqma8xdp-mba8xx-lvds0-tm070jvhg33-dtbs = imx8dxp-tqma8xdp-mba8xx.dtb tqma8xx-display.dtbo mba8xx-lvds0-tm070jvhg33.dtbo
 imx8dxp-tqma8xdp-mba8xx-lvds1-tm070jvhg33-dtbs = imx8dxp-tqma8xdp-mba8xx.dtb tqma8xx-display.dtbo mba8xx-lvds1-tm070jvhg33.dtbo
 imx8dxp-tqma8xdp-mba8xx-rpmsg-dtbs = imx8dxp-tqma8xdp-mba8xx.dtb tqma8xx-rpmsg.dtbo
+imx8dxp-tqma8xdps-mb-smarc-2-lvds-g133han01-dtbs = imx8dxp-tqma8xdps-mb-smarc-2.dtb tqma8xx-display.dtbo mb-smarc-2-lvds-g133han01.dtbo
+imx8dxp-tqma8xdps-mb-smarc-2-lvds0-tm070jvhg33-dtbs = imx8dxp-tqma8xdps-mb-smarc-2.dtb tqma8xx-display.dtbo mb-smarc-2-lvds0-tm070jvhg33.dtbo
+imx8dxp-tqma8xdps-mb-smarc-2-lvds1-tm070jvhg33-dtbs = imx8dxp-tqma8xdps-mb-smarc-2.dtb tqma8xx-display.dtbo mb-smarc-2-lvds1-tm070jvhg33.dtbo
+imx8dxp-tqma8xdps-mb-smarc-2-rpmsg-dtbs = imx8dxp-tqma8xdps-mb-smarc-2.dtb tqma8xxs-rpmsg.dtbo
 dtb-$(CONFIG_ARCH_MXC) += imx8dxp-tqma8xdp-mba8xx-lvds-g133han01.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8dxp-tqma8xdp-mba8xx-lvds0-tm070jvhg33.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8dxp-tqma8xdp-mba8xx-lvds1-tm070jvhg33.dtb
@@ -465,6 +469,7 @@ imx8qxp-tqma8xqp-mba8xx-rpmsg-dtbs = imx8qxp-tqma8xqp-mba8xx.dtb tqma8xx-rpmsg.d
 imx8qxp-tqma8xqps-mb-smarc-2-lvds-g133han01-dtbs = imx8qxp-tqma8xqps-mb-smarc-2.dtb tqma8xx-display.dtbo mb-smarc-2-lvds-g133han01.dtbo
 imx8qxp-tqma8xqps-mb-smarc-2-lvds0-tm070jvhg33-dtbs = imx8qxp-tqma8xqps-mb-smarc-2.dtb tqma8xx-display.dtbo mb-smarc-2-lvds0-tm070jvhg33.dtbo
 imx8qxp-tqma8xqps-mb-smarc-2-lvds1-tm070jvhg33-dtbs = imx8qxp-tqma8xqps-mb-smarc-2.dtb tqma8xx-display.dtbo mb-smarc-2-lvds1-tm070jvhg33.dtbo
+imx8qxp-tqma8xqps-mb-smarc-2-rpmsg-dtbs = imx8qxp-tqma8xqps-mb-smarc-2.dtb tqma8xxs-rpmsg.dtbo
 dtb-$(CONFIG_ARCH_MXC) += imx8qxp-tqma8xqp-mba8xx-lvds-g133han01.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8qxp-tqma8xqp-mba8xx-lvds0-tm070jvhg33.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8qxp-tqma8xqp-mba8xx-lvds1-tm070jvhg33.dtb
@@ -474,6 +479,7 @@ dtb-$(CONFIG_ARCH_MXC) += imx8qxp-tqma8xqps-mb-smarc-2-lvds-g133han01.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8qxp-tqma8xqps-mb-smarc-2-lvds0-tm070jvhg33.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8qxp-tqma8xqps-mb-smarc-2-lvds1-tm070jvhg33.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8qxp-tqma8xqps-mb-smarc-2-lvds-g133han01.dtb
+dtb-$(CONFIG_ARCH_MXC) += imx8qxp-tqma8xqps-mb-smarc-2-rpmsg.dtb
 
 dtb-$(CONFIG_ARCH_MXC) += imx93-14x14-evk.dtb \
 			  imx93-14x14-evk-tja1103.dtb imx93-14x14-evk-rm67199.dtb \
