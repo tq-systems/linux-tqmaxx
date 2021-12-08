@@ -1,0 +1,11 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright 2021-2022 TQ-Systems GmbH
+ * Author: Alexander Stein <linux@ew.tq-group.com>
+ */
+
+/dts-v1/;
+
+#include "imx8dxp-tqma8xdps-mb-smarc-2.dts"
+#include "mb-smarc-2-lvds0-tm070jvhg33.dtsi"
+#include "tqma8xxs-display.dtsi"
