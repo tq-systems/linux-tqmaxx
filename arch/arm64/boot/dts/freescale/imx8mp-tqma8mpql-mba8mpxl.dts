@@ -574,7 +574,7 @@
 		>;
 	};
 
-	pinctrl_i2c2_gpio: i2c2grp-gpio {
+	pinctrl_i2c2_gpio: i2c2-gpiogrp {
 		fsl,pins = <
 			MX8MP_IOMUXC_I2C2_SCL__GPIO5_IO16	0x400001e2
 			MX8MP_IOMUXC_I2C2_SDA__GPIO5_IO17	0x400001e2
@@ -588,7 +588,7 @@
 		>;
 	};
 
-	pinctrl_i2c4_gpio: i2c4grp-gpio {
+	pinctrl_i2c4_gpio: i2c4-gpiogrp {
 		fsl,pins = <
 			MX8MP_IOMUXC_I2C4_SCL__GPIO5_IO20	0x400001e2
 			MX8MP_IOMUXC_I2C4_SDA__GPIO5_IO21	0x400001e2
@@ -602,7 +602,7 @@
 		>;
 	};
 
-	pinctrl_i2c6_gpio: i2c6grp-gpio {
+	pinctrl_i2c6_gpio: i2c6-gpiogrp {
 		fsl,pins = <
 			MX8MP_IOMUXC_SD1_DATA0__GPIO2_IO02	0x400001e2
 			MX8MP_IOMUXC_SD1_DATA1__GPIO2_IO03	0x400001e2
@@ -743,7 +743,7 @@
 		>;
 	};
 
-	pinctrl_usdhc2_100mhz: usdhc2grp-100mhz {
+	pinctrl_usdhc2_100mhz: usdhc2-100mhzgrp {
 		fsl,pins = <
 			MX8MP_IOMUXC_SD2_CLK__USDHC2_CLK	0x194
 			MX8MP_IOMUXC_SD2_CMD__USDHC2_CMD	0x1d4
@@ -755,7 +755,7 @@
 		>;
 	};
 
-	pinctrl_usdhc2_200mhz: usdhc2grp-200mhz {
+	pinctrl_usdhc2_200mhz: usdhc2-200mhzgrp {
 		fsl,pins = <
 			MX8MP_IOMUXC_SD2_CLK__USDHC2_CLK	0x194
 			MX8MP_IOMUXC_SD2_CMD__USDHC2_CMD	0x1d4
@@ -767,7 +767,7 @@
 		>;
 	};
 
-	pinctrl_usdhc2_gpio: usdhc2grp-gpio {
+	pinctrl_usdhc2_gpio: usdhc2-gpiogrp {
 		fsl,pins = <
 			MX8MP_IOMUXC_SD2_CD_B__GPIO2_IO12	0x1c0
 		>;
