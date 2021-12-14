@@ -57,7 +57,7 @@
 		compatible = "fsl,imx-audio-tlv320aic32x4";
 		model = "tqm-tlv320aic32";
 		ssi-controller = <&sai2>;
-		audio-codec = <&codec>;
+		audio-codec = <&tlv320aic3x04>;
 	};
 
 	thermal-zones {
@@ -171,7 +171,7 @@
 		};
 	};
 
-	codec: codec@18 {
+	tlv320aic3x04: audio-codec@18 {
 		compatible = "ti,tlv320aic32x4";
 		reg = <0x18>;
 		clock-names = "mclk";
