@@ -130,7 +130,7 @@
 		compatible = "fsl,imx-audio-tlv320aic32x4";
 		model = "tqm-tlv320aic32";
 		ssi-controller = <&sai3>;
-		audio-codec = <&codec>;
+		audio-codec = <&tlv320aic3x04>;
 	};
 };
 
@@ -246,7 +246,7 @@
 	sda-gpios = <&gpio5 17 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
 	status = "okay";
 
-	codec: tlv320aic3x04@18 {
+	tlv320aic3x04: audio-codec@18 {
 		compatible = "ti,tlv320aic32x4";
 		reg = <0x18>;
 		reset-gpios = <&expander2 0 GPIO_ACTIVE_LOW>;

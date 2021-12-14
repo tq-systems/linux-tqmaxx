@@ -64,7 +64,7 @@
 	gpios = <&gpio3 17 GPIO_ACTIVE_LOW>;
 };
 
-&codec {
+&tlv320aic3x04 {
 	clock-names = "mclk";
 	clocks = <&clk IMX8MQ_CLK_SAI3_ROOT>;
 };

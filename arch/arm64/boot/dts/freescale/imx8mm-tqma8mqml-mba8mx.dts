@@ -42,7 +42,7 @@
 	};
 };
 
-&codec {
+&tlv320aic3x04 {
 	clock-names = "mclk";
 	clocks = <&clk IMX8MM_CLK_SAI3_ROOT>;
 };
