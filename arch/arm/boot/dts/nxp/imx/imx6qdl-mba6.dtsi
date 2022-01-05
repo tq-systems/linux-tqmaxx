@@ -31,6 +31,17 @@
 		gpios = <&gpio1 21 GPIO_ACTIVE_HIGH>;
 	};
 
+	backlight: pwm_backlight {
+		compatible = "pwm-backlight";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_backlight>;
+		pwms = <&pwm1 0 5000000 0>;
+		power-supply = <&reg_mba6_3p3v>;
+		enable-gpios = <&gpio4 5 GPIO_ACTIVE_HIGH>;
+		brightness-levels = <0 2 4 8 16 32 64 128 255>;
+		default-brightness-level = <8>;
+	};
+
 	gpio_buttons: gpio-buttons {
 		compatible = "gpio-keys";
 		pinctrl-names = "default";
@@ -73,6 +84,22 @@
 			label = "led2";
 			gpios = <&gpio6 31 GPIO_ACTIVE_HIGH>;
 			linux,default-trigger = "heartbeat";
+		};
+	};
+
+	panel0: panel-lvds0 {
+		/*
+		 * Display is not fixed, so compatible has to be added from
+		 * DT overlay
+		 */
+		backlight = <&backlight>;
+		power-supply = <&reg_mba6_3p3v>;
+		status = "disabled";
+
+		port {
+			panel_in_lvds0: endpoint {
+				remote-endpoint = <&lvds0_out>;
+			};
 		};
 	};
 
@@ -243,6 +270,19 @@
 	status = "okay";
 };
 
+&ldb {
+	lvds-channel@0 {
+		port@4 {
+			reg = <4>;
+
+			lvds0_out: endpoint {
+				remote-endpoint = <&panel_in_lvds0>;
+			};
+		};
+	};
+
+};
+
 &pcie {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pcie>;
@@ -376,6 +416,13 @@
 			MX6QDL_PAD_CSI0_DAT4__AUD3_TXC  0x1b0b0
 			MX6QDL_PAD_CSI0_DAT5__AUD3_TXD  0x1b0b0
 			MX6QDL_PAD_CSI0_DAT6__AUD3_TXFS 0x1b0b0
+		>;
+	};
+
+	pinctrl_backlight: backlightgrp {
+		fsl,pins = <
+			/* LCD.BLT_EN */
+			MX6QDL_PAD_GPIO_19__GPIO4_IO05 0x0001b099
 		>;
 	};
 
