@@ -19,6 +19,11 @@
 		mmc1 = &usdhc2;
 		/delete-property/ mmc2;
 		/delete-property/ mmc3;
+
+		mxcfb0 = &mxcfb1;
+		mxcfb1 = &mxcfb2;
+		mxcfb2 = &mxcfb3;
+		mxcfb3 = &mxcfb4;
 	};
 
 	chosen {
@@ -75,6 +80,30 @@
 			gpios = <&gpio6 31 GPIO_ACTIVE_HIGH>;
 			linux,default-trigger = "heartbeat";
 		};
+	};
+
+	mxcfb1: fb@0 {
+		compatible = "fsl,mxc_sdc_fb";
+		disp_dev = "ldb";
+		status = "disabled";
+	};
+
+	mxcfb2: fb@1 {
+		compatible = "fsl,mxc_sdc_fb";
+		disp_dev = "hdmi";
+		status = "disabled";
+	};
+
+	mxcfb3: fb@2 {
+		compatible = "fsl,mxc_sdc_fb";
+		disp_dev = "lcd";
+		status = "disabled";
+	};
+
+	mxcfb4: fb@3 {
+		compatible = "fsl,mxc_sdc_fb";
+		disp_dev = "ldb";
+		status = "disabled";
 	};
 
 	reg_mba6_3p3v: regulator-mba6-3p3v {

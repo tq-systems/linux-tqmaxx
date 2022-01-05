@@ -1,0 +1,8 @@
+// SPDX-License-Identifier: GPL-2.0-only
+/*
+ * Copyright 2018-2022 TQ-Systems GmbH
+ * Author: Markus Niebel <linux@ew.tq-group.com>
+ */
+
+#include "imx6dl-mba6a.dts"
+#include "imx6qdl-mba6-lvds-tm070jvhg33.dtsi"
