@@ -166,7 +166,19 @@
 &ecspi1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_ecspi1>, <&pinctrl_ecspi1_mba6>;
-	cs-gpios = <&gpio3 19 0>, <&gpio3 24 0>;
+	cs-gpios = <&gpio3 19 0>, <&gpio3 24 0>, <&gpio3 25 0>;
+
+	spidev1_1: spidev1-1@1 {
+		compatible = "tq,testdev";
+		reg = <1>;
+		spi-max-frequency = <1000000>;
+	};
+
+	spidev1_2: spidev1-2@2 {
+		compatible = "tq,testdev";
+		reg = <2>;
+		spi-max-frequency = <1000000>;
+	};
 };
 
 &fec {
@@ -360,6 +372,7 @@
 	pinctrl_ecspi1_mba6: ecspimba6grp {
 		fsl,pins = <
 			MX6QDL_PAD_EIM_D24__GPIO3_IO24 0xb099 /* eCSPI1 SS2 */
+			MX6QDL_PAD_EIM_D25__GPIO3_IO25 0xb099 /* eCSPI1 SS3 */
 		>;
 	};
 
