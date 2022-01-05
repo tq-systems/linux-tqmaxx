@@ -452,7 +452,9 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6dl-icore-rqs.dtb \
 	imx6dl-mamoj.dtb \
 	imx6dl-mba6a.dtb \
+	imx6dl-mba6a-usb-peripheral.dtb \
 	imx6dl-mba6b.dtb \
+	imx6dl-mba6b-usb-peripheral.dtb \
 	imx6dl-nit6xlite.dtb \
 	imx6dl-nitrogen6x.dtb \
 	imx6dl-phytec-mira-rdk-nand.dtb \
@@ -552,7 +554,9 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6q-logicpd.dtb \
 	imx6q-marsboard.dtb \
 	imx6q-mba6a.dtb \
+	imx6q-mba6a-usb-peripheral.dtb \
 	imx6q-mba6b.dtb \
+	imx6q-mba6b-usb-peripheral.dtb \
 	imx6q-mccmon6.dtb \
 	imx6q-nitrogen6x.dtb \
 	imx6q-nitrogen6_max.dtb \
