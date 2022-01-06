@@ -1,0 +1,94 @@
+// SPDX-License-Identifier: GPL-2.0-only
+/*
+ * Copyright 2019-2022 TQ-Systems GmbH
+ * Author: Markus Niebel <linux@ew.tq-group.com>
+ */
+
+/ {
+	backlight_ldb: backlight {
+		compatible = "pwm-backlight";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_backlight>;
+		pwms = <&pwm1 0 62500 0>;
+		brightness-levels = <0 16 32 64 96 128 160 192 224 255>;
+		default-brightness-level = <5>;
+		power-supply = <&reg_mba6_3p3v>;
+		enable-gpios = <&gpio4 5 GPIO_ACTIVE_HIGH>;
+		status = "okay";
+	};
+};
+
+&ldb {
+	status = "okay";
+
+	lvds-channel@0 {
+		fsl,data-mapping = "spwg";
+		fsl,data-width = <24>;
+		crtc = "ipu1-di0";
+		primary;
+		status = "okay";
+
+		display-timings {
+			native-mode = <&timing0>;
+			timing0: tm070jvhg33 {
+				clock-frequency = <68200000>;
+				hactive = <1280>;
+				vactive = <800>;
+				hback-porch = <5>;
+				hfront-porch = <64>;
+				vback-porch = <2>;
+				vfront-porch = <40>;
+				hsync-len = <1>;
+				vsync-len = <1>;
+			};
+		};
+	};
+
+	lvds-channel@1 {
+		fsl,data-mapping = "spwg";
+		fsl,data-width = <24>;
+		crtc = "ipu1-di1";
+		primary;
+		status = "okay";
+
+		display-timings {
+			native-mode = <&timing1>;
+			timing1: tm070jvhg33 {
+				clock-frequency = <68200000>;
+				hactive = <1280>;
+				vactive = <800>;
+				hback-porch = <5>;
+				hfront-porch = <64>;
+				vback-porch = <2>;
+				vfront-porch = <40>;
+				hsync-len = <1>;
+				vsync-len = <1>;
+			};
+		};
+	};
+};
+
+&mxcfb1 {
+	interface_pix_fmt = "RGB24";
+	default_bpp = <32>;
+	int_clk = <0>;
+	late_init = <0>;
+	status = "okay";
+};
+
+&mxcfb4 {
+	interface_pix_fmt = "RGB24";
+	default_bpp = <32>;
+	int_clk = <0>;
+	late_init = <0>;
+	status = "okay";
+};
+
+&iomuxc {
+	pinctrl_backlight: backlightgrp {
+		fsl,pins = <
+			/* LCD.BLT_EN */
+			MX6QDL_PAD_GPIO_19__GPIO4_IO05 0x0001b099
+		>;
+	};
+};
