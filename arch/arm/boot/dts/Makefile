@@ -452,9 +452,11 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6dl-icore-rqs.dtb \
 	imx6dl-mamoj.dtb \
 	imx6dl-mba6a.dtb \
+	imx6dl-mba6a-hdmi.dtb \
 	imx6dl-mba6a-lvds-tm070jvhg33.dtb \
 	imx6dl-mba6a-usb-peripheral.dtb \
 	imx6dl-mba6b.dtb \
+	imx6dl-mba6b-hdmi.dtb \
 	imx6dl-mba6b-lvds-tm070jvhg33.dtb \
 	imx6dl-mba6b-usb-peripheral.dtb \
 	imx6dl-nit6xlite.dtb \
@@ -556,9 +558,11 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6q-logicpd.dtb \
 	imx6q-marsboard.dtb \
 	imx6q-mba6a.dtb \
+	imx6q-mba6a-hdmi.dtb \
 	imx6q-mba6a-lvds-tm070jvhg33.dtb \
 	imx6q-mba6a-usb-peripheral.dtb \
 	imx6q-mba6b.dtb \
+	imx6q-mba6b-hdmi.dtb \
 	imx6q-mba6b-lvds-tm070jvhg33.dtb \
 	imx6q-mba6b-usb-peripheral.dtb \
 	imx6q-mccmon6.dtb \
