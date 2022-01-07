@@ -657,6 +657,9 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6q-wandboard-revd1.dtb \
 	imx6q-zii-rdu2.dtb \
 	imx6qp-mba6b.dtb \
+	imx6qp-mba6b-duallvds-tm070jvhg33.dtb \
+	imx6qp-mba6b-hdmi.dtb \
+	imx6qp-mba6b-lvds-tm070jvhg33.dtb \
 	imx6qp-nitrogen6_max.dtb \
 	imx6qp-nitrogen6_som2.dtb \
 	imx6qp-phytec-mira-rdk-nand.dtb \
