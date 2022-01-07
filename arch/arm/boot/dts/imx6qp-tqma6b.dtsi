@@ -9,8 +9,16 @@
 #include "imx6qdl-tqma6.dtsi"
 
 / {
-	memory@10000000 {
+	memory: memory@10000000 {
 		device_type = "memory";
 		reg = <0x10000000 0x40000000>;
 	};
+};
+
+&prg1 {
+	memory-region = <&memory>;
+};
+
+&prg2 {
+	memory-region = <&memory>;
 };
