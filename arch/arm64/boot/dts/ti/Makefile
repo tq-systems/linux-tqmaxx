@@ -19,7 +19,8 @@ dtb-$(CONFIG_ARCH_K3_AM6_SOC) += k3-am654-base-board.dtb  \
 				 k3-am654-pcie-usb3.dtbo \
 				 k3-am654-pcie-usb2.dtbo \
 				 k3-am654-evm-prupwm.dtbo \
-				 k3-am654-idk-sr1.dtbo
+				 k3-am654-idk-sr1.dtbo \
+				 k3-am654-tqma65xx-mba65xx.dtb
 
 dtb-$(CONFIG_ARCH_K3_J721E_SOC) += k3-j721e-common-proc-board.dtb \
 				   k3-j721e-proc-board-tps65917.dtb \
