@@ -1,0 +1,122 @@
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * Copyright (C) 2020-2022 TQ-Systems GmbH
+ * Author: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+ *
+ * Common definition for display overlays
+ */
+
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/pinctrl/k3.h>
+
+&{/} {
+	backlight: backlight {
+		compatible = "pwm-backlight";
+		pinctrl-names = "default";
+		pinctrl-0 = <&display_backlight_en_pin>;
+		pwms = <&ecap0 0 50000 0>;
+		enable-gpios = <&pca9555_21 4 GPIO_ACTIVE_HIGH>;
+		brightness-levels = <0 32 64 96 128 160 192 224 255>;
+		default-brightness-level = <5>;
+	};
+
+	display: display {
+		power-supply = <&reg_display_3v3>;
+		backlight = <&backlight>;
+
+		port {
+			display_in: endpoint {
+				remote-endpoint = <&dss_out>;
+			};
+		};
+	};
+
+	reg_display_3v3: regulator-display-3v3 {
+		compatible = "regulator-fixed";
+		regulator-name = "DISPLAY_3V3";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		gpio = <&pca9555_21 1 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+	};
+};
+
+&dss {
+	pinctrl-names = "default";
+	pinctrl-0 = <&dss_vout1_pins_default>;
+	status = "okay";
+};
+
+&gpu {
+	status = "okay";
+};
+
+&main_pmx0 {
+	display_backlight_en_pin: display_backlight_en_pin {
+		pinctrl-single,pins = <
+			/* (U26) PRG0_PRU0_GPO17.PRG0_PRU0_GPI17 */
+			AM65X_IOPAD(0x0238, PIN_OUTPUT, 3)
+		>;
+	};
+
+	dss_vout1_pins_default: dss_vout1_pins_default {
+		pinctrl-single,pins = <
+			/* VOUT1_DATA0 */
+			AM65X_IOPAD(0x0000, PIN_OUTPUT, 1)
+			/* VOUT1_DATA1 */
+			AM65X_IOPAD(0x0004, PIN_OUTPUT, 1)
+			/* VOUT1_DATA2 */
+			AM65X_IOPAD(0x0008, PIN_OUTPUT, 1)
+			/* VOUT1_DATA3 */
+			AM65X_IOPAD(0x000c, PIN_OUTPUT, 1)
+			/* VOUT1_DATA4 */
+			AM65X_IOPAD(0x0010, PIN_OUTPUT, 1)
+			/* VOUT1_DATA5 */
+			AM65X_IOPAD(0x0014, PIN_OUTPUT, 1)
+			/* VOUT1_DATA6 */
+			AM65X_IOPAD(0x0018, PIN_OUTPUT, 1)
+			/* VOUT1_DATA7 */
+			AM65X_IOPAD(0x001c, PIN_OUTPUT, 1)
+			/* VOUT1_DATA8 */
+			AM65X_IOPAD(0x0020, PIN_OUTPUT, 1)
+			/* VOUT1_DATA9 */
+			AM65X_IOPAD(0x0024, PIN_OUTPUT, 1)
+			/* VOUT1_DATA10 */
+			AM65X_IOPAD(0x0028, PIN_OUTPUT, 1)
+			/* VOUT1_DATA11 */
+			AM65X_IOPAD(0x002c, PIN_OUTPUT, 1)
+			/* VOUT1_DATA12 */
+			AM65X_IOPAD(0x0030, PIN_OUTPUT, 1)
+			/* VOUT1_DATA13 */
+			AM65X_IOPAD(0x0034, PIN_OUTPUT, 1)
+			/* VOUT1_DATA14 */
+			AM65X_IOPAD(0x0038, PIN_OUTPUT, 1)
+			/* VOUT1_DATA15 */
+			AM65X_IOPAD(0x003c, PIN_OUTPUT, 1)
+			/* VOUT1_DATA16 */
+			AM65X_IOPAD(0x0040, PIN_OUTPUT, 1)
+			/* VOUT1_DATA17 */
+			AM65X_IOPAD(0x0044, PIN_OUTPUT, 1)
+			/* VOUT1_DATA18 */
+			AM65X_IOPAD(0x0048, PIN_OUTPUT, 1)
+			/* VOUT1_DATA19 */
+			AM65X_IOPAD(0x004c, PIN_OUTPUT, 1)
+			/* VOUT1_DATA20 */
+			AM65X_IOPAD(0x0050, PIN_OUTPUT, 1)
+			/* VOUT1_DATA21 */
+			AM65X_IOPAD(0x0054, PIN_OUTPUT, 1)
+			/* VOUT1_DATA22 */
+			AM65X_IOPAD(0x0058, PIN_OUTPUT, 1)
+			/* VOUT1_DATA23 */
+			AM65X_IOPAD(0x005c, PIN_OUTPUT, 1)
+			/* VOUT1_VSYNC */
+			AM65X_IOPAD(0x0060, PIN_OUTPUT, 1)
+			/* VOUT1_HSYNC */
+			AM65X_IOPAD(0x0064, PIN_OUTPUT, 1)
+			/* VOUT1_PCLK */
+			AM65X_IOPAD(0x0068, PIN_OUTPUT, 1)
+			/* VOUT1_DE */
+			AM65X_IOPAD(0x006c, PIN_OUTPUT, 1)
+		>;
+	};
+};

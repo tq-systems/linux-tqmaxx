@@ -1,0 +1,57 @@
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * Copyright (C) 2020-2022 TQ-Systems GmbH
+ * Author: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+ */
+
+/dts-v1/;
+/plugin/;
+#include "k3-am65-tqma65xx-mba65xx-display.dtsi"
+#include <dt-bindings/interrupt-controller/irq.h>
+
+&display {
+	compatible = "cdtech,s070swv29hg-dc44";
+};
+
+&dss_ports {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	port@1 {
+		reg = <1>;
+
+		dss_out: endpoint {
+			remote-endpoint = <&display_in>;
+		};
+	};
+};
+
+&mcu_i2c0 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	edt-ft5x04@38 {
+		compatible = "edt,edt-ft5406", "edt,edt-ft5x06";
+		reg = <0x38>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&touch_int_pin>;
+		interrupt-parent = <&main_gpio1>;
+		interrupts = <16 IRQ_TYPE_EDGE_FALLING>;
+		/* LCD_PWR_EN -> TSC /WAKE */
+		wake-gpios = <&pca9555_21 3 GPIO_ACTIVE_HIGH>;
+		/* DISPLAY_RST# -> TSC /RST */
+		reset-gpios = <&pca9555_21 5 GPIO_ACTIVE_LOW>;
+		gain = <20>;
+		touchscreen-size-x = <800>;
+		touchscreen-size-y = <480>;
+	};
+};
+
+&main_pmx0 {
+	touch_int_pin: touch_int_pingroup {
+		pinctrl-single,pins = <
+			/* SPI0_CS1.GPIO1_16 */
+			AM65X_IOPAD(0x01c0, PIN_INPUT_PULLUP, 7)
+		>;
+	};
+};

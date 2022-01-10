@@ -1,0 +1,31 @@
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * Copyright (C) 2020-2022 TQ-Systems GmbH
+ * Author: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+ */
+
+/dts-v1/;
+/plugin/;
+#include "k3-am65-tqma65xx-mba65xx-display.dtsi"
+
+&display {
+	compatible = "tianma,tm070jdhg30";
+};
+
+&dss {
+	assigned-clocks = <&k3_clks 67 2>;
+	assigned-clock-parents = <&k3_clks 67 5>;
+};
+
+&dss_ports {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	port@0 {
+		reg = <0>;
+
+		dss_out: endpoint {
+			remote-endpoint = <&display_in>;
+		};
+	};
+};
