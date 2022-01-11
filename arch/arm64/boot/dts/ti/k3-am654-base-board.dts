@@ -457,8 +457,6 @@
 		spi-tx-bus-width = <1>;
 		spi-rx-bus-width = <1>;
 		spi-max-frequency = <48000000>;
-		#address-cells = <1>;
-		#size-cells= <1>;
 	};
 };
 
@@ -593,11 +591,16 @@
 		cdns,tslch-ns = <60>;
 		cdns,read-delay = <0>;
 		cdns,phy-mode;
-		#address-cells = <1>;
-		#size-cells = <1>;
-		partition@3fe0000 {
-			label = "ospi.phypattern";
-			reg = <0x3fe0000 0x20000>;
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			partition@3fe0000 {
+				label = "ospi.phypattern";
+				reg = <0x3fe0000 0x20000>;
+			};
 		};
 	};
 };
