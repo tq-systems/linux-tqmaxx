@@ -133,7 +133,7 @@
 		compatible = "fsl,imx-audio-tlv320aic32x4";
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_audmux>;
-		model = "imx6-tqma6x-tlv320aic32";
+		model = "imx-audio-tlv320aic32x4";
 		ssi-controller = <&ssi1>;
 		audio-codec = <&tlv320aic32x4>;
 		audio-asrc = <&asrc>;
