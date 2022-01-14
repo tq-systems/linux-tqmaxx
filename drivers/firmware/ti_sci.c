@@ -166,9 +166,11 @@ static int ti_sci_debugfs_create(struct platform_device *pdev,
 	/* Debug region is optional */
 	res = platform_get_resource_byname(pdev, IORESOURCE_MEM,
 					   "debug_messages");
+	if (!res)
+		return 0;
 	info->debug_region = devm_ioremap_resource(dev, res);
 	if (IS_ERR(info->debug_region))
-		return 0;
+		return PTR_ERR(info->debug_region);
 	info->debug_region_size = resource_size(res);
 
 	info->debug_buffer = devm_kcalloc(dev, info->debug_region_size + 1,
