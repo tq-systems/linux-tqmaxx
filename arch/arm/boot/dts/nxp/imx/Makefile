@@ -96,7 +96,9 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6dl-lanmcu.dtb \
 	imx6dl-mamoj.dtb \
 	imx6dl-mba6a.dtb \
+	imx6dl-mba6a-hdmi.dtb \
 	imx6dl-mba6b.dtb \
+	imx6dl-mba6b-hdmi.dtb \
 	imx6dl-nit6xlite.dtb \
 	imx6dl-nitrogen6x.dtb \
 	imx6dl-phytec-mira-rdk-nand.dtb \
@@ -203,7 +205,9 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6q-logicpd.dtb \
 	imx6q-marsboard.dtb \
 	imx6q-mba6a.dtb \
+	imx6q-mba6a-hdmi.dtb \
 	imx6q-mba6b.dtb \
+	imx6q-mba6b-hdmi.dtb \
 	imx6q-mccmon6.dtb \
 	imx6q-nitrogen6x.dtb \
 	imx6q-nitrogen6_max.dtb \
@@ -252,6 +256,7 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6q-yapp4-pegasus.dtb \
 	imx6q-zii-rdu2.dtb \
 	imx6qp-mba6b.dtb \
+	imx6qp-mba6b-hdmi.dtb \
 	imx6qp-nitrogen6_max.dtb \
 	imx6qp-nitrogen6_som2.dtb \
 	imx6qp-phytec-mira-rdk-nand.dtb \
