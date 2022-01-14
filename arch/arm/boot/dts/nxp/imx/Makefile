@@ -291,6 +291,17 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6qp-zii-rdu2.dtb \
 	imx6s-dhcom-drc02.dtb
 
+imx6dl-mba6a-duallvds-tm070jvhg33-dtbs = imx6dl-mba6a.dtb imx6qdl-mba6-duallvds-tm070jvhg33.dtbo
+imx6dl-mba6b-duallvds-tm070jvhg33-dtbs = imx6dl-mba6b.dtb imx6qdl-mba6-duallvds-tm070jvhg33.dtbo
+imx6q-mba6a-duallvds-tm070jvhg33-dtbs = imx6q-mba6a.dtb imx6qdl-mba6-duallvds-tm070jvhg33.dtbo
+imx6q-mba6b-duallvds-tm070jvhg33-dtbs = imx6q-mba6b.dtb imx6qdl-mba6-duallvds-tm070jvhg33.dtbo
+imx6qp-mba6b-duallvds-tm070jvhg33-dtbs = imx6qp-mba6b.dtb imx6qdl-mba6-duallvds-tm070jvhg33.dtbo
+dtb-$(CONFIG_SOC_IMX6Q) += imx6dl-mba6a-duallvds-tm070jvhg33.dtb
+dtb-$(CONFIG_SOC_IMX6Q) += imx6dl-mba6b-duallvds-tm070jvhg33.dtb
+dtb-$(CONFIG_SOC_IMX6Q) += imx6q-mba6a-duallvds-tm070jvhg33.dtb
+dtb-$(CONFIG_SOC_IMX6Q) += imx6q-mba6b-duallvds-tm070jvhg33.dtb
+dtb-$(CONFIG_SOC_IMX6Q) += imx6qp-mba6b-duallvds-tm070jvhg33.dtb
+
 imx6dl-mba6a-lvds-tm070jvhg33-dtbs = imx6dl-mba6a.dtb imx6qdl-mba6-lvds-tm070jvhg33.dtbo
 imx6dl-mba6b-lvds-tm070jvhg33-dtbs = imx6dl-mba6b.dtb imx6qdl-mba6-lvds-tm070jvhg33.dtbo
 imx6q-mba6a-lvds-tm070jvhg33-dtbs = imx6q-mba6a.dtb imx6qdl-mba6-lvds-tm070jvhg33.dtbo

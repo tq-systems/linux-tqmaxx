@@ -103,6 +103,22 @@
 		};
 	};
 
+	panel1: panel-lvds1 {
+		/*
+		 * Display is not fixed, so compatible has to be added from
+		 * DT overlay
+		 */
+		backlight = <&backlight>;
+		power-supply = <&reg_mba6_3p3v>;
+		status = "disabled";
+
+		port {
+			panel_in_lvds1: endpoint {
+				remote-endpoint = <&lvds1_out>;
+			};
+		};
+	};
+
 	reg_mba6_3p3v: regulator-mba6-3p3v {
 		compatible = "regulator-fixed";
 		regulator-name = "supply-mba6-3p3v";
@@ -281,6 +297,15 @@
 		};
 	};
 
+	lvds-channel@1 {
+		port@4 {
+			reg = <4>;
+
+			lvds1_out: endpoint {
+				remote-endpoint = <&panel_in_lvds1>;
+			};
+		};
+	};
 };
 
 &pcie {
