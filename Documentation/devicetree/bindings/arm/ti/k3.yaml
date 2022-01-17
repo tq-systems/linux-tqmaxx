@@ -33,3 +33,10 @@ properties:
               - ti,am642-evm
               - ti,am642-sk
           - const: ti,am642
+
+      - description: K3 AM654 SoC on TQ-Systems TQMa65xx SoM
+        item:
+          - enum:
+              - tq,am654-tqma6548-mba65xx
+          - const: tq,am654-tqma6548
+          - const: ti,am654
