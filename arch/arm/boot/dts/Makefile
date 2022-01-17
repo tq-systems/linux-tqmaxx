@@ -511,11 +511,15 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6dl-lanmcu.dtb \
 	imx6dl-mamoj.dtb \
 	imx6dl-mba6a.dtb \
+	imx6dl-mba6a-cdtech-dc44.dtb \
+	imx6dl-mba6a-cdtech-fc21.dtb \
 	imx6dl-mba6a-duallvds-tm070jvhg33.dtb \
 	imx6dl-mba6a-hdmi.dtb \
 	imx6dl-mba6a-multi.dtb \
 	imx6dl-mba6a-lvds-tm070jvhg33.dtb \
 	imx6dl-mba6b.dtb \
+	imx6dl-mba6b-cdtech-dc44.dtb \
+	imx6dl-mba6b-cdtech-fc21.dtb \
 	imx6dl-mba6b-duallvds-tm070jvhg33.dtb \
 	imx6dl-mba6b-hdmi.dtb \
 	imx6dl-mba6b-multi.dtb \
@@ -624,11 +628,15 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6q-logicpd.dtb \
 	imx6q-marsboard.dtb \
 	imx6q-mba6a.dtb \
+	imx6q-mba6a-cdtech-dc44.dtb \
+	imx6q-mba6a-cdtech-fc21.dtb \
 	imx6q-mba6a-duallvds-tm070jvhg33.dtb \
 	imx6q-mba6a-hdmi.dtb \
 	imx6q-mba6a-multi.dtb \
 	imx6q-mba6a-lvds-tm070jvhg33.dtb \
 	imx6q-mba6b.dtb \
+	imx6q-mba6b-cdtech-dc44.dtb \
+	imx6q-mba6b-cdtech-fc21.dtb \
 	imx6q-mba6b-duallvds-tm070jvhg33.dtb \
 	imx6q-mba6b-hdmi.dtb \
 	imx6q-mba6b-multi.dtb \
@@ -680,6 +688,8 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6q-yapp4-crux.dtb \
 	imx6q-zii-rdu2.dtb \
 	imx6qp-mba6b.dtb \
+	imx6qp-mba6b-cdtech-dc44.dtb \
+	imx6qp-mba6b-cdtech-fc21.dtb \
 	imx6qp-mba6b-duallvds-tm070jvhg33.dtb \
 	imx6qp-mba6b-hdmi.dtb \
 	imx6qp-mba6b-multi.dtb \
