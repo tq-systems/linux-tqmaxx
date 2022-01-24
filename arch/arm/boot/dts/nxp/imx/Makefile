@@ -381,7 +381,11 @@ dtb-$(CONFIG_SOC_IMX6UL) += \
 	imx6ulz-bsh-smm-m2.dtb
 
 imx6ul-tqma6ul2-mba6ulx-lvds-tm070jvhg33-dtbs += imx6ul-tqma6ul2-mba6ulx.dtb imx6ul-tqma6ul2-mba6ulx-lvds-tm070jvhg33.dtbo
+imx6ul-tqma6ul2-mba6ulx-rgb-cdtech-dc44-dtbs += imx6ul-tqma6ul2-mba6ulx.dtb imx6ul-tqma6ul2-mba6ulx-rgb-cdtech-dc44.dtbo
+imx6ul-tqma6ul2-mba6ulx-rgb-cdtech-fc21-dtbs += imx6ul-tqma6ul2-mba6ulx.dtb imx6ul-tqma6ul2-mba6ulx-rgb-cdtech-fc21.dtbo
 dtb-$(CONFIG_SOC_IMX6UL) += imx6ul-tqma6ul2-mba6ulx-lvds-tm070jvhg33.dtb
+dtb-$(CONFIG_SOC_IMX6UL) += imx6ul-tqma6ul2-mba6ulx-rgb-cdtech-dc44.dtb
+dtb-$(CONFIG_SOC_IMX6UL) += imx6ul-tqma6ul2-mba6ulx-rgb-cdtech-fc21.dtb
 
 dtb-$(CONFIG_SOC_IMX7D) += \
 	imx7d-cl-som-imx7.dtb \
