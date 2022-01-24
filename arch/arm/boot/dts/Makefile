@@ -712,6 +712,8 @@ dtb-$(CONFIG_SOC_IMX6UL) += \
 	imx6ul-liteboard.dtb \
 	imx6ul-tqma6ul1-mba6ulx.dtb \
 	imx6ul-tqma6ul2-mba6ulx.dtb \
+	imx6ul-tqma6ul2-mba6ulx-cdtech-dc44.dtb \
+	imx6ul-tqma6ul2-mba6ulx-cdtech-fc21.dtb \
 	imx6ul-tqma6ul2-mba6ulx-lvds.dtb \
 	imx6ul-tqma6ul2l-mba6ulx.dtb \
 	imx6ul-opos6uldev.dtb \
