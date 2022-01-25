@@ -1658,8 +1658,10 @@ static int am65_cpsw_nuss_init_tx_chns(struct am65_cpsw_common *common)
 						    &tx_cfg);
 		if (IS_ERR(tx_chn->tx_chn)) {
 			ret = PTR_ERR(tx_chn->tx_chn);
-			dev_err(dev, "Failed to request tx dma channel %d\n",
-				ret);
+			if (ret != -EPROBE_DEFER)
+				dev_err(dev,
+					"Failed to request tx dma channel %d\n",
+					ret);
 			goto err;
 		}
 		tx_chn->dma_dev = k3_udma_glue_tx_get_dma_device(tx_chn->tx_chn);
@@ -1734,7 +1736,9 @@ static int am65_cpsw_nuss_init_rx_chns(struct am65_cpsw_common *common)
 	rx_chn->rx_chn = k3_udma_glue_request_rx_chn(dev, "rx", &rx_cfg);
 	if (IS_ERR(rx_chn->rx_chn)) {
 		ret = PTR_ERR(rx_chn->rx_chn);
-		dev_err(dev, "Failed to request rx dma channel %d\n", ret);
+		if (ret != -EPROBE_DEFER)
+			dev_err(dev, "Failed to request rx dma channel %d\n",
+				ret);
 		goto err;
 	}
 	rx_chn->dma_dev = k3_udma_glue_rx_get_dma_device(rx_chn->rx_chn);
