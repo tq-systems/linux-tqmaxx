@@ -41,6 +41,13 @@ Optional property:
 				    SGMII configuration is used (4 or 6-wire modes).
 				    Some MACs work with differential SGMII clock.
 				    See data manual for details.
+	- ti,force-master - Forces the PHY to master mode. Should normally not
+				    be used, as two PHYs will be unable to
+				    establish a link when both are set to master
+				    mode, rather than detecting their role
+				    automatically. May be useful as a workaround
+				    for certain hardware implementation
+				    deficiencies.
 
 Note: ti,min-output-impedance and ti,max-output-impedance are mutually
       exclusive. When both properties are present ti,max-output-impedance
