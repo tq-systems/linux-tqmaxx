@@ -348,6 +348,8 @@ dtb-$(CONFIG_SOC_IMX6UL) += \
 	imx6ull-tarragon-slave.dtb \
 	imx6ull-tarragon-slavext.dtb \
 	imx6ull-tqma6ull2-mba6ulx.dtb \
+	imx6ull-tqma6ull2-mba6ulx-cdtech-dc44.dtb \
+	imx6ull-tqma6ull2-mba6ulx-cdtech-fc21.dtb \
 	imx6ull-tqma6ull2-mba6ulx-lvds.dtb \
 	imx6ull-tqma6ull2l-mba6ulx.dtb \
 	imx6ulz-14x14-evk.dtb \
