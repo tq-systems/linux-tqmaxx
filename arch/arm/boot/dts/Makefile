@@ -718,6 +718,8 @@ dtb-$(CONFIG_SOC_IMX6UL) += \
 	imx6ull-tqma6ull2-mba6ulx-cdtech-fc21.dtb \
 	imx6ull-tqma6ull2-mba6ulx-lvds.dtb \
 	imx6ull-tqma6ull2l-mba6ulx.dtb \
+	imx6ull-tqma6ull2l-mba6ulx-cdtech-dc44.dtb \
+	imx6ull-tqma6ull2l-mba6ulx-cdtech-fc21.dtb \
 	imx6ull-tqma6ull2l-mba6ulx-lvds.dtb \
 	imx6ull-myir-mys-6ulx-eval.dtb \
 	imx6ull-opos6uldev.dtb \
