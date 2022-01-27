@@ -52,7 +52,6 @@
 			reg_sw2: sw2 {
 				regulator-min-microvolt = <2500000>;
 				regulator-max-microvolt = <3300000>;
-				regulator-boot-on;
 			};
 
 			reg_sw3_ddr: sw3 {
@@ -127,7 +126,6 @@
 		compatible = "atmel,24c64";
 		reg = <0x50>;
 		pagesize = <32>;
-		vcc-supply = <&reg_sw2>;
 		status = "okay";
 	};
 
@@ -136,7 +134,6 @@
 		reg = <0x52>;
 		pagesize = <16>;
 		read-only;
-		vcc-supply = <&reg_sw2>;
 		status = "okay";
 	};
 
