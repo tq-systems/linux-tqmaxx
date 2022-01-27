@@ -112,7 +112,7 @@
 		gpio = <&expander_out0 2 GPIO_ACTIVE_HIGH>;
 		enable-active-high;
 		regulator-always-on;
-		startup-delay-us = <200000>;
+		startup-delay-us = <500000>;
 		vin-supply = <&reg_mba6ul_3v3>;
 	};
 
