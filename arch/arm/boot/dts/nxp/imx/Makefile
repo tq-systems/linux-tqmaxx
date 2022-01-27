@@ -387,6 +387,9 @@ dtb-$(CONFIG_SOC_IMX6UL) += imx6ul-tqma6ul2-mba6ulx-lvds-tm070jvhg33.dtb
 dtb-$(CONFIG_SOC_IMX6UL) += imx6ul-tqma6ul2-mba6ulx-rgb-cdtech-dc44.dtb
 dtb-$(CONFIG_SOC_IMX6UL) += imx6ul-tqma6ul2-mba6ulx-rgb-cdtech-fc21.dtb
 
+imx6ull-tqma6ull2-mba6ulx-lvds-tm070jvhg33-dtbs += imx6ull-tqma6ull2-mba6ulx.dtb imx6ul-tqma6ul2-mba6ulx-lvds-tm070jvhg33.dtbo
+dtb-$(CONFIG_SOC_IMX6UL) += imx6ull-tqma6ull2-mba6ulx-lvds-tm070jvhg33.dtb
+
 dtb-$(CONFIG_SOC_IMX7D) += \
 	imx7d-cl-som-imx7.dtb \
 	imx7d-colibri-aster.dtb \
