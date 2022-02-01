@@ -233,7 +233,7 @@ static void __init zone_sizes_init(unsigned long min, unsigned long max)
 		}
 #endif
 #ifdef CONFIG_ZONE_DMA32
-		if (start < max_dma32) {
+		if (end > max_dma && start < max_dma32) {
 			unsigned long dma32_end = min(end, max_dma32);
 			unsigned long dma32_start = max(start, max_dma);
 			zhole_size[ZONE_DMA32] -= dma32_end - dma32_start;
