@@ -394,6 +394,7 @@ static int imx_get_trend(struct thermal_zone_device *tz,
 {
 	int ret;
 	int trip_temp;
+	struct imx_thermal_data *data = tz->devdata;
 
 	ret = imx_get_trip_temp(tz, trip, &trip_temp);
 	if (ret < 0)
