@@ -1531,7 +1531,7 @@ static long csis_priv_ioctl(struct v4l2_subdev *sd, unsigned int cmd, void *arg_
 		ret = csis_ioc_qcap(sd, arg);
 		break;
 	default:
-		v4l2_err(&state->sd, "unsupported csi-sam command %d.", cmd);
+		v4l2_err(&state->sd, "unsupported csi-sam command %#x.", _IOC_NR(cmd));
 		ret = -EINVAL;
 		break;
 	}
