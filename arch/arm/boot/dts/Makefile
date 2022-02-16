@@ -719,6 +719,7 @@ dtb-$(CONFIG_SOC_IMX6UL) += \
 	imx6ul-tqma6ul2l-mba6ulx-cdtech-dc44.dtb \
 	imx6ul-tqma6ul2l-mba6ulx-cdtech-fc21.dtb \
 	imx6ul-tqma6ul2l-mba6ulx-lvds.dtb \
+	imx6ul-tqma6ul2l-mba6ulxl.dtb \
 	imx6ul-opos6uldev.dtb \
 	imx6ul-pico-dwarf.dtb \
 	imx6ul-pico-hobbit.dtb \
