@@ -6,6 +6,11 @@
 #include <dt-bindings/net/ti-dp83867.h>
 
 / {
+	adc {
+		compatible = "iio-hwmon";
+		io-channels = <&adc 0>, <&adc 1>;
+	};
+
 	backlight_lvds: backlight-lvds {
 		compatible = "pwm-backlight";
 		pinctrl-names = "default";
@@ -115,9 +120,13 @@
 
 	reg_vcc_12v0: regulator-12v0 {
 		compatible = "regulator-fixed";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_reg12v0>;
 		regulator-name = "VCC_12V0";
 		regulator-min-microvolt = <12000000>;
 		regulator-max-microvolt = <12000000>;
+		gpio = <&gpio2 6 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
 	};
 
 	reg_vcc_3v3: regulator-3v3 {
@@ -131,19 +140,6 @@
 &easrc {
 	fsl,asrc-rate  = <48000>;
 	status = "disabled";
-};
-
-&ecspi1 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_ecspi1>;
-	cs-gpios = <&gpio5 9 GPIO_ACTIVE_LOW>;
-	status = "okay";
-
-	spidev1_0: spidev@0 {
-		reg = <0>;
-		compatible = "tq,testdev";
-		spi-max-frequency = <5000000>;
-	};
 };
 
 &ecspi2 {
@@ -165,16 +161,19 @@
 	cs-gpios = <&gpio5 25 GPIO_ACTIVE_LOW>;
 	status = "okay";
 
-	spidev3_0: spidev@0 {
+	adc: adc@0 {
 		reg = <0>;
-		compatible = "tq,testdev";
-		spi-max-frequency = <5000000>;
+		compatible = "microchip,mcp3202";
+		/* 100 ksps * 18 */
+		spi-max-frequency = <1800000>;
+		vfef-supply = <&reg_vcc_3v3>;
+		#io-channel-cells = <1>;
 	};
 };
 
 &eqos {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_eqos>;
+	pinctrl-0 = <&pinctrl_eqos>, <&pinctrl_eqos_phy>;
 	phy-mode = "rgmii-id";
 	phy-handle = <&ethphy3>;
 	status = "okay";
@@ -206,7 +205,7 @@
 
 &fec {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_fec>;
+	pinctrl-0 = <&pinctrl_fec>, <&pinctrl_fec_phy>;
 	phy-mode = "rgmii-id";
 	phy-handle = <&ethphy0>;
 	fsl,magic-packet;

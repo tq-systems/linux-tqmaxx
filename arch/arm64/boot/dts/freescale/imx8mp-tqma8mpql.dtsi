@@ -40,6 +40,7 @@
 &flexspi {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_flexspi0>;
+	num-cs = <1>;
 	status = "okay";
 
 	flash0: flash@0 {
@@ -80,8 +81,7 @@
 	pmic: pmic@25 {
 		reg = <0x25>;
 		compatible = "nxp,pca9450c";
-
-		/* PMIC PCA9450 PMIC_nINT GPIO1_IO08 */
+		/* PMIC PCA9450 PMIC_nINT GPIO1_IO8 */
 		pinctrl-0 = <&pinctrl_pmic>;
 		pinctrl-names = "default";
 		interrupt-parent = <&gpio1>;

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later OR MIT
 /*
- * Copyright 2021 TQ-Systems GmbH
+ * Copyright 2021 - 2022 TQ-Systems GmbH
  */
 
 /dts-v1/;
@@ -56,7 +56,7 @@
 	sound {
 		compatible = "fsl,imx-audio-tlv320aic32x4";
 		model = "tqm-tlv320aic32";
-		ssi-controller = <&sai2>;
+		ssi-controller = <&sai3>;
 		audio-codec = <&tlv320aic3x04>;
 	};
 
@@ -84,9 +84,9 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_gpio1>, <&pinctrl_usbhub>;
 
-	gpio-line-names = "GPO0", "GPO1", "", "GPO2",
-			  "", "", "GPO3", "GPI0",
-			  "", "GPI1", "OTG_ID", "USB_HUB_RST#",
+	gpio-line-names = "GPO1", "GPO0", "", "GPO3",
+			  "", "", "GPO2", "GPI0",
+			  "PMIC_IRQ", "GPI1", "OTG_ID", "USB_HUB_RST#",
 			  "OTG_PWR", "", "GPI2", "GPI3",
 			  "", "", "", "",
 			  "", "", "", "",
@@ -102,12 +102,47 @@
 };
 
 &gpio2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_hoggpio2>;
+
+	gpio-line-names = "", "", "", "",
+			  "", "", "VCC12V_EN", "PERST#",
+			  "", "", "", "",
+			  "USDHC2_CD", "", "CLKREQ#", "PEWAKE#",
+			  "", "", "", "V_SD3V3_EN",
+			  "", "", "", "",
+			  "", "", "", "",
+			  "", "", "", "";
+
+	perst {
+		gpio-hog;
+		gpios = <7 0>;
+		output-high;
+		line-name = "PERST#";
+	};
+
+	clkreq {
+		gpio-hog;
+		gpios = <10 0>;
+		input;
+		line-name = "CLKREQ#";
+	};
+
+	pewake {
+		gpio-hog;
+		gpios = <11 0>;
+		input;
+		line-name = "PEWAKE#";
+	};
+};
+
+&gpio3 {
 	gpio-line-names = "", "", "", "",
 			  "", "", "", "",
 			  "", "", "", "",
-			  "USDHC2_CD", "", "", "",
-			  "", "", "", "",
-			  "", "", "", "",
+			  "", "", "LVDS0_RESET#", "",
+			  "", "", "", "LVDS0_BLT_EN",
+			  "LVDS0_PWR_EN", "", "", "",
 			  "", "", "", "",
 			  "", "", "", "";
 };
@@ -116,31 +151,35 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_gpio4>;
 
-	gpio-line-names = "ENET1_RST#", "", "ENET0_RST#", "",
+	gpio-line-names = "ENET0_RST#", "ENET0_INT#", "ENET1_RST#", "ENET1_INT#",
 			  "", "", "", "",
 			  "", "", "", "",
 			  "", "", "", "",
 			  "", "", "DP_IRQ", "DSI_EN",
-			  "HDMI_OC#", "", "", "",
-			  "", "", "", "",
-			  "", "", "", "";
+			  "HDMI_OC#", "TEMP_EVENT#", "PCIE_CLKREQ#", "",
+			  "", "", "", "FAN_PWR",
+			  "RTC_EVENT#", "CODEC_RST#", "", "";
 };
 
 &gpio5 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_gpio5>;
-
 	gpio-line-names = "", "", "", "LED2",
-			  "LED1", "LED0", "", "",
-			  "", "ECSPI1_SS0", "", "",
+			  "LED1", "LED0", "CSI0_RESET#", "CSI0_SYNC",
+			  "CSI0_TRIGGER", "CSI0_ENABLE", "", "",
 			  "", "ECSPI2_SS0", "", "",
 			  "", "", "", "",
-			  "ECSPI3_S0", "", "", "",
-			  "", "", "SWITCH_A", "SWITCH_B",
+			  "", "", "", "",
+			  "", "ECSPI3_SS0", "SWITCH_A", "SWITCH_B",
 			  "", "", "", "";
 };
 
-&i2c1 {
+&i2c2 {
+	pinctrl-names = "default", "gpio";
+	pinctrl-0 = <&pinctrl_i2c2>;
+	pinctrl-1 = <&pinctrl_i2c2_gpio>;
+	scl-gpios = <&gpio5 16 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
+	sda-gpios = <&gpio5 17 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
+	status = "okay";
+
 	dsi2dp: bridge@f {
 		compatible = "toshiba,tc358767";
 		pinctrl-names = "default";
@@ -173,11 +212,14 @@
 
 	tlv320aic3x04: audio-codec@18 {
 		compatible = "ti,tlv320aic32x4";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_tlv320aic3x04>;
 		reg = <0x18>;
 		clock-names = "mclk";
-		clocks = <&audio_blk_ctrl IMX8MP_CLK_AUDIO_BLK_CTRL_SAI2_MCLK1>;
+		clocks = <&audio_blk_ctrl IMX8MP_CLK_AUDIO_BLK_CTRL_SAI3_MCLK1>;
 		iov-supply = <&reg_vcc_3v3>;
 		ldoin-supply = <&reg_vcc_3v3>;
+		reset-gpios = <&gpio4 29 GPIO_ACTIVE_LOW>;
 	};
 
 	/* NXP SE97BTP with temperature sensor + eeprom */
@@ -191,15 +233,6 @@
 		reg = <0x54>;
 		pagesize = <16>;
 	};
-};
-
-&i2c2 {
-	pinctrl-names = "default", "gpio";
-	pinctrl-0 = <&pinctrl_i2c2>;
-	pinctrl-1 = <&pinctrl_i2c2_gpio>;
-	scl-gpios = <&gpio5 16 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
-	sda-gpios = <&gpio5 17 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
-	status = "okay";
 };
 
 &i2c4 {
@@ -254,6 +287,10 @@
 };
 
 &pcie{
+/*
+	reset-gpio = <&gpio2 7 GPIO_ACTIVE_LOW>;
+	clkreq-gpio = <&gpio2 7 GPIO_ACTIVE_LOW>;
+*/
 	ext_osc = <1>;
 	clocks = <&clk IMX8MP_CLK_HSIO_ROOT>,
 		 <&clk IMX8MP_CLK_PCIE_AUX>,
@@ -286,22 +323,16 @@
 	status = "disabled";
 };
 
-&pwm4 {
+&sai3 {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_pwm4>;
-	status = "disabled";
-};
+	pinctrl-0 = <&pinctrl_sai3>;
 
-&sai2 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_sai2>;
-
-	assigned-clocks = <&clk IMX8MP_CLK_SAI2>;
+	assigned-clocks = <&clk IMX8MP_CLK_SAI3>;
 	assigned-clock-parents = <&clk IMX8MP_AUDIO_PLL1_OUT>;
 	assigned-clock-rates = <12288000>;
-	clocks = <&audio_blk_ctrl IMX8MP_CLK_AUDIO_BLK_CTRL_SAI2_IPG>,
+	clocks = <&audio_blk_ctrl IMX8MP_CLK_AUDIO_BLK_CTRL_SAI3_IPG>,
 		 <&clk IMX8MP_CLK_DUMMY>,
-		 <&audio_blk_ctrl IMX8MP_CLK_AUDIO_BLK_CTRL_SAI2_MCLK1>,
+		 <&audio_blk_ctrl IMX8MP_CLK_AUDIO_BLK_CTRL_SAI3_MCLK1>,
 		 <&clk IMX8MP_CLK_DUMMY>,
 		 <&clk IMX8MP_CLK_DUMMY>;
 	clock-names = "bus", "mclk0", "mclk1", "mclk2", "mclk3";
@@ -318,7 +349,6 @@
 	pinctrl-0 = <&pinctrl_uart1>;
 	assigned-clocks = <&clk IMX8MP_CLK_UART1>;
 	assigned-clock-parents = <&clk IMX8MP_SYS_PLL1_80M>;
-	fsl,dte-mode;
 	status = "okay";
 };
 
@@ -327,8 +357,6 @@
 	pinctrl-0 = <&pinctrl_uart2>;
 	assigned-clocks = <&clk IMX8MP_CLK_UART2>;
 	assigned-clock-parents = <&clk IMX8MP_SYS_PLL1_80M>;
-	fsl,uart-has-rtscts;
-	fsl,dte-mode;
 	status = "okay";
 };
 
@@ -337,8 +365,6 @@
 	pinctrl-0 = <&pinctrl_uart3>;
 	assigned-clocks = <&clk IMX8MP_CLK_UART3>;
 	assigned-clock-parents = <&clk IMX8MP_SYS_PLL1_80M>;
-	fsl,uart-has-rtscts;
-	fsl,dte-mode;
 	status = "okay";
 };
 
@@ -397,6 +423,17 @@
 };
 
 &iomuxc {
+	pinctrl_hoggpio2: hoggpio2grp {
+		fsl,pins = <
+			/* PERST0# X48 / M2 */
+			MX8MP_IOMUXC_SD1_DATA5__GPIO2_IO07	0x140
+			/* PCIe / M2 CLKREQ (alternative) */
+			MX8MP_IOMUXC_SD1_RESET_B__GPIO2_IO10	0x140
+			/* PCIe / M2 PEWAKE# (alternative) */
+			MX8MP_IOMUXC_SD1_STROBE__GPIO2_IO11	0x140
+		>;
+	};
+
 	pinctrl_bllvds: bllvdsgrp {
 		fsl,pins = <
 			MX8MP_IOMUXC_SAI5_RXFS__GPIO3_IO19	0x14
@@ -417,6 +454,7 @@
 		>;
 	};
 
+	/* only on X57, primary used as CSI0 control signals */
 	pinctrl_ecspi1: ecspi1grp {
 		fsl,pins = <
 			MX8MP_IOMUXC_ECSPI1_MISO__ECSPI1_MISO	0x1c0
@@ -426,6 +464,7 @@
 		>;
 	};
 
+	/* on X63 and optionally on X57, can also be used as CSI1 control signals */
 	pinctrl_ecspi2: ecspi2grp {
 		fsl,pins = <
 			MX8MP_IOMUXC_ECSPI2_MISO__ECSPI2_MISO	0x1c0
@@ -468,10 +507,22 @@
 			MX8MP_IOMUXC_ENET_TD3__ENET_QOS_RGMII_TD3	0x12
 			MX8MP_IOMUXC_ENET_TX_CTL__ENET_QOS_RGMII_TX_CTL	0x12
 			MX8MP_IOMUXC_ENET_TXC__CCM_ENET_QOS_CLOCK_GENERATE_TX_CLK	0x14
+		>;
+	};
+
+	pinctrl_eqos_phy: eqosphygrp {
+		fsl,pins = <
 			/* EVENT1_IN / RST# -> PE */
 			MX8MP_IOMUXC_SAI1_RXD0__GPIO4_IO02		0x100
 			/* EVENT1_OUT / INT/PD -> PE + HYS + PUE */
 			MX8MP_IOMUXC_SAI1_RXD1__GPIO4_IO03		0x1c0
+		>;
+	};
+
+	pinctrl_eqos_event: eqosevtgrp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SAI2_RXD0__ENET_QOS_1588_EVENT2_OUT	0x100
+			MX8MP_IOMUXC_SAI2_TXD0__ENET_QOS_1588_EVENT2_IN	0x1c0
 		>;
 	};
 
@@ -492,10 +543,31 @@
 			MX8MP_IOMUXC_SAI1_TXD3__ENET1_RGMII_TD3		0x12
 			MX8MP_IOMUXC_SAI1_TXD4__ENET1_RGMII_TX_CTL	0x12
 			MX8MP_IOMUXC_SAI1_TXD5__ENET1_RGMII_TXC		0x14
+		>;
+	};
+
+	pinctrl_fec_event: fecevtgrp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SAI1_RXFS__ENET1_1588_EVENT0_IN	0x100
+			MX8MP_IOMUXC_SAI1_RXC__ENET1_1588_EVENT0_OUT	0x1c0
+		>;
+	};
+
+	pinctrl_fec_phy: fecphygrp {
+		fsl,pins = <
 			/* EVENT0_IN / RST# -> PE */
 			MX8MP_IOMUXC_SAI1_RXFS__GPIO4_IO00		0x100
 			/* EVENT0_OUT / INT/PD -> PE + HYS + PUE */
 			MX8MP_IOMUXC_SAI1_RXC__GPIO4_IO01		0x1c0
+		>;
+	};
+
+	pinctrl_fec_phyalt: fecphyaltgrp {
+		fsl,pins = <
+			/* ENET1_INT#_ALT */
+			MX8MP_IOMUXC_SAI2_TXFS__GPIO4_IO24	0x180
+			/* ENET1_RST#_ALT */
+			MX8MP_IOMUXC_SAI2_TXC__GPIO4_IO25	0x180
 		>;
 	};
 
@@ -529,22 +601,20 @@
 
 	pinctrl_gpio4: gpio4grp {
 		fsl,pins = <
+			/* ENET0_TX_CLK for MII, HDMI_OC on MBa8MPxL */
 			MX8MP_IOMUXC_SAI1_MCLK__GPIO4_IO20	0x180
-
+			/* TEMP_EVENT# on MBa8MPxL */
+			MX8MP_IOMUXC_SAI2_RXFS__GPIO4_IO21	0x180
+			/* PCIe CLK REQ / OE# */
+			MX8MP_IOMUXC_SAI2_RXC__GPIO4_IO22	0x180
+			/* FAN PWR */
+			MX8MP_IOMUXC_SAI2_MCLK__GPIO4_IO27	0x180
+			/* not used for CODEC on MBa8MPxL, RTC_EVENT# */
 			MX8MP_IOMUXC_SAI3_RXFS__GPIO4_IO28	0x180
-			MX8MP_IOMUXC_SAI3_RXC__GPIO4_IO29	0x180
-			MX8MP_IOMUXC_SAI3_RXD__GPIO4_IO30	0x180
-			MX8MP_IOMUXC_SAI3_TXFS__GPIO4_IO31	0x180
 		>;
 	};
 
-	pinctrl_gpio5: gpio5grp {
-		fsl,pins = <
-			MX8MP_IOMUXC_SAI3_TXC__GPIO5_IO00	0x180
-			MX8MP_IOMUXC_SAI3_TXD__GPIO5_IO01	0x180
-		>;
-	};
-
+	/* alternative usage for gpio button, X63 */
 	pinctrl_gpt1: gpt1grp {
 		fsl,pins = <
 			MX8MP_IOMUXC_UART3_RXD__GPT1_CAPTURE2	0x14
@@ -552,6 +622,7 @@
 		>;
 	};
 
+	/* FAN RPM */
 	pinctrl_gpt2: gpt2grp {
 		fsl,pins = <
 			MX8MP_IOMUXC_I2C3_SCL__GPT2_CLK		0x14
@@ -628,6 +699,7 @@
 		>;
 	};
 
+	/* ALTERNATIV */
 	pinctrl_mipicsi1: mipicsi1grp {
 		fsl,pins = <
 			/* TRIGGER */
@@ -641,21 +713,24 @@
 		>;
 	};
 
+	/* LVDS Backlight */
 	pinctrl_pwm2: pwm2grp {
 		fsl,pins = <
 			MX8MP_IOMUXC_SAI5_RXD0__PWM2_OUT	0x14
 		>;
 	};
 
+	/* FAN */
 	pinctrl_pwm3: pwm3grp {
 		fsl,pins = <
 			MX8MP_IOMUXC_I2C3_SDA__PWM3_OUT		0x14
 		>;
 	};
 
-	pinctrl_pwm4: pwm4grp {
+	pinctrl_reg12v0: reg12v0grp {
 		fsl,pins = <
-			MX8MP_IOMUXC_SAI3_MCLK__PWM4_OUT	0x14
+			/* VCC12V enable */
+			MX8MP_IOMUXC_SD1_DATA4__GPIO2_IO06	0x140
 		>;
 	};
 
@@ -666,40 +741,46 @@
 		>;
 	};
 
-	pinctrl_sai2: sai2grp {
+	/* RXC / RXFS not used on codec */
+	pinctrl_sai3: sai3grp {
 		fsl,pins = <
-			MX8MP_IOMUXC_SAI2_MCLK__AUDIOMIX_SAI2_MCLK	0x94
-			MX8MP_IOMUXC_SAI2_RXC__AUDIOMIX_SAI2_RX_BCLK	0x94
-			MX8MP_IOMUXC_SAI2_RXFS__AUDIOMIX_SAI2_RX_SYNC	0x94
-			MX8MP_IOMUXC_SAI2_RXD0__AUDIOMIX_SAI2_RX_DATA00	0x94
-			MX8MP_IOMUXC_SAI2_TXFS__AUDIOMIX_SAI2_TX_SYNC	0x94
-			MX8MP_IOMUXC_SAI2_TXC__AUDIOMIX_SAI2_TX_BCLK	0x94
-			MX8MP_IOMUXC_SAI2_TXD0__AUDIOMIX_SAI2_TX_DATA00	0x94
+			MX8MP_IOMUXC_SAI3_MCLK__AUDIOMIX_SAI3_MCLK	0x94
+			/* MX8MP_IOMUXC_SAI3_RXC__AUDIOMIX_SAI3_RX_BCLK	0x94 */
+			/* MX8MP_IOMUXC_SAI3_RXFS__AUDIOMIX_SAI3_RX_SYNC	0x94 */
+			MX8MP_IOMUXC_SAI3_RXD__AUDIOMIX_SAI3_RX_DATA00	0x94
+			MX8MP_IOMUXC_SAI3_TXD__AUDIOMIX_SAI3_TX_DATA00	0x94
+			MX8MP_IOMUXC_SAI3_TXFS__AUDIOMIX_SAI3_TX_SYNC	0x94
+			MX8MP_IOMUXC_SAI3_TXC__AUDIOMIX_SAI3_TX_BCLK	0x94
 		>;
 	};
 
+	pinctrl_tlv320aic3x04: tlv320aic3x04grp {
+		fsl,pins = <
+			/* CODEC RST# */
+			MX8MP_IOMUXC_SAI3_RXC__GPIO4_IO29	0x180
+		>;
+	};
+
+	/* X61 */
 	pinctrl_uart1: uart1grp {
 		fsl,pins = <
-			MX8MP_IOMUXC_SD1_CLK__UART1_DTE_RX	0x140
-			MX8MP_IOMUXC_SD1_CMD__UART1_DTE_TX	0x140
+			MX8MP_IOMUXC_SD1_CLK__UART1_DCE_TX	0x140
+			MX8MP_IOMUXC_SD1_CMD__UART1_DCE_RX	0x140
 		>;
 	};
 
+	/* X61 */
 	pinctrl_uart2: uart2grp {
 		fsl,pins = <
-			MX8MP_IOMUXC_SD1_DATA2__UART2_DTE_RX	0x140
-			MX8MP_IOMUXC_SD1_DATA3__UART2_DTE_TX	0x140
-			MX8MP_IOMUXC_SD1_DATA4__UART2_DTE_CTS	0x140
-			MX8MP_IOMUXC_SD1_DATA5__UART2_DTE_RTS	0x140
+			MX8MP_IOMUXC_SD1_DATA2__UART2_DCE_TX	0x140
+			MX8MP_IOMUXC_SD1_DATA3__UART2_DCE_RX	0x140
 		>;
 	};
 
 	pinctrl_uart3: uart3grp {
 		fsl,pins = <
-			MX8MP_IOMUXC_SD1_DATA6__UART3_DTE_RX	0x140
-			MX8MP_IOMUXC_SD1_DATA7__UART3_DTE_TX	0x140
-			MX8MP_IOMUXC_SD1_RESET_B__UART3_DTE_CTS	0x140
-			MX8MP_IOMUXC_SD1_STROBE__UART3_DTE_RTS	0x140
+			MX8MP_IOMUXC_SD1_DATA6__UART3_DCE_TX	0x140
+			MX8MP_IOMUXC_SD1_DATA7__UART3_DCE_RX	0x140
 		>;
 	};
 
