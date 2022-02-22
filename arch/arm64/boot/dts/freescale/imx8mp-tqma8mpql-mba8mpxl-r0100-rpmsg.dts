@@ -1,0 +1,66 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Copyright 2021 -2022 TQ-Systems GmbH
+ */
+/dts-v1/;
+
+#include "imx8mp-tqma8mpql-mba8mpxl-r0100.dts"
+
+/ {
+	imx8mp_cm7: imx8mp-cm7 {
+		compatible = "fsl,imx8mp-cm7";
+		mbox-names = "tx", "rx", "rxdb";
+		mboxes = <&mu 0 1
+			  &mu 1 1
+			  &mu 3 1>;
+		clocks = <&clk IMX8MP_CLK_M7_DIV>;
+		memory-region =  <&vdevbuffer>, <&vdev0vring0>,
+				 <&vdev0vring1>, <&rsc_table>;
+		status = "okay";
+	};
+
+	reserved-memory {
+		/*
+		 * 0x8000_0000 ~ 0x80FF_FFFF is reserved for M7
+		 * Should not be used at A core and Linux side, when M4 running
+		 * from RAM. Must match linker settings for M7
+		 */
+		m7_reserved: m7@0x80000000 {
+			no-map;
+			reg = <0 0x80000000 0 0x1000000>;
+		};
+
+		vdev0vring0: vdev0vring0@55000000 {
+			compatible = "shared-dma-pool";
+			reg = <0 0x55000000 0 0x8000>;
+			no-map;
+		};
+
+		vdev0vring1: vdev0vring1@55008000 {
+			compatible = "shared-dma-pool";
+			reg = <0 0x55008000 0 0x8000>;
+			no-map;
+		};
+
+		/* Note: The underscore in node name is important! */
+		rsc_table: rsc_table@550ff000 {
+			reg = <0 0x550ff000 0 0x1000>;
+			no-map;
+		};
+
+		vdevbuffer: vdevbuffer@55400000 {
+			compatible = "shared-dma-pool";
+			reg = <0 0x55400000 0 0x100000>;
+			no-map;
+		};
+	};
+};
+
+/*
+ * ATTENTION: M7 may use IPs SPI, CAN, GPIO, GPT, I2C, I2S3, UART,
+ * PWM, SDMA1/SDMA2. These needs to be disabled to prevent resource conflicts
+ */
+&uart3 {
+	status = "disabled";
+};
+
