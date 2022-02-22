@@ -21,7 +21,9 @@
 };
 
 &polytouch {
-	/* reset-gpios is controlled by stk reset */
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_analog_touch>, <&pinctrl_touch_rst>;
+	reset-gpios = <&gpio3 4 GPIO_ACTIVE_LOW>;
 	gain = <1>;
 	offset = <0>;
 	threshold = <0x0f>;
@@ -32,4 +34,13 @@
 	 */
 
 	status = "okay";
+};
+
+&iomuxc {
+	pinctrl_touch_rst: touch-rstgrp {
+		fsl,pins = <
+			MX6UL_PAD_LCD_RESET__GPIO3_IO04		0x1b099 /* Touch Reset */
+		>;
+	};
+
 };
