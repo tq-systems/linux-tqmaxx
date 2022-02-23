@@ -41,18 +41,21 @@
 			label = "s14";
 			linux,code = <KEY_1>;
 			gpios = <&expander_in0 0 GPIO_ACTIVE_LOW>;
+			wakeup-source;
 		};
 
 		button@1 {
 			label = "s6";
 			linux,code = <KEY_2>;
 			gpios = <&expander_in0 1 GPIO_ACTIVE_LOW>;
+			wakeup-source;
 		};
 
 		button@2 {
 			label = "s7";
 			linux,code = <KEY_3>;
 			gpios = <&expander_in0 2 GPIO_ACTIVE_LOW>;
+			wakeup-source;
 		};
 
 		button@3 {
