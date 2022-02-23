@@ -830,6 +830,7 @@
 				interrupts = <0 97 IRQ_TYPE_LEVEL_HIGH>;
 				clocks = <&clks IMX6SL_CLK_EPDC_AXI>, <&clks IMX6SL_CLK_EPDC_PIX>;
 				clock-names = "epdc_axi", "epdc_pix";
+				status = "disabled";
 			};
 
 			lcdif: lcdif@20f8000 {
