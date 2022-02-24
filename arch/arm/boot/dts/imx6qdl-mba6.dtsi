@@ -13,6 +13,8 @@
 
 / {
 	aliases {
+		ethernet0 = &fec;
+		ethernet1 = &usb_ethernet;
 		mmc0 = &usdhc3;
 		mmc1 = &usdhc2;
 		/delete-property/ mmc2;
@@ -272,6 +274,20 @@
 &usbh1 {
 	disable-over-current;
 	status = "okay";
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	hub@1 {
+		compatible = "usb424,2517";
+		reg = <1>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		usb_ethernet: ethernet@1 {
+			compatible = "usb424,9e00";
+			reg = <1>;
+		};
+	};
 };
 
 &usbotg {
