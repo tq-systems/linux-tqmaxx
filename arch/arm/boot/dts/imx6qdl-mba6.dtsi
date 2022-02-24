@@ -18,6 +18,8 @@
 		/delete-property/ mmc2;
 		/delete-property/ mmc3;
 		rtc0 = &rtc0;
+		ethernet0 = &fec;
+		ethernet1 = &usb_ethernet;
 	};
 
 	chosen {
@@ -281,7 +283,7 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 
-		ethernet@1 {
+		usb_ethernet: ethernet@1 {
 			compatible = "usb424,9e00";
 			reg = <1>;
 			nvmem-cells = <&mba_mac_address>;
