@@ -383,9 +383,17 @@ dtb-$(CONFIG_SOC_IMX7D) += \
 	imx7s-warp.dtb
 
 imx7d-mba7-lvds-tm070jvhg33-dtbs += imx7d-mba7.dtb imx7-mba7-lvds-tm070jvhg33.dtbo
+imx7d-mba7-rgb-cdtech-fc21-dtbs += imx7d-mba7.dtb imx7-mba7-rgb-cdtech-fc21.dtbo
+imx7d-mba7-rgb-cdtech-dc44-dtbs += imx7d-mba7.dtb imx7-mba7-rgb-cdtech-dc44.dtbo
 imx7s-mba7-lvds-tm070jvhg33-dtbs += imx7s-mba7.dtb imx7-mba7-lvds-tm070jvhg33.dtbo
+imx7s-mba7-rgb-cdtech-fc21-dtbs += imx7s-mba7.dtb imx7-mba7-rgb-cdtech-fc21.dtbo
+imx7s-mba7-rgb-cdtech-dc44-dtbs += imx7s-mba7.dtb imx7-mba7-rgb-cdtech-dc44.dtbo
 dtb-$(CONFIG_SOC_IMX7D) += imx7d-mba7-lvds-tm070jvhg33.dtb
+dtb-$(CONFIG_SOC_IMX7D) += imx7d-mba7-rgb-cdtech-fc21.dtb
+dtb-$(CONFIG_SOC_IMX7D) += imx7d-mba7-rgb-cdtech-dc44.dtb
 dtb-$(CONFIG_SOC_IMX7D) += imx7s-mba7-lvds-tm070jvhg33.dtb
+dtb-$(CONFIG_SOC_IMX7D) += imx7s-mba7-rgb-cdtech-fc21.dtb
+dtb-$(CONFIG_SOC_IMX7D) += imx7s-mba7-rgb-cdtech-dc44.dtb
 
 dtb-$(CONFIG_SOC_IMX7ULP) += \
 	imx7ulp-com.dtb \
