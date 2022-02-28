@@ -133,7 +133,7 @@
 
 	/* NXP SE97BTP with temperature sensor + eeprom */
 	se97b: temperature-sensor-eeprom@1e {
-		compatible = "nxp,se97b", "jedec,jc-42.4-temp";
+		compatible = "nxp,se97", "jedec,jc-42.4-temp";
 		reg = <0x1e>;
 		status = "okay";
 	};
@@ -147,7 +147,7 @@
 	};
 
 	at24c02: eeprom@56 {
-		compatible = "atmel,24c02";
+		compatible = "nxp,se97b", "atmel,24c02";
 		reg = <0x56>;
 		pagesize = <16>;
 		status = "okay";
