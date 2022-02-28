@@ -807,6 +807,8 @@ dtb-$(CONFIG_SOC_IMX7D) += \
 	imx7d-flex-concentrator-mfg.dtb \
 	imx7d-mba7.dtb \
 	imx7d-mba7-lvds.dtb \
+	imx7d-mba7-cdtech-fc21.dtb \
+	imx7d-mba7-cdtech-dc44.dtb \
 	imx7d-meerkat96.dtb \
 	imx7d-nitrogen7.dtb \
 	imx7d-pico-dwarf.dtb \
@@ -827,6 +829,8 @@ dtb-$(CONFIG_SOC_IMX7D) += \
 	imx7s-colibri-iris-v2.dtb \
 	imx7s-mba7.dtb \
 	imx7s-mba7-lvds.dtb \
+	imx7s-mba7-cdtech-fc21.dtb \
+	imx7s-mba7-cdtech-dc44.dtb \
 	imx7s-warp.dtb
 dtb-$(CONFIG_SOC_IMX7ULP) += \
 	imx7ulp-com.dtb \
