@@ -661,6 +661,8 @@
 	vmmc-supply = <&reg_sd1_vmmc>;
 	bus-width = <4>;
 	no-1-8-v;
+	no-sdio;
+	no-mmc;
 	status = "okay";
 };
 
