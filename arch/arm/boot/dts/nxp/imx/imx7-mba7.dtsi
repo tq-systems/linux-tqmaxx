@@ -221,6 +221,21 @@
 		vin-supply = <&reg_mba_3v3>;
 	};
 
+	rgb_display: rgb-display {
+		/*
+		 * Display is not fixed, so compatible has to be added from
+		 * DT overlay
+		 */
+		backlight = <&backlight>;
+		power-supply = <&reg_mba_3v3>;
+		status = "disabled";
+
+		port {
+			rgb_display_in: endpoint {
+			};
+		};
+	};
+
 	sound {
 		compatible = "fsl,imx-audio-tlv320aic32x4";
 		model = "tqm-tlv320aic32";
@@ -658,9 +673,6 @@
 &lcdif {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lcdif>;
-	assigned-clocks = <&clks IMX7D_LCDIF_PIXEL_ROOT_SRC>;
-	assigned-clock-parents = <&clks IMX7D_PLL_VIDEO_POST_DIV>;
-	assigned-clock-rates = <136400000>;
 
 	port {
 		lcdif_out: endpoint {
