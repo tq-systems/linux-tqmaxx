@@ -113,6 +113,15 @@
 		enable-active-high;
 	};
 
+	reg_diplay_3v3: regulator-display-3v3 {
+		compatible = "regulator-fixed";
+		regulator-name = "VCC3V3_LVDS";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-always-on;
+		vin-supply = <&reg_mba_3v3>;
+	};
+
 	reg_mpcie_1v5: regulator-mpcie-1v5 {
 		compatible = "regulator-fixed";
 		regulator-name = "VCC1V5_MPCIE";

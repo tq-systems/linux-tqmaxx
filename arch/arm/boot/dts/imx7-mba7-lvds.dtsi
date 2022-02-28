@@ -1,0 +1,63 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright (c) 2015-2023 TQ-Systems GmbH <linux@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Markus Niebel <Markus.Niebel@tq-group.com>
+ */
+
+/ {
+	lvds_encoder: lvds-encoder {
+		compatible = "ti,sn75lvds83", "lvds-encoder";
+		powerdown-gpios = <&pca9555 1 GPIO_ACTIVE_LOW>;
+		power-supply = <&reg_mba_3v3>;
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+
+				lvds_encoder_in: endpoint {
+					remote-endpoint = <&lcdif_out>;
+				};
+			};
+
+			port@1 {
+				reg = <1>;
+
+				lvds_encoder_out: endpoint {
+					remote-endpoint = <&display_in>;
+				};
+			};
+		};
+	};
+};
+
+&backlight {
+	pwms = <&pwm1 0 62500 0>;
+	brightness-levels = <0 16 32 64 96 128 160 192 224 255>;
+	default-brightness-level = <5>;
+	status = "okay";
+};
+
+&display {
+	compatible = "tianma,tm070jvhg33";
+	power-supply = <&reg_diplay_3v3>;
+};
+
+&display_in {
+	remote-endpoint = <&lvds_encoder_out>;
+};
+
+&lcdif {
+	status = "okay";
+};
+
+&lcdif_out {
+	remote-endpoint = <&lvds_encoder_in>;
+};
+
+&pwm1 {
+	status = "okay";
+};
