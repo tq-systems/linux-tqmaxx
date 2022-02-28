@@ -22,6 +22,16 @@
 		rtc1 = &snvs_rtc;
 	};
 
+	backlight: pwm_backlight {
+		compatible = "pwm-backlight";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_pwmbacklight>;
+		/* PWM duty and brightness levels are display specific */
+		enable-gpios = <&gpio1 2 GPIO_ACTIVE_HIGH>;
+		power-supply = <&reg_mba_12v0>;
+		status = "disabled";
+	};
+
 	beeper {
 		compatible = "gpio-beeper";
 		gpios = <&pca9555 0 GPIO_ACTIVE_HIGH>;
@@ -29,6 +39,22 @@
 
 	chosen {
 		stdout-path = &uart6;
+	};
+
+	lvds_display: lvds-display {
+		/*
+		 * Display is not fixed, so compatible has to be added from
+		 * DT overlay
+		 */
+		backlight = <&backlight>;
+		power-supply = <&reg_mba_3v3>;
+		status = "disabled";
+
+		port {
+			lvds_display_in: endpoint {
+				remote-endpoint = <&lvds_encoder_out>;
+			};
+		};
 	};
 
 	gpio_buttons: gpio-keys {
@@ -85,6 +111,33 @@
 		compatible = "iio-hwmon";
 		io-channels = <&adc1 0>, <&adc1 1>, <&adc1 2>, <&adc1 3>,
 			      <&adc2 0>, <&adc2 1>, <&adc2 2>, <&adc2 3>;
+	};
+
+	lvds_encoder: lvds-encoder {
+		compatible = "ti,sn75lvds83", "lvds-encoder";
+		powerdown-gpios = <&pca9555 1 GPIO_ACTIVE_LOW>;
+		power-supply = <&reg_mba_3v3>;
+		status = "disabled";
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+
+				lvds_encoder_in: endpoint {
+				};
+			};
+
+			port@1 {
+				reg = <1>;
+
+				lvds_encoder_out: endpoint {
+					remote-endpoint = <&lvds_display_in>;
+				};
+			};
+		};
 	};
 
 	reg_usb_otg1_vbus: regulator-usb-otg1-vbus {
@@ -428,6 +481,38 @@
 			<MX7D_PAD_I2C3_SDA__GPIO4_IO13		0x40000078>;
 	};
 
+	pinctrl_lcdif: lcdifgrp {
+		fsl,pins =
+			<MX7D_PAD_LCD_DATA00__LCD_DATA0		0x71>,
+			<MX7D_PAD_LCD_DATA01__LCD_DATA1		0x71>,
+			<MX7D_PAD_LCD_DATA02__LCD_DATA2		0x71>,
+			<MX7D_PAD_LCD_DATA03__LCD_DATA3		0x71>,
+			<MX7D_PAD_LCD_DATA04__LCD_DATA4		0x71>,
+			<MX7D_PAD_LCD_DATA05__LCD_DATA5		0x71>,
+			<MX7D_PAD_LCD_DATA06__LCD_DATA6		0x71>,
+			<MX7D_PAD_LCD_DATA07__LCD_DATA7		0x71>,
+			<MX7D_PAD_LCD_DATA08__LCD_DATA8		0x71>,
+			<MX7D_PAD_LCD_DATA09__LCD_DATA9		0x71>,
+			<MX7D_PAD_LCD_DATA10__LCD_DATA10	0x71>,
+			<MX7D_PAD_LCD_DATA11__LCD_DATA11	0x71>,
+			<MX7D_PAD_LCD_DATA12__LCD_DATA12	0x71>,
+			<MX7D_PAD_LCD_DATA13__LCD_DATA13	0x71>,
+			<MX7D_PAD_LCD_DATA14__LCD_DATA14	0x71>,
+			<MX7D_PAD_LCD_DATA15__LCD_DATA15	0x71>,
+			<MX7D_PAD_LCD_DATA16__LCD_DATA16	0x71>,
+			<MX7D_PAD_LCD_DATA17__LCD_DATA17	0x71>,
+			<MX7D_PAD_LCD_DATA18__LCD_DATA18	0x71>,
+			<MX7D_PAD_LCD_DATA19__LCD_DATA19	0x71>,
+			<MX7D_PAD_LCD_DATA20__LCD_DATA20	0x71>,
+			<MX7D_PAD_LCD_DATA21__LCD_DATA21	0x71>,
+			<MX7D_PAD_LCD_DATA22__LCD_DATA22	0x71>,
+			<MX7D_PAD_LCD_DATA23__LCD_DATA23	0x71>,
+			<MX7D_PAD_LCD_CLK__LCD_CLK		0x71>,
+			<MX7D_PAD_LCD_ENABLE__LCD_ENABLE	0x71>,
+			<MX7D_PAD_LCD_VSYNC__LCD_VSYNC		0x71>,
+			<MX7D_PAD_LCD_HSYNC__LCD_HSYNC		0x71>;
+	};
+
 	pinctrl_pca9555: pca95550grp {
 		fsl,pins =
 			<MX7D_PAD_ENET1_TX_CLK__GPIO7_IO12	0x78>;
@@ -526,6 +611,12 @@
 };
 
 &iomuxc_lpsr {
+	pinctrl_pwmbacklight: pwmbacklightgrp {
+		fsl,pins =
+			/* LCD_BLT_EN */
+			<MX7D_PAD_LPSR_GPIO1_IO02__GPIO1_IO2	0x10>;
+	};
+
 	pinctrl_pwm1: pwm1grp {
 		fsl,pins =
 			/* LCD_CONTRAST */
@@ -541,6 +632,19 @@
 	pinctrl_wdog1: wdog1grp {
 		fsl,pins =
 			<MX7D_PAD_LPSR_GPIO1_IO00__WDOG1_WDOG_B	0x30>;
+	};
+};
+
+&lcdif {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_lcdif>;
+	assigned-clocks = <&clks IMX7D_LCDIF_PIXEL_ROOT_SRC>;
+	assigned-clock-parents = <&clks IMX7D_PLL_VIDEO_POST_DIV>;
+	assigned-clock-rates = <136400000>;
+
+	port {
+		lcdif_out: endpoint {
+		};
 	};
 };
 
