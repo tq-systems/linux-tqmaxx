@@ -1,0 +1,44 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright (c) 2015-2024 TQ-Systems GmbH <linux@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Marco Felsch
+ * Author: Markus Niebel
+ * Author: Alexander Stein
+ */
+
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/clock/imx7d-clock.h>
+
+&backlight {
+	pwms = <&pwm1 0 62500 0>;
+	brightness-levels = <0 16 32 64 96 128 160 192 224 255>;
+	default-brightness-level = <5>;
+	status = "okay";
+};
+
+&lcdif {
+	assigned-clocks = <&clks IMX7D_LCDIF_PIXEL_ROOT_SRC>;
+	assigned-clock-parents = <&clks IMX7D_PLL_VIDEO_POST_DIV>;
+	assigned-clock-rates = <136400000>;
+	status = "okay";
+};
+
+&lcdif_out {
+	remote-endpoint = <&lvds_encoder_in>;
+};
+
+&lvds_encoder_in {
+	remote-endpoint = <&lcdif_out>;
+};
+
+&lvds_encoder {
+	status = "okay";
+};
+
+&lvds_display {
+	compatible = "tianma,tm070jvhg33";
+	status = "okay";
+};
