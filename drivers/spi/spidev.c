@@ -701,6 +701,7 @@ static const struct spi_device_id spidev_spi_ids[] = {
 	{ .name = "spi-petra" },
 	{ .name = "spi-authenta" },
 	{ .name = "testdev" },
+	{ .name = "nafe13388" },
 	{},
 };
 MODULE_DEVICE_TABLE(spi, spidev_spi_ids);
@@ -728,6 +729,7 @@ static const struct of_device_id spidev_dt_ids[] = {
 	{ .compatible = "cisco,spi-petra", .data = &spidev_of_check },
 	{ .compatible = "micron,spi-authenta", .data = &spidev_of_check },
 	{ .compatible = "tq,testdev", .data = &spidev_of_check  },
+	{ .compatible = "nxp,nafe13388" },
 	{},
 };
 MODULE_DEVICE_TABLE(of, spidev_dt_ids);
