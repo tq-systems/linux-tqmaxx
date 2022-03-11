@@ -58,7 +58,7 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_ft5x06>;
 		interrupt-parent = <&gpio3>;
-		interrupts = <25 IRQ_TYPE_NONE>;
+		interrupts = <25 IRQ_TYPE_EDGE_FALLING>;
 		/* LCD.PWR_EN -> TSC /WAKE */
 		wake-gpios = <&gpio7 11 GPIO_ACTIVE_HIGH>;
 		/* LCD.RESET -> TSC /RST */

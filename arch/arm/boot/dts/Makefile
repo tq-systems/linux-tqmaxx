@@ -704,6 +704,8 @@ dtb-$(CONFIG_SOC_IMX6UL) += \
 	imx6ul-tqma6ul2l-mba6ulx-cdtech-dc44.dtb \
 	imx6ul-tqma6ul2l-mba6ulx-cdtech-fc21.dtb \
 	imx6ul-tqma6ul2l-mba6ulx-lvds.dtb \
+	imx6ul-tqma6ul2l-mba6ulxl.dtb \
+	imx6ul-tqma6ul2l-mba6ulxl-glyn-etm0700g0edh6.dtb \
 	imx6ul-opos6uldev.dtb \
 	imx6ul-pico-dwarf.dtb \
 	imx6ul-pico-hobbit.dtb \
@@ -740,6 +742,9 @@ dtb-$(CONFIG_SOC_IMX7D) += \
 	imx7d-flex-concentrator.dtb \
 	imx7d-flex-concentrator-mfg.dtb \
 	imx7d-mba7.dtb \
+	imx7d-mba7-lvds.dtb \
+	imx7d-mba7-cdtech-fc21.dtb \
+	imx7d-mba7-cdtech-dc44.dtb \
 	imx7d-meerkat96.dtb \
 	imx7d-nitrogen7.dtb \
 	imx7d-pico-dwarf.dtb \
@@ -756,6 +761,9 @@ dtb-$(CONFIG_SOC_IMX7D) += \
 	imx7s-colibri-aster.dtb \
 	imx7s-colibri-eval-v3.dtb \
 	imx7s-mba7.dtb \
+	imx7s-mba7-lvds.dtb \
+	imx7s-mba7-cdtech-fc21.dtb \
+	imx7s-mba7-cdtech-dc44.dtb \
 	imx7s-warp.dtb
 dtb-$(CONFIG_SOC_IMX7ULP) += \
 	imx7ulp-com.dtb \
@@ -831,6 +839,7 @@ dtb-$(CONFIG_ARCH_OMAP3) += \
 	logicpd-som-lv-37xx-devkit.dtb \
 	omap3430-sdp.dtb \
 	omap3-beagle.dtb \
+	omap3-beagle-ab4.dtb \
 	omap3-beagle-xm.dtb \
 	omap3-beagle-xm-ab.dtb \
 	omap3-cm-t3517.dtb \

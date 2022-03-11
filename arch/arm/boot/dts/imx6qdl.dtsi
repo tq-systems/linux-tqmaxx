@@ -1054,6 +1054,8 @@
 					 <&clks IMX6QDL_CLK_ENET_REF>;
 				clock-names = "ipg", "ahb", "ptp", "enet_out";
 				fsl,stop-mode = <&gpr 0x34 27>;
+				nvmem-cells = <&fec_mac_address>;
+				nvmem-cell-names = "mac-address";
 				status = "disabled";
 			};
 
@@ -1186,6 +1188,10 @@
 
 				tempmon_temp_grade: temp-grade@20 {
 					reg = <0x20 4>;
+				};
+
+				fec_mac_address: mac-address@88 {
+					reg = <0x88 6>;
 				};
 			};
 
