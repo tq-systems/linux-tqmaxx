@@ -92,23 +92,55 @@ static void sample_timer(struct timer_list *t)
 	mod_timer(&ctx->rpm_timer, jiffies + HZ);
 }
 
-static int  __set_pwm(struct pwm_fan_ctx *ctx, unsigned long pwm)
+static int __set_pwm(struct pwm_fan_ctx *ctx, unsigned long pwm)
 {
 	unsigned long period;
 	int ret = 0;
 	struct pwm_state *state = &ctx->pwm_state;
+	/* track changes of reg_en for error handling */
+	enum regulator_change {
+		untouched,
+		enabled,
+		disabled,
+	} reg_change = untouched;
 
 	mutex_lock(&ctx->lock);
+
 	if (ctx->pwm_value == pwm)
 		goto exit_set_pwm_err;
+
+	if (ctx->reg_en) {
+		if (pwm && !state->enabled) {
+			reg_change = enabled;
+			ret = regulator_enable(ctx->reg_en);
+		} else if (!pwm && state->enabled) {
+			reg_change = disabled;
+			ret = regulator_disable(ctx->reg_en);
+		}
+		if (ret)
+			goto exit_set_pwm_err;
+	}
 
 	period = state->period;
 	state->duty_cycle = DIV_ROUND_UP(pwm * (period - 1), MAX_PWM);
 	state->enabled = pwm ? true : false;
 
 	ret = pwm_apply_state(ctx->pwm, state);
-	if (!ret)
+	if (!ret) {
 		ctx->pwm_value = pwm;
+	} else if (reg_change != untouched) {
+		/*
+		 * revert regulator changes to keep consistency between
+		 * pwm and regulator
+		 */
+		int err;
+
+		if (reg_change == enabled)
+			err = regulator_disable(ctx->reg_en);
+		else if (reg_change == disabled)
+			err = regulator_enable(ctx->reg_en);
+	}
+
 exit_set_pwm_err:
 	mutex_unlock(&ctx->lock);
 	return ret;
@@ -280,18 +312,50 @@ static int pwm_fan_of_get_cooling_data(struct device *dev,
 	return 0;
 }
 
-static void pwm_fan_regulator_disable(void *data)
+/*
+ * disable fan and regulator
+ * if cleanup is true, disable pwm regardless of regulator disable result
+ * this makes the function dual use for unloading driver and suspend
+ */
+static int __pwm_fan_disable_or_cleanup(struct pwm_fan_ctx *ctx, bool cleanup)
 {
-	regulator_disable(data);
+	int ret;
+
+	if (ctx->pwm_value) {
+		/* keep ctx->pwm_state unmodified for pwm_fan_resume() */
+		struct pwm_state state = ctx->pwm_state;
+
+		/* regulator is only enabled if pwm_value is not zero */
+		if (ctx->pwm_value && ctx->reg_en) {
+			ret = regulator_disable(ctx->reg_en);
+			if (ret) {
+				pr_err("Failed to disable fan supply: %d\n", ret);
+				if (!cleanup)
+					return ret;
+			}
+		}
+
+		state.duty_cycle = 0;
+		state.enabled = false;
+		ret = pwm_apply_state(ctx->pwm, &state);
+	}
+
+	return ret;
 }
 
-static void pwm_fan_pwm_disable(void *__ctx)
+static void pwm_fan_cleanup(void *__ctx)
 {
 	struct pwm_fan_ctx *ctx = __ctx;
 
-	ctx->pwm_state.enabled = false;
-	pwm_apply_state(ctx->pwm, &ctx->pwm_state);
 	del_timer_sync(&ctx->rpm_timer);
+	__pwm_fan_disable_or_cleanup(ctx, true);
+}
+
+static int pwm_fan_disable(void *__ctx)
+{
+	struct pwm_fan_ctx *ctx = __ctx;
+
+	return __pwm_fan_disable_or_cleanup(ctx, false);
 }
 
 static int pwm_fan_probe(struct platform_device *pdev)
@@ -324,19 +388,14 @@ static int pwm_fan_probe(struct platform_device *pdev)
 			return PTR_ERR(ctx->reg_en);
 
 		ctx->reg_en = NULL;
-	} else {
-		ret = regulator_enable(ctx->reg_en);
-		if (ret) {
-			dev_err(dev, "Failed to enable fan supply: %d\n", ret);
-			return ret;
-		}
-		ret = devm_add_action_or_reset(dev, pwm_fan_regulator_disable,
-					       ctx->reg_en);
-		if (ret)
-			return ret;
 	}
 
 	pwm_init_state(ctx->pwm, &ctx->pwm_state);
+	/*
+	 * Ensure the PWM is switched on (including the regulator),
+	 * independently from any previous PWM state
+	 */
+	ctx->pwm_state.enabled = false;
 
 	/*
 	 * __set_pwm assumes that MAX_PWM * (period - 1) fits into an unsigned
@@ -348,14 +407,17 @@ static int pwm_fan_probe(struct platform_device *pdev)
 		return -EINVAL;
 	}
 
-	/* Set duty cycle to maximum allowed and enable PWM output */
+	/*
+	 * Set duty cycle to maximum allowed and enable PWM output as well as
+	 * the regulator. In case of error nothing is changed
+	 */
 	ret = __set_pwm(ctx, MAX_PWM);
 	if (ret) {
 		dev_err(dev, "Failed to configure PWM: %d\n", ret);
 		return ret;
 	}
 	timer_setup(&ctx->rpm_timer, sample_timer, 0);
-	ret = devm_add_action_or_reset(dev, pwm_fan_pwm_disable, ctx);
+	ret = devm_add_action_or_reset(dev, pwm_fan_cleanup, ctx);
 	if (ret)
 		return ret;
 
@@ -446,6 +508,7 @@ static int pwm_fan_probe(struct platform_device *pdev)
 
 	ctx->pwm_fan_state = ctx->pwm_fan_max_state;
 	if (IS_ENABLED(CONFIG_THERMAL)) {
+
 		cdev = devm_thermal_of_cooling_device_register(dev,
 			dev->of_node, "pwm-fan", ctx, &pwm_fan_cooling_ops);
 		if (IS_ERR(cdev)) {
@@ -461,48 +524,31 @@ static int pwm_fan_probe(struct platform_device *pdev)
 	return 0;
 }
 
-static int pwm_fan_disable(struct device *dev)
-{
-	struct pwm_fan_ctx *ctx = dev_get_drvdata(dev);
-	int ret;
-
-	if (ctx->pwm_value) {
-		/* keep ctx->pwm_state unmodified for pwm_fan_resume() */
-		struct pwm_state state = ctx->pwm_state;
-
-		state.duty_cycle = 0;
-		state.enabled = false;
-		ret = pwm_apply_state(ctx->pwm, &state);
-		if (ret < 0)
-			return ret;
-	}
-
-	if (ctx->reg_en) {
-		ret = regulator_disable(ctx->reg_en);
-		if (ret) {
-			dev_err(dev, "Failed to disable fan supply: %d\n", ret);
-			return ret;
-		}
-	}
-
-	return 0;
-}
-
 static void pwm_fan_shutdown(struct platform_device *pdev)
 {
-	pwm_fan_disable(&pdev->dev);
+	struct pwm_fan_ctx *ctx = platform_get_drvdata(pdev);
+
+	pwm_fan_cleanup(ctx);
 }
 
 #ifdef CONFIG_PM_SLEEP
 static int pwm_fan_suspend(struct device *dev)
 {
-	return pwm_fan_disable(dev);
+	struct pwm_fan_ctx *ctx = dev_get_drvdata(dev);
+	int ret;
+
+	ret = pwm_fan_disable(ctx);
+
+	return ret;
 }
 
 static int pwm_fan_resume(struct device *dev)
 {
 	struct pwm_fan_ctx *ctx = dev_get_drvdata(dev);
 	int ret;
+
+	if (ctx->pwm_value == 0)
+		return 0;
 
 	if (ctx->reg_en) {
 		ret = regulator_enable(ctx->reg_en);
@@ -511,9 +557,6 @@ static int pwm_fan_resume(struct device *dev)
 			return ret;
 		}
 	}
-
-	if (ctx->pwm_value == 0)
-		return 0;
 
 	return pwm_apply_state(ctx->pwm, &ctx->pwm_state);
 }
