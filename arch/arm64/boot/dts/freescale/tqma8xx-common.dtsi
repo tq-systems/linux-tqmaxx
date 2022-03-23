@@ -245,6 +245,27 @@
 		>;
 	};
 
+	/*
+	 * use pull down -> 3.3V @PMIC,
+	 * to be used for mainboards without SD card slot or without UHS
+	 * support.
+	 */
+	pinctrl_gpio4vselecthog: gpio4vselecthoggrp {
+		fsl,pins = <
+			IMX8QXP_USDHC1_VSELECT_LSIO_GPIO4_IO20	0x00000041
+		>;
+	};
+
+	/*
+	 * VSELECT to PMIC controlled by USDHC2,
+	 * to be used for mainboards with SD card slot and UHS support.
+	 */
+	pinctrl_usdhc2_vsel: usdhc2vselgrp {
+		fsl,pins = <
+			IMX8QXP_USDHC1_VSELECT_CONN_USDHC1_VSELECT	0x00000041
+		>;
+	};
+
 	pinctrl_flexspi0: flexspi0grp {
 		fsl,pins = <
 			IMX8QXP_QSPI0A_DATA0_LSIO_QSPI0A_DATA0	0x0600004d
