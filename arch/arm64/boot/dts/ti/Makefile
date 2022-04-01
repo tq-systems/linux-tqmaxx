@@ -40,4 +40,8 @@ dtb-$(CONFIG_ARCH_K3) += k3-am642-evm-nand.dtbo
 
 dtb-$(CONFIG_ARCH_K3) += k3-am642-sk.dtb
 
+dtb-$(CONFIG_ARCH_K3) += k3-am642-tqma64xxl-mbax4xxl.dtb
+dtb-$(CONFIG_ARCH_K3) += k3-am64-tqma64xxl-mbax4xxl-sdcard.dtbo
+dtb-$(CONFIG_ARCH_K3) += k3-am64-tqma64xxl-mbax4xxl-wlan.dtbo
+
 dtb-$(CONFIG_ARCH_K3) += k3-am625-sk.dtb
