@@ -262,7 +262,7 @@ struct dcss_dev *dcss_dev_create(struct device *dev, bool hdmi_output)
 	ret = dcss_submodules_init(dcss);
 	if (ret) {
 		of_node_put(dcss->of_port);
-		dev_err(dev, "submodules initialization failed\n");
+		dev_err_probe(dev, ret, "submodules initialization failed\n");
 		goto clks_err;
 	}
 
