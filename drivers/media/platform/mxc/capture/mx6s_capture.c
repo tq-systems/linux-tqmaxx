@@ -1086,19 +1086,22 @@ static int mx6s_start_streaming(struct vb2_queue *vq, unsigned int count)
 
 	rc = mx6s_csi_enable(csi_dev);
 	if (rc < 0) {
+		void *b;
+
 		spin_lock_irqsave(&csi_dev->slock, flags);
+
+		mx6s_release_bufs(&csi_dev->active_bufs, VB2_BUF_STATE_QUEUED);
+		mx6s_release_bufs(&csi_dev->capture, VB2_BUF_STATE_QUEUED);
+
+		b = csi_dev->discard_buffer;
+		csi_dev->discard_buffer = NULL;
+
+		spin_unlock_irqrestore(&csi_dev->slock, flags);
 
 		dma_free_coherent(csi_dev->v4l2_dev.dev,
 				  csi_dev->discard_size,
 				  csi_dev->discard_buffer,
 				  csi_dev->discard_buffer_dma);
-
-		csi_dev->discard_buffer = NULL;
-
-		mx6s_release_bufs(&csi_dev->active_bufs, VB2_BUF_STATE_QUEUED);
-		mx6s_release_bufs(&csi_dev->capture, VB2_BUF_STATE_QUEUED);
-
-		spin_unlock_irqrestore(&csi_dev->slock, flags);
 
 		goto out;
 	}
