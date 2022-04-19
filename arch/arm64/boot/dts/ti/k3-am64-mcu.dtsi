@@ -12,7 +12,6 @@
 		reg-shift = <2>;
 		reg-io-width = <4>;
 		interrupts = <GIC_SPI 185 IRQ_TYPE_LEVEL_HIGH>;
-		clock-frequency = <48000000>;
 		current-speed = <115200>;
 		power-domains = <&k3_pds 149 TI_SCI_PD_EXCLUSIVE>;
 		clocks = <&k3_clks 149 0>;
@@ -25,7 +24,6 @@
 		reg-shift = <2>;
 		reg-io-width = <4>;
 		interrupts = <GIC_SPI 186 IRQ_TYPE_LEVEL_HIGH>;
-		clock-frequency = <48000000>;
 		current-speed = <115200>;
 		power-domains = <&k3_pds 160 TI_SCI_PD_EXCLUSIVE>;
 		clocks = <&k3_clks 160 0>;
