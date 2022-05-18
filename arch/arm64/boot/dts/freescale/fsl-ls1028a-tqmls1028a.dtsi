@@ -146,11 +146,12 @@
 };
 
 &hdptx0 {
-	status = "disabled";
+	lane-mapping = <0x4e>;
+	status = "okay";
 };
 
 &malidp0 {
-	status = "disabled";
+	status = "okay";
 };
 
 &usb0 {
