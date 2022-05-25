@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later OR MIT
 /*
- * Copyright (C) 2021 TQ-Systems GmbH - http://www.tq-group.com/
+ * Copyright (C) 2021 - 2022 TQ-Systems GmbH - https://www.tq-group.com/
  *
  * Based on:
  * Copyright (C) 2012 Texas Instruments Incorporated - http://www.ti.com/
@@ -13,7 +13,7 @@
 #include <dt-bindings/interrupt-controller/irq.h>
 
 / {
-	model = "TQ-Systems Gmbh MBa335x";
+	model = "TQ-Systems GmbH MBa335x";
 	compatible = "tq,mba335x", "tq,tqma335x", "ti,am33xx";
 
 	chosen {
@@ -188,7 +188,7 @@
 	expander2_pins: pinmux_expander2_pins {
 		pinctrl-single,pins = <
 			/* Interrupt */
-			0x78 (PIN_INPUT_PULLUP | MUX_MODE7)		/* gpmc_ben1.gpio1_28 */
+			0x78 (PIN_INPUT_PULLUP | MUX_MODE7)             /* gpmc_ben1.gpio1_28 */
 		>;
 	};
 
