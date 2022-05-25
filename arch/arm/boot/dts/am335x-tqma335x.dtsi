@@ -60,16 +60,16 @@
 
 	mmc2_pins: mmc2_pins {
 		pinctrl-single,pins = <
-			0x00 (PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad0.mmc1_dat0 */
-			0x04 (PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad1.mmc1_dat1 */
-			0x08 (PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad2.mmc1_dat2 */
-			0x0c (PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad3.mmc1_dat3 */
-			0x10 (PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad4.mmc1_dat4 */
-			0x14 (PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad5.mmc1_dat5 */
-			0x18 (PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad6.mmc1_dat6 */
-			0x1c (PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad7.mmc1_dat7 */
-			0x80 (PIN_INPUT_PULLUP | MUX_MODE2)		/* gpmc_csn1.mmc1_clk */
-			0x84 (PIN_INPUT_PULLUP | MUX_MODE2)		/* gpmc_csn2.mmc1_cmd */
+			0x00 (SLEWCTRL_SLOW | PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad0.mmc1_dat0 */
+			0x04 (SLEWCTRL_SLOW | PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad1.mmc1_dat1 */
+			0x08 (SLEWCTRL_SLOW | PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad2.mmc1_dat2 */
+			0x0c (SLEWCTRL_SLOW | PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad3.mmc1_dat3 */
+			0x10 (SLEWCTRL_SLOW | PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad4.mmc1_dat4 */
+			0x14 (SLEWCTRL_SLOW | PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad5.mmc1_dat5 */
+			0x18 (SLEWCTRL_SLOW | PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad6.mmc1_dat6 */
+			0x1c (SLEWCTRL_SLOW | PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad7.mmc1_dat7 */
+			0x80 (PIN_INPUT_PULLUP | MUX_MODE2)				/* gpmc_csn1.mmc1_clk */
+			0x84 (SLEWCTRL_SLOW | PIN_INPUT_PULLUP | MUX_MODE2)		/* gpmc_csn2.mmc1_cmd */
 		>;
 	};
 
