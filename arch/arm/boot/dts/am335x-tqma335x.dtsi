@@ -221,6 +221,18 @@
 	};
 };
 
+&spi0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&spi0_pins>;
+	status = "okay";
+
+	flash@0 {
+		compatible = "jedec,spi-nor";
+		spi-max-frequency = <24000000>;
+		reg = <0x0>;
+	};
+};
+
 &wkup_m3 {
 	ti,scale-data-fw = "am335x-evm-scale-data.bin";
 };
