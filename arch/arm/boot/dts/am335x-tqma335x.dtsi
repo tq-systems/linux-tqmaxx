@@ -18,6 +18,12 @@
 	model = "TQ-Systems GmbH TQMa335x";
 	compatible = "tq,tqma335x", "ti,am33xx";
 
+	aliases {
+		rtc0 = &tps;
+		rtc1 = &ds1339;
+		rtc2 = &rtc;
+	};
+
 	cpus {
 		cpu@0 {
 			cpu0-supply = <&vdd1_reg>;
