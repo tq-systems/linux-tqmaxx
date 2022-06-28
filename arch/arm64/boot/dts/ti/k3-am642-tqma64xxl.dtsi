@@ -266,6 +266,7 @@
 
 &sdhci0 {
 	ti,driver-strength-ohm = <50>;
+	non-removable;
 	disable-wp;
 	no-sdio;
 	no-sd;
