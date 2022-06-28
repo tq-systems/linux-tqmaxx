@@ -217,6 +217,7 @@
 	pinctrl-0 = <&main_gpio1_hog_pins_default>;
 
 	line50 {
+		/* See also usb0 */
 		gpio-hog;
 		gpios = <50 0>;
 		line-name = "USB0_VBUS_OC#";
@@ -395,6 +396,11 @@
 };
 
 &usb0 {
+	/*
+	 * The CDNS USB driver currently doesn't support overcurrent GPIOs,
+	 * so there is no overcurrent detection. The OC pin is configured
+	 * as a GPIO hog instead.
+	 */
 	pinctrl-names = "default";
 	pinctrl-0 = <&main_usb0_pins_default>;
 	dr_mode = "otg";
