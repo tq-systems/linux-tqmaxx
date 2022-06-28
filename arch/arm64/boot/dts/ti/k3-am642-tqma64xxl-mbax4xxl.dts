@@ -138,6 +138,9 @@
 };
 
 &cpsw3g_mdio {
+	pinctrl-names = "default";
+	pinctrl-0 = <&cpsw_mdio_pins_default>;
+
 	cpsw3g_phy0: ethernet-phy@0 {
 		reg = <0>;
 		reset-gpios = <&main_gpio0 44 GPIO_ACTIVE_LOW>;
@@ -251,7 +254,7 @@
 
 &icssg1_mdio {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pru_icssg1_mdio1_pins_default>;
+	pinctrl-0 = <&pru_icssg1_mdio_pins_default>;
 
 	icssg1_phy03: ethernet-phy@3 {
 		reg = <0x3>;
@@ -420,14 +423,6 @@
 &main_pmx0 {
 	cpsw_pins_default: cpsw-pins-default {
 		pinctrl-single,pins = <
-			/* (R21) GPMC0_CSn3.GPIO0_44 - RESET_RGMII1# */
-			AM64X_IOPAD(0x00b4, PIN_OUTPUT, 7)
-
-			/* (R2) PRG0_PRU1_GPO19.MDIO0_MDC */
-			AM64X_IOPAD(0x01fc, PIN_OUTPUT, 4)
-			/* (P5) PRG0_PRU1_GPO18.MDIO0_MDIO */
-			AM64X_IOPAD(0x01f8, PIN_INPUT, 4)
-
 			/* (W5) PRG0_PRU1_GPO7.RGMII1_RD0 */
 			AM64X_IOPAD(0x01cc, PIN_INPUT, 4)
 			/* (Y5) PRG0_PRU1_GPO9.RGMII1_RD1 */
@@ -452,6 +447,18 @@
 			AM64X_IOPAD(0x00e0, PIN_OUTPUT, 4)
 			/* (U15) PRG1_PRU0_GPO9.RGMII1_TX_CTL */
 			AM64X_IOPAD(0x00dc, PIN_OUTPUT, 4)
+		>;
+	};
+
+	cpsw_mdio_pins_default: cpsw-mdio-pins-default {
+		pinctrl-single,pins = <
+			/* (R21) GPMC0_CSn3.GPIO0_44 - RESET_RGMII1# */
+			AM64X_IOPAD(0x00b4, PIN_OUTPUT, 7)
+
+			/* (R2) PRG0_PRU1_GPO19.MDIO0_MDC */
+			AM64X_IOPAD(0x01fc, PIN_OUTPUT, 4)
+			/* (P5) PRG0_PRU1_GPO18.MDIO0_MDIO */
+			AM64X_IOPAD(0x01f8, PIN_INPUT, 4)
 		>;
 	};
 
@@ -667,7 +674,7 @@
 		>;
 	};
 
-	pru_icssg1_mdio1_pins_default: pru-icssg1-mdio1-pins-default {
+	pru_icssg1_mdio_pins_default: pru-icssg1-mdio-pins-default {
 		pinctrl-single,pins = <
 			/* (A15) SPI1_D1.GPIO1_51 - RESET_PRG1_RGMII1# */
 			AM64X_IOPAD(0x022c, PIN_INPUT, 7)
