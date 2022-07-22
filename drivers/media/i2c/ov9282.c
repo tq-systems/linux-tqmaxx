@@ -10,6 +10,7 @@
 #include <linux/delay.h>
 #include <linux/i2c.h>
 #include <linux/module.h>
+#include <linux/regmap.h>
 #include <linux/pm_runtime.h>
 #include <linux/regulator/consumer.h>
 
@@ -148,6 +149,7 @@ struct ov9282_mode {
 /**
  * struct ov9282 - ov9282 sensor device structure
  * @dev: Pointer to generic device
+ * @regmap: sensor's regmap
  * @sd: V4L2 sub-device
  * @pad: Media pad. Only one pad supported
  * @reset_gpio: Sensor reset gpio
@@ -169,6 +171,7 @@ struct ov9282_mode {
  */
 struct ov9282 {
 	struct device *dev;
+	struct regmap *regmap;
 	struct v4l2_subdev sd;
 	struct media_pad pad;
 	struct gpio_desc *reset_gpio;
@@ -189,6 +192,11 @@ struct ov9282 {
 	u32 code;
 	struct mutex mutex;
 	bool streaming;
+};
+
+static const struct regmap_config ov9282_regmap_config = {
+	.reg_bits = 16,
+	.val_bits = 8,
 };
 
 static const s64 link_freq[] = {
@@ -457,35 +465,20 @@ static inline struct ov9282 *to_ov9282(struct v4l2_subdev *subdev)
  */
 static int ov9282_read_reg(struct ov9282 *ov9282, u16 reg, u32 len, u32 *val)
 {
-	struct i2c_client *client = v4l2_get_subdevdata(&ov9282->sd);
-	struct i2c_msg msgs[2] = {0};
-	u8 addr_buf[2] = {0};
-	u8 data_buf[4] = {0};
+	u8 data[4] = {0};
 	int ret;
 
 	if (WARN_ON(len > 4))
 		return -EINVAL;
 
-	put_unaligned_be16(reg, addr_buf);
+	ret = regmap_raw_read(ov9282->regmap, reg, &data[4 - len], len);
+	if (ret < 0) {
+		dev_err(ov9282->dev, "read from 0x%04x failed: %d\n",
+			reg, ret);
+		return ret;
+	}
 
-	/* Write register address */
-	msgs[0].addr = client->addr;
-	msgs[0].flags = 0;
-	msgs[0].len = ARRAY_SIZE(addr_buf);
-	msgs[0].buf = addr_buf;
-
-	/* Read data from register */
-	msgs[1].addr = client->addr;
-	msgs[1].flags = I2C_M_RD;
-	msgs[1].len = len;
-	msgs[1].buf = &data_buf[4 - len];
-
-	ret = i2c_transfer(client->adapter, msgs, ARRAY_SIZE(msgs));
-	if (ret != ARRAY_SIZE(msgs))
-		return -EIO;
-
-	*val = get_unaligned_be32(data_buf);
-
+	*val = get_unaligned_be32(data);
 	return 0;
 }
 
@@ -500,16 +493,17 @@ static int ov9282_read_reg(struct ov9282 *ov9282, u16 reg, u32 len, u32 *val)
  */
 static int ov9282_write_reg(struct ov9282 *ov9282, u16 reg, u32 len, u32 val)
 {
-	struct i2c_client *client = v4l2_get_subdevdata(&ov9282->sd);
-	u8 buf[6] = {0};
+	u8 data[4] = {0};
+	int ret;
 
 	if (WARN_ON(len > 4))
 		return -EINVAL;
 
-	put_unaligned_be16(reg, buf);
-	put_unaligned_be32(val << (8 * (4 - len)), buf + 2);
-	if (i2c_master_send(client, buf, len + 2) != len + 2)
-		return -EIO;
+	put_unaligned_be32(val << (8 * (4 - len)), data);
+
+	ret = regmap_raw_write(ov9282->regmap, reg, data, len);
+	if (ret < 0)
+		dev_err(ov9282->dev, "write to 0x%04x failed: %d\n", reg, ret);
 
 	return 0;
 }
@@ -1400,6 +1394,11 @@ static int ov9282_probe(struct i2c_client *client)
 		return -ENOMEM;
 
 	ov9282->dev = &client->dev;
+	ov9282->regmap = devm_regmap_init_i2c(client, &ov9282_regmap_config);
+	if (IS_ERR(ov9282->regmap)) {
+		dev_err(ov9282->dev, "Unable to initialize I2C\n");
+		return -ENODEV;
+	}
 
 	/* Initialize subdev */
 	v4l2_i2c_subdev_init(&ov9282->sd, client, &ov9282_subdev_ops);
