@@ -1,0 +1,29 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Copyright (c) 2021-2023 TQ-Systems GmbH <linux@ew.tq-group.com>, D-82229 Seefeld, Germany.
+ * Author: Andreas Dumberger, Paul Gerber
+ *
+ */
+
+#include "r8a774b1.dtsi"
+#include "tqmarzg2-common.dtsi"
+
+/ {
+	model = "TQ-Systems TQMaRZG2N on a MBaRZG2X main board";
+	compatible = "tq,tqmarzg2n", "renesas,r8a774b1";
+};
+
+&du {
+	clocks = <&cpg CPG_MOD 724>,
+		<&cpg CPG_MOD 723>,
+		<&cpg CPG_MOD 721>,
+		<&du_dotclk_in0>,
+		<&du_dotclk_in1>,
+		<&du_dotclk_in2>;
+		clock-names = "du.0", "du.1", "du.3",
+			"dclkin.0", "dclkin.1", "dclkin.2";
+};
+
+&sata {
+	status = "okay";
+};

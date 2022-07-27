@@ -1,0 +1,11 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Copyright (c) 2021-2023 TQ-Systems GmbH <linux@ew.tq-group.com>, D-82229 Seefeld, Germany.
+ * Author: Andreas Dumberger, Paul Gerber
+ *
+ */
+
+/dts-v1/;
+
+#include "tqmarzg2h.dtsi"
+#include "mbarzg2x.dtsi"

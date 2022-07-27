@@ -1,0 +1,178 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Copyright (c) 2023 TQ-Systems GmbH <linux@ew.tq-group.com>, D-82229 Seefeld, Germany.
+ * Author: Paul Gerber
+ *
+ */
+
+/ {
+	memory@48000000 {
+		device_type = "memory";
+		/* first 128MB is reserved for secure area. */
+		reg = <0x0 0x48000000 0x0 0x78000000>;
+	};
+
+	reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		/* device specific region for Lossy Decompression */
+		lossy_decompress: linux,lossy_decompress@54000000 {
+			no-map;
+			reg = <0x00000000 0x54000000 0x0 0x03000000>;
+		};
+
+		/* global autoconfigured region for contiguous allocations */
+		global_cma: linux,cma@58000000 {
+			compatible = "shared-dma-pool";
+			reusable;
+			reg = <0x00000000 0x58000000 0x0 0x20000000>;
+			linux,cma-default;
+		};
+
+		/* device specific region for contiguous allocations */
+		mmp_reserved: linux,multimedia@70000000 {
+			compatible = "shared-dma-pool";
+			reusable;
+			reg = <0x00000000 0x78000000 0x0 0x10000000>;
+		};
+	};
+
+	mmngr {
+		compatible = "renesas,mmngr";
+		memory-region = <&mmp_reserved>, <&lossy_decompress>;
+	};
+
+	mmngrbuf {
+		compatible = "renesas,mmngrbuf";
+	};
+};
+
+&i2c_dvfs {
+	clock-frequency = <400000>;
+	status = "okay";
+
+	sensor1: temperature-sensor@1f {
+		compatible = "nxp,se97b", "jedec,jc-42.4-temp";
+		reg = <0x1f>;
+	};
+
+	/* user eeprom 24LC64 */
+	eeprom0: eeprom@50 {
+		compatible = "atmel,24c64";
+		reg = <0x50>;
+		pagesize = <32>;
+	};
+
+	rtc0: rtc@51 {
+		compatible = "nxp,pcf85063";
+		reg = <0x51>;
+		quartz-load-femtofarads = <12500>;
+	};
+
+	/* config eeprom SE97B */
+	eeprom1: eeprom@57 {
+		compatible = "nxp,se97b", "atmel,24c02";
+		reg = <0x57>;
+		pagesize = <16>;
+		read-only;
+	};
+};
+
+&xhci0 {
+	memory-region = <&global_cma>;
+};
+
+&ehci0 {
+	memory-region = <&global_cma>;
+};
+
+&ohci0 {
+	memory-region = <&global_cma>;
+};
+
+&ehci1 {
+	memory-region = <&global_cma>;
+};
+
+&ohci1 {
+	memory-region = <&global_cma>;
+};
+
+&rpc {
+	renesas,rpc-mode = "spi";
+	status = "okay";
+
+	flash@0 {
+		compatible = "jedec,spi-nor";
+		reg = <0>;
+		spi-max-frequency = <40000000>;
+		spi-tx-bus-width = <1>;
+		spi-rx-bus-width = <4>;
+		m25p,fast-read;
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			bootparam@0 {
+				reg = <0x00000000 0x040000>;
+				read-only;
+			};
+			bl2@40000 {
+				reg = <0x00040000 0x140000>;
+				read-only;
+			};
+			cert_header_sa6@180000 {
+				reg = <0x00180000 0x040000>;
+				read-only;
+			};
+			bl31@1c0000 {
+				reg = <0x001c0000 0x040000>;
+				read-only;
+			};
+			tee@200000 {
+				reg = <0x00200000 0x100000>;
+				read-only;
+			};
+			uboot@300000 {
+				reg = <0x00300000 0x0F0000>;
+				read-only;
+			};
+			uboot-env@3f0000 {
+				reg = <0x003f0000 0x010000>;
+				read-only;
+			};
+			user@400000 {
+				reg = <0x00400000 0xC00000>;
+			};
+		};
+	};
+};
+
+&pfc {
+	sdhi3_pins: sd3 {
+		mux {
+			groups = "sdhi3_data8", "sdhi3_ctrl", "sdhi3_ds";
+			function = "sdhi3";
+			power-source = <1800>;
+		};
+
+		pins_sdhi3_ctrl {
+			groups = "sdhi3_ctrl";
+			drive-strength = <9>;
+		};
+
+		pins_sdhi3_ds {
+			groups = "sdhi3_ds";
+			drive-strength = <24>;
+		};
+
+		pins_sdhi3_data8 {
+			groups = "sdhi3_data8";
+			drive-strength = <6>;
+		};
+	};
+};

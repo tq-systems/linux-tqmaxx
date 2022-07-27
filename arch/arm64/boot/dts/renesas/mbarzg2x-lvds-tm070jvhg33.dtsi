@@ -1,0 +1,74 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Copyright (c) 2021-2023 TQ-Systems GmbH <linux@ew.tq-group.com>, D-82229 Seefeld, Germany.
+ * Author: Andreas Dumberger, Paul Gerber
+ *
+ */
+
+&lvds0 {
+	status = "okay";
+
+	ports {
+		port@1 {
+			lvds_connector: endpoint {
+				remote-endpoint = <&panel_in>;
+			};
+		};
+	};
+};
+
+&pfc {
+	pwm1_pins: pwm1 {
+		groups = "pwm1_a";
+		function = "pwm1";
+	};
+};
+
+&pwm1 {
+	pinctrl-0 = <&pwm1_pins>;
+	pinctrl-names = "default";
+
+	status = "okay";
+};
+
+/ {
+	backlight {
+		compatible = "pwm-backlight";
+		pwms = <&pwm1 0 50000>;
+
+		enable-gpios = <&gpio5 3 GPIO_ACTIVE_HIGH>;
+		brightness-levels = <0 2 8 16 32 64 128 255>;
+		default-brightness-level = <6>;
+	};
+
+	panel-lvds {
+		compatible = "tianma,tm070jvhg33", "panel-lvds";
+
+		width-mm = <161>;
+		height-mm = <107>;
+
+		data-mapping = "vesa-24";
+
+		enable-gpios = <&gpio5 4 GPIO_ACTIVE_HIGH>;
+		reset-gpios = <&gpio0 5 GPIO_ACTIVE_HIGH>;
+
+		panel-timing {
+			/* 1280x800 @60Hz */
+			clock-frequency = <68300000>;
+			hactive = <1280>;
+			vactive = <800>;
+			hsync-len = <20>;
+			hfront-porch = <45>;
+			hback-porch = <5>;
+			vfront-porch = <38>;
+			vback-porch = <4>;
+			vsync-len = <1>;
+		};
+
+		port {
+			panel_in: endpoint {
+				remote-endpoint = <&lvds_connector>;
+			};
+		};
+	};
+};
