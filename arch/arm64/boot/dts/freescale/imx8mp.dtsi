@@ -2160,6 +2160,9 @@
 			clocks = <&clk IMX8MP_CLK_HSIO_ROOT>,
 				 <&clk IMX8MP_CLK_USB_ROOT>;
 			clock-names = "hsio", "suspend";
+			assigned-clocks = <&clk IMX8MP_CLK_HSIO_AXI>;
+			assigned-clock-parents = <&clk IMX8MP_SYS_PLL2_500M>;
+			assigned-clock-rates = <500000000>;
 			interrupts = <GIC_SPI 148 IRQ_TYPE_LEVEL_HIGH>;
 			power-domains = <&hsiomix_pd>;
 			#address-cells = <1>;
@@ -2175,9 +2178,6 @@
 					 <&clk IMX8MP_CLK_USB_CORE_REF>,
 					 <&clk IMX8MP_CLK_USB_ROOT>;
 				clock-names = "bus_early", "ref", "suspend";
-				assigned-clocks = <&clk IMX8MP_CLK_HSIO_AXI>;
-				assigned-clock-parents = <&clk IMX8MP_SYS_PLL2_500M>;
-				assigned-clock-rates = <500000000>;
 				interrupts = <GIC_SPI 40 IRQ_TYPE_LEVEL_HIGH>;
 				phys = <&usb3_phy0>, <&usb3_phy0>;
 				phy-names = "usb2-phy", "usb3-phy";
@@ -2203,6 +2203,9 @@
 			clocks = <&clk IMX8MP_CLK_HSIO_ROOT>,
 				 <&clk IMX8MP_CLK_USB_ROOT>;
 			clock-names = "hsio", "suspend";
+			assigned-clocks = <&clk IMX8MP_CLK_HSIO_AXI>;
+			assigned-clock-parents = <&clk IMX8MP_SYS_PLL2_500M>;
+			assigned-clock-rates = <500000000>;
 			interrupts = <GIC_SPI 149 IRQ_TYPE_LEVEL_HIGH>;
 			power-domains = <&hsiomix_pd>;
 			#address-cells = <1>;
@@ -2218,9 +2221,6 @@
 					 <&clk IMX8MP_CLK_USB_CORE_REF>,
 					 <&clk IMX8MP_CLK_USB_ROOT>;
 				clock-names = "bus_early", "ref", "suspend";
-				assigned-clocks = <&clk IMX8MP_CLK_HSIO_AXI>;
-				assigned-clock-parents = <&clk IMX8MP_SYS_PLL2_500M>;
-				assigned-clock-rates = <500000000>;
 				interrupts = <GIC_SPI 41 IRQ_TYPE_LEVEL_HIGH>;
 				phys = <&usb3_phy1>, <&usb3_phy1>;
 				phy-names = "usb2-phy", "usb3-phy";
