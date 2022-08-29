@@ -10,7 +10,7 @@
 	clock-frequency = <100000>;
 	pinctrl-names = "default", "gpio";
 	pinctrl-0 = <&pinctrl_i2c2>;
-	pinctrl-0 = <&pinctrl_i2c2_recovery>;
+	pinctrl-1 = <&pinctrl_i2c2_recovery>;
 	scl-gpios = <&gpio4 12 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
 	sda-gpios = <&gpio4 13 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
 	status = "okay";
@@ -19,7 +19,7 @@
 &hdmi {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_hdmi>;
-        ddc-i2c-bus = <&i2c2>;
+	ddc-i2c-bus = <&i2c2>;
 	status = "okay";
 };
 

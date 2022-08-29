@@ -4763,8 +4763,11 @@ void ath10k_halt(struct ath10k *ar)
 	ath10k_scan_finish(ar);
 	ath10k_peer_cleanup_all(ar);
 	ath10k_stop_radar_confirmation(ar);
-	ath10k_core_stop(ar);
-	ath10k_hif_power_down(ar);
+	/* Leave target running if hw_params.start_once is set */
+	if (!ar->hw_params.start_once) {
+		ath10k_core_stop(ar);
+		ath10k_hif_power_down(ar);
+	}
 
 	spin_lock_bh(&ar->data_lock);
 	list_for_each_entry(arvif, &ar->arvifs, list)

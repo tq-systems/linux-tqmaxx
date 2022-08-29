@@ -29,6 +29,7 @@ enum ath10k_bus {
 #define QCA9888_2_0_DEVICE_ID	(0x0056)
 #define QCA9984_1_0_DEVICE_ID	(0x0046)
 #define QCA9377_1_0_DEVICE_ID   (0x0042)
+#define QCA9377_1_1_DEVICE_ID   (0x9378)
 #define QCA9887_1_0_DEVICE_ID   (0x0050)
 
 /* QCA988X 1.0 definitions (unsupported) */
@@ -122,6 +123,13 @@ enum qca9377_chip_id_rev {
 #define QCA9377_HW_1_0_FW_DIR          ATH10K_FW_DIR "/QCA9377/hw1.0"
 #define QCA9377_HW_1_0_BOARD_DATA_FILE "board.bin"
 #define QCA9377_HW_1_0_PATCH_LOAD_ADDR	0x1234
+
+/* QCA9377 1.1 definitions */
+#define QCA9377_HW_1_1_FW_DIR          ATH10K_FW_DIR "/QCA9377/hw1.1"
+#define QCA9377_HW_1_1_BOARD_DATA_FILE "board.bin"
+#define QCA9377_HW_1_1_SDIO_BOARD_DATA_FILE "board-sdio.bin"
+#define QCA9377_HW_1_1_USB_BOARD_DATA_FILE "board-usb.bin"
+#define QCA9377_HW_1_1_PATCH_LOAD_ADDR	0x1234
 
 /* QCA4019 1.0 definitions */
 #define QCA4019_HW_1_0_DEV_VERSION     0x01000000
@@ -628,6 +636,14 @@ struct ath10k_hw_params {
 	bool supports_peer_stats_info;
 
 	bool dynamic_sar_support;
+
+	bool hw_restart_disconnect;
+
+	/* Specifies whether or not the device should be started once.
+	 * If set, the device will be started once by the early fw probe
+	 * and it will not be terminated afterwards.
+	 */
+	bool start_once;
 };
 
 struct htt_rx_desc;
