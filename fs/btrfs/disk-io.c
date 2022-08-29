@@ -441,17 +441,31 @@ static int csum_one_extent_buffer(struct extent_buffer *eb)
 	else
 		ret = btrfs_check_leaf_full(eb);
 
-	if (ret < 0) {
-		btrfs_print_tree(eb, 0);
+	if (ret < 0)
+		goto error;
+
+	/*
+	 * Also check the generation, the eb reached here must be newer than
+	 * last committed. Or something seriously wrong happened.
+	 */
+	if (unlikely(btrfs_header_generation(eb) <= fs_info->last_trans_committed)) {
+		ret = -EUCLEAN;
 		btrfs_err(fs_info,
-			"block=%llu write time tree block corruption detected",
-			eb->start);
-		WARN_ON(IS_ENABLED(CONFIG_BTRFS_DEBUG));
-		return ret;
+			"block=%llu bad generation, have %llu expect > %llu",
+			  eb->start, btrfs_header_generation(eb),
+			  fs_info->last_trans_committed);
+		goto error;
 	}
 	write_extent_buffer(eb, result, 0, fs_info->csum_size);
 
 	return 0;
+
+error:
+	btrfs_print_tree(eb, 0);
+	btrfs_err(fs_info, "block=%llu write time tree block corruption detected",
+		  eb->start);
+	WARN_ON(IS_ENABLED(CONFIG_BTRFS_DEBUG));
+	return ret;
 }
 
 /* Checksum all dirty extent buffers in one bio_vec */
@@ -1724,9 +1738,10 @@ again:
 
 	ret = btrfs_insert_fs_root(fs_info, root);
 	if (ret) {
-		btrfs_put_root(root);
-		if (ret == -EEXIST)
+		if (ret == -EEXIST) {
+			btrfs_put_root(root);
 			goto again;
+		}
 		goto fail;
 	}
 	return root;
@@ -2899,6 +2914,7 @@ void btrfs_init_fs_info(struct btrfs_fs_info *fs_info)
 	mutex_init(&fs_info->reloc_mutex);
 	mutex_init(&fs_info->delalloc_root_mutex);
 	mutex_init(&fs_info->zoned_meta_io_lock);
+	mutex_init(&fs_info->zoned_data_reloc_io_lock);
 	seqlock_init(&fs_info->profiles_lock);
 
 	INIT_LIST_HEAD(&fs_info->dirty_cowonly_roots);
@@ -3355,7 +3371,7 @@ int __cold open_ctree(struct super_block *sb, struct btrfs_fs_devices *fs_device
 		~BTRFS_FEATURE_INCOMPAT_SUPP;
 	if (features) {
 		btrfs_err(fs_info,
-		    "cannot mount because of unsupported optional features (%llx)",
+		    "cannot mount because of unsupported optional features (0x%llx)",
 		    features);
 		err = -EINVAL;
 		goto fail_alloc;
@@ -3393,13 +3409,24 @@ int __cold open_ctree(struct super_block *sb, struct btrfs_fs_devices *fs_device
 		~BTRFS_FEATURE_COMPAT_RO_SUPP;
 	if (!sb_rdonly(sb) && features) {
 		btrfs_err(fs_info,
-	"cannot mount read-write because of unsupported optional features (%llx)",
+	"cannot mount read-write because of unsupported optional features (0x%llx)",
 		       features);
 		err = -EINVAL;
 		goto fail_alloc;
 	}
 
 	if (sectorsize != PAGE_SIZE) {
+		/*
+		 * V1 space cache has some hardcoded PAGE_SIZE usage, and is
+		 * going to be deprecated.
+		 *
+		 * Force to use v2 cache for subpage case.
+		 */
+		btrfs_clear_opt(fs_info->mount_opt, SPACE_CACHE);
+		btrfs_set_and_info(fs_info, FREE_SPACE_TREE,
+			"forcing free space tree for sector size %u with page size %lu",
+			sectorsize, PAGE_SIZE);
+
 		btrfs_warn(fs_info,
 		"read-write for sector size %u with page size %lu is experimental",
 			   sectorsize, PAGE_SIZE);
@@ -4334,6 +4361,17 @@ void __cold close_ctree(struct btrfs_fs_info *fs_info)
 	int ret;
 
 	set_bit(BTRFS_FS_CLOSING_START, &fs_info->flags);
+
+	/*
+	 * We may have the reclaim task running and relocating a data block group,
+	 * in which case it may create delayed iputs. So stop it before we park
+	 * the cleaner kthread otherwise we can get new delayed iputs after
+	 * parking the cleaner, and that can make the async reclaim task to hang
+	 * if it's waiting for delayed iputs to complete, since the cleaner is
+	 * parked and can not run delayed iputs - this will make us hang when
+	 * trying to stop the async reclaim task.
+	 */
+	cancel_work_sync(&fs_info->reclaim_bgs_work);
 	/*
 	 * We don't want the cleaner to start new transactions, add more delayed
 	 * iputs, etc. while we're closing. We can't use kthread_stop() yet
@@ -4373,8 +4411,6 @@ void __cold close_ctree(struct btrfs_fs_info *fs_info)
 	cancel_work_sync(&fs_info->async_reclaim_work);
 	cancel_work_sync(&fs_info->async_data_reclaim_work);
 	cancel_work_sync(&fs_info->preempt_reclaim_work);
-
-	cancel_work_sync(&fs_info->reclaim_bgs_work);
 
 	/* Cancel or finish ongoing discard work */
 	btrfs_discard_cleanup(fs_info);
