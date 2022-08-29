@@ -907,14 +907,12 @@ static int mxc_isi_cap_try_fmt_mplane(struct file *file, void *fh,
 			pix->plane_fmt[i].bytesperline =
 					(pix->width * fmt->depth[i]) >> 3;
 
-		if (pix->plane_fmt[i].sizeimage == 0) {
-			if ((i == 1) && (pix->pixelformat == V4L2_PIX_FMT_NV12))
-				pix->plane_fmt[i].sizeimage =
-				  (pix->width * (pix->height >> 1) * fmt->depth[i] >> 3);
-			else
-				pix->plane_fmt[i].sizeimage =
-					(pix->width * pix->height * fmt->depth[i] >> 3);
-		}
+		if ((i == 1) && (pix->pixelformat == V4L2_PIX_FMT_NV12))
+			pix->plane_fmt[i].sizeimage =
+				(pix->width * (pix->height >> 1) * fmt->depth[i] >> 3);
+		else
+			pix->plane_fmt[i].sizeimage =
+				(pix->width * pix->height * fmt->depth[i] >> 3);
 	}
 
 	return 0;
