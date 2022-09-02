@@ -41,7 +41,16 @@
 	};
 };
 
+&gpu_2d {
+	status = "okay";
+};
+
+&gpu_3d {
+	status = "okay";
+};
+
 &i2c1 {
+	/* Errata ERR007805: limit clk to <= 384000 Hz */
 	clock-frequency = <384000>;
 	pinctrl-names = "default", "gpio";
 	pinctrl-0 = <&pinctrl_i2c1>;
@@ -170,6 +179,18 @@
 	};
 };
 
+&mix_gpu_ml {
+	status = "okay";
+};
+
+&ml_vipsi {
+	status = "okay";
+};
+
+&sdma2 {
+	status = "okay";
+};
+
 &usdhc3 {
 	pinctrl-names = "default", "state_100mhz", "state_200mhz";
 	pinctrl-0 = <&pinctrl_usdhc3>;
@@ -181,6 +202,18 @@
 	no-sdio;
 	vmmc-supply = <&buck4_reg>;
 	vqmmc-supply = <&buck5_reg>;
+	status = "okay";
+};
+
+&vpu_g1 {
+	status = "okay";
+};
+
+&vpu_g2 {
+	status = "okay";
+};
+
+&vpu_vc8000e {
 	status = "okay";
 };
 
