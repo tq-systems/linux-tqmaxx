@@ -147,6 +147,12 @@
 		enable-gpios = <&gpio3 20 GPIO_ACTIVE_HIGH>;
 		backlight = <&backlight_lvds>;
 		status = "disabled";
+
+		port {
+			panel_in_lvds0: endpoint {
+				remote-endpoint = <&lvds_out>;
+			};
+		};
 	};
 
 	reg_pwm_fan: regulator-pwm-fan {
@@ -282,6 +288,12 @@
 	pinctrl-0 = <&pinctrl_ecspi2>;
 	cs-gpios = <&gpio5 13 GPIO_ACTIVE_LOW>;
 	status = "okay";
+
+	spidev2_0: spidev@0 {
+		reg = <0>;
+		compatible = "tq,testdev";
+		spi-max-frequency = <5000000>;
+	};
 };
 
 &ecspi3 {
@@ -326,6 +338,10 @@
 			enet-phy-lane-no-swap;
 			interrupt-parent = <&gpio4>;
 			interrupts = <3 IRQ_TYPE_EDGE_FALLING>;
+			/* LED0: Link, LED2: activity */
+			ti,led-function = <0x0100>;
+			/* LED0/2: active High, driven by phy function */
+			ti,led-ctrl = <0x1414>;
 		};
 	};
 };
@@ -356,6 +372,10 @@
 			enet-phy-lane-no-swap;
 			interrupt-parent = <&gpio4>;
 			interrupts = <1 IRQ_TYPE_EDGE_FALLING>;
+			/* LED0: Link, LED2: activity */
+			ti,led-function = <0x0100>;
+			/* LED0/2: active High, driven by phy function */
+			ti,led-ctrl = <0x1414>;
 		};
 	};
 };
@@ -525,6 +545,30 @@
 	scl-gpios = <&gpio2 2 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
 	sda-gpios = <&gpio2 3 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
 	status = "okay";
+};
+
+&ldb {
+	lvds-channel@0 {
+		port@1 {
+			reg = <1>;
+
+			lvds_out: endpoint {
+				remote-endpoint = <&panel_in_lvds0>;
+			};
+		};
+	};
+};
+
+&mipi_csi_0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_mipicsi0>;
+	status = "disabled";
+};
+
+&mipi_csi_1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_mipicsi1>;
+	status = "disabled";
 };
 
 &pcf85063 {
@@ -811,7 +855,16 @@
 
 	pinctrl_gpio4: gpio4grp {
 		fsl,pins = <MX8MP_IOMUXC_SAI1_MCLK__GPIO4_IO20		0x180>,
-			   <MX8MP_IOMUXC_SAI2_RXC__GPIO4_IO22		0x180>;
+			   <MX8MP_IOMUXC_SAI2_RXC__GPIO4_IO22		0x180>,
+			   <MX8MP_IOMUXC_SAI2_RXFS__GPIO4_IO21		0x180>; /* TEMP_EVENT# on MBa8MPxL */
+	};
+
+	/* alternative usage for gpio button, X63 */
+	pinctrl_gpt1: gpt1grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_UART3_RXD__GPT1_CAPTURE2	0x14
+			MX8MP_IOMUXC_UART3_TXD__GPT1_CLK	0x14
+		>;
 	};
 
 	pinctrl_hdmi: hdmigrp {
@@ -859,6 +912,33 @@
 
 	pinctrl_lvdsdisplay: lvdsdisplaygrp {
 		fsl,pins = <MX8MP_IOMUXC_SAI5_RXC__GPIO3_IO20		0x10>; /* Power enable */
+	};
+
+	pinctrl_mipicsi0: mipicsi0grp {
+		fsl,pins = <
+			/* TRIGGER */
+			MX8MP_IOMUXC_ECSPI1_MISO__GPIO5_IO08	0x1c0
+			/* SYNC */
+			MX8MP_IOMUXC_ECSPI1_MOSI__GPIO5_IO07	0x1c0
+			/* RESET# */
+			MX8MP_IOMUXC_ECSPI1_SCLK__GPIO5_IO06	0x1c0
+			/* ENABLE */
+			MX8MP_IOMUXC_ECSPI1_SS0__GPIO5_IO09	0x1c0
+		>;
+	};
+
+	/* ALTERNATIV */
+	pinctrl_mipicsi1: mipicsi1grp {
+		fsl,pins = <
+			/* TRIGGER */
+			MX8MP_IOMUXC_ECSPI2_MISO__GPIO5_IO12	0x1c0
+			/* SYNC */
+			MX8MP_IOMUXC_ECSPI2_MOSI__GPIO5_IO11	0x1c0
+			/* RESET# */
+			MX8MP_IOMUXC_ECSPI2_SCLK__GPIO5_IO10	0x1c0
+			/* ENABLE */
+			MX8MP_IOMUXC_ECSPI2_SS0__GPIO5_IO13	0x1c0
+		>;
 	};
 
 	pinctrl_pcf85063: pcf85063grp {
@@ -927,8 +1007,8 @@
 	};
 
 	pinctrl_usb0: usb0grp {
-		fsl,pins = <MX8MP_IOMUXC_GPIO1_IO13__USB1_OTG_OC	0x1c0>,
-			   <MX8MP_IOMUXC_GPIO1_IO12__USB1_OTG_PWR	0x1c0>;
+		fsl,pins = <MX8MP_IOMUXC_GPIO1_IO13__USB1_OC		0x1c0>,
+			   <MX8MP_IOMUXC_GPIO1_IO12__USB1_PWR		0x1c0>;
 	};
 
 	pinctrl_usbcon0: usb0congrp {
