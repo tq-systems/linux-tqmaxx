@@ -48,6 +48,28 @@
 		status = "disabled";
 	};
 
+	edp_refclk: edp-refclk {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <26000000>;
+	};
+
+	fan0: pwm-fan {
+		compatible = "pwm-fan";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_pwmfan>;
+		fan-supply = <&reg_pwm_fan>;
+		#cooling-cells = <2>;
+		/* typical 25 kHz -> 40.000 nsec */
+		pwms = <&pwm3 0 40000 PWM_POLARITY_INVERTED>;
+		cooling-levels = <0 32 64 128 196 240>;
+		pulses-per-revolution = <2>;
+		interrupt-parent = <&gpio5>;
+		interrupts = <18 IRQ_TYPE_EDGE_FALLING>;
+
+		status = "disabled";
+	};
+
 	gpio-keys {
 		compatible = "gpio-keys";
 		pinctrl-names = "default";
@@ -58,12 +80,14 @@
 			label = "S12";
 			linux,code = <BTN_0>;
 			gpios = <&gpio5 27 GPIO_ACTIVE_LOW>;
+			wakeup-source;
 		};
 
 		switch-2 {
 			label = "S13";
 			linux,code = <BTN_1>;
 			gpios = <&gpio5 26 GPIO_ACTIVE_LOW>;
+			wakeup-source;
 		};
 	};
 
@@ -106,6 +130,35 @@
 		enable-gpios = <&gpio3 20 GPIO_ACTIVE_HIGH>;
 		backlight = <&backlight_lvds>;
 		status = "disabled";
+
+		port {
+			panel_in_lvds0: endpoint {
+				remote-endpoint = <&lvds_out>;
+			};
+		};
+	};
+
+	reg_otg_vbus: regulator-otg-vbus {
+		compatible = "regulator-fixed";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_regotgvbus>;
+		regulator-name = "OTG_VBUS";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		gpio = <&gpio1 12 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+	};
+
+	reg_pwm_fan: regulator-pwm-fan {
+		compatible = "regulator-fixed";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_regpwmfan>;
+		regulator-name = "FAN_PWR";
+		regulator-min-microvolt = <12000000>;
+		regulator-max-microvolt = <12000000>;
+		gpio = <&gpio4 27 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		vin-supply = <&reg_vcc_12v0>;
 	};
 
 	reg_usdhc2_vmmc: regulator-usdhc2 {
@@ -132,11 +185,25 @@
 		enable-active-high;
 	};
 
+	reg_vcc_1v8: regulator-1v8 {
+		compatible = "regulator-fixed";
+		regulator-name = "VCC_1V8";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+	};
+
 	reg_vcc_3v3: regulator-3v3 {
 		compatible = "regulator-fixed";
 		regulator-name = "VCC_3V3";
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
+	};
+
+	reg_vcc_5v0: regulator-5v0 {
+		compatible = "regulator-fixed";
+		regulator-name = "VCC_5V0";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
 	};
 
 	reserved-memory {
@@ -158,6 +225,28 @@
 			linux,cma-default;
 		};
 	};
+
+	sound {
+		compatible = "fsl,imx-audio-tlv320aic32x4";
+		model = "tqm-tlv320aic32";
+		ssi-controller = <&sai3>;
+		audio-codec = <&tlv320aic3x04>;
+	};
+
+	thermal-zones {
+		soc-thermal {
+			cooling-maps {
+				map0 {
+					cooling-device =
+						<&A53_0 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>,
+						<&A53_1 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>,
+						<&A53_2 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>,
+						<&A53_3 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>,
+						<&fan0 0 1>;
+				};
+			};
+		};
+	};
 };
 
 &ecspi1 {
@@ -172,6 +261,12 @@
 	pinctrl-0 = <&pinctrl_ecspi2>;
 	cs-gpios = <&gpio5 13 GPIO_ACTIVE_LOW>;
 	status = "okay";
+
+	spidev2_0: spidev@0 {
+		reg = <0>;
+		compatible = "tq,testdev";
+		spi-max-frequency = <5000000>;
+	};
 };
 
 &ecspi3 {
@@ -216,6 +311,10 @@
 			enet-phy-lane-no-swap;
 			interrupt-parent = <&gpio4>;
 			interrupts = <3 IRQ_TYPE_EDGE_FALLING>;
+			/* LED0: Link, LED2: activity */
+			ti,led-function = <0x0100>;
+			/* LED0/2: active High, driven by phy function */
+			ti,led-ctrl = <0x1414>;
 		};
 	};
 };
@@ -246,6 +345,10 @@
 			enet-phy-lane-no-swap;
 			interrupt-parent = <&gpio4>;
 			interrupts = <1 IRQ_TYPE_EDGE_FALLING>;
+			/* LED0: Link, LED2: activity */
+			ti,led-function = <0x0100>;
+			/* LED0/2: active High, driven by phy function */
+			ti,led-ctrl = <0x1414>;
 		};
 	};
 };
@@ -266,7 +369,7 @@
 
 &gpio1 {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_gpio1>;
+	pinctrl-0 = <&pinctrl_gpio1>, <&pinctrl_usbhub>;
 
 	gpio-line-names = "GPO1", "GPO0", "", "GPO3",
 			  "", "", "GPO2", "GPI0",
@@ -276,6 +379,13 @@
 			  "", "", "", "",
 			  "", "", "", "",
 			  "", "", "", "";
+
+	usb-hub-reset {
+		gpio-hog;
+		gpios = <11 0>;
+		output-high;
+		line-name = "USB_HUB_RST#";
+	};
 };
 
 &gpio2 {
@@ -336,6 +446,13 @@
 			  "HDMI_OC#", "TEMP_EVENT#", "PCIE_CLK_OE#", "",
 			  "", "", "", "FAN_PWR",
 			  "RTC_EVENT#", "CODEC_RST#", "", "";
+
+	pcie_refclk-hog {
+		gpio-hog;
+		gpios = <22 0>;
+		output-high;
+		line-name = "PCIE_REFCLK";
+	};
 };
 
 &gpio5 {
@@ -358,9 +475,51 @@
 	sda-gpios = <&gpio5 17 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
 	status = "okay";
 
+	dsi2dp: bridge@f {
+		compatible = "toshiba,tc358767";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_edpbridge>;
+		reg = <0xf>;
+		reset-gpios = <&gpio4 19 GPIO_ACTIVE_LOW>;
+		clock-names = "ref";
+		clocks = <&edp_refclk>;
+		toshiba,hpd-pin = <0>;
+
+		interrupt-names = "irq";
+		interrupt-parent = <&gpio4>;
+		interrupts = <18 IRQ_TYPE_LEVEL_HIGH>;
+
+		status = "disabled";
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+
+				tc358767_from_dsim: endpoint {
+					remote-endpoint = <&dsim_to_tc358767>;
+				};
+			};
+		};
+	};
+
+	tlv320aic3x04: audio-codec@18 {
+		compatible = "ti,tlv320aic32x4";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_tlv320aic3x04>;
+		reg = <0x18>;
+		clock-names = "mclk";
+		clocks = <&audio_blk_ctrl IMX8MP_CLK_AUDIO_BLK_CTRL_SAI3_MCLK1>;
+		iov-supply = <&reg_vcc_1v8>;
+		ldoin-supply = <&reg_vcc_3v3>;
+		reset-gpios = <&gpio4 29 GPIO_ACTIVE_LOW>;
+	};
+
 	/* NXP SE97BTP with temperature sensor + eeprom */
-	se97_1c: temperature-sensor-eeprom@1c {
-		compatible = "nxp,se97", "jedec,jc-42.4-temp";
+	se97_1c: temperature-sensor@1c {
+		compatible = "nxp,se97b", "jedec,jc-42.4-temp";
 		reg = <0x1c>;
 	};
 
@@ -392,10 +551,64 @@
 	status = "okay";
 };
 
+&ldb {
+	lvds-channel@0 {
+		port@1 {
+			reg = <1>;
+
+			lvds_out: endpoint {
+				remote-endpoint = <&panel_in_lvds0>;
+			};
+		};
+	};
+};
+
+&mipi_dsi {
+	port@1 {
+		dsim_to_tc358767: endpoint {
+			remote-endpoint = <&tc358767_from_dsim>;
+			attach-bridge;
+		};
+	};
+};
+
+&mipi_csi_0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_mipicsi0>;
+	status = "disabled";
+};
+
+&mipi_csi_1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_mipicsi1>;
+	status = "disabled";
+};
+
 &pcf85063 {
 	/* RTC_EVENT# is connected on MBa8MPxL */
 	interrupt-parent = <&gpio4>;
 	interrupts = <28 IRQ_TYPE_EDGE_FALLING>;
+};
+
+&pcie {
+	ext_osc = <1>;
+	clocks = <&clk IMX8MP_CLK_HSIO_ROOT>,
+		 <&clk IMX8MP_CLK_PCIE_AUX>,
+		 <&clk IMX8MP_CLK_HSIO_AXI>,
+		 <&clk IMX8MP_CLK_PCIE_ROOT>;
+	clock-names = "pcie", "pcie_aux", "pcie_phy", "pcie_bus";
+	assigned-clocks = <&clk IMX8MP_CLK_HSIO_AXI>,
+			  <&clk IMX8MP_CLK_PCIE_AUX>;
+	assigned-clock-rates = <500000000>, <10000000>;
+	assigned-clock-parents = <&clk IMX8MP_SYS_PLL2_500M>,
+				 <&clk IMX8MP_SYS_PLL2_50M>;
+	l1ss-disabled;
+	status = "okay";
+};
+
+&pcie_phy {
+	ext_osc = <1>;
+	status = "okay";
 };
 
 &pwm2 {
@@ -407,6 +620,23 @@
 &pwm3 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pwm3>;
+	status = "okay";
+};
+
+&sai3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_sai3>;
+
+	assigned-clocks = <&clk IMX8MP_CLK_SAI3>;
+	assigned-clock-parents = <&clk IMX8MP_AUDIO_PLL1_OUT>;
+	assigned-clock-rates = <12288000>;
+	clocks = <&audio_blk_ctrl IMX8MP_CLK_AUDIO_BLK_CTRL_SAI3_IPG>,
+		 <&clk IMX8MP_CLK_DUMMY>,
+		 <&audio_blk_ctrl IMX8MP_CLK_AUDIO_BLK_CTRL_SAI3_MCLK1>,
+		 <&clk IMX8MP_CLK_DUMMY>,
+		 <&clk IMX8MP_CLK_DUMMY>;
+	clock-names = "bus", "mclk0", "mclk1", "mclk2", "mclk3";
+	fsl,sai-mclk-direction-output;
 	status = "okay";
 };
 
@@ -442,6 +672,56 @@
 	/* console */
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart4>;
+	status = "okay";
+};
+
+&usb3_phy0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usb0>;
+	vbus-supply = <&reg_vcc_5v0>;
+	status = "okay";
+};
+
+&usb3_0 {
+	fsl,over-current-active-low;
+	status = "okay";
+};
+
+&usb_dwc3_0 {
+	/* we implement dual role but not full featured OTG */
+	hnp-disable;
+	srp-disable;
+	adp-disable;
+	dr_mode = "otg";
+	usb-role-switch;
+	role-switch-default-mode = "none";
+	status = "okay";
+
+	connector {
+		compatible = "gpio-usb-b-connector", "usb-b-connector";
+		type = "micro";
+		label = "X29";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_usbcon0>;
+		id-gpio = <&gpio1 10 GPIO_ACTIVE_HIGH>;
+		vbus-supply = <&reg_otg_vbus>;
+	};
+};
+
+&usb3_phy1 {
+	vbus-supply = <&reg_vcc_5v0>;
+	status = "okay";
+};
+
+&usb3_1 {
+	fsl,disable-port-power-control;
+	fsl,permanently-attached;
+	status = "okay";
+};
+
+&usb_dwc3_1 {
+	dr_mode = "host";
+	snps,dis_u3_susphy_quirk;
 	status = "okay";
 };
 
@@ -495,6 +775,13 @@
 			   <MX8MP_IOMUXC_UART1_RXD__ECSPI3_SCLK		0x1c0>,
 			   <MX8MP_IOMUXC_UART2_RXD__ECSPI3_MISO		0x1c0>,
 			   <MX8MP_IOMUXC_UART2_TXD__GPIO5_IO25		0x1c0>;
+	};
+
+	pinctrl_edpbridge: edpbridgegrp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SAI1_TXD6__GPIO4_IO18	0x1c0
+			MX8MP_IOMUXC_SAI1_TXD7__GPIO4_IO19	0x1c0
+		>;
 	};
 
 	pinctrl_eqos: eqosgrp {
@@ -580,7 +867,17 @@
 
 	pinctrl_gpio4: gpio4grp {
 		fsl,pins = <MX8MP_IOMUXC_SAI1_MCLK__GPIO4_IO20		0x180>,
-			   <MX8MP_IOMUXC_SAI2_RXC__GPIO4_IO22		0x180>;
+			   <MX8MP_IOMUXC_SAI2_RXC__GPIO4_IO22		0x180>,
+			   <MX8MP_IOMUXC_SAI2_RXFS__GPIO4_IO21		0x180>, /* TEMP_EVENT# on MBa8MPxL */
+			   <MX8MP_IOMUXC_SAI3_RXFS__GPIO4_IO28		0x180>; /* RTC_EVENT# */
+	};
+
+	/* alternative usage for gpio button, X63 */
+	pinctrl_gpt1: gpt1grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_UART3_RXD__GPT1_CAPTURE2	0x14
+			MX8MP_IOMUXC_UART3_TXD__GPT1_CLK	0x14
+		>;
 	};
 
 	pinctrl_hdmi: hdmigrp {
@@ -630,6 +927,33 @@
 		fsl,pins = <MX8MP_IOMUXC_SAI5_RXC__GPIO3_IO20		0x10>; /* Power enable */
 	};
 
+	pinctrl_mipicsi0: mipicsi0grp {
+		fsl,pins = <
+			/* TRIGGER */
+			MX8MP_IOMUXC_ECSPI1_MISO__GPIO5_IO08	0x1c0
+			/* SYNC */
+			MX8MP_IOMUXC_ECSPI1_MOSI__GPIO5_IO07	0x1c0
+			/* RESET# */
+			MX8MP_IOMUXC_ECSPI1_SCLK__GPIO5_IO06	0x1c0
+			/* ENABLE */
+			MX8MP_IOMUXC_ECSPI1_SS0__GPIO5_IO09	0x1c0
+		>;
+	};
+
+	/* ALTERNATIV */
+	pinctrl_mipicsi1: mipicsi1grp {
+		fsl,pins = <
+			/* TRIGGER */
+			MX8MP_IOMUXC_ECSPI2_MISO__GPIO5_IO12	0x1c0
+			/* SYNC */
+			MX8MP_IOMUXC_ECSPI2_MOSI__GPIO5_IO11	0x1c0
+			/* RESET# */
+			MX8MP_IOMUXC_ECSPI2_SCLK__GPIO5_IO10	0x1c0
+			/* ENABLE */
+			MX8MP_IOMUXC_ECSPI2_SS0__GPIO5_IO13	0x1c0
+		>;
+	};
+
 	/* LVDS Backlight */
 	pinctrl_pwm2: pwm2grp {
 		fsl,pins = <MX8MP_IOMUXC_SAI5_RXD0__PWM2_OUT		0x14>;
@@ -640,8 +964,42 @@
 		fsl,pins = <MX8MP_IOMUXC_I2C3_SDA__PWM3_OUT		0x14>;
 	};
 
+	/* FAN RPM */
+	pinctrl_pwmfan: pwmfangrp {
+		fsl,pins = <MX8MP_IOMUXC_I2C3_SCL__GPIO5_IO18		0x80>;
+	};
+
 	pinctrl_reg12v0: reg12v0grp {
 		fsl,pins = <MX8MP_IOMUXC_SD1_DATA4__GPIO2_IO06		0x140>; /* VCC12V enable */
+	};
+
+	pinctrl_regotgvbus: reggotgvbusgrp {
+		fsl,pins = <
+			/* USB1 OTG PWR as GPIO */
+			MX8MP_IOMUXC_GPIO1_IO12__GPIO1_IO12	0x100
+		>;
+	};
+
+	pinctrl_regpwmfan: regpwmfangrp {
+		fsl,pins = <MX8MP_IOMUXC_SAI2_MCLK__GPIO4_IO27		0x80>; /* FAN PWR */
+	};
+
+	/* RXC / RXFS not used on codec */
+	pinctrl_sai3: sai3grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SAI3_MCLK__AUDIOMIX_SAI3_MCLK	0x94
+			MX8MP_IOMUXC_SAI3_RXD__AUDIOMIX_SAI3_RX_DATA00	0x94
+			MX8MP_IOMUXC_SAI3_TXD__AUDIOMIX_SAI3_TX_DATA00	0x94
+			MX8MP_IOMUXC_SAI3_TXFS__AUDIOMIX_SAI3_TX_SYNC	0x94
+			MX8MP_IOMUXC_SAI3_TXC__AUDIOMIX_SAI3_TX_BCLK	0x94
+		>;
+	};
+
+	pinctrl_tlv320aic3x04: tlv320aic3x04grp {
+		fsl,pins = <
+			/* CODEC RST# */
+			MX8MP_IOMUXC_SAI3_RXC__GPIO4_IO29	0x180
+		>;
 	};
 
 	/* X61 */
@@ -664,6 +1022,27 @@
 	pinctrl_uart4: uart4grp {
 		fsl,pins = <MX8MP_IOMUXC_UART4_RXD__UART4_DCE_RX	0x140>,
 			   <MX8MP_IOMUXC_UART4_TXD__UART4_DCE_TX	0x140>;
+	};
+
+	pinctrl_usbcon0: usb0congrp {
+		fsl,pins = <
+			/* ID: floating / high: device, low: host -> use PU */
+			MX8MP_IOMUXC_GPIO1_IO10__GPIO1_IO10	0x1c0
+		>;
+	};
+
+	pinctrl_usb0: usb0grp {
+		fsl,pins = <
+			/* ID -> via usb-connector */
+			/* PWR -> via regulator @phy */
+			MX8MP_IOMUXC_GPIO1_IO13__USB1_OC	0x1C0
+		>;
+	};
+
+	pinctrl_usbhub: usbhubgrp {
+		fsl,pins = <
+			MX8MP_IOMUXC_GPIO1_IO11__GPIO1_IO11	0x10
+		>;
 	};
 
 	pinctrl_usdhc2: usdhc2grp {
