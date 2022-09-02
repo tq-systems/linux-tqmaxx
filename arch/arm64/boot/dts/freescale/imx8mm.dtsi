@@ -800,7 +800,7 @@
 				clocks = <&clk IMX8MM_CLK_PWM1_ROOT>,
 					<&clk IMX8MM_CLK_PWM1_ROOT>;
 				clock-names = "ipg", "per";
-				#pwm-cells = <2>;
+				#pwm-cells = <3>;
 				status = "disabled";
 			};
 
@@ -811,7 +811,7 @@
 				clocks = <&clk IMX8MM_CLK_PWM2_ROOT>,
 					 <&clk IMX8MM_CLK_PWM2_ROOT>;
 				clock-names = "ipg", "per";
-				#pwm-cells = <2>;
+				#pwm-cells = <3>;
 				status = "disabled";
 			};
 
@@ -822,7 +822,7 @@
 				clocks = <&clk IMX8MM_CLK_PWM3_ROOT>,
 					 <&clk IMX8MM_CLK_PWM3_ROOT>;
 				clock-names = "ipg", "per";
-				#pwm-cells = <2>;
+				#pwm-cells = <3>;
 				status = "disabled";
 			};
 
@@ -833,7 +833,7 @@
 				clocks = <&clk IMX8MM_CLK_PWM4_ROOT>,
 					 <&clk IMX8MM_CLK_PWM4_ROOT>;
 				clock-names = "ipg", "per";
-				#pwm-cells = <2>;
+				#pwm-cells = <3>;
 				status = "disabled";
 			};
 
