@@ -54,7 +54,16 @@
 	};
 };
 
+&gpu_2d {
+	status = "okay";
+};
+
+&gpu_3d {
+	status = "okay";
+};
+
 &i2c1 {
+	/* Errata ERR007805: limit clk to <= 384000 Hz */
 	clock-frequency = <384000>;
 	pinctrl-names = "default", "gpio";
 	pinctrl-0 = <&pinctrl_i2c1>;
@@ -184,6 +193,60 @@
 	};
 };
 
+&i2c2 {
+	/* Errata ERR007805: limit clk to <= 384000 Hz */
+	clock-frequency = <384000>;
+};
+
+&i2c3 {
+	/* Errata ERR007805: limit clk to <= 384000 Hz */
+	clock-frequency = <384000>;
+};
+
+&i2c4 {
+	/* Errata ERR007805: limit clk to <= 384000 Hz */
+	clock-frequency = <384000>;
+};
+
+&i2c5 {
+	/* Errata ERR007805: limit clk to <= 384000 Hz */
+	clock-frequency = <384000>;
+};
+
+&i2c6 {
+	/* Errata ERR007805: limit clk to <= 384000 Hz */
+	clock-frequency = <384000>;
+};
+
+/* HACK begin:
+ * The following nodes are required so that some essential clocks are enabled.
+ * lcdif3 is absolutly required one, the others are dependencies.
+ */
+&irqsteer_hdmi {
+	status = "okay";
+};
+
+&hdmi_blk_ctrl {
+	status = "okay";
+};
+
+&hdmiphy {
+	status = "okay";
+};
+
+&lcdif3 {
+	status = "okay";
+};
+/* HACK end */
+
+&mix_gpu_ml {
+	status = "okay";
+};
+
+&sdma2 {
+	status = "okay";
+};
+
 &usdhc3 {
 	pinctrl-names = "default", "state_100mhz", "state_200mhz";
 	pinctrl-0 = <&pinctrl_usdhc3>;
@@ -195,6 +258,18 @@
 	no-sdio;
 	vmmc-supply = <&reg_vcc3v3>;
 	vqmmc-supply = <&reg_vcc1v8>;
+	status = "okay";
+};
+
+&vpu_g1 {
+	status = "okay";
+};
+
+&vpu_g2 {
+	status = "okay";
+};
+
+&vpu_vc8000e {
 	status = "okay";
 };
 
