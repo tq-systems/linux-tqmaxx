@@ -73,8 +73,8 @@
 	status = "okay";
 
 	/* NXP SE97BTP with temperature sensor + eeprom */
-	se97: temperature-sensor-eeprom@1b {
-		compatible = "nxp,se97", "jedec,jc-42.4-temp";
+	se97: temperature-sensor@1b {
+		compatible = "nxp,se97b", "jedec,jc-42.4-temp";
 		reg = <0x1b>;
 	};
 
