@@ -649,6 +649,32 @@ static int dp83867_of_init(struct phy_device *phydev)
 }
 #endif /* CONFIG_OF_MDIO */
 
+static int dp83867_suspend(struct phy_device *phydev)
+{
+	/* Disable PHY Interrupts */
+	if (phy_interrupt_is_valid(phydev)) {
+		phydev->interrupts = PHY_INTERRUPT_DISABLED;
+		if (phydev->drv->config_intr)
+			phydev->drv->config_intr(phydev);
+	}
+
+	return genphy_suspend(phydev);
+}
+
+static int dp83867_resume(struct phy_device *phydev)
+{
+	genphy_resume(phydev);
+
+	/* Enable PHY Interrupts */
+	if (phy_interrupt_is_valid(phydev)) {
+		phydev->interrupts = PHY_INTERRUPT_ENABLED;
+		if (phydev->drv->config_intr)
+			phydev->drv->config_intr(phydev);
+	}
+
+	return 0;
+}
+
 static int dp83867_probe(struct phy_device *phydev)
 {
 	struct dp83867_private *dp83867;
@@ -915,8 +941,8 @@ static struct phy_driver dp83867_driver[] = {
 		.config_intr	= dp83867_config_intr,
 		.handle_interrupt = dp83867_handle_interrupt,
 
-		.suspend	= genphy_suspend,
-		.resume		= genphy_resume,
+		.suspend	= dp83867_suspend,
+		.resume		= dp83867_resume,
 
 		.link_change_notify = dp83867_link_change_notify,
 	},
