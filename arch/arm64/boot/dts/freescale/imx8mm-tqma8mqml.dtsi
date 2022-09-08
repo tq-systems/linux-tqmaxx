@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
 /*
- * Copyright 2020-2021 TQ-Systems GmbH
+ * Copyright 2020-2022 TQ-Systems GmbH
+ * Author: Alexander Stein <linux@ew.tq-group.com>
  */
 
 #include "imx8mm.dtsi"
@@ -69,11 +70,7 @@
 	};
 };
 
-&gpu_2d {
-	status = "okay";
-};
-
-&gpu_3d {
+&gpu {
 	status = "okay";
 };
 
@@ -206,7 +203,6 @@
 		};
 	};
 
-
 	pcf85063: rtc@51 {
 		compatible = "nxp,pcf85063a";
 		reg = <0x51>;
@@ -225,11 +221,6 @@
 		reg = <0x57>;
 		pagesize = <32>;
 	};
-};
-
-&pcie_phy {
-	fsl,refclk-pad-mode = <IMX8_PCIE_REFCLK_PAD_INPUT>;
-	fsl,clkreq-unsupported;
 };
 
 &usdhc3 {

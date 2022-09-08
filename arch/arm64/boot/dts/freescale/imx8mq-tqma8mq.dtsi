@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
 /*
- * Copyright 2019-2021 TQ-Systems GmbH
+ * Copyright 2019-2022 TQ-Systems GmbH
+ * Author: Alexander Stein <linux@ew.tq-group.com>
  */
 
 #include "imx8mq.dtsi"
@@ -77,7 +78,7 @@
 	cpu-supply = <&reg_vdd_arm>;
 };
 
-&gpu {
+&gpu3d {
 	status = "okay";
 };
 
@@ -272,6 +273,10 @@
 };
 
 &vpu {
+	status = "okay";
+};
+
+&vpu_v4l2 {
 	status = "okay";
 };
 

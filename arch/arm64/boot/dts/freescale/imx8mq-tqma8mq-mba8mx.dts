@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
 /*
- * Copyright 2019-2021 TQ-Systems GmbH
+ * Copyright 2019-2022 TQ-Systems GmbH
+ * Author: Alexander Stein <linux@ew.tq-group.com>
  */
 
 /dts-v1/;
@@ -111,6 +112,7 @@
 	clock-names = "pcie", "pcie_aux", "pcie_phy", "pcie_bus";
 	epdev_on-supply = <&reg_vcc_3v3>;
 	hard-wired = <1>;
+	l1ss-disabled;
 	status = "okay";
 };
 
@@ -126,6 +128,7 @@
 	clock-names = "pcie", "pcie_aux", "pcie_phy", "pcie_bus";
 	epdev_on-supply = <&reg_vcc_3v3>;
 	hard-wired = <1>;
+	l1ss-disabled;
 	status = "okay";
 };
 
