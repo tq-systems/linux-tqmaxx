@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
 /*
- * Copyright 2020-2021 TQ-Systems GmbH
+ * Copyright (c) 2020-2024 TQ-Systems GmbH <linux@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Alexander Stein
  */
 
 #include <dt-bindings/phy/phy-imx8-pcie.h>
@@ -74,11 +76,7 @@
 	};
 };
 
-&gpu_2d {
-	status = "okay";
-};
-
-&gpu_3d {
+&gpu {
 	status = "okay";
 };
 
@@ -255,6 +253,22 @@
 	no-sdio;
 	vmmc-supply = <&reg_vcc3v3>;
 	vqmmc-supply = <&reg_vcc1v8>;
+	status = "okay";
+};
+
+&vpu_g1 {
+	status = "okay";
+};
+
+&vpu_g2 {
+	status = "okay";
+};
+
+&vpu_h1 {
+	status = "okay";
+};
+
+&vpu_v4l2 {
 	status = "okay";
 };
 

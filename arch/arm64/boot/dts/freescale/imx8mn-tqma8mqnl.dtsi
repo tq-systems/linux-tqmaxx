@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
 /*
- * Copyright 2020-2021 TQ-Systems GmbH
+ * Copyright (c) 2020-2024 TQ-Systems GmbH <linux@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Alexander Stein
  */
 
 #include "imx8mn.dtsi"
@@ -66,6 +68,10 @@
 		spi-tx-bus-width = <1>;
 		spi-rx-bus-width = <4>;
 	};
+};
+
+&gpu {
+	status = "okay";
 };
 
 &i2c1 {

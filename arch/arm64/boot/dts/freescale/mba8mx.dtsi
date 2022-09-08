@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
 /*
- * Copyright 2020-2021 TQ-Systems GmbH
+ * Copyright (c) 2020-2024 TQ-Systems GmbH <linux@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Alexander Stein
  */
 
 #include <dt-bindings/net/ti-dp83867.h>
@@ -317,14 +319,11 @@
 	samsung,burst-clock-frequency = <891000000>;
 	samsung,esc-clock-frequency = <20000000>;
 
-	ports {
-		port@1 {
-			reg = <1>;
-
-			mipi_dsi_out: endpoint {
-				data-lanes = <1 2 3 4>;
-				remote-endpoint = <&lvds_bridge_in>;
-			};
+	port@1 {
+		mipi_dsi_out: endpoint {
+			data-lanes = <1 2 3 4>;
+			remote-endpoint = <&lvds_bridge_in>;
+			attach-bridge;
 		};
 	};
 };
