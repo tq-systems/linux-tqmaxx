@@ -319,6 +319,9 @@ static int mipi_csi2_s_power(struct v4l2_subdev *sd, int on)
 	struct device *dev = &csi2dev->pdev->dev;
 	int ret;
 
+	if (!sensor_sd)
+		return -ENODEV;
+
 	if (on)
 		pm_runtime_get_sync(dev);
 
