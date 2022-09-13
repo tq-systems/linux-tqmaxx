@@ -295,6 +295,9 @@ static int mipi_csi2_s_power(struct v4l2_subdev *sd, int on)
 	struct mxc_mipi_csi2_dev *csi2dev = sd_to_mxc_mipi_csi2_dev(sd);
 	struct v4l2_subdev *sensor_sd = csi2dev->sensor_sd;
 
+	if (!sensor_sd)
+		return -ENODEV;
+
 	return v4l2_subdev_call(sensor_sd, core, s_power, on);
 }
 
