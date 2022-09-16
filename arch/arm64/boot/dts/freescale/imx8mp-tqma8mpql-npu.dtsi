@@ -1,0 +1,13 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Copyright 2022 TQ-Systems GmbH
+ * Author: Markus Niebel <linux@ew.tq-group.com>
+ */
+
+&ml_vipsi {
+	status = "okay";
+};
+
+&mix_gpu_ml {
+	status = "okay";
+};
