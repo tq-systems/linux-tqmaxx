@@ -457,7 +457,17 @@ static int imx_sec_dsim_probe(struct platform_device *pdev)
 
 	pm_runtime_enable(dev);
 
-	return component_add(dev, &imx_sec_dsim_ops);
+	ret = component_add(dev, &imx_sec_dsim_ops);
+	if (ret)
+		goto err_disable_runtime;
+
+	return 0;
+
+err_disable_runtime:
+	pm_runtime_disable(&pdev->dev);
+	sec_dsim_of_put_resets(dsim_dev);
+
+	return ret;
 }
 
 static int imx_sec_dsim_remove(struct platform_device *pdev)
