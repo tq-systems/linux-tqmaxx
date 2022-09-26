@@ -1133,6 +1133,8 @@ static int mxc_md_probe(struct platform_device *pdev)
 				/* no sensors connected */
 				mxc_md_unregister_all(mxc_md);
 				v4l2_async_notifier_unregister(&mxc_md->subdev_notifier);
+				ret = dev_err_probe(&mxc_md->pdev->dev, -EPROBE_DEFER, "No sensors connected\n");
+				goto clean_ents;
 			}
 		}
 	}
