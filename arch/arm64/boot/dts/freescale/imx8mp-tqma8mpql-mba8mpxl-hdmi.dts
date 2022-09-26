@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later OR MIT
 /*
- * Copyright 2021 TQ-Systems GmbH
+ * Copyright 2021-2022 TQ-Systems GmbH
+ * Author: Alexander Stein <linux@ew.tq-group.com>
  */
 
 #include "imx8mp-tqma8mpql-mba8mpxl.dts"

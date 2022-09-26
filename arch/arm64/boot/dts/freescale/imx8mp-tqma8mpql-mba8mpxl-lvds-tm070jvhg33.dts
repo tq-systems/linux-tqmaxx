@@ -1,14 +1,17 @@
 // SPDX-License-Identifier: GPL-2.0-or-later OR MIT
 /*
- * Copyright 2021 TQ-Systems GmbH
+ * Copyright 2021-2022 TQ-Systems GmbH
+ * Author: Alexander Stein <linux@ew.tq-group.com>
  */
 
 #include "imx8mp-tqma8mpql-mba8mpxl.dts"
 
 &backlight_lvds {
-	pwms = <&pwm2 0 5000000 0>;
-	brightness-levels = <0 4 8 16 32 64 128 255>;
-	default-brightness-level = <7>;
+	status = "okay";
+};
+
+&display {
+	compatible = "tianma,tm070jvhg33";
 	status = "okay";
 };
 
@@ -30,11 +33,6 @@
 	lvds-channel@0 {
 		status = "okay";
 	};
-};
-
-&lvds_panel {
-	compatible = "tianma,tm070jvhg33";
-	status = "okay";
 };
 
 &pwm2 {

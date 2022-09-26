@@ -1,16 +1,28 @@
 // SPDX-License-Identifier: GPL-2.0-or-later OR MIT
 /*
- * Copyright 2021 - 2022 TQ-Systems GmbH
+ * Copyright 2021-2022 TQ-Systems GmbH
+ * Author: Alexander Stein <alexander.stein@tq-group.com>
  */
 
 /dts-v1/;
 
+#include <dt-bindings/leds/common.h>
 #include <dt-bindings/net/ti-dp83867.h>
+#include <dt-bindings/pwm/pwm.h>
 #include "imx8mp-tqma8mpql.dtsi"
 
 / {
 	model = "TQ-Systems i.MX8MPlus TQMa8MPxL on MBa8MPxL";
 	compatible = "tq,imx8mp-tqma8mpql-mba8mpxl", "tq,imx8mp-tqma8mpql", "fsl,imx8mp";
+
+	chosen {
+		stdout-path = &uart4;
+	};
+
+	iio-hwmon {
+		compatible = "iio-hwmon";
+		io-channels = <&adc 0>, <&adc 1>;
+	};
 
 	aliases {
 		mmc0 = &usdhc3;
@@ -18,23 +30,19 @@
 		mmc2 = &usdhc1;
 		rtc0 = &pcf85063;
 		rtc1 = &snvs_rtc;
+		spi0 = &flexspi;
+		spi1 = &ecspi1;
+		spi2 = &ecspi2;
+		spi3 = &ecspi3;
 	};
 
-	chosen {
-		bootargs = "console=ttymxc3,115200 earlycon=ec_imx6q,30a60000,115200";
-		stdout-path = &uart4;
-	};
-
-	adc {
-		compatible = "iio-hwmon";
-		io-channels = <&adc 0>, <&adc 1>;
-	};
-
-	backlight_lvds: backlight-lvds {
+	backlight_lvds: backlight {
 		compatible = "pwm-backlight";
 		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_bllvds>;
+		pinctrl-0 = <&pinctrl_backlight>;
 		pwms = <&pwm2 0 5000000 0>;
+		brightness-levels = <0 4 8 16 32 64 128 255>;
+		default-brightness-level = <7>;
 		power-supply = <&reg_vcc_12v0>;
 		enable-gpios = <&gpio3 19 GPIO_ACTIVE_HIGH>;
 		status = "disabled";
@@ -44,14 +52,21 @@
 		compatible = "fixed-clock";
 		#clock-cells = <0>;
 		clock-frequency = <26000000>;
-		status = "disabled";
 	};
 
 	fan0: pwm-fan {
 		compatible = "pwm-fan";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_pwmfan>;
+		fan-supply = <&reg_pwm_fan>;
 		#cooling-cells = <2>;
-		pwms = <&pwm3 0 10000 0>;
-		cooling-levels = <0 102 170 230>;
+		/* typical 25 kHz -> 40.000 nsec */
+		pwms = <&pwm3 0 40000 PWM_POLARITY_INVERTED>;
+		cooling-levels = <0 32 64 128 196 240>;
+		pulses-per-revolution = <2>;
+		interrupt-parent = <&gpio5>;
+		interrupts = <18 IRQ_TYPE_EDGE_FALLING>;
+
 		status = "disabled";
 	};
 
@@ -61,17 +76,17 @@
 		pinctrl-0 = <&pinctrl_gpiobutton>;
 		autorepeat;
 
-		switch1 {
+		switch-1 {
 			label = "S12";
 			linux,code = <BTN_0>;
-			gpios = <&gpio5 26 GPIO_ACTIVE_LOW>;
+			gpios = <&gpio5 27 GPIO_ACTIVE_LOW>;
 			wakeup-source;
 		};
 
-		switch2 {
+		switch-2 {
 			label = "S13";
 			linux,code = <BTN_1>;
-			gpios = <&gpio5 27 GPIO_ACTIVE_LOW>;
+			gpios = <&gpio5 26 GPIO_ACTIVE_LOW>;
 			wakeup-source;
 		};
 	};
@@ -81,27 +96,37 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_gpioled>;
 
-		led0 {
-			label = "led0";
+		led-0 {
+			color = <LED_COLOR_ID_GREEN>;
+			function = LED_FUNCTION_STATUS;
+			function-enumerator = <0>;
 			gpios = <&gpio5 5 GPIO_ACTIVE_HIGH>;
 			linux,default-trigger = "default-on";
 		};
 
-		led1 {
-			label = "led1";
+		led-1 {
+			color = <LED_COLOR_ID_GREEN>;
+			function = LED_FUNCTION_HEARTBEAT;
 			gpios = <&gpio5 4 GPIO_ACTIVE_HIGH>;
 			linux,default-trigger = "heartbeat";
 		};
 
-		led2 {
-			label = "led2";
+		led-2 {
+			color = <LED_COLOR_ID_YELLOW>;
+			function = LED_FUNCTION_STATUS;
+			function-enumerator = <1>;
 			gpios = <&gpio5 3 GPIO_ACTIVE_HIGH>;
 		};
 	};
 
-	lvds_panel: lvds-panel {
+	display: display {
+		/*
+		 * Display is not fixed, so compatible has to be added from
+		 * DT overlay
+		 */
 		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_lvdspanel>;
+		pinctrl-0 = <&pinctrl_lvdsdisplay>;
+		power-supply = <&reg_vcc_3v3>;
 		enable-gpios = <&gpio3 20 GPIO_ACTIVE_HIGH>;
 		backlight = <&backlight_lvds>;
 		status = "disabled";
@@ -122,6 +147,18 @@
 		regulator-max-microvolt = <5000000>;
 		gpio = <&gpio1 12 GPIO_ACTIVE_HIGH>;
 		enable-active-high;
+	};
+
+	reg_pwm_fan: regulator-pwm-fan {
+		compatible = "regulator-fixed";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_regpwmfan>;
+		regulator-name = "FAN_PWR";
+		regulator-min-microvolt = <12000000>;
+		regulator-max-microvolt = <12000000>;
+		gpio = <&gpio4 27 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		vin-supply = <&reg_vcc_12v0>;
 	};
 
 	reg_usdhc2_vmmc: regulator-usdhc2 {
@@ -148,11 +185,25 @@
 		enable-active-high;
 	};
 
+	reg_vcc_1v8: regulator-1v8 {
+		compatible = "regulator-fixed";
+		regulator-name = "VCC_1V8";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+	};
+
 	reg_vcc_3v3: regulator-3v3 {
 		compatible = "regulator-fixed";
 		regulator-name = "VCC_3V3";
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
+	};
+
+	reg_vcc_5v0: regulator-5v0 {
+		compatible = "regulator-fixed";
+		regulator-name = "VCC_5V0";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
 	};
 
 	reserved-memory {
@@ -215,6 +266,13 @@
 	status = "disabled";
 };
 
+&ecspi1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_ecspi1>;
+	cs-gpios = <&gpio5 9 GPIO_ACTIVE_LOW>;
+	status = "okay";
+};
+
 &ecspi2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_ecspi2>;
@@ -239,7 +297,7 @@
 		compatible = "microchip,mcp3202";
 		/* 100 ksps * 18 */
 		spi-max-frequency = <1800000>;
-		vfef-supply = <&reg_vcc_3v3>;
+		vref-supply = <&reg_vcc_3v3>;
 		#io-channel-cells = <1>;
 	};
 };
@@ -268,6 +326,8 @@
 			reset-assert-us = <500000>;
 			reset-deassert-us = <50000>;
 			enet-phy-lane-no-swap;
+			interrupt-parent = <&gpio4>;
+			interrupts = <3 IRQ_TYPE_EDGE_FALLING>;
 			/* LED0: Link, LED2: activity */
 			ti,led-function = <0x0100>;
 			/* LED0/2: active High, driven by phy function */
@@ -300,6 +360,8 @@
 			reset-assert-us = <500000>;
 			reset-deassert-us = <50000>;
 			enet-phy-lane-no-swap;
+			interrupt-parent = <&gpio4>;
+			interrupts = <1 IRQ_TYPE_EDGE_FALLING>;
 			/* LED0: Link, LED2: activity */
 			ti,led-function = <0x0100>;
 			/* LED0/2: active High, driven by phy function */
@@ -349,28 +411,28 @@
 
 	gpio-line-names = "", "", "", "",
 			  "", "", "VCC12V_EN", "PERST#",
-			  "", "", "", "",
-			  "USDHC2_CD", "", "CLKREQ#", "PEWAKE#",
+			  "", "", "CLKREQ#", "PEWAKE#",
+			  "USDHC2_CD", "", "", "",
 			  "", "", "", "V_SD3V3_EN",
 			  "", "", "", "",
 			  "", "", "", "",
 			  "", "", "", "";
 
-	perst {
+	perst-hog {
 		gpio-hog;
 		gpios = <7 0>;
 		output-high;
 		line-name = "PERST#";
 	};
 
-	clkreq {
+	clkreq-hog {
 		gpio-hog;
 		gpios = <10 0>;
 		input;
 		line-name = "CLKREQ#";
 	};
 
-	pewake {
+	pewake-hog {
 		gpio-hog;
 		gpios = <11 0>;
 		input;
@@ -398,9 +460,16 @@
 			  "", "", "", "",
 			  "", "", "", "",
 			  "", "", "DP_IRQ", "DSI_EN",
-			  "HDMI_OC#", "TEMP_EVENT#", "PCIE_CLKREQ#", "",
+			  "HDMI_OC#", "TEMP_EVENT#", "PCIE_CLK_OE#", "",
 			  "", "", "", "FAN_PWR",
 			  "RTC_EVENT#", "CODEC_RST#", "", "";
+
+	pcie_refclk-hog {
+		gpio-hog;
+		gpios = <22 0>;
+		output-high;
+		line-name = "PCIE_REFCLK";
+	};
 };
 
 &gpio5 {
@@ -415,6 +484,7 @@
 };
 
 &i2c2 {
+	clock-frequency = <384000>;
 	pinctrl-names = "default", "gpio";
 	pinctrl-0 = <&pinctrl_i2c2>;
 	pinctrl-1 = <&pinctrl_i2c2_gpio>;
@@ -459,14 +529,14 @@
 		reg = <0x18>;
 		clock-names = "mclk";
 		clocks = <&audio_blk_ctrl IMX8MP_CLK_AUDIO_BLK_CTRL_SAI3_MCLK1>;
-		iov-supply = <&reg_vcc_3v3>;
+		iov-supply = <&reg_vcc_1v8>;
 		ldoin-supply = <&reg_vcc_3v3>;
 		reset-gpios = <&gpio4 29 GPIO_ACTIVE_LOW>;
 	};
 
 	/* NXP SE97BTP with temperature sensor + eeprom */
-	se97_1c: temperature-sensor-eeprom@1c {
-		compatible = "nxp,se97", "jedec,jc-42.4-temp";
+	se97_1c: temperature-sensor@1c {
+		compatible = "nxp,se97b", "jedec,jc-42.4-temp";
 		reg = <0x1c>;
 	};
 
@@ -474,6 +544,7 @@
 		compatible = "nxp,se97b", "atmel,24c02";
 		reg = <0x54>;
 		pagesize = <16>;
+		vcc-supply = <&reg_vcc_3v3>;
 	};
 };
 
@@ -484,6 +555,8 @@
 };
 
 &i2c4 {
+	/* Errata ERR007805: limit clk to <= 384000 Hz */
+	clock-frequency = <384000>;
 	pinctrl-names = "default", "gpio";
 	pinctrl-0 = <&pinctrl_i2c4>;
 	pinctrl-1 = <&pinctrl_i2c4_gpio>;
@@ -498,6 +571,8 @@
 };
 
 &i2c6 {
+	/* Errata ERR007805: limit clk to <= 384000 Hz */
+	clock-frequency = <384000>;
 	pinctrl-names = "default", "gpio";
 	pinctrl-0 = <&pinctrl_i2c6>;
 	pinctrl-1 = <&pinctrl_i2c6_gpio>;
@@ -539,11 +614,13 @@
 	status = "disabled";
 };
 
-&pcie{
-/*
-	reset-gpio = <&gpio2 7 GPIO_ACTIVE_LOW>;
-	clkreq-gpio = <&gpio2 7 GPIO_ACTIVE_LOW>;
-*/
+&pcf85063 {
+	/* RTC_EVENT# is connected on MBa8MPxL */
+	interrupt-parent = <&gpio4>;
+	interrupts = <28 IRQ_TYPE_EDGE_FALLING>;
+};
+
+&pcie {
 	ext_osc = <1>;
 	clocks = <&clk IMX8MP_CLK_HSIO_ROOT>,
 		 <&clk IMX8MP_CLK_PCIE_AUX>,
@@ -559,7 +636,7 @@
 	status = "okay";
 };
 
-&pcie_phy{
+&pcie_phy {
 	ext_osc = <1>;
 	status = "okay";
 };
@@ -573,7 +650,7 @@
 &pwm3 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pwm3>;
-	status = "disabled";
+	status = "okay";
 };
 
 &sai3 {
@@ -690,21 +767,8 @@
 };
 
 &iomuxc {
-	pinctrl_hoggpio2: hoggpio2grp {
-		fsl,pins = <
-			/* PERST0# X48 / M2 */
-			MX8MP_IOMUXC_SD1_DATA5__GPIO2_IO07	0x140
-			/* PCIe / M2 CLKREQ (alternative) */
-			MX8MP_IOMUXC_SD1_RESET_B__GPIO2_IO10	0x140
-			/* PCIe / M2 PEWAKE# (alternative) */
-			MX8MP_IOMUXC_SD1_STROBE__GPIO2_IO11	0x140
-		>;
-	};
-
-	pinctrl_bllvds: bllvdsgrp {
-		fsl,pins = <
-			MX8MP_IOMUXC_SAI5_RXFS__GPIO3_IO19	0x14
-		>;
+	pinctrl_backlight: backlightgrp {
+		fsl,pins = <MX8MP_IOMUXC_SAI5_RXFS__GPIO3_IO19		0x14>;
 	};
 
 	pinctrl_flexcan1: flexcan1grp {
@@ -777,19 +841,19 @@
 		>;
 	};
 
+	pinctrl_eqos_event: eqosevtgrp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SAI2_RXD0__ENET_QOS_1588_EVENT2_OUT	0x100
+			MX8MP_IOMUXC_SAI2_TXD0__ENET_QOS_1588_EVENT2_IN	0x1c0
+		>;
+	};
+
 	pinctrl_eqos_phy: eqosphygrp {
 		fsl,pins = <
 			/* EVENT1_IN / RST# -> PE */
 			MX8MP_IOMUXC_SAI1_RXD0__GPIO4_IO02		0x100
 			/* EVENT1_OUT / INT/PD -> PE + HYS + PUE */
 			MX8MP_IOMUXC_SAI1_RXD1__GPIO4_IO03		0x1c0
-		>;
-	};
-
-	pinctrl_eqos_event: eqosevtgrp {
-		fsl,pins = <
-			MX8MP_IOMUXC_SAI2_RXD0__ENET_QOS_1588_EVENT2_OUT	0x100
-			MX8MP_IOMUXC_SAI2_TXD0__ENET_QOS_1588_EVENT2_IN	0x1c0
 		>;
 	};
 
@@ -870,12 +934,10 @@
 		fsl,pins = <
 			/* ENET0_TX_CLK for MII, HDMI_OC on MBa8MPxL */
 			MX8MP_IOMUXC_SAI1_MCLK__GPIO4_IO20	0x180
-			/* TEMP_EVENT# on MBa8MPxL */
-			MX8MP_IOMUXC_SAI2_RXFS__GPIO4_IO21	0x180
 			/* PCIe CLK REQ / OE# */
 			MX8MP_IOMUXC_SAI2_RXC__GPIO4_IO22	0x180
-			/* FAN PWR */
-			MX8MP_IOMUXC_SAI2_MCLK__GPIO4_IO27	0x180
+			/* TEMP_EVENT# on MBa8MPxL */
+			MX8MP_IOMUXC_SAI2_RXFS__GPIO4_IO21	0x180
 			/* not used for CODEC on MBa8MPxL, RTC_EVENT# */
 			MX8MP_IOMUXC_SAI3_RXFS__GPIO4_IO28	0x180
 		>;
@@ -902,6 +964,17 @@
 			MX8MP_IOMUXC_HDMI_DDC_SDA__HDMIMIX_HDMI_SDA	0x400001c3
 			MX8MP_IOMUXC_HDMI_HPD__HDMIMIX_HDMI_HPD		0x40000019
 			MX8MP_IOMUXC_HDMI_CEC__HDMIMIX_HDMI_CEC		0x40000019
+		>;
+	};
+
+	pinctrl_hoggpio2: hoggpio2grp {
+		fsl,pins = <
+			/* PERST0# X48 / M2 */
+			MX8MP_IOMUXC_SD1_DATA5__GPIO2_IO07	0x140
+			/* PCIe / M2 CLKREQ (alternative) */
+			MX8MP_IOMUXC_SD1_RESET_B__GPIO2_IO10	0x140
+			/* PCIe / M2 PEWAKE# (alternative) */
+			MX8MP_IOMUXC_SD1_STROBE__GPIO2_IO11	0x140
 		>;
 	};
 
@@ -947,10 +1020,8 @@
 		>;
 	};
 
-	pinctrl_lvdspanel: lvdspanelgrp {
-		fsl,pins = <
-			MX8MP_IOMUXC_SAI5_RXC__GPIO3_IO20	0x14
-		>;
+	pinctrl_lvdsdisplay: lvdsdisplaygrp {
+		fsl,pins = <MX8MP_IOMUXC_SAI5_RXC__GPIO3_IO20		0x10>; /* Power enable */
 	};
 
 	pinctrl_mipicsi0: mipicsi0grp {
@@ -989,9 +1060,12 @@
 
 	/* FAN */
 	pinctrl_pwm3: pwm3grp {
-		fsl,pins = <
-			MX8MP_IOMUXC_I2C3_SDA__PWM3_OUT		0x14
-		>;
+		fsl,pins = <MX8MP_IOMUXC_I2C3_SDA__PWM3_OUT		0x14>;
+	};
+
+	/* FAN RPM */
+	pinctrl_pwmfan: pwmfangrp {
+		fsl,pins = <MX8MP_IOMUXC_I2C3_SCL__GPIO5_IO18		0x80>;
 	};
 
 	pinctrl_reg12v0: reg12v0grp {
@@ -1008,12 +1082,14 @@
 		>;
 	};
 
+	pinctrl_regpwmfan: regpwmfangrp {
+		fsl,pins = <MX8MP_IOMUXC_SAI2_MCLK__GPIO4_IO27		0x80>; /* FAN PWR */
+	};
+
 	/* RXC / RXFS not used on codec */
 	pinctrl_sai3: sai3grp {
 		fsl,pins = <
 			MX8MP_IOMUXC_SAI3_MCLK__AUDIOMIX_SAI3_MCLK	0x94
-			/* MX8MP_IOMUXC_SAI3_RXC__AUDIOMIX_SAI3_RX_BCLK	0x94 */
-			/* MX8MP_IOMUXC_SAI3_RXFS__AUDIOMIX_SAI3_RX_SYNC	0x94 */
 			MX8MP_IOMUXC_SAI3_RXD__AUDIOMIX_SAI3_RX_DATA00	0x94
 			MX8MP_IOMUXC_SAI3_TXD__AUDIOMIX_SAI3_TX_DATA00	0x94
 			MX8MP_IOMUXC_SAI3_TXFS__AUDIOMIX_SAI3_TX_SYNC	0x94
