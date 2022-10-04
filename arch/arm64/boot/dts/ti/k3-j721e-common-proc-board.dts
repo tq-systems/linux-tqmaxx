@@ -1075,3 +1075,43 @@
 &csi0_port4 {
 	status = "disabled";
 };
+
+&main_spi4 {
+	status = "disabled";
+};
+
+&mcu_spi0 {
+	status = "disabled";
+};
+
+&mcu_spi1 {
+	status = "disabled";
+};
+
+&mcu_spi2 {
+	status = "disabled";
+};
+
+&main_ehrpwm0 {
+	status = "disabled";
+};
+
+&main_ehrpwm1 {
+	status = "disabled";
+};
+
+&main_ehrpwm2 {
+	status = "disabled";
+};
+
+&main_ehrpwm3 {
+	status = "disabled";
+};
+
+&main_ehrpwm4 {
+	status = "disabled";
+};
+
+&main_ehrpwm5 {
+	status = "disabled";
+};

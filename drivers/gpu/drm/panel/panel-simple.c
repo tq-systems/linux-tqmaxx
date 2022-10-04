@@ -676,7 +676,7 @@ static const struct drm_display_mode ampire_am_1280800n3tzqw_t00h_mode = {
 static const struct panel_desc ampire_am_1280800n3tzqw_t00h = {
 	.modes = &ampire_am_1280800n3tzqw_t00h_mode,
 	.num_modes = 1,
-	.bpc = 6,
+	.bpc = 8,
 	.size = {
 		.width = 217,
 		.height = 136,
@@ -2176,6 +2176,7 @@ static const struct panel_desc innolux_g070y2_l01 = {
 		.unprepare = 800,
 	},
 	.bus_format = MEDIA_BUS_FMT_RGB888_1X7X4_SPWG,
+	.bus_flags = DRM_BUS_FLAG_DE_HIGH,
 	.connector_type = DRM_MODE_CONNECTOR_LVDS,
 };
 
@@ -2788,6 +2789,35 @@ static const struct panel_desc mitsubishi_aa070mc01 = {
 	.bus_format = MEDIA_BUS_FMT_RGB888_1X7X4_SPWG,
 	.connector_type = DRM_MODE_CONNECTOR_LVDS,
 	.bus_flags = DRM_BUS_FLAG_DE_HIGH,
+};
+
+static const struct drm_display_mode microtips_13_101hieb0hf0_s_mode = {
+	.clock = 150275,
+	.hdisplay = 1920,
+	.hsync_start = 1920 + 32,
+	.hsync_end = 1920 + 32 + 52,
+	.htotal = 1920 + 32 + 52 + 24,
+	.vdisplay = 1200,
+	.vsync_start = 1200 + 24,
+	.vsync_end = 1200 + 24 + 8,
+	.vtotal = 1200 + 24 + 8 + 3,
+};
+
+static const struct panel_desc microtips_13_101hieb0hf0_s = {
+	.modes = &microtips_13_101hieb0hf0_s_mode,
+	.bpc = 8,
+	.num_modes = 1,
+	.size = {
+		.width = 217,
+		.height = 136,
+	},
+	.delay = {
+		.prepare = 50,
+		.disable = 50,
+	},
+	.bus_flags = DRM_BUS_FLAG_DE_HIGH,
+	.bus_format = MEDIA_BUS_FMT_RGB888_1X7X4_SPWG,
+	.connector_type = DRM_MODE_CONNECTOR_LVDS,
 };
 
 static const struct display_timing nec_nl12880bc20_05_timing = {
@@ -4184,6 +4214,9 @@ static const struct of_device_id platform_of_match[] = {
 	}, {
 		.compatible = "logictechno,lt170410-2whc",
 		.data = &logictechno_lt170410_2whc,
+	}, {
+		.compatible = "microtips,13-101hieb0hf0-s",
+		.data = &microtips_13_101hieb0hf0_s,
 	}, {
 		.compatible = "mitsubishi,aa070mc01-ca1",
 		.data = &mitsubishi_aa070mc01,

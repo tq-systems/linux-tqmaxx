@@ -28,6 +28,7 @@
 #include <linux/sched.h>
 #include <linux/spi/spi.h>
 #include <linux/spi/spi-mem.h>
+#include <linux/sys_soc.h>
 #include <linux/timer.h>
 
 #define CQSPI_NAME			"cadence-qspi"
@@ -1306,19 +1307,20 @@ static int cqspi_write_setup(struct cqspi_flash_pdata *f_pdata,
 	reg = cqspi_calc_rdreg(op);
 	writel(reg, reg_base + CQSPI_REG_RD_INSTR);
 
-	if (op->cmd.dtr) {
-		/*
-		 * Some flashes like the cypress Semper flash expect a 4-byte
-		 * dummy address with the Read SR command in DTR mode, but this
-		 * controller does not support sending address with the Read SR
-		 * command. So, disable write completion polling on the
-		 * controller's side. spi-nor will take care of polling the
-		 * status register.
-		 */
-		reg = readl(reg_base + CQSPI_REG_WR_COMPLETION_CTRL);
-		reg |= CQSPI_REG_WR_DISABLE_AUTO_POLL;
-		writel(reg, reg_base + CQSPI_REG_WR_COMPLETION_CTRL);
-	}
+	/*
+	 * SPI NAND flashes require the address of the status register to be
+	 * passed in the Read SR command. Also, some SPI NOR flashes like the
+	 * cypress Semper flash expect a 4-byte dummy address in the Read SR
+	 * command in DTR mode.
+	 *
+	 * But this controller does not support address phase in the Read SR
+	 * command when doing auto-HW polling. So, disable write completion
+	 * polling on the controller's side. spinand and spi-nor will take
+	 * care of polling the status register.
+	 */
+	reg = readl(reg_base + CQSPI_REG_WR_COMPLETION_CTRL);
+	reg |= CQSPI_REG_WR_DISABLE_AUTO_POLL;
+	writel(reg, reg_base + CQSPI_REG_WR_COMPLETION_CTRL);
 
 	reg = readl(reg_base + CQSPI_REG_SIZE);
 	reg &= ~CQSPI_REG_SIZE_ADDRESS_MASK;
@@ -2148,6 +2150,11 @@ static int cqspi_setup_flash(struct cqspi_st *cqspi)
 	return 0;
 }
 
+static const struct soc_device_attribute k3_soc_devices[] = {
+	{ .family = "AM64X", .revision = "SR1.0" },
+	{ /* sentinel */ }
+};
+
 static int cqspi_probe(struct platform_device *pdev)
 {
 	const struct cqspi_driver_platdata *ddata;
@@ -2282,7 +2289,7 @@ static int cqspi_probe(struct platform_device *pdev)
 		goto probe_setup_failed;
 	}
 
-	if (cqspi->use_direct_mode) {
+	if (cqspi->use_direct_mode && !soc_device_match(k3_soc_devices)) {
 		ret = cqspi_request_mmap_dma(cqspi);
 		if (ret == -EPROBE_DEFER)
 			goto probe_setup_failed;

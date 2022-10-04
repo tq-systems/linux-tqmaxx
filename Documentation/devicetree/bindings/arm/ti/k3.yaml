@@ -48,18 +48,24 @@ properties:
               - ti,am642-sk
           - const: ti,am642
 
+      - description: K3 AM642 SoC on TQ-Systems TQMaX4XxL SoM
+        item:
+          - enum:
+              - tq,am642-tqma6442l-mbax4xxl  # MBaX4XxL base board
+          - const: tq,am642-tqma6442l
+          - const: ti,am642
+
       - description: K3 J721s2 SoC
         items:
           - enum:
               - ti,j721s2-evm
           - const: ti,j721s2
 
-      - description: K3 AM642 SoC on TQ-Systems TQMaX4XxL SoM
-        item:
+      - description: K3 J784s4 SoC
+        items:
           - enum:
-              - tq,am642-tqma6442l-mbax4xxl # MBaX4XxL base board
-          - const: tq,am642-tqma6442l
-          - const: ti,am642
+              - ti,j784s4-evm
+          - const: ti,j784s4
 
 additionalProperties: true
 
