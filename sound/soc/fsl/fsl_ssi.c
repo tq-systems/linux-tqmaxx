@@ -1600,13 +1600,13 @@ static int fsl_ssi_probe(struct platform_device *pdev)
 	}
 
 	dev_set_drvdata(dev, ssi);
-	pm_runtime_enable(&pdev->dev);
 
 	if (ssi->soc->imx) {
 		ret = fsl_ssi_imx_probe(pdev, ssi, iomem);
 		if (ret)
 			return ret;
 	}
+	pm_runtime_enable(&pdev->dev);
 
 	if (fsl_ssi_is_ac97(ssi)) {
 		mutex_init(&ssi->ac97_reg_lock);
@@ -1670,6 +1670,8 @@ error_asoc_register:
 error_ac97_ops:
 	if (fsl_ssi_is_ac97(ssi))
 		mutex_destroy(&ssi->ac97_reg_lock);
+
+	pm_runtime_disable(&pdev->dev);
 
 	if (ssi->soc->imx)
 		fsl_ssi_imx_clean(pdev, ssi);
