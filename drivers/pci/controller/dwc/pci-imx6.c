@@ -813,6 +813,7 @@ static int imx6_pcie_enable_ref_clk(struct imx6_pcie *imx6_pcie)
 		break;
 	}
 
+	return ret;
 err_pciex2_per:
 	clk_disable_unprepare(imx6_pcie->pcie_phy_pclk);
 err_pcie_phy_pclk:
@@ -1370,6 +1371,8 @@ static void imx6_pcie_deassert_core_reset(struct imx6_pcie *imx6_pcie)
 		/* Wait for 100ms after PERST# deassertion (PCIe r5.0, 6.6.1) */
 		msleep(100);
 	}
+
+	return;
 
 err_ref_clk:
 	clk_disable_unprepare(imx6_pcie->pcie);
