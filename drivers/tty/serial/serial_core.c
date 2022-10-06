@@ -2412,7 +2412,7 @@ uart_configure_port(struct uart_driver *drv, struct uart_state *state,
 		spin_lock_irqsave(&port->lock, flags);
 		port->mctrl &= TIOCM_DTR;
 		if (port->rs485.flags & SER_RS485_ENABLED &&
-		    !(port->rs485.flags & SER_RS485_RTS_ON_SEND))
+		    !(port->rs485.flags & SER_RS485_RTS_AFTER_SEND))
 			port->mctrl |= TIOCM_RTS;
 		port->ops->set_mctrl(port, port->mctrl);
 		spin_unlock_irqrestore(&port->lock, flags);
