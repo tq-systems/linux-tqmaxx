@@ -15,7 +15,7 @@
 		compatible = "pwm-backlight";
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_bllvds>;
-		pwms = <&pwm2 0 5000000>;
+		pwms = <&pwm2 0 5000000 0>;
 		power-supply = <&reg_vcc_12v0>;
 		enable-gpios = <&gpio3 19 GPIO_ACTIVE_HIGH>;
 		status = "disabled";
