@@ -11,6 +11,7 @@
 #include <dt-bindings/mux/ti-serdes.h>
 #include <dt-bindings/net/ti-dp83867.h>
 #include <dt-bindings/phy/phy.h>
+#include <dt-bindings/pwm/pwm.h>
 #include "k3-am642-tqma64xxl.dtsi"
 
 / {
@@ -121,6 +122,33 @@
 			local-mac-address = [00 00 00 00 00 00];
 		};
 	};
+
+	fan0: pwm-fan {
+		compatible = "pwm-fan";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pwm_fan_pins_default>;
+		fan-supply = <&reg_pwm_fan>;
+		#cooling-cells = <2>;
+		/* typical 25 kHz -> 40.000 nsec */
+		pwms = <&epwm5 0 40000 PWM_POLARITY_INVERTED>;
+		cooling-levels = <0 32 64 128 196 240>;
+		pulses-per-revolution = <2>;
+		interrupt-parent = <&main_gpio1>;
+		interrupts = <49 IRQ_TYPE_EDGE_FALLING>;
+
+		status = "disabled";
+	};
+
+	reg_pwm_fan: regulator-pwm-fan {
+		compatible = "regulator-fixed";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pwm_fan_reg_pins_default>;
+		regulator-name = "FAN_PWR";
+		regulator-min-microvolt = <12000000>;
+		regulator-max-microvolt = <12000000>;
+		gpio = <&main_gpio1 48 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+	};
 };
 
 &cpsw3g {
@@ -191,7 +219,7 @@
 
 &epwm5 {
 	pinctrl-names = "default";
-	pinctrl-0 = <&epwm5_pins_default>, <&epwm5_fan_pins_default>;
+	pinctrl-0 = <&epwm5_pins_default>;
 };
 
 &epwm6 {
@@ -234,6 +262,84 @@
 		gpios = <70 0>;
 		line-name = "PHY_INT#";
 		input;
+	};
+};
+
+&main0_thermal {
+	trips {
+		main0_active0: trip-active0 {
+			temperature = <40000>;
+			hysteresis = <5000>;
+			type = "active";
+		};
+
+		main0_active1: trip-active1 {
+			temperature = <48000>;
+			hysteresis = <3000>;
+			type = "active";
+		};
+
+		main0_active2: trip-active2 {
+			temperature = <60000>;
+			hysteresis = <10000>;
+			type = "active";
+		};
+	};
+
+	cooling-maps {
+		map1 {
+			trip = <&main0_active0>;
+			cooling-device = <&fan0 1 1>;
+		};
+
+		map2 {
+			trip = <&main0_active1>;
+			cooling-device = <&fan0 2 2>;
+		};
+
+		map3 {
+			trip = <&main0_active2>;
+			cooling-device = <&fan0 3 3>;
+		};
+	};
+};
+
+&main1_thermal {
+	trips {
+		main1_active0: trip-active0 {
+			temperature = <40000>;
+			hysteresis = <5000>;
+			type = "active";
+		};
+
+		main1_active1: trip-active1 {
+			temperature = <48000>;
+			hysteresis = <3000>;
+			type = "active";
+		};
+
+		main1_active2: trip-active2 {
+			temperature = <60000>;
+			hysteresis = <10000>;
+			type = "active";
+		};
+	};
+
+	cooling-maps {
+		map1 {
+			trip = <&main1_active0>;
+			cooling-device = <&fan0 1 1>;
+		};
+
+		map2 {
+			trip = <&main1_active1>;
+			cooling-device = <&fan0 2 2>;
+		};
+
+		map3 {
+			trip = <&main1_active2>;
+			cooling-device = <&fan0 3 3>;
+		};
 	};
 };
 
@@ -472,17 +578,6 @@
 		pinctrl-single,pins = <
 			/* (W19) GPMC0_WAIT0.EHRPWM5_B */
 			AM64X_IOPAD(0x0098, PIN_OUTPUT, 3)
-		>;
-	};
-
-	epwm5_fan_pins_default: epwm5-fan-pins-default {
-		pinctrl-single,pins = <
-			/* (T19) GPMC0_BE1n.EHRPWM5_A */
-			AM64X_IOPAD(0x0094, PIN_OUTPUT, 3)
-			/* (D14) SPI1_CS1.GPIO1_48 - FAN_PWR */
-			AM64X_IOPAD(0x0220, PIN_OUTPUT, 7)
-			/* (C14) SPI1_CLK.GPIO1_49 - FAN_RPM */
-			AM64X_IOPAD(0x0224, PIN_INPUT, 7)
 		>;
 	};
 
@@ -749,6 +844,22 @@
 			AM64X_IOPAD(0x0148, PIN_OUTPUT, 2)
 			/* (Y11) PRG1_PRU1_GPO15.PRG1_RGMII2_TX_CTL */
 			AM64X_IOPAD(0x0144, PIN_OUTPUT, 2)
+		>;
+	};
+
+	pwm_fan_pins_default: pwm-fan-pins-default {
+		pinctrl-single,pins = <
+			/* (T19) GPMC0_BE1n.EHRPWM5_A */
+			AM64X_IOPAD(0x0094, PIN_OUTPUT, 3)
+			/* (C14) SPI1_CLK.GPIO1_49 - FAN_RPM */
+			AM64X_IOPAD(0x0224, PIN_INPUT, 7)
+		>;
+	};
+
+	pwm_fan_reg_pins_default: pwm-fan-reg-pins-default {
+		pinctrl-single,pins = <
+			/* (D14) SPI1_CS1.GPIO1_48 - FAN_PWR */
+			AM64X_IOPAD(0x0220, PIN_OUTPUT, 7)
 		>;
 	};
 };
