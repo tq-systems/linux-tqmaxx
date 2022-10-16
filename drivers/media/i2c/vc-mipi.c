@@ -238,14 +238,12 @@ error:
 	return ret;
 }
 
-static int vc_mipi_i2c_remove(struct i2c_client *i2c)
+static void vc_mipi_i2c_remove(struct i2c_client *i2c)
 {
 	struct vc_mipi_ctrl *ctrl = i2c_get_clientdata(i2c);
 
 	vc_mipi_clk_cleanup(ctrl);
 	regulator_disable(ctrl->supply);
-
-	return 0;
 }
 
 static const struct of_device_id vc_mipi_dt_ids[] = {
