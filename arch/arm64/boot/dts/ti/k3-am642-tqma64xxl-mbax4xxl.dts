@@ -450,11 +450,7 @@
 &main_uart3 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&main_uart3_pins_default>;
-
-	bluetooth {
-		compatible = "qcom,qca9377-bt";
-		enable-gpios = <&main_gpio0 23 GPIO_ACTIVE_HIGH>;
-	};
+	status = "disabled";
 };
 
 /* IOT Module - Main UART */
@@ -620,8 +616,6 @@
 
 	main_gpio1_hog_pins_default: main-gpio1-hog-pins-default {
 		pinctrl-single,pins = <
-			/* (C13) SPI0_CS1.GPIO1_43 - WLAN_PWD# */
-			AM64X_IOPAD(0x020c, PIN_OUTPUT, 7)
 			/* (B15) SPI1_D0.GPIO1_50 - USB0_VBUS_OC# */
 			AM64X_IOPAD(0x0228, PIN_INPUT, 7)
 			/* (B16) UART0_CTSn.GPIO1_54 - PRG0_MDIO_SWITCH */
@@ -735,8 +729,6 @@
 			AM64X_IOPAD(0x0048, PIN_INPUT, 2)
 			/* (U18) GPMC0_AD4.UART3_TXD */
 			AM64X_IOPAD(0x004c, PIN_OUTPUT, 2)
-			/* (V19) GPMC0_AD8.GPIO0_23 - BT_PWD# */
-			AM64X_IOPAD(0x005c, PIN_OUTPUT, 7)
 		>;
 	};
 

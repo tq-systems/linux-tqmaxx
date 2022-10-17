@@ -19,12 +19,3 @@
 		output-high;
 	};
 };
-
-&main_gpio1 {
-	line43 {
-		gpio-hog;
-		gpios = <43 0>;
-		line-name = "WLAN_PWD#";
-		output-high;
-	};
-};
