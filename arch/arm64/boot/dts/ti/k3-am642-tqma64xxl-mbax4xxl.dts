@@ -149,6 +149,17 @@
 		gpio = <&main_gpio1 48 GPIO_ACTIVE_HIGH>;
 		enable-active-high;
 	};
+
+	reg_sd: regulator-sd {
+		compatible = "regulator-fixed";
+		pinctrl-names = "default";
+		pinctrl-0 = <&main_mmc1_reg_pins_default>;
+		regulator-name = "V_3V3_SD";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		gpio = <&main_gpio1 43 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+	};
 };
 
 &cpsw3g {
@@ -661,6 +672,13 @@
 			AM64X_IOPAD(0x0298, PIN_INPUT, 0)
 			/* (#N/A) MMC1_CLKLB */
 			AM64X_IOPAD(0x0290, PIN_INPUT, 0)
+		>;
+	};
+
+	main_mmc1_reg_pins_default: main-mmc1-reg-pins-default {
+		pinctrl-single,pins = <
+			/* (C13) SPI0_CS1.GPIO1_43 - MMC1_SD_EN */
+			AM64X_IOPAD(0x020c, PIN_OUTPUT, 7)
 		>;
 	};
 
