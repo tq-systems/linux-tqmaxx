@@ -139,6 +139,13 @@
 		status = "disabled";
 	};
 
+	wifi_pwrseq: pwrseq-wifi {
+		pinctrl-names = "default";
+		pinctrl-0 = <&main_mmc1_wifi_pwrseq_pins_default>;
+		compatible = "mmc-pwrseq-simple";
+		reset-gpios = <&main_gpio0 23 GPIO_ACTIVE_LOW>;
+	};
+
 	reg_pwm_fan: regulator-pwm-fan {
 		compatible = "regulator-fixed";
 		pinctrl-names = "default";
@@ -679,6 +686,13 @@
 		pinctrl-single,pins = <
 			/* (C13) SPI0_CS1.GPIO1_43 - MMC1_SD_EN */
 			AM64X_IOPAD(0x020c, PIN_OUTPUT, 7)
+		>;
+	};
+
+	main_mmc1_wifi_pwrseq_pins_default: main-mmc1-wifi-pwrseq-default {
+		pinctrl-single,pins = <
+			/* (V19) GPMC0_AD8.GPIO0_23 - WIFI-BT_EN */
+			AM64X_IOPAD(0x005c, PIN_OUTPUT, 7)
 		>;
 	};
 
