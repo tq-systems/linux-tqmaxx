@@ -1,0 +1,18 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Device Tree file for TQ-Systems TQMa571x SoM on MBa57xx baseboard.
+ *
+ * Copyright (c) 2020-2022 TQ-Systems GmbH <linux@ew.tq-group.com>, D-82229 Seefeld, Germany.
+ * Author: Michael Krummsdorf, Matthias Schiffer
+ */
+
+/dts-v1/;
+
+#include "am571x-tqma57xx.dtsi"
+#include "am57xx-mba57xx.dtsi"
+
+/ {
+	model = "TQ-Systems TQMa571x on MBa57xx";
+	compatible = "tq,am5718-tqma5718-mba57xx", "tq,am5718-tqma5718",
+		"ti,am5718", "ti,dra7";
+};

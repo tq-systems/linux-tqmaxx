@@ -1,0 +1,596 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Device Tree file for TQ-Systems MBa57xx baseboard.
+ *
+ * Copyright (c) 2020-2022 TQ-Systems GmbH <linux@ew.tq-group.com>, D-82229 Seefeld, Germany.
+ * Author: Michael Krummsdorf, Matthias Schiffer
+ */
+
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/interrupt-controller/irq.h>
+#include <dt-bindings/net/ti-dp83867.h>
+#include <dt-bindings/input/input.h>
+
+/ {
+	aliases {
+		display0 = &hdmi0;
+		ethernet2 = &pruss2_emac0;
+		ethernet3 = &pruss2_emac1;
+		mmc1 = &mmc1;
+		spi1 = &mcspi1;
+	};
+
+
+	chosen {
+		stdout-path = &uart3;
+	};
+
+	gpio-keys {
+		compatible = "gpio-keys";
+
+		button0 {
+			label = "button_1";
+			gpios = <&expander20 1 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_HOME>;
+			wakeup-source;
+		};
+
+		button1 {
+			label = "button_2";
+			gpios = <&expander20 2 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_UP>;
+			wakeup-source;
+		};
+
+		button2 {
+			label = "button_3";
+			gpios = <&expander20 3 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_DOWN>;
+			wakeup-source;
+		};
+	};
+
+	gpio-leds {
+		compatible = "gpio-leds";
+
+		led-out0 {
+			label = "out0";
+			gpios = <&expander21 3 GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+		};
+
+		led-out1 {
+			label = "out1";
+			gpios = <&expander21 4 GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+		};
+	};
+
+	/* HDMI companion chip */
+	tpd12s015: encoder {
+		compatible = "ti,tpd12s016", "ti,tpd12s015";
+		gpios = <0>, /* optional CT_CP_HPD */
+			<0>, /* optional LS_OE */
+			<&gpio7 12 GPIO_ACTIVE_HIGH>;   /* HPD */
+		pinctrl-names = "ddc";
+		pinctrl-0 = <&hdmi_i2c_pins_ddc>;
+		ddc-i2c-bus = <&i2c2>;
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+				tpd12s015_in: endpoint@0 {
+					remote-endpoint = <&hdmi_out>;
+				};
+			};
+
+			port@1 {
+				reg = <1>;
+				tpd12s015_out: endpoint@0 {
+					remote-endpoint = <&hdmi_connector_in>;
+				};
+			};
+		};
+	};
+
+	hdmi0: hdmi-connector {
+		compatible = "hdmi-connector";
+		label = "hdmi";
+		type = "a";
+
+		port {
+			hdmi_connector_in: endpoint {
+				remote-endpoint = <&tpd12s015_out>;
+			};
+		};
+	};
+
+	vcc_5v: regulator-vcc_5v {
+		compatible = "regulator-fixed";
+		regulator-name = "VCC5V";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		regulator-always-on;
+		regulator-boot-on;
+	};
+
+	vcc_3v3: regulator-vcc_3v3 {
+		compatible = "regulator-fixed";
+		regulator-name = "VCC3V3";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-always-on;
+		regulator-boot-on;
+	};
+
+	/* miniPCIe */
+	vcc_1v5: regulator-vcc_1v5 {
+		/* TPS62090RGT */
+		compatible = "regulator-fixed";
+		regulator-name = "VCC1V5";
+		vin-supply = <&vcc_5v>;
+		regulator-min-microvolt = <1500000>;
+		regulator-max-microvolt = <1500000>;
+		gpio = <&expander21 1 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		regulator-boot-on;
+	};
+
+	vcc_3v3_display: regulator-vcc_3v3_display {
+		/* TPS62090RGT */
+		compatible = "regulator-fixed";
+		regulator-name = "VCC3V3_DISPLAY";
+		vin-supply = <&vcc_5v>;
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		gpio = <&expander20 14 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		regulator-boot-on;
+	};
+
+	vcc_5v_display: regulator-vcc_5v_display {
+		/* filtered vcc_5v */
+		compatible = "regulator-fixed";
+		regulator-name = "VCC5V_DISPLAY";
+		vin-supply = <&vcc_5v>;
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		/* LCD_BLT_EN */
+		gpio = <&expander20 13 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		regulator-boot-on;
+	};
+
+	/* Dual-MAC Ethernet application node on PRU-ICSS2 */
+	pruss2_eth: pruss2_eth {
+		compatible = "ti,am57-prueth";
+		ti,prus = <&pru2_0>, <&pru2_1>;
+		sram = <&ocmcram1>;
+		mii-rt = <&pruss2_mii_rt>;
+		iep = <&pruss2_iep>;
+		interrupts = <20 2 2>, <21 3 3>;
+		interrupt-names = "rx_lre_hp", "rx_lre_lp";
+		interrupt-parent = <&pruss2_intc>;
+
+		pruss2_emac0: ethernet-mii0 {
+			phy-handle = <&pruss2_eth0_phy>;
+			phy-mode = "mii";
+			interrupts = <20 2 2>, <26 6 6>, <23 6 6>;
+			interrupt-names = "rx", "emac_ptp_tx", "hsr_ptp_tx";
+			ti,no-half-duplex;
+			/* Filled in by bootloader */
+			local-mac-address = [00 00 00 00 00 00];
+		};
+
+		pruss2_emac1: ethernet-mii1 {
+			phy-handle = <&pruss2_eth1_phy>;
+			phy-mode = "mii";
+			interrupts = <21 3 3>, <27 9 7>, <24 9 7>;
+			interrupt-names = "rx", "emac_ptp_tx", "hsr_ptp_tx";
+			ti,no-half-duplex;
+			/* Filled in by bootloader */
+			local-mac-address = [00 00 00 00 00 00];
+		};
+	};
+
+	buzzer {
+		compatible = "gpio-beeper";
+		gpios = <&gpio6 19 GPIO_ACTIVE_HIGH>;
+	};
+};
+
+&pruss2_iep {
+	interrupt-parent = <&pruss2_intc>;
+	interrupts = <7 7 8>;
+	interrupt-names = "iep_cap_cmp";
+};
+
+&i2c4 {
+	clock-frequency = <400000>;
+	status = "okay";
+
+	/* Input/Output GPIO Port Expander 16 bit */
+	expander20: gpio@20 {
+		compatible = "nxp,pca9555";
+		reg = <0x20>;
+		interrupt-parent = <&gpio2>;
+		interrupts = <2 IRQ_TYPE_EDGE_FALLING>;
+		interrupt-controller;
+		#interrupt-cells = <2>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		vcc-supply = <&vcc_3v3>;
+		wakeup-source;
+	};
+
+	/* Output GPIO Port Expander 16 bit */
+	expander21: gpio@21 {
+		compatible = "nxp,pca9555";
+		reg = <0x21>;
+		interrupt-parent = <&gpio5>;
+		interrupts = <7 IRQ_TYPE_EDGE_FALLING>;
+		interrupt-controller;
+		#interrupt-cells = <2>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		vcc-supply = <&vcc_3v3>;
+		wakeup-source;
+
+		/*
+		 * Some board revisions erroneously connect PWR_EN_1V1 to VCC5V.
+		 * As a safe default, hog the pin as an input, so the GPIO
+		 * expander does not drive against VCC.
+		 *
+		 * On other board revisions, where this pin actually needs to
+		 * be set to power the on-board USB hub, the bootloader will
+		 * adjust the hog as needed.
+		 */
+		pwr_en_1v1 {
+			gpio-hog;
+			gpios = <2 GPIO_ACTIVE_HIGH>;
+			input;
+			line-name = "PWR_EN_1V1";
+		};
+
+		usb20_hub_rstn {
+			gpio-hog;
+			gpios = <12 GPIO_ACTIVE_HIGH>;
+			output-high;
+			line-name = "USB2.0_HUB_RST#";
+		};
+
+		usb30_hub_rstn {
+			gpio-hog;
+			gpios = <13 GPIO_ACTIVE_HIGH>;
+			output-high;
+			line-name = "USB3.0_HUB_RST#";
+		};
+	};
+
+	/* touch controller */
+	analog_touch: stmpe811@41 {
+		compatible = "st,stmpe811";
+		reg = <0x41>;
+		/* touch interrupt TOUCH_INT#, native CPU GPIO4_0 */
+		interrupts = <0 IRQ_TYPE_EDGE_FALLING>;
+		interrupt-parent = <&gpio4>;
+		interrupt-controller;
+		id = <0>;
+		blocks = <5>;
+		irq-trigger = <0x1>;
+		st,mod-12b = <1>;       /* 12-bit ADC */
+		st,ref-sel = <0>;       /* internal ADC reference */
+		st,adc-freq = <1>;      /* 3.25 MHz ADC clock speed */
+		st,sample-time = <4>;   /* ADC converstion time: 80 clocks */
+
+		stmpe_touchscreen {
+			compatible = "st,stmpe-ts";
+			/* 8 sample average control */
+			st,ave-ctrl = <3>;
+			/* 7 length fractional part in z */
+			st,fraction-z = <7>;
+			/*
+			 * 50 mA typical 80 mA max touchscreen drivers
+			 * current limit value
+			 */
+			st,i-drive = <1>;
+			/* 1 ms panel driver settling time */
+			st,settling = <3>;
+			/* 5 ms touch detect interrupt delay */
+			st,touch-det-delay = <5>;
+
+			status = "disabled";
+		};
+	};
+
+	/* TODO: Audio not implemented yet */
+	codec: audio-codec@18 {
+		compatible = "ti,tlv320aic32x4";
+		reg = <0x18>;
+	};
+};
+
+/* Debug UART */
+&uart3 {
+	interrupts-extended = <&crossbar_mpu GIC_SPI 69 IRQ_TYPE_LEVEL_HIGH
+			       &dra7_pmx_core 0x3c0>;
+	wakeup-source;
+	status = "okay";
+};
+
+/* RS485 */
+&uart10 {
+	interrupts-extended = <&crossbar_mpu GIC_SPI 221 IRQ_TYPE_LEVEL_HIGH
+			       &dra7_pmx_core 0x170>;
+	linux,rs485-enabled-at-boot-time;
+	status = "okay";
+};
+
+&mac_sw {
+	status = "okay";
+};
+
+&cpsw_port1 {
+	phy-handle = <&dp83867_0>;
+	phy-mode = "rgmii-rxid";
+	ti,dual-emac-pvid = <1>;
+};
+
+&cpsw_port2 {
+	phy-handle = <&dp83867_1>;
+	phy-mode = "rgmii-rxid";
+	ti,dual-emac-pvid = <2>;
+};
+
+&davinci_mdio_sw {
+	dp83867_0: ethernet-phy@2 {
+		compatible = "ethernet-phy-id2000.a231",
+			     "ethernet-phy-ieee802.3-c22";
+		reg = <2>;
+		ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_75_NS>;
+		ti,tx-internal-delay = <DP83867_RGMIIDCTL_250_PS>;
+		ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_8_B_NIB>;
+		ti,min-output-impedance;
+		reset-gpios = <&expander21 10 GPIO_ACTIVE_LOW>;
+		reset-assert-us = <2>;
+	};
+
+	dp83867_1: ethernet-phy@3 {
+		compatible = "ethernet-phy-id2000.a231",
+			     "ethernet-phy-ieee802.3-c22";
+		reg = <3>;
+		ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_75_NS>;
+		ti,tx-internal-delay = <DP83867_RGMIIDCTL_250_PS>;
+		ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_8_B_NIB>;
+		ti,min-output-impedance;
+		reset-gpios = <&expander21 11 GPIO_ACTIVE_LOW>;
+		reset-assert-us = <2>;
+	};
+};
+
+&usb1 {
+	dr_mode = "host";
+};
+
+&usb2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&usb2_id_pin>;
+	dr_mode = "otg";
+};
+
+/* SD card */
+&mmc1 {
+	pinctrl-names = "default", "hs";
+	pinctrl-0 = <&mmc1_pins_default>;
+	pinctrl-1 = <&mmc1_pins_hs>;
+	vmmc-supply = <&vdd_3v3>;
+	vqmmc-supply = <&ldo1_reg>;
+	bus-width = <4>;
+	no-mmc;
+	no-sdio;
+	no-1-8-v;
+	/delete-property/ mmc-ddr-1_8v;
+	/delete-property/ mmc-ddr-3_3v;
+	cd-debounce-delay-ms = <7>; /* Maximum supported by gpio-omap */
+	cd-gpios = <&gpio6 27 GPIO_ACTIVE_LOW>; /* gpio 219 */
+	wp-gpios = <&gpio6 28 GPIO_ACTIVE_HIGH>; /* gpio 220 */
+	status = "okay";
+};
+
+&dcan1 {
+	pinctrl-names = "default", "sleep", "active";
+	pinctrl-0 = <&dcan1_pins_sleep>;
+	pinctrl-1 = <&dcan1_pins_sleep>;
+	pinctrl-2 = <&dcan1_pins_default>;
+	status = "okay";
+};
+
+&dcan2 {
+	pinctrl-names = "default", "sleep", "active";
+	pinctrl-0 = <&dcan2_pins_sleep>;
+	pinctrl-1 = <&dcan2_pins_sleep>;
+	pinctrl-2 = <&dcan2_pins_default>;
+	status = "okay";
+};
+
+&hdmi {
+	vdda-supply = <&ldo4_reg>;
+	status = "okay";
+
+	port {
+		hdmi_out: endpoint {
+			remote-endpoint = <&tpd12s015_in>;
+		};
+	};
+};
+
+&ehrpwm1 {
+	status = "okay";
+};
+
+&epwmss1 {
+	status = "okay";
+};
+
+&mcspi1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&spi1_pins>;
+	status = "okay";
+
+	spidev0: spidev@0 {
+		compatible = "tq,testdev";
+		reg = <0>;
+		spi-max-frequency = <100000>;
+	};
+};
+
+&flash0_partitions {
+	/* MTD partition table.
+	 * The ROM checks the first four physical blocks
+	 * for a valid file to boot and the flash here is
+	 * 64KiB block size.
+	 */
+	partition@0 {
+		label = "QSPI.SPL";
+		reg = <0x00000000 0x000040000>;
+	};
+	partition@40000 {
+		label = "QSPI.u-boot";
+		reg = <0x00040000 0x00100000>;
+	};
+	partition@140000 {
+		label = "QSPI.u-boot-spl-os";
+		reg = <0x00140000 0x00080000>;
+	};
+	partition@1c0000 {
+		label = "QSPI.u-boot-env";
+		reg = <0x001c0000 0x00010000>;
+	};
+	partition@1d0000 {
+		label = "QSPI.u-boot-env.backup1";
+		reg = <0x001d0000 0x0010000>;
+	};
+	partition@1e0000 {
+		label = "QSPI.kernel";
+		reg = <0x001e0000 0x0800000>;
+	};
+	partition@9e0000 {
+		label = "QSPI.file-system";
+		reg = <0x009e0000 0x01620000>;
+	};
+};
+
+&pruss2_mdio {
+	status = "okay";
+
+	pruss2_eth0_phy: ethernet-phy@0 {
+		compatible = "ethernet-phy-id2000.a240",
+			     "ethernet-phy-ieee802.3-c22";
+		reg = <0>;
+		reset-gpios = <&expander20 6 GPIO_ACTIVE_LOW>;
+		reset-assert-us = <2>;
+	};
+
+	pruss2_eth1_phy: ethernet-phy@1 {
+		compatible = "ethernet-phy-id2000.a240",
+			     "ethernet-phy-ieee802.3-c22";
+		reg = <1>;
+		reset-gpios =  <&expander20 7 GPIO_ACTIVE_LOW>;
+		reset-assert-us = <2>;
+	};
+};
+
+&omap_dwc3_2 {
+	extcon = <&extcon_usb2>;
+};
+
+&extcon_usb2 {
+	/* WAKEUP3.gpio1_3 */
+	id-gpio = <&gpio1 3 GPIO_ACTIVE_HIGH>;
+};
+
+/* PCIe lane 0 PCIe x4 connector */
+&pcie1_rc {
+	status = "okay";
+};
+
+&sata {
+	status = "okay";
+};
+
+&gpio2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&gpio2_pins>;
+};
+
+&gpio5 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&gpio5_pins>;
+};
+
+&dra7_pmx_core {
+	dcan1_pins_default: dcan1_pins_default {
+		pinctrl-single,pins = <
+			DRA7XX_CORE_IOPAD(0x37d0, PIN_OUTPUT_PULLUP | MUX_MODE0)        /* dcan1_tx */
+			DRA7XX_CORE_IOPAD(0x37d4, PIN_INPUT_PULLUP | MUX_MODE0)         /* dcan1_rx */
+		>;
+	};
+
+	dcan1_pins_sleep: dcan1_pins_sleep {
+		pinctrl-single,pins = <
+			DRA7XX_CORE_IOPAD(0x37d0, MUX_MODE15 | PULL_UP) /* dcan1_tx.off */
+			DRA7XX_CORE_IOPAD(0x37d4, MUX_MODE15 | PULL_UP) /* dcan1_rx.off */
+		>;
+	};
+
+	dcan2_pins_default: dcan2_pins_default {
+		pinctrl-single,pins = <
+			DRA7XX_CORE_IOPAD(0x3688, PIN_OUTPUT_PULLUP | MUX_MODE2)        /* dcan2_tx */
+			DRA7XX_CORE_IOPAD(0x368C, PIN_INPUT_PULLUP | MUX_MODE2)         /* dcan2_rx */
+		>;
+	};
+
+	dcan2_pins_sleep: dcan2_pins_sleep {
+		pinctrl-single,pins = <
+			DRA7XX_CORE_IOPAD(0x3688, MUX_MODE15 | PULL_UP) /* dcan2_tx.off */
+			DRA7XX_CORE_IOPAD(0x368C, MUX_MODE15 | PULL_UP) /* dcan2_rx.off */
+		>;
+	};
+
+	hdmi_i2c_pins_ddc: pinmux_hdmi_i2c_pins_ddc {
+		pinctrl-single,pins = <
+			DRA7XX_CORE_IOPAD(0x3808, PIN_INPUT | MUX_MODE1) /* i2c2_sda.hdmi1_ddc_scl */
+			DRA7XX_CORE_IOPAD(0x380c, PIN_INPUT | MUX_MODE1) /* i2c2_scl.hdmi1_ddc_sda */
+		>;
+	};
+
+	gpio2_pins: pinmux_gpio2_pins {
+		pinctrl-single,pins = <
+			DRA7XX_CORE_IOPAD(0x3470, MUX_MODE14 | PIN_INPUT | WAKEUP_EN) /* gpmc_a12.gpio2_2 */
+		>;
+	};
+
+	gpio5_pins: pinmux_gpio5_pins {
+		pinctrl-single,pins = <
+			DRA7XX_CORE_IOPAD(0x36C8, MUX_MODE14 | PIN_INPUT | WAKEUP_EN) /* gpio5_7.gpio5_7 */
+		>;
+	};
+
+	spi1_pins: pinmux_spi1_pins {
+		pinctrl-single,pins = <
+			DRA7XX_CORE_IOPAD(0x37a4, PIN_INPUT | MUX_MODE0)         /* spi1_sclk */
+			DRA7XX_CORE_IOPAD(0x37a8, PIN_OUTPUT | MUX_MODE0)        /* spi1_d1 */
+			DRA7XX_CORE_IOPAD(0x37ac, PIN_INPUT_PULLUP | MUX_MODE0)  /* spi1_d0 */
+			DRA7XX_CORE_IOPAD(0x37b0, PIN_OUTPUT | MUX_MODE0)        /* spi1_cs0 */
+		>;
+	};
+
+	usb2_id_pin: usb2_id_pin {
+		pinctrl-single,pins = <
+			DRA7XX_CORE_IOPAD(0x3824, PIN_INPUT | MUX_MODE14)	/* WAKEUP3.gpio1_3 */
+		>;
+	};
+};

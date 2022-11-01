@@ -1,0 +1,28 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Device Tree file for TQ-Systems TQMa574x SoM on MBa57xx baseboard.
+ *
+ * Copyright (c) 2020-2022 TQ-Systems GmbH <linux@ew.tq-group.com>, D-82229 Seefeld, Germany.
+ * Author: Michael Krummsdorf, Matthias Schiffer
+ */
+
+/dts-v1/;
+
+#include "am574x-tqma57xx.dtsi"
+#include "am57xx-mba57xx.dtsi"
+
+/ {
+	model = "TQ-Systems TQMa574x on MBa57xx";
+	compatible = "tq,am5748-tqma5748-mba57xx", "tq,am5748-tqma5748",
+		"ti,am5748", "ti,dra762", "ti,dra7";
+};
+
+/* PCIe lane 1 mPCIe connector */
+&pcie2_rc {
+	status = "okay";
+	/* PCIe reset R532 not placed */
+};
+
+&pcie2_phy {
+	status = "okay";
+};
