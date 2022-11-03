@@ -65,7 +65,7 @@
 
 	rtc0: rtc@51 {
 		compatible = "nxp,pcf85063";
-		nxp,quartz_load = "12.5pF";
+		quartz-load-femtofarads = <12500>;
 		nxp,offset = <0x80>;
 		reg = <0x51>;
 		status = "okay";
