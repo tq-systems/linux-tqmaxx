@@ -68,6 +68,12 @@
 			reg = <0x34 0x4>;
 			#phy-cells = <1>;
 		};
+
+		usb_serdes_mux: mux-controller1 {
+			compatible = "mmio-mux";
+			#mux-control-cells = <1>;
+			mux-reg-masks = <0x0 0x8000000>; /* USB0 to SERDES0 lane 1/3 mux */
+		};
 	};
 
 	gic500: interrupt-controller@1800000 {
@@ -248,6 +254,16 @@
 		status = "disabled";
 	};
 
+	gpu: gpu@4e20000000 {
+		compatible = "ti,j721s2-pvr", "img,pvr-bxs64";
+		reg = <0x4e 0x20000000 0x00 0x80000>;
+		interrupts = <GIC_SPI 24 IRQ_TYPE_LEVEL_HIGH>;
+		power-domains = <&k3_pds 181 TI_SCI_PD_EXCLUSIVE>,
+						<&k3_pds 182 TI_SCI_PD_EXCLUSIVE>;
+		power-domain-names = "gpu_0", "gpucore_0";
+		clocks = <&k3_clks 181 1>;
+	};
+
 	main_gpio0: gpio@600000 {
 		compatible = "ti,j721e-gpio", "ti,keystone-gpio";
 		reg = <0x00 0x00600000 0x00 0x100>;
@@ -314,6 +330,37 @@
 		clocks = <&k3_clks 166 0>;
 		clock-names = "gpio";
 		status = "disabled";
+	};
+
+	usbss0: cdns-usb@4104000 {
+		compatible = "ti,j721e-usb";
+		reg = <0x00 0x4104000 0x00 0x100>;
+		dma-coherent;
+		power-domains = <&k3_pds 398 TI_SCI_PD_EXCLUSIVE>;
+		clocks = <&k3_clks 398 21>, <&k3_clks 398 2>;
+		clock-names = "ref", "lpm";
+		assigned-clocks = <&k3_clks 398 21>;	/* USB2_REFCLK */
+		assigned-clock-parents = <&k3_clks 398 22>; /* HFOSC0 */
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		status = "disabled";
+
+		usb0: usb@6000000 {
+			compatible = "cdns,usb3";
+			reg = <0x00 0x6000000 0x00 0x10000>,
+			      <0x00 0x6010000 0x00 0x10000>,
+			      <0x00 0x6020000 0x00 0x10000>;
+			reg-names = "otg", "xhci", "dev";
+			interrupts = <GIC_SPI 96 IRQ_TYPE_LEVEL_HIGH>,	/* irq.0 */
+				     <GIC_SPI 102 IRQ_TYPE_LEVEL_HIGH>,	/* irq.6 */
+				     <GIC_SPI 120 IRQ_TYPE_LEVEL_HIGH>;	/* otgirq.0 */
+			interrupt-names = "host",
+					  "peripheral",
+					  "otg";
+			status = "disabled";
+		};
 	};
 
 	main_i2c0: i2c@2000000 {
