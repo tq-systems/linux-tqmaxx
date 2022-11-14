@@ -841,6 +841,21 @@ properties:
           - const: fsl,imx93
 
       - description:
+          TQMa93xxLA is a series of LGA SOM featuring NXP i.MX93 in
+          system-on-chip 11x11 mm package variants. It is designed to
+          be soldered on different carrier boards.
+          All CPU variants use the same device tree hence only one compatible
+          is needed. Bootloader disables all features not present in the
+          assembled SOC.
+          MBa9xxxCA mainboard can be used as starterkit for the SOM
+          soldered on an adapter board
+        items:
+          - enum:
+              - tq,imx93-tqma9352la-mba9xxxca # TQ-Systems GmbH i.MX93 TQMa93xxLA SOM on MBa9xxxCA
+          - const: tq,imx93-tqma9352la        # TQ-Systems GmbH i.MX93 TQMa93xxLA SOM
+          - const: fsl,imx93
+
+      - description:
           Freescale Vybrid Platform Device Tree Bindings
 
           For the Vybrid SoC familiy all variants with DDR controller are supported,
