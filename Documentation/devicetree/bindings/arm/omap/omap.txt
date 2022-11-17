@@ -223,3 +223,12 @@ Boards (incomplete list of examples):
 
 - DM3730 Logic PD SOM-LV: Commercial System on Module with WiFi and Bluetooth
   compatible = "logicpd,dm3730-som-lv-devkit", "ti,omap3630", "ti,omap3"
+
+- TQ-Systems TQMa571x on MBa57xx
+	compatible = "tq,am5718-tqma5718-mba57xx", "tq,am5718-tqma5718", "ti,am5718", "ti,dra7"
+
+- TQ-Systems TQMa572x on MBa57xx
+	compatible = "tq,am5728-tqma5728-mba57xx", "tq,am5728-tqma5728", "ti,am5728", "ti,dra7"
+
+- TQ-Systems TQMa574x on MBa57xx
+	compatible = "tq,am5748-tqma5748-mba57xx", "tq,am5748-tqma5748", "ti,am5748", "ti,dra762", "ti,dra7"
