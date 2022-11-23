@@ -25,6 +25,34 @@
 	};
 };
 
+&flexspi1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_flexspi1>;
+	pinctrl-1 = <&pinctrl_flexspi1>;
+	status = "okay";
+
+	flash0: flash@0 {
+		reg = <0>;
+		compatible = "jedec,spi-nor";
+		/*
+		 * no DQS, RXCLKSRC internal loop back, max 66 MHz
+		 * clk framework uses CLK_DIVIDER_ROUND_CLOSEST
+		 * selected value together with root from
+		 * IMX93_CLK_SYS_PLL_PFD1 @ 800.000.000 Hz helps to
+		 * respect the maximum value.
+		 */
+		spi-max-frequency = <62000000>;
+		spi-tx-bus-width = <4>;
+		spi-rx-bus-width = <4>;
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+		};
+	};
+};
+
 &gpio1 {
 	pmic-irq-hog {
 		gpio-hog;
@@ -210,14 +238,14 @@
 };
 
 &iomuxc {
-	pinctrl_flexspi: flexspigrp {
+	pinctrl_flexspi1: flexspi1grp {
 		fsl,pins = <
-			MX93_PAD_SD3_CMD__FLEXSPI1_A_SS0_B	0x42
-			MX93_PAD_SD3_CLK__FLEXSPI1_A_SCLK	0x42
-			MX93_PAD_SD3_DATA0__FLEXSPI1_A_DATA00	0x42
-			MX93_PAD_SD3_DATA1__FLEXSPI1_A_DATA01	0x42
-			MX93_PAD_SD3_DATA2__FLEXSPI1_A_DATA02	0x42
-			MX93_PAD_SD3_DATA3__FLEXSPI1_A_DATA03	0x42
+			MX93_PAD_SD3_CMD__FLEXSPI1_A_SS0_B	0x3fe
+			MX93_PAD_SD3_CLK__FLEXSPI1_A_SCLK	0x3fe
+			MX93_PAD_SD3_DATA0__FLEXSPI1_A_DATA00	0x3fe
+			MX93_PAD_SD3_DATA1__FLEXSPI1_A_DATA01	0x3fe
+			MX93_PAD_SD3_DATA2__FLEXSPI1_A_DATA02	0x3fe
+			MX93_PAD_SD3_DATA3__FLEXSPI1_A_DATA03	0x3fe
 		>;
 	};
 
