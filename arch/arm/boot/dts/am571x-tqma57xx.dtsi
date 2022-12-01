@@ -9,6 +9,7 @@
 #include "am5718.dtsi"
 #include "am57xx-tqma57xx.dtsi"
 #include "dra72x-mmc-iodelay.dtsi"
+#include "dra7-ipu-dsp-common.dtsi"
 
 &mmc2 {
 	pinctrl-names = "default", "hs", "ddr_1_8v", "hs200_1_8v";

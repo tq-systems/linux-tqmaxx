@@ -9,10 +9,11 @@
 #include "am5748.dtsi"
 #include "am57xx-tqma57xx.dtsi"
 #include "dra76x-mmc-iodelay.dtsi"
+#include "dra74-ipu-dsp-common.dtsi"
 
 / {
 	reserved-memory {
-		dsp2_cma_pool: dsp2_cma@9f000000 {
+		dsp2_memory_region: dsp2-memory@9f000000 {
 			compatible = "shared-dma-pool";
 			reg = <0x0 0x9f000000 0x0 0x800000>;
 			reusable;
@@ -33,5 +34,10 @@
 };
 
 &mmu1_dsp2 {
+	status = "okay";
+};
+
+&dsp2 {
+	memory-region = <&dsp2_memory_region>;
 	status = "okay";
 };
