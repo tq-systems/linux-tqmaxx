@@ -3083,10 +3083,8 @@ static bool __flush_work(struct work_struct *work, bool from_cancel)
 	if (WARN_ON(!work->func))
 		return false;
 
-	if (!from_cancel) {
-		lock_map_acquire(&work->lockdep_map);
-		lock_map_release(&work->lockdep_map);
-	}
+	lock_map_acquire(&work->lockdep_map);
+	lock_map_release(&work->lockdep_map);
 
 	if (start_flush_work(work, &barr, from_cancel)) {
 		wait_for_completion(&barr.done);
@@ -4845,7 +4843,9 @@ void show_workqueue_state(void)
 				 * drivers that queue work while holding locks
 				 * also taken in their write paths.
 				 */
+				printk_deferred_enter();
 				show_pwq(pwq);
+				printk_deferred_exit();
 			}
 			raw_spin_unlock_irqrestore(&pwq->pool->lock, flags);
 			/*
@@ -4869,6 +4869,7 @@ void show_workqueue_state(void)
 		 * queue work while holding locks also taken in their write
 		 * paths.
 		 */
+		printk_deferred_enter();
 		pr_info("pool %d:", pool->id);
 		pr_cont_pool_info(pool);
 		pr_cont(" hung=%us workers=%d",
@@ -4883,6 +4884,7 @@ void show_workqueue_state(void)
 			first = false;
 		}
 		pr_cont("\n");
+		printk_deferred_exit();
 	next_pool:
 		raw_spin_unlock_irqrestore(&pool->lock, flags);
 		/*
