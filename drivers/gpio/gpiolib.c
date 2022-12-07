@@ -589,10 +589,25 @@ static void gpiochip_setup_devs(void)
 	}
 }
 
+/**
+ * gpio_first_nonreserved_index() - get the first index that is not reserved
+ */
+static int gpio_first_nonreserved_index(void)
+{
+	int max;
+
+	max = of_alias_get_highest_id("gpio");
+	if (max < 0)
+		return 0;
+
+	return max + 1;
+}
+
 int gpiochip_add_data_with_key(struct gpio_chip *gc, void *data,
 			       struct lock_class_key *lock_key,
 			       struct lock_class_key *request_key)
 {
+	int index, alias_id, min_idx, max_idx;
 	struct fwnode_handle *fwnode = gc->parent ? dev_fwnode(gc->parent) : NULL;
 	unsigned long	flags;
 	int		ret = 0;
@@ -621,11 +636,23 @@ int gpiochip_add_data_with_key(struct gpio_chip *gc, void *data,
 	 */
 	gdev->dev.fwnode = dev_fwnode(&gdev->dev) ?: fwnode;
 
-	gdev->id = ida_alloc(&gpio_ida, GFP_KERNEL);
-	if (gdev->id < 0) {
-		ret = gdev->id;
-		goto err_free_gdev;
+	alias_id = of_alias_get_id(gc->of_node, "gpio");
+	if (alias_id >= 0) {
+		index = ida_simple_get(&gpio_ida, alias_id, alias_id + 1,
+				       GFP_KERNEL);
+	} else {
+		min_idx = gpio_first_nonreserved_index();
+		max_idx = 0;
+
+		index = ida_simple_get(&gpio_ida, min_idx, max_idx,
+				       GFP_KERNEL);
+		if (index < 0) {
+			ret = gdev->id;
+			goto err_free_gdev;
+		}
 	}
+
+	gdev->id = index;
 
 	ret = dev_set_name(&gdev->dev, GPIOCHIP_NAME "%d", gdev->id);
 	if (ret)
