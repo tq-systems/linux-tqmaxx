@@ -70,6 +70,15 @@
 	};
 };
 
+&gpio1 {
+	pmic-irq-hog {
+		gpio-hog;
+		gpios = <8 0>;
+		input;
+		line-name = "PMIC_IRQ#";
+	};
+};
+
 &gpu {
 	status = "okay";
 };
