@@ -60,6 +60,15 @@
 	};
 };
 
+&gpio1 {
+	portexpander-irq-hog {
+		gpio-hog;
+		gpios = <9 0>;
+		input;
+		line-name = "IRQ_PORTEXPANDER#";
+	};
+};
+
 &i2c1 {
 	expander2: gpio@25 {
 		compatible = "nxp,pca9555";
