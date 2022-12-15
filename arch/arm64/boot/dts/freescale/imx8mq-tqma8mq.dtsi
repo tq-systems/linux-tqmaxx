@@ -91,6 +91,15 @@
 	power-supply = <&sw1c_reg>;
 };
 
+&gpio1 {
+	rtc-irq-hog {
+		gpio-hog;
+		gpios = <1 0>;
+		input;
+		line-name = "RTC_IRQ#";
+	};
+};
+
 &i2c1 {
 	clock-frequency = <100000>;
 	pinctrl-names = "default", "gpio";
