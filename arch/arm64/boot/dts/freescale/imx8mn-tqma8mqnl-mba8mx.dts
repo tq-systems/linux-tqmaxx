@@ -35,6 +35,15 @@
 	};
 };
 
+&gpio1 {
+	portexpander-irq-hog {
+		gpio-hog;
+		gpios = <9 0>;
+		input;
+		line-name = "IRQ_PORTEXPANDER#";
+	};
+};
+
 /* Located on TQMa8MxML-ADAP */
 &gpio2 {
 	pinctrl-names = "default";
