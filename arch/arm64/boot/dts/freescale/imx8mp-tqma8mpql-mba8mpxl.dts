@@ -467,11 +467,39 @@
 			  "", "", "", "FAN_PWR",
 			  "RTC_EVENT#", "CODEC_RST#", "", "";
 
+	eth0-phy-irq-hog {
+		gpio-hog;
+		gpios = <1 0>;
+		input;
+		line-name = "ETH0_PHY_IRQ#";
+	};
+
+	eth1-phy-irq-hog {
+		gpio-hog;
+		gpios = <3 0>;
+		input;
+		line-name = "ETH1_PHY_IRQ#";
+	};
+
+	dsi-dp-bridge-hog {
+		gpio-hog;
+		gpios = <18 0>;
+		input;
+		line-name = "DSI_DP_BRIDGE_IRQ#";
+	};
+
 	pcie-refclkreq-hog {
 		gpio-hog;
 		gpios = <22 0>;
 		output-high;
 		line-name = "PCIE_REFCLK_OE#";
+	};
+
+	rtc-irq-hog {
+		gpio-hog;
+		gpios = <28 0>;
+		input;
+		line-name = "RTC_IRQ#";
 	};
 };
 
@@ -484,6 +512,13 @@
 			  "", "", "", "",
 			  "", "ECSPI3_SS0", "SWITCH_A", "SWITCH_B",
 			  "", "", "", "";
+
+	fan-rpm-irq-hog {
+		gpio-hog;
+		gpios = <18 0>;
+		input;
+		line-name = "FAN_RPM#";
+	};
 };
 
 &i2c2 {
