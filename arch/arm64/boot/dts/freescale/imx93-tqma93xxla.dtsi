@@ -25,6 +25,10 @@
 	};
 };
 
+&adc1 {
+	vref-supply = <&buck5>;
+};
+
 &flexspi1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_flexspi1>;
