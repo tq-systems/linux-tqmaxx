@@ -73,6 +73,7 @@
 };
 
 &esdhc {
+	cd-gpios = <&gpio1 31 GPIO_ACTIVE_LOW>;
 	disable-wp;
 	no-mmc;
 	no-sdio;
