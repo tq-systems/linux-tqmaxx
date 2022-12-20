@@ -105,7 +105,7 @@
 &gpio_exp_1v8 {
 	dcdc_reset {
 		gpio-hog;
-		gpios = <7 0>;
+		gpios = <6 0>;
 		output-low;
 		line-name = "DCDC_RESET";
 	};
