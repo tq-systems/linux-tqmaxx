@@ -19,6 +19,10 @@
 		gpio2 = &gpio3;
 
 		crypto = &crypto;
+
+		mmc0 = &esdhc; /* SD-Card */
+		mmc1 = &esdhc1; /* eMMC */
+
 		serial0 = &duart0;
 		serial1 = &duart1;
 	};
