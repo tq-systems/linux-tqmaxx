@@ -722,10 +722,11 @@ static bool pca953x_irq_pending(struct pca953x_chip *chip, u8 *pending)
 			trigger_seen = true;
 	}
 
+	memcpy(chip->irq_stat, cur_stat, NBANK(chip));
+
 	if (!trigger_seen)
 		return false;
 
-	memcpy(chip->irq_stat, cur_stat, NBANK(chip));
 
 	for (i = 0; i < NBANK(chip); i++) {
 		pending[i] = (old_stat[i] & chip->irq_trig_fall[i]) |
