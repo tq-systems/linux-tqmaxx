@@ -552,7 +552,6 @@
 		reset-gpios = <&gpio4 29 GPIO_ACTIVE_LOW>;
 	};
 
-	/* NXP SE97BTP with temperature sensor + eeprom */
 	se97_1c: temperature-sensor@1c {
 		compatible = "nxp,se97b", "jedec,jc-42.4-temp";
 		reg = <0x1c>;
