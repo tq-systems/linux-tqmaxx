@@ -534,6 +534,7 @@
 	pinctrl-0 = <&main_mmc1_pins_default>;
 	bus-width = <4>;
 	ti,driver-strength-ohm = <50>;
+	cd-gpios = <&main_gpio1 77 GPIO_ACTIVE_LOW>;
 	disable-wp;
 	no-mmc;
 	/* Enabled by overlay */
@@ -675,8 +676,8 @@
 			AM64X_IOPAD(0x0280, PIN_INPUT, 0)
 			/* (K18) MMC1_DAT3 */
 			AM64X_IOPAD(0x027c, PIN_INPUT, 0)
-			/* (D19) MMC1_SDCD */
-			AM64X_IOPAD(0x0298, PIN_INPUT, 0)
+			/* (D19) MMC1_SDCD.GPIO1_77 */
+			AM64X_IOPAD(0x0298, PIN_INPUT, 7)
 			/* (#N/A) MMC1_CLKLB */
 			AM64X_IOPAD(0x0290, PIN_INPUT, 0)
 		>;
