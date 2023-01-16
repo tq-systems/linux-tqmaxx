@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
 /*
- * Copyright (c) 2022 TQ-Systems GmbH <linux@ew.tq-group.com>,
+ * Copyright (c) 2022-2023 TQ-Systems GmbH <linux@ew.tq-group.com>,
  * D-82229 Seefeld, Germany.
  * Author: Markus Niebel
  */
@@ -121,6 +121,26 @@
 		regulator-max-microvolt = <12000000>;
 		gpio = <&expander1 7 GPIO_ACTIVE_HIGH>;
 		enable-active-high;
+	};
+
+	reg_pcie_1v5: regulator-pcie-1v5 {
+		compatible = "regulator-fixed";
+		regulator-name = "V_PCIE_1V5";
+		regulator-min-microvolt = <1500000>;
+		regulator-max-microvolt = <1500000>;
+		gpio = <&expander0 2 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		regulator-always-on;
+	};
+
+	reg_pcie_3v3: regulator-pcie-3v3 {
+		compatible = "regulator-fixed";
+		regulator-name = "V_PCIE_3V3";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		gpio = <&expander0 3 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		regulator-always-on;
 	};
 
 	reg_pwm_fan: regulator-pwm-fan {
@@ -320,6 +340,13 @@
 			output-high;
 			line-name = "MPCIE_PERST#";
 		};
+
+		mpcie-wdisable-hog {
+			gpio-hog;
+			gpios = <5 0>;
+			output-high;
+			line-name = "MPCIE_WDISABLE#";
+		};
 	};
 
 	expander1: gpio@71 {
@@ -336,11 +363,36 @@
 			line-name = "USB_RESET#";
 		};
 
+		/*
+		 * selects between LVDS / miniPCIe, defaults to mPCIe
+		 * will be removed in REV.020x
+		 */
 		usb-h2-select-hog {
 			gpio-hog;
 			gpios = <3 0>;
-			output-high;
+			output-low;
 			line-name = "USB_H2_SELECT";
+		};
+
+		wlan-pd-hog {
+			gpio-hog;
+			gpios = <4 0>;
+			output-high;
+			line-name = "WLAN_PD#";
+		};
+
+		wlan-wdisable-hog {
+			gpio-hog;
+			gpios = <5 0>;
+			output-high;
+			line-name = "WLAN_W_DISABLE#";
+		};
+
+		wlan-perst-hog {
+			gpio-hog;
+			gpios = <6 0>;
+			output-high;
+			line-name = "WLAN_PERST#";
 		};
 	};
 
