@@ -1,0 +1,94 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright (c) 2023-2024 TQ-Systems GmbH <linux@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Markus Niebel
+ */
+
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/gpio/gpio.h>
+
+&backlight_lvds {
+	status = "okay";
+};
+
+&display {
+	compatible = "tianma,tm070jvhg33";
+	status = "okay";
+};
+
+&dphy {
+	status = "disabled";
+};
+
+&dsi {
+	status = "disabled";
+};
+
+&epxp {
+	status = "okay";
+};
+
+&lcdif {
+	/* PLL -> pix_clk * 7 (LDB serial clk) */
+	assigned-clock-rates = <445333333>, <63619048>, <400000000>, <133333333>;
+	status = "okay";
+};
+
+&ldb {
+	status = "okay";
+
+	lvds-channel@0 {
+		status = "okay";
+	};
+};
+
+&ldb_phy {
+	status = "okay";
+};
+
+/*
+ * Controls the mPCIE slot reset which is low active as
+ * reset signal. Invert the active polarity
+ */
+&mpcie_rst_hog {
+	gpios = <4 GPIO_ACTIVE_HIGH>;
+};
+
+/*
+ * Controls the mPCIE slot WDISABLE pin which is low active
+ * as disable signal. Invert the active polarity
+ */
+&mpcie_wdisable_hog {
+	gpios = <5 GPIO_ACTIVE_HIGH>;
+};
+
+&expander0 {
+	mpcie-1v5-enable-hog {
+		gpio-hog;
+		gpios = <2 GPIO_ACTIVE_HIGH>;
+		output-low;
+		line-name = "MPCIE_1V5_EN";
+	};
+
+	mpcie-3v3-enable-hog {
+		gpio-hog;
+		gpios = <3 GPIO_ACTIVE_HIGH>;
+		output-low;
+		line-name = "MPCIE_3V3_EN";
+	};
+};
+
+&reg_mpcie_1v5 {
+	status = "disabled";
+};
+
+&reg_mpcie_3v3 {
+	status = "disabled";
+};
+
+&tpm5 {
+	status = "okay";
+};
