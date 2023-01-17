@@ -367,7 +367,7 @@
 		 * selects between LVDS / miniPCIe, defaults to mPCIe
 		 * will be removed in REV.020x
 		 */
-		usb-h2-select-hog {
+		usb_h2_select_hog: usb-h2-select-hog {
 			gpio-hog;
 			gpios = <3 0>;
 			output-low;

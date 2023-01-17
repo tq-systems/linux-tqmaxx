@@ -1,0 +1,52 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright (c) 2023 TQ-Systems GmbH <linux@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Markus Niebel
+ */
+
+#include "imx93-tqma93xxla-mba9xxxca.dts"
+
+&backlight_lvds {
+	status = "okay";
+};
+
+&display {
+	compatible = "tianma,tm070jvhg33";
+	status = "okay";
+};
+
+&dphy {
+	status = "disabled";
+};
+
+&dsi {
+	status = "disabled";
+};
+
+&epxp {
+	status = "okay";
+};
+
+/* route to LVDS CMD at X11, disable USB at X16 (miniPCIe) */
+&usb_h2_select_hog {
+	output-high;
+};
+
+&lcdif {
+	/* PLL -> pix_clk * 7 (LDB serial clk) */
+	assigned-clock-rates = <445333333>, <63619048>, <400000000>, <133333333>;
+	status = "okay";
+};
+
+&ldb {
+	status = "okay";
+
+	lvds-channel@0 {
+		status = "okay";
+	};
+};
+
+&ldb_phy {
+	status = "okay";
+};
