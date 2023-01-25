@@ -3222,6 +3222,9 @@ int spi_nor_scan(struct spi_nor *nor, const char *name,
 	/* Configure OTP parameters and ops */
 	spi_nor_otp_init(nor);
 
+	dev_info(dev, "addr_width = %d erase_cmd = %x rd_cmd = %x pp_cmd = %x\n",
+		 (int)nor->addr_width, (u32)nor->erase_opcode,
+		 (u32)nor->read_opcode, (u32)nor->program_opcode);
 	dev_info(dev, "%s (%lld Kbytes)\n", info->name,
 			(long long)mtd->size >> 10);
 
