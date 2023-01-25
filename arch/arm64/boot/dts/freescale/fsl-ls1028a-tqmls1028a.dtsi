@@ -147,11 +147,11 @@
 
 &hdptx0 {
 	lane-mapping = <0x4e>;
-	status = "okay";
+	status = "disabled";
 };
 
 &malidp0 {
-	status = "okay";
+	status = "disabled";
 };
 
 &usb0 {
