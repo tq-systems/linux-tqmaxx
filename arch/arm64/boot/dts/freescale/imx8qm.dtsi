@@ -57,6 +57,9 @@
 		dphy1 = &mipi1_dphy;
 		mipi_dsi0 = &mipi0_dsi_host;
 		mipi_dsi1 = &mipi1_dsi_host;
+		spi0 = &lpspi1;
+		spi1 = &lpspi2;
+		spi2 = &lpspi3;
 		vpu_core0 = &vpu_core0;
 		vpu_core1 = &vpu_core1;
 		vpu_core2 = &vpu_core2;
