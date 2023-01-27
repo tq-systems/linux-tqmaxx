@@ -200,8 +200,8 @@
 			  "LID", "SLEEP", "CHARGING#", "CHGPRSNT#",
 			  "BATLOW#", "", "", "",
 			  "", "SMARC GPIO6", "SMARC GPIO5", "",
-			  "PHY3 RST#", "", "", "",
-			  "", "", "", "";
+			  "PHY3 RST#", "", "", "SPI0_CS0",
+			  "", "SPI0_CS1", "", "";
 };
 
 &lsio_gpio1 {
@@ -325,10 +325,11 @@
 
 &lpspi1 {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_spi1>;
+	pinctrl-0 = <&pinctrl_spi1 &pinctrl_spi1_cs>;
 	#address-cells = <1>;
 	#size-cells = <0>;
 	num-cs = <2>;
+	cs-gpios = <&lsio_gpio0 27 GPIO_ACTIVE_LOW>, <&lsio_gpio0 29 GPIO_ACTIVE_LOW>;
 	status = "okay";
 };
 
@@ -740,13 +741,18 @@
 
 	pinctrl_spi1: spi1grp {
 		fsl,pins = <
-			/* PU + PDRV Low + INOUT - MEK has 0x0600004c */
-			IMX8QXP_SAI0_RXD_ADMA_SPI1_CS0			0x06000021
-			IMX8QXP_SAI1_RXD_ADMA_SPI1_CS1			0x06000021
 			/* PD + PDRV Low + INOUT - MEK has 0x0600004c */
 			IMX8QXP_SAI0_TXC_ADMA_SPI1_SDI			0x06000041
 			IMX8QXP_SAI0_TXD_ADMA_SPI1_SDO			0x06000041
 			IMX8QXP_SAI0_TXFS_ADMA_SPI1_SCK			0x06000041
+		>;
+	};
+
+	pinctrl_spi1_cs: spi1csgrp {
+		fsl,pins = <
+			/* PU + PDRV Low + DEFAULT - MEK has 0x0600004c */
+			IMX8QXP_SAI0_RXD_LSIO_GPIO0_IO27		0x00000021
+			IMX8QXP_SAI1_RXD_LSIO_GPIO0_IO29		0x00000021
 		>;
 	};
 
