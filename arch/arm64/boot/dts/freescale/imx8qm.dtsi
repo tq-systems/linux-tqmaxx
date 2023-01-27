@@ -60,6 +60,9 @@
 		vpu-core0 = &vpu_core0;
 		vpu-core1 = &vpu_core1;
 		vpu-core2 = &vpu_core2;
+		spi0 = &lpspi1;
+		spi1 = &lpspi2;
+		spi2 = &lpspi3;
 	};
 
 	cpus: cpus {
