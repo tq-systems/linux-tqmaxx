@@ -28,11 +28,6 @@
 	status = "okay";
 };
 
-/* route to LVDS CMD at X11, disable USB at X16 (miniPCIe) */
-&usb_h2_select_hog {
-	output-high;
-};
-
 &lcdif {
 	/* PLL -> pix_clk * 7 (LDB serial clk) */
 	assigned-clock-rates = <445333333>, <63619048>, <400000000>, <133333333>;
@@ -49,4 +44,53 @@
 
 &ldb_phy {
 	status = "okay";
+};
+
+/*
+ * selects between LVDS / miniPCIe, defaults to mPCIe
+ * will be removed in REV.020x
+ * route to LVDS CMD at X11, disable USB at X16 (miniPCIe)
+ */
+&usb_h2_select_hog {
+	gpios = <3 GPIO_ACTIVE_LOW>;
+};
+
+/*
+ * Controls the mPCIE slot reset which is low active as
+ * reset signal. Invert the active polarity
+ */
+&mpcie_rst_hog {
+	gpios = <4 GPIO_ACTIVE_HIGH>;
+};
+
+/*
+ * Controls the mPCIE slot WDISABLE pin which is low active
+ * as disable signal. Invert the active polarity
+ */
+&mpcie_wdisable_hog {
+	gpios = <5 GPIO_ACTIVE_HIGH>;
+};
+
+&expander0 {
+	mpcie-1v5-enable-hog {
+		gpio-hog;
+		gpios = <2 GPIO_ACTIVE_HIGH>;
+		output-low;
+		line-name = "MPCIE_1V5_EN";
+	};
+
+	mpcie-3v3-enable-hog {
+		gpio-hog;
+		gpios = <3 GPIO_ACTIVE_HIGH>;
+		output-low;
+		line-name = "MPCIE_3V3_EN";
+	};
+};
+
+&reg_pcie_1v5 {
+	status = "disabled";
+};
+
+&reg_pcie_3v3 {
+	status = "disabled";
 };

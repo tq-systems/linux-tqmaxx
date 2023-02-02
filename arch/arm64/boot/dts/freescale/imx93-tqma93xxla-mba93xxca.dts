@@ -329,22 +329,32 @@
 
 		mpcie-wake-hog {
 			gpio-hog;
-			gpios = <1 0>;
+			gpios = <1 GPIO_ACTIVE_LOW>;
 			input;
 			line-name = "MPCIE_WAKE#";
 		};
 
-		mpcie-rst-hog {
+		/*
+		 * Controls the mPCIE slot reset which is low active as
+		 * reset signal. The output-low states, the signal is
+		 * inactive, e.g. not in reset
+		 */
+		mpcie_rst_hog: mpcie-rst-hog {
 			gpio-hog;
-			gpios = <4 0>;
-			output-high;
+			gpios = <4 GPIO_ACTIVE_LOW>;
+			output-low;
 			line-name = "MPCIE_PERST#";
 		};
 
-		mpcie-wdisable-hog {
+		/*
+		 * Controls the mPCIE slot WDISABLE pin which is low active
+		 * as disable signal. The output-low states, the signal is
+		 * inactive, e.g. not disabled
+		 */
+		mpcie_wdisable_hog: mpcie-wdisable-hog {
 			gpio-hog;
-			gpios = <5 0>;
-			output-high;
+			gpios = <5 GPIO_ACTIVE_LOW>;
+			output-low;
 			line-name = "MPCIE_WDISABLE#";
 		};
 	};
@@ -356,10 +366,15 @@
 		#gpio-cells = <2>;
 		vcc-supply = <&reg_3v3>;
 
+		/*
+		 * Controls the on board USB Hub reset which is low
+		 * active as reset signal. The output-low states, the
+		 * signal is inactive, e.g. no reset
+		 */
 		usb-reset-hog {
 			gpio-hog;
-			gpios = <2 0>;
-			output-high;
+			gpios = <2 GPIO_ACTIVE_LOW>;
+			output-low;
 			line-name = "USB_RESET#";
 		};
 
@@ -369,29 +384,44 @@
 		 */
 		usb_h2_select_hog: usb-h2-select-hog {
 			gpio-hog;
-			gpios = <3 0>;
+			gpios = <3 GPIO_ACTIVE_HIGH>;
 			output-low;
 			line-name = "USB_H2_SELECT";
 		};
 
+		/*
+		 * Controls the WiFi card PD pin which is low active
+		 * as power down signal. The output-low states, the signal
+		 * is inactive, e.g. not power down
+		 */
 		wlan-pd-hog {
 			gpio-hog;
-			gpios = <4 0>;
-			output-high;
+			gpios = <4 GPIO_ACTIVE_LOW>;
+			output-low;
 			line-name = "WLAN_PD#";
 		};
 
+		/*
+		 * Controls the WiFi card disable pin which is low active
+		 * as disable signal. The output-low states, the signal
+		 * is inactive, e.g. not disabled
+		 */
 		wlan-wdisable-hog {
 			gpio-hog;
-			gpios = <5 0>;
-			output-high;
+			gpios = <5 GPIO_ACTIVE_LOW>;
+			output-low;
 			line-name = "WLAN_W_DISABLE#";
 		};
 
+		/*
+		 * Controls the WiFi card reset pin which is low active
+		 * as reset signal. The output-low states, the signal
+		 * is inactive, e.g. not in reset
+		 */
 		wlan-perst-hog {
 			gpio-hog;
-			gpios = <6 0>;
-			output-high;
+			gpios = <6 GPIO_ACTIVE_LOW>;
+			output-low;
 			line-name = "WLAN_PERST#";
 		};
 	};
