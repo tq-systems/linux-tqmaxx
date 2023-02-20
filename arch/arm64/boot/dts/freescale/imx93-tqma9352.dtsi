@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
 /*
- * Copyright (c) 2022 TQ-Systems GmbH <linux@ew.tq-group.com>,
+ * Copyright (c) 2022-2023 TQ-Systems GmbH <linux@ew.tq-group.com>,
  * D-82229 Seefeld, Germany.
  * Author: Markus Niebel
  */
@@ -8,8 +8,8 @@
 #include "imx93.dtsi"
 
 /{
-	model = "TQ-Systems i.MX93 TQMa93xxLA SOM";
-	compatible = "tq,imx93-tqma9352la", "fsl,imx93";
+	model = "TQ-Systems i.MX93 TQMa93xxLA/TQMa93xxCA SOM";
+	compatible = "tq,imx93-tqma9352", "fsl,imx93";
 
 	reserved-memory {
 		#address-cells = <2>;

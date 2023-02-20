@@ -5,7 +5,7 @@
  * Author: Markus Niebel
  */
 
-#include "imx93-tqma93xxla-mba93xxca.dts"
+#include "imx93-tqma9352-mba93xxca.dts"
 
 &backlight_lvds {
 	status = "okay";
