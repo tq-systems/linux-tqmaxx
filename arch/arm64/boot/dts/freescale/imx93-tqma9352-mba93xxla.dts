@@ -48,6 +48,23 @@
 		clock-frequency = <26000000>;
 	};
 
+	display: display {
+		/*
+		 * Display is not fixed, so compatible has to be added from
+		 * DT overlay
+		 */
+		power-supply = <&reg_3v3>;
+		enable-gpios = <&expander2 1 GPIO_ACTIVE_HIGH>;
+		backlight = <&backlight_lvds>;
+		status = "disabled";
+
+		port {
+			panel_in_lvds0: endpoint {
+				remote-endpoint = <&lvds_channel0_out>;
+			};
+		};
+	};
+
 	gpio-keys {
 		compatible = "gpio-keys";
 		autorepeat;
@@ -299,6 +316,18 @@
 		gpios = <29 GPIO_ACTIVE_LOW>;
 		input;
 		line-name = "DP_INT";
+	};
+};
+
+&ldb {
+	lvds-channel@0 {
+		port@1 {
+			reg = <1>;
+
+			lvds_channel0_out: endpoint {
+				remote-endpoint = <&panel_in_lvds0>;
+			};
+		};
 	};
 };
 
