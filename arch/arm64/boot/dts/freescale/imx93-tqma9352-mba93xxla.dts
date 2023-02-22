@@ -293,6 +293,10 @@
 		interrupt-parent = <&gpio2>;
 		interrupts = <3 IRQ_TYPE_LEVEL_LOW>;
 		vcc-supply = <&reg_3v3>;
+		gpio-line-names = "3V8_EN", "",
+				  "", "IOT_PWRKEY",
+				  "IOT_RESET", "IOT_W_DISABLE",
+				  "BUTTON_A#", "BUTTON_B#";
 
 		/*
 		 * Controls the IOT W_DISABLE pin which is low active
@@ -314,6 +318,10 @@
 		gpio-controller;
 		#gpio-cells = <2>;
 		vcc-supply = <&reg_3v3>;
+		gpio-line-names = "ENET1_RESET#", "ENET2_RESET#",
+				  "USB_RESET#", "",
+				  "WLAN_PD#", "WLAN_W_DISABLE#",
+				  "WLAN_PERST#", "12V_EN";
 
 		/*
 		 * Controls the on board USB Hub reset which is low
@@ -370,6 +378,10 @@
 		gpio-controller;
 		#gpio-cells = <2>;
 		vcc-supply = <&reg_3v3>;
+		gpio-line-names = "LCD_RESET#", "LCD_PWR_EN",
+				  "LCD_BLT_EN", "DP_EN",
+				  "MIPI_CSI_EN", "MIPI_CSI_RST#",
+				  "USER_LED1", "USER_LED2";
 	};
 };
 
