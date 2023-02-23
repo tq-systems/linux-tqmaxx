@@ -74,7 +74,7 @@
 &gpio1 {
 	pmic-irq-hog {
 		gpio-hog;
-		gpios = <2 GPIO_ACTIVE_LOW>;
+		gpios = <3 GPIO_ACTIVE_LOW>;
 		input;
 		line-name = "PMIC_IRQ#";
 	};
@@ -101,7 +101,7 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_pca9451>;
 		interrupt-parent = <&gpio1>;
-		interrupts = <2 IRQ_TYPE_LEVEL_LOW>;
+		interrupts = <3 IRQ_TYPE_LEVEL_LOW>;
 
 		pca9451a_regulators: regulators {
 			/* V_0V8_SOC - hw developer guide: 0.75 .. 0.9 */
@@ -276,7 +276,7 @@
 
 	pinctrl_pca9451: pca9451grp {
 		fsl,pins = <
-			MX93_PAD_I2C2_SCL__GPIO1_IO02		0x1306
+			MX93_PAD_I2C2_SDA__GPIO1_IO03		0x1306
 		>;
 	};
 
