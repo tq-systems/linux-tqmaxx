@@ -281,6 +281,14 @@
 				nxp,no-divider;
 			};
 
+			tpm1: pwm@44310000 {
+				compatible = "fsl,imx7ulp-pwm";
+				reg = <0x44310000 0x1000>;
+				clocks = <&clk IMX93_CLK_TPM1_GATE>;
+				#pwm-cells = <3>;
+				status = "disabled";
+			};
+
 			tpm2: pwm@44320000 {
 				compatible = "fsl,imx7ulp-pwm";
 				reg = <0x44320000 0x10000>;
@@ -688,6 +696,14 @@
 				interrupts = <GIC_SPI 79 IRQ_TYPE_LEVEL_HIGH>;
 				clocks = <&clk IMX93_CLK_WDOG3_GATE>;
 				timeout-sec = <40>;
+			};
+
+			tpm3: pwm@424e0000 {
+				compatible = "fsl,imx7ulp-pwm";
+				reg = <0x424e0000 0x1000>;
+				clocks = <&clk IMX93_CLK_TPM3_GATE>;
+				#pwm-cells = <3>;
+				status = "disabled";
 			};
 
 			tpm4: pwm@424f0000 {
