@@ -535,6 +535,7 @@
 	bus-width = <4>;
 	ti,driver-strength-ohm = <50>;
 	cd-gpios = <&main_gpio1 77 GPIO_ACTIVE_LOW>;
+	ti,fails-without-test-cd;
 	disable-wp;
 	no-mmc;
 	/* Enabled by overlay */
