@@ -1030,8 +1030,8 @@ static int __maybe_unused lpi2c_runtime_suspend(struct device *dev)
 	struct lpi2c_imx_struct *lpi2c_imx = dev_get_drvdata(dev);
 
 	devm_free_irq(dev, lpi2c_imx->irq, lpi2c_imx);
-	clk_disable_unprepare(lpi2c_imx->clk_ipg);
-	clk_disable_unprepare(lpi2c_imx->clk_per);
+	clk_disable(lpi2c_imx->clk_ipg);
+	clk_disable(lpi2c_imx->clk_per);
 	pinctrl_pm_select_idle_state(dev);
 
 	return 0;
@@ -1043,13 +1043,13 @@ static int __maybe_unused lpi2c_runtime_resume(struct device *dev)
 	int ret;
 
 	pinctrl_pm_select_default_state(dev);
-	ret = clk_prepare_enable(lpi2c_imx->clk_per);
+	ret = clk_enable(lpi2c_imx->clk_per);
 	if (ret) {
 		dev_err(dev, "can't enable I2C per clock, ret=%d\n", ret);
 		return ret;
 	}
 
-	ret = clk_prepare_enable(lpi2c_imx->clk_ipg);
+	ret = clk_enable(lpi2c_imx->clk_ipg);
 	if (ret) {
 		clk_disable_unprepare(lpi2c_imx->clk_per);
 		dev_err(dev, "can't enable I2C ipg clock, ret=%d\n", ret);
