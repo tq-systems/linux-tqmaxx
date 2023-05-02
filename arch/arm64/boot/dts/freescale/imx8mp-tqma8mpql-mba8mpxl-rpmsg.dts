@@ -57,10 +57,29 @@
 };
 
 /*
- * ATTENTION: M7 may use IPs SPI, CAN, GPIO, GPT, I2C, I2S3, UART,
- * PWM, SDMA1/SDMA2. These needs to be disabled to prevent resource conflicts
+ * ATTENTION: M7 may use other IPs like SPI, CAN, GPIO, GPT, I2C, I2S, UART,
+ * PWM, SDMA1/SDMA2. All IP used solely by M7 needs to be disabled to prevent
+ * resource conflicts.
+ * Keep in mind to configure the RDC according to the real product design to
+ * enforce hardware based isolation.
  */
-&uart3 {
+
+&ecspi3 {
 	status = "disabled";
 };
 
+&flexcan2 {
+	status = "disabled";
+};
+
+&flexspi {
+	status = "disabled";
+};
+
+&i2c2 {
+	status = "disabled";
+};
+
+&uart3 {
+	status = "disabled";
+};
