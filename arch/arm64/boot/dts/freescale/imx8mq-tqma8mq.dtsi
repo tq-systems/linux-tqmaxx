@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
 /*
- * Copyright 2019-2022 TQ-Systems GmbH
+ * Copyright 2020-2023 TQ-Systems GmbH
  * Author: Alexander Stein <linux@ew.tq-group.com>
  */
 
@@ -53,10 +53,14 @@
 		linux,cma {
 			compatible = "shared-dma-pool";
 			reusable;
-			/* 640 MiB */
+			/*
+			 * 640 MiB total, SOM should have at least 1024 MiB
+			 * limit range to 1024 - 128 - 16 MiB, to leave room:
+			 * 128 MiB generic
+			 * 16 MiB: allow optional carveout for M4 at 0x77000000
+			 */
 			size = <0 0x28000000>;
-			/*  1024 - 128 MiB, our minimum RAM config will be 1024 MiB */
-			alloc-ranges = <0 0x40000000 0 0x78000000>;
+			alloc-ranges = <0 0x40000000 0 0x77000000>;
 			linux,cma-default;
 		};
 	};
