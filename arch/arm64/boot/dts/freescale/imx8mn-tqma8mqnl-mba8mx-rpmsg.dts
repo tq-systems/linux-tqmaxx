@@ -4,19 +4,34 @@
  * Author: Alexander Stein <linux@ew.tq-group.com>
  */
 
-/dts-v1/;
-
 #include "imx8mn-tqma8mqnl-mba8mx.dts"
 
 / {
+
+	imx8mn-cm7 {
+		compatible = "fsl,imx8mn-cm7";
+		rsc-da = <0x78100000>;
+		mbox-names = "tx", "rx", "rxdb";
+		mboxes = <&mu 0 1
+			  &mu 1 1
+			  &mu 3 1>;
+		memory-region = <&vdevbuffer>, <&vdev0vring0>,
+				<&vdev0vring1>, <&rsc_table>;
+	};
+
 	reserved-memory {
 		#address-cells = <2>;
 		#size-cells = <2>;
 		ranges;
 
-		m4_reserved: m4@78000000 {
+		/*
+		 * 0x7700_0000 ~ 0x77FF_FFFF is reserved for M7
+		 * Must not be used from code running on Cortex-A cluster
+		 * Must be in sync with linker settings for M7
+		 */
+		m7_reserved: m7@77000000 {
+			reg = <0 0x77000000 0 0x1000000>;
 			no-map;
-			reg = <0 0x78000000 0 0x100000>;
 		};
 
 		vdev0vring0: vdev0vring0@78100000 {
@@ -29,6 +44,7 @@
 			no-map;
 		};
 
+		/* Note: The underscore in node name is important! */
 		rsc_table: rsc_table@781ff000 {
 			reg = <0 0x781ff000 0 0x1000>;
 			no-map;
@@ -39,16 +55,6 @@
 			reg = <0 0x78500000 0 0x100000>;
 			no-map;
 		};
-	};
-
-	imx8mn-cm7 {
-		compatible = "fsl,imx8mn-cm7";
-		rsc-da = <0x78100000>;
-		mbox-names = "tx", "rx", "rxdb";
-		mboxes = <&mu 0 1
-			  &mu 1 1
-			  &mu 3 1>;
-		memory-region = <&vdevbuffer>, <&vdev0vring0>, <&vdev0vring1>, <&rsc_table>;
 	};
 };
 
