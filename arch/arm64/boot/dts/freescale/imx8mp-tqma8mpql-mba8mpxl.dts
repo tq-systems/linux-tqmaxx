@@ -50,6 +50,12 @@
 		status = "disabled";
 	};
 
+	clk_ref_dp: clk-ref-dp {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <26000000>;
+	};
+
 	clk_xtal25: clk-xtal25 {
 		compatible = "fixed-clock";
 		#clock-cells = <0>;
@@ -508,6 +514,39 @@
 	sda-gpios = <&gpio5 17 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
 	status = "okay";
 
+	tc9595: bridge@f {
+		compatible = "toshiba,tc9595", "toshiba,tc358767";
+		reg = <0xf>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_tc9595>;
+		clock-names = "ref";
+		clocks = <&clk_ref_dp>;
+		reset-gpios = <&gpio4 19 GPIO_ACTIVE_HIGH>;
+		toshiba,hpd-pin = <0>;
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+
+				dsi_in: endpoint {
+					remote-endpoint = <&dsi_out>;
+					data-lanes = <1 2 3 4>;
+				};
+			};
+
+			port@2 {
+				reg = <2>;
+
+				endpoint {
+					toshiba,pre-emphasis = /bits/ 8 <1 1>;
+				};
+			};
+		};
+	};
+
 	tlv320aic3x04: audio-codec@18 {
 		compatible = "ti,tlv320aic32x4";
 		pinctrl-names = "default";
@@ -560,8 +599,46 @@
 	status = "okay";
 };
 
+&lcdif1 {
+	status = "okay";
+};
+
 &lcdif3 {
 	status = "okay";
+};
+
+// This is to let LCDIF configure the pixel clock,
+// it removes the fixed Video PLL configuration from DT
+&media_blk_ctrl {
+	assigned-clocks = <&clk IMX8MP_CLK_MEDIA_AXI>,
+			  <&clk IMX8MP_CLK_MEDIA_APB>,
+			  <&clk IMX8MP_CLK_MEDIA_DISP1_PIX>,
+			  <&clk IMX8MP_CLK_MEDIA_DISP2_PIX>,
+			  <&clk IMX8MP_CLK_MEDIA_ISP>;
+	assigned-clock-parents = <&clk IMX8MP_SYS_PLL2_1000M>,
+				 <&clk IMX8MP_SYS_PLL1_800M>,
+				 <&clk IMX8MP_VIDEO_PLL1_OUT>,
+				 <&clk IMX8MP_VIDEO_PLL1_OUT>,
+				 <&clk IMX8MP_SYS_PLL2_500M>;
+	assigned-clock-rates = <500000000>, <200000000>,
+			       <0>, <0>, <500000000>;
+};
+
+&mipi_dsi {
+	samsung,burst-clock-frequency = <1000000000>;
+	samsung,esc-clock-frequency = <10000000>;
+	status = "okay";
+
+	ports {
+		port@1 {
+			reg = <1>;
+
+			dsi_out: endpoint {
+				remote-endpoint = <&dsi_in>;
+				data-lanes = <1 2 3 4>;
+			};
+		};
+	};
 };
 
 &pcf85063 {
@@ -932,6 +1009,10 @@
 			MX8MP_IOMUXC_SAI3_TXD__AUDIOMIX_SAI3_TX_DATA00	0x94
 			MX8MP_IOMUXC_SAI3_MCLK__AUDIOMIX_SAI3_MCLK	0x94
 		>;
+	};
+
+	pinctrl_tc9595: tc9595-grp {
+		fsl,pins = <MX8MP_IOMUXC_SAI1_TXD7__GPIO4_IO19		0x140>;
 	};
 
 	pinctrl_tlv320aic3x04: tlv320aic3x04grp {
