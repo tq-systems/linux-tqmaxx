@@ -14,30 +14,27 @@
 			  &mu 1 1
 			  &mu 3 1>;
 		clocks = <&clk IMX8MP_CLK_M7_DIV>;
-		memory-region =  <&vdevbuffer>, <&vdev0vring0>,
-				 <&vdev0vring1>, <&rsc_table>;
-		status = "okay";
+		memory-region = <&vdevbuffer>, <&vdev0vring0>,
+				<&vdev0vring1>, <&rsc_table>;
 	};
 
 	reserved-memory {
 		/*
-		 * 0x8000_0000 ~ 0x80FF_FFFF is reserved for M7
-		 * Should not be used at A core and Linux side, when M4 running
-		 * from RAM. Must match linker settings for M7
+		 * 0x7700_0000 ~ 0x77FF_FFFF is reserved for M7
+		 * Must not be used from code running on Cortex-A cluster
+		 * Must be in sync with linker settings for M7
 		 */
-		m7_reserved: m7@0x80000000 {
+		m7_reserved: m7@77000000 {
+			reg = <0 0x77000000 0 0x1000000>;
 			no-map;
-			reg = <0 0x80000000 0 0x1000000>;
 		};
 
 		vdev0vring0: vdev0vring0@55000000 {
-			compatible = "shared-dma-pool";
 			reg = <0 0x55000000 0 0x8000>;
 			no-map;
 		};
 
 		vdev0vring1: vdev0vring1@55008000 {
-			compatible = "shared-dma-pool";
 			reg = <0 0x55008000 0 0x8000>;
 			no-map;
 		};

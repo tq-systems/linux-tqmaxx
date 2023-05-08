@@ -206,26 +206,6 @@
 		regulator-max-microvolt = <5000000>;
 	};
 
-	reserved-memory {
-		#address-cells = <2>;
-		#size-cells = <2>;
-		ranges;
-
-		ocram: ocram@900000 {
-			no-map;
-			reg = <0 0x900000 0 0x70000>;
-		};
-
-		/* global autoconfigured region for contiguous allocations */
-		linux,cma {
-			compatible = "shared-dma-pool";
-			reusable;
-			size = <0 0x38000000>;
-			alloc-ranges = <0 0x40000000 0 0xB0000000>;
-			linux,cma-default;
-		};
-	};
-
 	sound {
 		compatible = "fsl,imx-audio-tlv320aic32x4";
 		model = "tqm-tlv320aic32";
