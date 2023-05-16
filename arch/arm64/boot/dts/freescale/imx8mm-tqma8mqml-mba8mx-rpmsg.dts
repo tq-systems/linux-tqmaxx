@@ -9,7 +9,6 @@
 / {
 	imx8mm-cm4 {
 		compatible = "fsl,imx8mm-cm4";
-		rsc-da = <0x78100000>;
 		clocks = <&clk IMX8MM_CLK_M4_DIV>;
 		mbox-names = "tx", "rx", "rxdb";
 		mboxes = <&mu 0 1
