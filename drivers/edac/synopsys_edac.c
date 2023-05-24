@@ -470,6 +470,45 @@ static void handle_error(struct mem_ctl_info *mci, struct synps_ecc_status *p)
 	memset(p, 0, sizeof(*p));
 }
 
+static void enable_intr_imx8mp(struct synps_edac_priv *priv)
+{
+	int regval;
+
+	regval = readl(priv->baseaddr + ECC_CLR_OFST);
+	regval |= (DDR_CE_INTR_EN_MASK | DDR_UE_INTR_EN_MASK);
+	writel(regval, priv->baseaddr + ECC_CLR_OFST);
+}
+
+/* Interrupt Handler for ECC interrupts on imx8mp platform. */
+static irqreturn_t intr_handler_imx8mp(int irq, void *dev_id)
+{
+	const struct synps_platform_data *p_data;
+	struct mem_ctl_info *mci = dev_id;
+	struct synps_edac_priv *priv;
+	int status, regval;
+
+	priv = mci->pvt_info;
+	p_data = priv->p_data;
+
+	regval = readl(priv->baseaddr + ECC_STAT_OFST);
+	if (!(regval & ECC_INTR_MASK))
+		return IRQ_NONE;
+
+	status = p_data->get_error_info(priv);
+	if (status)
+		return IRQ_NONE;
+
+	priv->ce_cnt += priv->stat.ce_cnt;
+	priv->ue_cnt += priv->stat.ue_cnt;
+	handle_error(mci, &priv->stat);
+
+	edac_dbg(3, "Total error count CE %d UE %d\n",
+		 priv->ce_cnt, priv->ue_cnt);
+	enable_intr_imx8mp(priv);
+
+	return IRQ_HANDLED;
+}
+
 /**
  * intr_handler - Interrupt Handler for ECC interrupts.
  * @irq:        IRQ number.
@@ -486,6 +525,9 @@ static irqreturn_t intr_handler(int irq, void *dev_id)
 
 	priv = mci->pvt_info;
 	p_data = priv->p_data;
+
+	if (p_data->quirks & DDR_ECC_IMX8MP)
+		return intr_handler_imx8mp(irq, dev_id);
 
 	regval = readl(priv->baseaddr + DDR_QOS_IRQ_STAT_OFST);
 	regval &= (DDR_QOSCE_MASK | DDR_QOSUE_MASK);
@@ -671,45 +713,6 @@ out:
  *
  * Handles ECC correctable and uncorrectable errors.
  */
-
-static void enable_intr_imx8mp(struct synps_edac_priv *priv)
-{
-	int regval;
-
-	regval = readl(priv->baseaddr + ECC_CLR_OFST);
-	regval |= (DDR_CE_INTR_EN_MASK | DDR_UE_INTR_EN_MASK);
-	writel(regval, priv->baseaddr + ECC_CLR_OFST);
-}
-
-/* Interrupt Handler for ECC interrupts on imx8mp platform. */
-static irqreturn_t intr_handler_imx8mp(int irq, void *dev_id)
-{
-	const struct synps_platform_data *p_data;
-	struct mem_ctl_info *mci = dev_id;
-	struct synps_edac_priv *priv;
-	int status, regval;
-
-	priv = mci->pvt_info;
-	p_data = priv->p_data;
-
-	regval = readl(priv->baseaddr + ECC_STAT_OFST);
-	if (!(regval & ECC_INTR_MASK))
-		return IRQ_NONE;
-
-	status = p_data->get_error_info(priv);
-	if (status)
-		return IRQ_NONE;
-
-	priv->ce_cnt += priv->stat.ce_cnt;
-	priv->ue_cnt += priv->stat.ue_cnt;
-	handle_error(mci, &priv->stat);
-
-	edac_dbg(3, "Total error count CE %d UE %d\n",
-		 priv->ce_cnt, priv->ue_cnt);
-	enable_intr_imx8mp(priv);
-
-	return IRQ_HANDLED;
-}
 
 /**
  * zynq_get_ecc_state - Return the controller ECC enable/disable status.
