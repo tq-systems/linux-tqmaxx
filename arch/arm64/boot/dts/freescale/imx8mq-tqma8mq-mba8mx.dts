@@ -178,6 +178,7 @@
 };
 
 &usb3_phy1 {
+	vbus-supply = <&reg_vcc_5v0>;
 	status = "okay";
 };
 
