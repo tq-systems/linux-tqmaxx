@@ -1204,6 +1204,10 @@ static int lpi2c_imx_probe(struct platform_device *pdev)
 	}
 	lpi2c_imx->num_clks = ret;
 
+	ret = clk_bulk_prepare_enable(lpi2c_imx->num_clks, lpi2c_imx->clks);
+	if (ret)
+		return ret;
+
 	ret = of_property_read_u32(pdev->dev.of_node,
 				   "clock-frequency", &lpi2c_imx->bitrate);
 	if (ret)
