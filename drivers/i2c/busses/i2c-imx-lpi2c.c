@@ -947,6 +947,18 @@ static int lpi2c_imx_probe(struct platform_device *pdev)
 		return PTR_ERR(lpi2c_imx->clk_ipg);
 	}
 
+	ret = clk_prepare_enable(lpi2c_imx->clk_per);
+	if (ret) {
+		dev_err(&pdev->dev, "Failed to enable per clock: %d\n", ret);
+		return ret;
+	}
+	ret = clk_prepare_enable(lpi2c_imx->clk_ipg);
+	if (ret) {
+		clk_disable_unprepare(lpi2c_imx->clk_per);
+		dev_err(&pdev->dev, "Failed to enable ipg clock: %d\n", ret);
+		return ret;
+	}
+
 	ret = of_property_read_u32(pdev->dev.of_node,
 				   "clock-frequency", &lpi2c_imx->bitrate);
 	if (ret)
