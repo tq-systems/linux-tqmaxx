@@ -1051,7 +1051,7 @@ static int __maybe_unused lpi2c_runtime_resume(struct device *dev)
 
 	ret = clk_enable(lpi2c_imx->clk_ipg);
 	if (ret) {
-		clk_disable_unprepare(lpi2c_imx->clk_per);
+		clk_disable(lpi2c_imx->clk_per);
 		dev_err(dev, "can't enable I2C ipg clock, ret=%d\n", ret);
 	}
 
