@@ -107,8 +107,6 @@
 	tps: pmic@2d {
 		compatible = "ti,tps65910";
 		reg = <0x2d>;
-		interrupt-parent = <&expander2>;
-		interrupts = <4 IRQ_TYPE_EDGE_RISING>;
 		ti,en-ck32k-xtal;
 	};
 
