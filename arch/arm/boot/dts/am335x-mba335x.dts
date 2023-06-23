@@ -9,5 +9,4 @@
  */
 /dts-v1/;
 
-#include "am335x-tqma335x.dtsi"
 #include "am335x-mba335x.dtsi"

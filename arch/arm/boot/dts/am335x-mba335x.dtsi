@@ -8,8 +8,8 @@
  * Copyright (C) 2012 Texas Instruments Incorporated - http://www.ti.com/
  *
  */
-#include "am335x-tqma335x.dtsi"
 #include <dt-bindings/interrupt-controller/irq.h>
+#include "am335x-tqma335x.dtsi"
 
 / {
 	model = "TQ-Systems GmbH MBa335x";
@@ -41,7 +41,7 @@
 
 		simple-audio-card,cpu {
 			sound-dai = <&mcasp0>;
-			#sound-dai-cells= <0>;
+			#sound-dai-cells = <0>;
 			system-clock-direction-out;
 		};
 
@@ -70,7 +70,6 @@
 };
 
 &am33xx_pinmux {
-
 	ecap2_pins: backlight_pins {
 		pinctrl-single,pins = <
 			0x19c (PIN_OUTPUT | MUX_MODE4)			/* mcasp0_ahclkr.ecap2_in_pwm2_out*/
@@ -334,20 +333,18 @@
 		pinctrl-0 = <&codec_pins>;
 		clocks = <&clk_24mhz>;
 		clock-names = "mclk";
-		status = "okay";
-		#sound-dai-cells= <0>;
-
+		#sound-dai-cells = <0>;
 		ldo-enable = "on";
 		ldoin-supply = <&vaux33_reg>;
 		iov-supply = <&vaux33_reg>;
 	};
 
-	jc42_2: temp-sensor@19 {
+	jc42_2: temperature-sensor@19 {
 		compatible = "jedec,jc-42.4-temp";
 		reg = <0x19>;
 	};
 
-	expander1: gpio-expander@20 {
+	expander1: gpio@20 {
 		compatible = "nxp,pca9554";
 		reg = <0x20>;
 		vcc-supply = <&vcc3v3>;
@@ -355,7 +352,7 @@
 		#gpio-cells = <2>;
 	};
 
-	expander2: gpio-expander@21 {
+	expander2: gpio@21 {
 		compatible = "nxp,pca9554";
 		reg = <0x21>;
 		pinctrl-names = "default";
@@ -386,11 +383,8 @@
 &mcasp0 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&mcasp0_pins>;
-	status = "okay";
-	#sound-dai-cells= <0>;
-
+	#sound-dai-cells = <0>;
 	op-mode = <0>;
-
 	tdm-slots = <2>;
 	/* 16 serializer */
 	serial-dir = <  /* 0: INACTIVE, 1: TX, 2: RX */
@@ -401,17 +395,18 @@
 	>;
 	tx-num-evt = <32>;
 	rx-num-evt = <32>;
+	status = "okay";
 };
 
 &mmc1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&mmc1_pins>;
-	status = "okay";
 	vmmc-supply = <&vcc3v3>;
 	bus-width = <4>;
 	no-1-8-v;
 	no-mmc;
 	no-sdio;
+	status = "okay";
 };
 
 &tps {

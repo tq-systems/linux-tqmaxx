@@ -8,7 +8,6 @@
  */
 /dts-v1/;
 
-#include "am335x-tqma335x.dtsi"
 #include "am335x-mba335x.dtsi"
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/interrupt-controller/irq.h>

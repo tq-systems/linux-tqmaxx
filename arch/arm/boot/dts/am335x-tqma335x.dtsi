@@ -9,12 +9,10 @@
  *
  */
 
+#include <dt-bindings/interrupt-controller/irq.h>
 #include "am33xx.dtsi"
 
-#include "dt-bindings/interrupt-controller/irq.h"
-
 / {
-	model = "TQ-Systems GmbH TQMa335x";
 	compatible = "tq,tqma335x", "ti,am33xx";
 
 	aliases {
@@ -31,7 +29,7 @@
 
 	memory {
 		device_type = "memory";
-		reg = <0x80000000 0x10000000>;					/* 256 MB */
+		reg = <0x80000000 0x10000000>; /* 256 MB */
 	};
 
 	/* SOM input voltage */
@@ -55,12 +53,6 @@
 		regulator-boot-on;
 		vin-supply = <&vcc3v3in>;
 	};
-
-	ocp {
-		sgx@0x56000000 {
-			status = "okay";
-		};
-	};
 };
 
 &elm {
@@ -68,8 +60,6 @@
 };
 
 &am33xx_pinmux {
-	pinctrl-names = "default";
-
 	i2c0_pins: i2c0_pins {
 		pinctrl-single,pins = <
 			0x188 (PIN_INPUT_PULLUP | MUX_MODE0)		/* i2c0_sda.i2c0_sda */
@@ -102,10 +92,6 @@
 	};
 };
 
-&aes {
-	status = "okay";
-};
-
 &i2c0 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&i2c0_pins>;
@@ -113,7 +99,7 @@
 	status = "okay";
 
 	/* optional, not on TQMa335xL */
-	jc42_1: temp-sensor@1f {
+	jc42_1: temperature-sensor@1f {
 		compatible = "jedec,jc-42.4-temp";
 		reg = <0x1f>;
 	};
@@ -146,7 +132,6 @@
 };
 
 &mmc2 {
-	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&mmc2_pins>;
 	vmmc-supply = <&vddshv>;
@@ -155,14 +140,11 @@
 	no-1-8-v;
 	no-sd;
 	no-sdio;
+	status = "okay";
 };
 
 &rtc {
 	status = "disabled";
-};
-
-&sham {
-	status = "okay";
 };
 
 /* include after i2c-device described */
