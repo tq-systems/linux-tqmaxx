@@ -221,6 +221,21 @@ read_end:
 	return ret;
 }
 
+static int imx_ocotp_cell_pp(void *context, const char *id, unsigned int offset,
+			     void *data, size_t bytes)
+{
+	/* Deal with some post processing of nvmem cell data */
+	if (id && !strcmp(id, "mac-address")) {
+		u8 *buf = data;
+		int i;
+
+		for (i = 0; i < bytes/2; i++)
+			swap(buf[i], buf[bytes - i - 1]);
+	}
+
+	return 0;
+}
+
 static void imx_ocotp_set_imx6_timing(struct ocotp_priv *priv)
 {
 	unsigned long clk_rate;
@@ -468,6 +483,7 @@ static struct nvmem_config imx_ocotp_nvmem_config = {
 	.stride = 1,
 	.reg_read = imx_ocotp_read,
 	.reg_write = imx_ocotp_write,
+	.cell_post_process = imx_ocotp_cell_pp,
 };
 
 static const struct ocotp_params imx6q_params = {
