@@ -99,6 +99,7 @@
 	clock-frequency = <100000>;
 	status = "okay";
 
+	/* optional, not on TQMa335xL */
 	jc42_1: temp-sensor@1f {
 		compatible = "jedec,jc-42.4-temp";
 		reg = <0x1f>;
@@ -110,22 +111,24 @@
 		ti,en-ck32k-xtal;
 	};
 
+	/* optional, not on TQMa335xL */
 	eeprom: eeprom@50 {
 		compatible = "atmel,24c64";
 		pagesize = <32>;
 		reg = <0x50>;
 	};
 
+	/* optional, not on TQMa335xL */
 	se97btp: eeprom@57 {
 		compatible = "atmel,24c02";
 		pagesize = <16>;
 		reg = <0x57>;
 	};
 
+	/* optional, not on TQMa335xL */
 	ds1339: rtc@68 {
 		compatible = "dallas,ds1339";
 		reg = <0x68>;
-		interrupts = <43>;
 	};
 };
 

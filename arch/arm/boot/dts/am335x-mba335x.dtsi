@@ -304,6 +304,11 @@
 	status = "okay";
 };
 
+&ds1339 {
+	interrupt-parent = <&expander2>;
+	interrupts = <3 IRQ_TYPE_EDGE_RISING>;
+};
+
 &i2c0 {
 	tlv320aic32x4: audio-codec@18 {
 		compatible = "ti,tlv320aic32x4";
