@@ -52,11 +52,20 @@
 		};
 	};
 
-	reg_mba335x_12v: fixedregulator-12v {
+	reg_mba335x_12v: regulator-12v {
 		compatible = "regulator-fixed";
 		regulator-name = "MBa335x-V12";
 		regulator-min-microvolt = <12000000>;
 		regulator-max-microvolt = <12000000>;
+		regulator-always-on;
+	};
+
+	vcc3v3: regulator-vcc3v3 {
+		compatible = "regulator-fixed";
+		regulator-name = "VCC3V3";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-always-on;
 	};
 };
 
@@ -338,6 +347,7 @@
 		reg = <0x20>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&expander1_pins>;
+		vcc-supply = <&vcc3v3>;
 		gpio-controller;
 		#gpio-cells = <2>;
 		interrupt-parent = <&gpio2>;
@@ -349,6 +359,7 @@
 		reg = <0x21>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&expander2_pins>;
+		vcc-supply = <&vcc3v3>;
 		gpio-controller;
 		#gpio-cells = <2>;
 		interrupt-controller;
@@ -395,8 +406,9 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&mmc1_pins>;
 	status = "okay";
-	vmmc-supply = <&vmmc_reg>;
+	vmmc-supply = <&vcc3v3>;
 	bus-width = <4>;
+	no-1-8-v;
 	no-mmc;
 	no-sdio;
 };
@@ -448,4 +460,9 @@
 &usb1 {
 	dr_mode = "otg";
 	status = "okay";
+};
+
+/* SOM supply */
+&vcc3v3in {
+	vin-supply = <&vcc3v3>;
 };

@@ -34,12 +34,26 @@
 		reg = <0x80000000 0x10000000>;					/* 256 MB */
 	};
 
-	vbat: fixedregulator@0 {
+	/* SOM input voltage */
+	vcc3v3in: regulator-vcc3v3in {
 		compatible = "regulator-fixed";
-		regulator-name = "vbat";
-		regulator-min-microvolt = <5000000>;
-		regulator-max-microvolt = <5000000>;
+		regulator-name = "VCC3V3IN";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
 		regulator-boot-on;
+	};
+
+	/*
+	 * Regulator is enabled by PMIC power sequence. The supplied voltage
+	 * rail is also usable on baseboard.
+	 */
+	vddshv: regulator-vddshv {
+		compatible = "regulator-fixed";
+		regulator-name = "VDDSHV";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-boot-on;
+		vin-supply = <&vcc3v3in>;
 	};
 
 	ocp {
@@ -133,11 +147,12 @@
 
 &mmc2 {
 	status = "okay";
-	vmmc-supply = <&vmmc_reg>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&mmc2_pins>;
+	vmmc-supply = <&vddshv>;
 	bus-width = <8>;
 	ti,non-removable;
+	no-1-8-v;
 	no-sd;
 	no-sdio;
 };
@@ -153,14 +168,14 @@
 /* include after i2c-device described */
 #include "tps65910.dtsi"
 &tps {
-	vcc1-supply = <&vbat>;
-	vcc2-supply = <&vbat>;
-	vcc3-supply = <&vbat>;
-	vcc4-supply = <&vbat>;
-	vcc5-supply = <&vbat>;
-	vcc6-supply = <&vbat>;
-	vcc7-supply = <&vbat>;
-	vccio-supply = <&vbat>;
+	vcc1-supply = <&vcc3v3in>;
+	vcc2-supply = <&vcc3v3in>;
+	vcc3-supply = <&vcc3v3in>;
+	vcc4-supply = <&vcc3v3in>;
+	vcc5-supply = <&vcc3v3in>;
+	vcc6-supply = <&vcc3v3in>;
+	vcc7-supply = <&vcc3v3in>;
+	vccio-supply = <&vcc3v3in>;
 
 	regulators {
 		vrtc_reg: regulator@0 {
@@ -220,8 +235,6 @@
 		};
 
 		vmmc_reg: regulator@12 {
-			regulator-min-microvolt = <1800000>;
-			regulator-max-microvolt = <3300000>;
 			regulator-always-on;
 		};
 	};
@@ -237,6 +250,14 @@
 		spi-max-frequency = <24000000>;
 		reg = <0x0>;
 	};
+};
+
+&usb0_phy {
+	vcc-supply = <&vaux1_reg>;
+};
+
+&usb1_phy {
+	vcc-supply = <&vaux1_reg>;
 };
 
 &wkup_m3 {
