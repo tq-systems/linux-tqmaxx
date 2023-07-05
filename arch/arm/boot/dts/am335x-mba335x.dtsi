@@ -235,6 +235,10 @@
 	};
 };
 
+&cppi41dma {
+	status = "okay";
+};
+
 &cpsw_emac0 {
 	phy-handle = <&ethphy0>;
 	phy-mode = "rgmii-txid";
@@ -422,30 +426,26 @@
 
 &usb {
 	status = "okay";
+};
 
-	control@44e10620 {
-		status = "okay";
-	};
+&usb_ctrl_mod {
+	status = "okay";
+};
 
-	usb-phy@47401300 {
-		status = "okay";
-	};
+&usb0_phy {
+	status = "okay";
+};
 
-	usb-phy@47401b00 {
-		status = "okay";
-	};
+&usb0 {
+	dr_mode = "host";
+	status = "okay";
+};
 
-	usb@47401000 {
-		status = "okay";
-		dr_mode = "host";
-	};
+&usb1_phy {
+	status = "okay";
+};
 
-	usb@47401800 {
-		status = "okay";
-		dr_mode = "peripheral";
-	};
-
-	dma-controller@47402000  {
-		status = "okay";
-	};
+&usb1 {
+	dr_mode = "otg";
+	status = "okay";
 };
