@@ -62,32 +62,48 @@
 &am33xx_pinmux {
 	i2c0_pins: i2c0_pins {
 		pinctrl-single,pins = <
-			0x188 (PIN_INPUT_PULLUP | MUX_MODE0)		/* i2c0_sda.i2c0_sda */
-			0x18c (PIN_INPUT_PULLUP | MUX_MODE0)		/* i2c0_scl.i2c0_scl */
+			/* i2c0_sda.i2c0_sda */
+			AM33XX_PADCONF(AM335X_PIN_I2C0_SDA, PIN_INPUT_PULLUP, MUX_MODE0)
+			/* i2c0_scl.i2c0_scl */
+			AM33XX_PADCONF(AM335X_PIN_I2C0_SCL, PIN_INPUT_PULLUP, MUX_MODE0)
 		>;
 	};
 
 	mmc2_pins: mmc2_pins {
 		pinctrl-single,pins = <
-			0x00 (SLEWCTRL_SLOW | PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad0.mmc1_dat0 */
-			0x04 (SLEWCTRL_SLOW | PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad1.mmc1_dat1 */
-			0x08 (SLEWCTRL_SLOW | PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad2.mmc1_dat2 */
-			0x0c (SLEWCTRL_SLOW | PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad3.mmc1_dat3 */
-			0x10 (SLEWCTRL_SLOW | PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad4.mmc1_dat4 */
-			0x14 (SLEWCTRL_SLOW | PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad5.mmc1_dat5 */
-			0x18 (SLEWCTRL_SLOW | PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad6.mmc1_dat6 */
-			0x1c (SLEWCTRL_SLOW | PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad7.mmc1_dat7 */
-			0x80 (PIN_INPUT_PULLUP | MUX_MODE2)				/* gpmc_csn1.mmc1_clk */
-			0x84 (SLEWCTRL_SLOW | PIN_INPUT_PULLUP | MUX_MODE2)		/* gpmc_csn2.mmc1_cmd */
+			/* gpmc_ad0.mmc1_dat0 */
+			AM33XX_PADCONF(AM335X_PIN_GPMC_AD0, SLEWCTRL_SLOW | PIN_INPUT_PULLUP, MUX_MODE1)
+			/* gpmc_ad1.mmc1_dat1 */
+			AM33XX_PADCONF(AM335X_PIN_GPMC_AD1, SLEWCTRL_SLOW | PIN_INPUT_PULLUP, MUX_MODE1)
+			/* gpmc_ad2.mmc1_dat2 */
+			AM33XX_PADCONF(AM335X_PIN_GPMC_AD2, SLEWCTRL_SLOW | PIN_INPUT_PULLUP, MUX_MODE1)
+			/* gpmc_ad3.mmc1_dat3 */
+			AM33XX_PADCONF(AM335X_PIN_GPMC_AD3, SLEWCTRL_SLOW | PIN_INPUT_PULLUP, MUX_MODE1)
+			/* gpmc_ad4.mmc1_dat4 */
+			AM33XX_PADCONF(AM335X_PIN_GPMC_AD4, SLEWCTRL_SLOW | PIN_INPUT_PULLUP, MUX_MODE1)
+			/* gpmc_ad5.mmc1_dat5 */
+			AM33XX_PADCONF(AM335X_PIN_GPMC_AD5, SLEWCTRL_SLOW | PIN_INPUT_PULLUP, MUX_MODE1)
+			/* gpmc_ad6.mmc1_dat6 */
+			AM33XX_PADCONF(AM335X_PIN_GPMC_AD6, SLEWCTRL_SLOW | PIN_INPUT_PULLUP, MUX_MODE1)
+			/* gpmc_ad7.mmc1_dat7 */
+			AM33XX_PADCONF(AM335X_PIN_GPMC_AD7, SLEWCTRL_SLOW | PIN_INPUT_PULLUP, MUX_MODE1)
+			/* gpmc_csn1.mmc1_clk */
+			AM33XX_PADCONF(AM335X_PIN_GPMC_CSN1, PIN_INPUT_PULLUP, MUX_MODE2)
+			/* gpmc_csn2.mmc1_cmd */
+			AM33XX_PADCONF(AM335X_PIN_GPMC_CSN2, SLEWCTRL_SLOW | PIN_INPUT_PULLUP, MUX_MODE2)
 		>;
 	};
 
 	spi0_pins: pinmux_spi0_pins {
 		pinctrl-single,pins = <
-			0x150 (PIN_INPUT_PULLUP | MUX_MODE0)		/* spi0_clk.spi0_clk */
-			0x154 (PIN_INPUT_PULLUP | MUX_MODE0)		/* spi0_d0.spi0_d0 */
-			0x158 (PIN_INPUT_PULLUP | MUX_MODE0)		/* spi0_d1.spi0_d1 */
-			0x15c (PIN_INPUT_PULLUP | MUX_MODE0)		/* spi0_cs0.spi0_cs0 */
+			/* spi0_clk.spi0_clk */
+			AM33XX_PADCONF(AM335X_PIN_SPI0_SCLK, PIN_INPUT_PULLUP, MUX_MODE0)
+			/* spi0_d0.spi0_d0 */
+			AM33XX_PADCONF(AM335X_PIN_SPI0_D0, PIN_INPUT, MUX_MODE0)
+			/* spi0_d1.spi0_d1 */
+			AM33XX_PADCONF(AM335X_PIN_SPI0_D1, PIN_OUTPUT_PULLUP, MUX_MODE0)
+			/* spi0_cs0.spi0_cs0 */
+			AM33XX_PADCONF(AM335X_PIN_SPI0_CS0, PIN_OUTPUT_PULLUP, MUX_MODE0)
 		>;
 	};
 };
