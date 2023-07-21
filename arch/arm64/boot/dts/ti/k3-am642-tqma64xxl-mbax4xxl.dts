@@ -336,7 +336,14 @@
 	ti,pindir-d0-out-d1-in;
 	status = "okay";
 
-	/* adc@0: NXP NAFE13388 */
+	adc@0 {
+		compatible = "nxp,nafe13388";
+		reg = <0>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&main_spi0_adc_pins>;
+		spi-max-frequency = <32000000>;
+		spi-cpha;
+	};
 };
 
 /* UART/USB adapter port 1 */
