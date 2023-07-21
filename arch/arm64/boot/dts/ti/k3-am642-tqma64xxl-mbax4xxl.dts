@@ -203,6 +203,10 @@
 		reset-deassert-us = <1000>;
 		ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
 		ti,clk-output-sel = <DP83867_CLK_O_SEL_OFF>;
+		/* LED0: 1Gbit/s, LED1: link+activity */
+		ti,led-function = <0x00b5>;
+		/* LED0/1: active high, driven by PHY function */
+		ti,led-ctrl = <0x1144>;
 	};
 };
 
@@ -230,6 +234,10 @@
 		reset-deassert-us = <1000>;
 		ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
 		ti,clk-output-sel = <DP83867_CLK_O_SEL_OFF>;
+		/* LED0: 1Gbit/s, LED1: link+activity */
+		ti,led-function = <0x00b5>;
+		/* LED0/1: active high, driven by PHY function */
+		ti,led-ctrl = <0x1144>;
 	};
 
 	icssg1_phy0c: ethernet-phy@c {
@@ -240,6 +248,10 @@
 		reset-deassert-us = <1000>;
 		ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
 		ti,clk-output-sel = <DP83867_CLK_O_SEL_OFF>;
+		/* LED0: 1Gbit/s, LED1: link+activity */
+		ti,led-function = <0x00b5>;
+		/* LED0/1: active high, driven by PHY function */
+		ti,led-ctrl = <0x1144>;
 	};
 };
 
