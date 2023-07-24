@@ -1,0 +1,42 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright 2023 TQ-Systems GmbH <linux@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Alexander Stein
+ */
+
+#include "imx8mp-tqma8mpql-mba8mpxl.dts"
+
+&backlight_lvds {
+	status = "okay";
+};
+
+&display {
+	compatible = "auo,g133han01";
+	status = "okay";
+};
+
+&display_subsystem {
+	status = "okay";
+};
+
+&lcdif2 {
+	status = "okay";
+};
+
+&ldb_phy {
+	status = "okay";
+};
+
+&ldb {
+	fsl,dual-channel;
+	status = "okay";
+
+	lvds-channel@0 {
+		status = "okay";
+	};
+};
+
+&pwm2 {
+	status = "okay";
+};
