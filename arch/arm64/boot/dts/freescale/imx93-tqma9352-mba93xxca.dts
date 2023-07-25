@@ -238,17 +238,17 @@
 	status = "okay";
 };
 
-&gpio2 {
+&gpio1 {
 	expander-irq-hog {
 		gpio-hog;
-		gpios = <3 GPIO_ACTIVE_LOW>;
+		gpios = <12 GPIO_ACTIVE_LOW>;
 		input;
 		line-name = "PEXP_INT#";
 	};
 
 	tcpc-irq-hog {
 		gpio-hog;
-		gpios = <7 GPIO_ACTIVE_LOW>;
+		gpios = <2 GPIO_ACTIVE_LOW>;
 		input;
 		line-name = "USB_C_ALERT#";
 	};
@@ -292,7 +292,7 @@
 
 		port {
 			typec_drd_sw: endpoint {
-				remote-endpoint = <&usb2_drd_sw>;
+				remote-endpoint = <&usb1_drd_sw>;
 			};
 		};
 
@@ -324,9 +324,13 @@
 		#gpio-cells = <2>;
 		interrupt-controller;
 		#interrupt-cells = <2>;
-		interrupt-parent = <&gpio2>;
-		interrupts = <3 IRQ_TYPE_LEVEL_LOW>;
+		interrupt-parent = <&gpio1>;
+		interrupts = <12 IRQ_TYPE_LEVEL_LOW>;
 		vcc-supply = <&reg_3v3>;
+		gpio-line-names = "FAN_PWR_EN", "MPCIE_WAKE#",
+				  "MPCIE_1V5_EN", "MPCIE_3V3_EN",
+				  "MPCIE_PERST#", "MPCIE_WDISABLE#",
+				  "BUTTON_A#", "BUTTON_B#";
 
 		mpcie-wake-hog {
 			gpio-hog;
@@ -366,6 +370,10 @@
 		gpio-controller;
 		#gpio-cells = <2>;
 		vcc-supply = <&reg_3v3>;
+		gpio-line-names = "ENET1_RESET#", "ENET2_RESET#",
+				  "USB_RESET#", "",
+				  "WLAN_PD#", "WLAN_W_DISABLE#",
+				  "WLAN_PERST#", "12V_EN";
 
 		/*
 		 * Controls the on board USB Hub reset which is low
@@ -377,17 +385,6 @@
 			gpios = <2 GPIO_ACTIVE_LOW>;
 			output-low;
 			line-name = "USB_RESET#";
-		};
-
-		/*
-		 * selects between LVDS / miniPCIe, defaults to mPCIe
-		 * will be removed in REV.020x
-		 */
-		usb_h2_select_hog: usb-h2-select-hog {
-			gpio-hog;
-			gpios = <3 GPIO_ACTIVE_HIGH>;
-			output-low;
-			line-name = "USB_H2_SELECT";
 		};
 
 		/*
@@ -433,6 +430,10 @@
 		gpio-controller;
 		#gpio-cells = <2>;
 		vcc-supply = <&reg_3v3>;
+		gpio-line-names = "LCD_RESET#", "LCD_PWR_EN",
+				  "LCD_BLT_EN", "DP_EN",
+				  "MIPI_CSI_EN", "MIPI_CSI_RST#",
+				  "USER_LED1", "USER_LED2";
 	};
 };
 
@@ -446,10 +447,29 @@
 	status = "okay";
 };
 
+&lpspi6 {
+	fsl,spi-num-chipselects = <1>;
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&pinctrl_lpspi6>;
+	pinctrl-1 = <&pinctrl_lpspi6>;
+	status = "okay";
+};
+
 &lpuart1 { /* console */
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart1>;
 	status = "okay";
+};
+
+/* TODO fix rts handling
+ * rts do not toggle during transmit
+ */
+&lpuart2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart2>;
+	linux,rs485-enabled-at-boot-time;
+	uart-has-rtscts;
+	status = "disabled";
 };
 
 /* disabled per default, console for M33 */
@@ -457,15 +477,6 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart3>;
 	status = "disabled";
-};
-
-&lpuart5 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_uart5>;
-	linux,rs485-enabled-at-boot-time;
-	/* Workaround for HW REV.0100, REV.0200 will use RTS */
-	rts-gpios = <&gpio2 2 GPIO_ACTIVE_HIGH>;
-	status = "okay";
 };
 
 &lpuart6 {
@@ -493,12 +504,6 @@
 };
 
 &usbotg1 {
-	dr_mode = "host";
-	disable-over-current;
-	status = "okay";
-};
-
-&usbotg2 {
 	dr_mode = "otg";
 	hnp-disable;
 	srp-disable;
@@ -508,10 +513,16 @@
 	status = "okay";
 
 	port {
-		usb2_drd_sw: endpoint {
+		usb1_drd_sw: endpoint {
 			remote-endpoint = <&typec_drd_sw>;
 		};
 	};
+};
+
+&usbotg2 {
+	dr_mode = "host";
+	disable-over-current;
+	status = "okay";
 };
 
 &usdhc2 {
@@ -618,7 +629,7 @@
 
 	pinctrl_pexp_irq: pexpirqgrp {
 		fsl,pins = <
-			MX93_PAD_GPIO_IO03__GPIO2_IO03		0x1306
+			MX93_PAD_SAI1_TXC__GPIO1_IO12		0x1306
 		>;
 	};
 
@@ -642,7 +653,7 @@
 
 	pinctrl_typec: typecgrp {
 		fsl,pins = <
-			MX93_PAD_GPIO_IO07__GPIO2_IO07		0x1306
+			MX93_PAD_I2C2_SCL__GPIO1_IO02		0x1306
 		>;
 	};
 
@@ -653,6 +664,14 @@
 		>;
 	};
 
+	pinctrl_uart2: uart2grp {
+		fsl,pins = <
+			MX93_PAD_UART2_TXD__LPUART2_TX		0x31e
+			MX93_PAD_UART2_RXD__LPUART2_RX		0x31e
+			MX93_PAD_SAI1_TXD0__LPUART2_RTS_B   0x51e
+		>;
+	};
+
 	pinctrl_uart3: uart3grp {
 		fsl,pins = <
 			MX93_PAD_GPIO_IO14__LPUART3_TX		0x31e
@@ -660,16 +679,12 @@
 		>;
 	};
 
-	pinctrl_uart5: uart5grp {
+	pinctrl_lpspi6: lpspi6grp {
 		fsl,pins = <
-			MX93_PAD_GPIO_IO00__LPUART5_TX		0x31e
-			MX93_PAD_GPIO_IO01__LPUART5_RX		0x31e
-			/*
-			 * TODO: RTS is controllable by hardware (REV.0200)
-			 * use MX93_PAD_GPIO_IO02__LPUART5_CTS as GPIO
-			 * for REV.0100 with patched driver
-			 */
-			MX93_PAD_GPIO_IO02__GPIO2_IO02		0x31e
+			MX93_PAD_GPIO_IO00__LPSPI6_PCS0		0x3fe
+			MX93_PAD_GPIO_IO01__LPSPI6_SIN		0x3fe
+			MX93_PAD_GPIO_IO02__LPSPI6_SOUT		0x3fe
+			MX93_PAD_GPIO_IO03__LPSPI6_SCK		0x3fe
 		>;
 	};
 

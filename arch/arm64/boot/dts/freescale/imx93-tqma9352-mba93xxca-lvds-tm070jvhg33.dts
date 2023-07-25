@@ -47,15 +47,6 @@
 };
 
 /*
- * selects between LVDS / miniPCIe, defaults to mPCIe
- * will be removed in REV.020x
- * route to LVDS CMD at X11, disable USB at X16 (miniPCIe)
- */
-&usb_h2_select_hog {
-	gpios = <3 GPIO_ACTIVE_LOW>;
-};
-
-/*
  * Controls the mPCIE slot reset which is low active as
  * reset signal. Invert the active polarity
  */
