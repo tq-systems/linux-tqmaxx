@@ -38,6 +38,20 @@ dtb-$(CONFIG_ARCH_K3) += k3-am62-lp-sk-microtips-mf101hie-panel.dtbo
 dtb-$(CONFIG_ARCH_K3) += k3-am625-sk-mcspi-loopback.dtbo
 dtb-$(CONFIG_ARCH_K3) += k3-am625-tqma62xx-mba62xx.dtb
 
+k3-am625-tqma62xx-mba62xx-csi-imx327-dtbs := \
+	k3-am625-tqma62xx-mba62xx.dtb k3-am62-tqma62xx-mba62xx-csi-imx327.dtbo
+k3-am625-tqma62xx-mba62xx-csi-ov9281-dtbs := \
+	k3-am625-tqma62xx-mba62xx.dtb k3-am62-tqma62xx-mba62xx-csi-ov9281.dtbo
+k3-am625-tqma62xx-mba62xx-lvds-tm070jdhg30-dtbs := \
+	k3-am625-tqma62xx-mba62xx.dtb k3-am62-tqma62xx-mba62xx-lvds-tm070jdhg30.dtbo
+k3-am625-tqma62xx-mba62xx-lvds-vesa-fhd-dtbs := \
+	k3-am625-tqma62xx-mba62xx.dtb k3-am62-tqma62xx-mba62xx-lvds-vesa-fhd.dtbo
+
+dtb-$(CONFIG_ARCH_K3) += k3-am625-tqma62xx-mba62xx-csi-imx327.dtb
+dtb-$(CONFIG_ARCH_K3) += k3-am625-tqma62xx-mba62xx-csi-ov9281.dtb
+dtb-$(CONFIG_ARCH_K3) += k3-am625-tqma62xx-mba62xx-lvds-tm070jdhg30.dtb
+dtb-$(CONFIG_ARCH_K3) += k3-am625-tqma62xx-mba62xx-lvds-vesa-fhd.dtb
+
 # Boards with AM62Ax SoC
 dtb-$(CONFIG_ARCH_K3) += k3-am62a7-sk.dtb
 dtb-$(CONFIG_ARCH_K3) += k3-am62a7-sk-csi2-ox05b1s.dtbo

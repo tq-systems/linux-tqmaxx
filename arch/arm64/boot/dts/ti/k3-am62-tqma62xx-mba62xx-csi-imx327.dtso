@@ -1,0 +1,78 @@
+// SPDX-License-Identifier: GPL-2.0-only OR MIT
+/*
+ * Copyright (c) 2023-2024 TQ-Systems GmbH <linux@ew.tq-group.com>, D-82229 Seefeld, Germany.
+ * Author: Matthias Schiffer
+ */
+
+#include <dt-bindings/media/video-interfaces.h>
+
+/dts-v1/;
+/plugin/;
+
+&cdns_csi2rx0 {
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port@0 {
+			reg = <0>;
+			status = "okay";
+
+			csi0_port0_in: endpoint {
+				remote-endpoint = <&camera_out>;
+				bus-type = <MEDIA_BUS_TYPE_CSI2_DPHY>;
+				clock-lanes = <0>;
+				data-lanes = <1 2>;
+			};
+		};
+	};
+};
+
+&dphy0 {
+	status = "okay";
+};
+
+&main_i2c1 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	vc_ctrl: controller@10 {
+		compatible = "vision-components,mipi-module";
+		reg = <0x10>;
+		#clock-cells = <0>;
+		vcc-supply = <&reg_3v3>;
+		clock-frequency = <37125000>;
+	};
+
+	camera: camera@1a {
+		compatible = "sony,imx327lqr";
+		reg = <0x1a>;
+		clocks = <&vc_ctrl>;
+		clock-names = "xclk";
+		clock-frequency = <37125000>;
+		vdda-supply = <&vc_ctrl>;
+		vddd-supply = <&vc_ctrl>;
+		vdddo-supply = <&vc_ctrl>;
+		orientation = <2>;
+		rotation = <0>;
+
+		port {
+			camera_out: endpoint {
+				remote-endpoint = <&csi0_port0_in>;
+				/* Both the AM62 and the IMX327 support up to 4
+				 * lanes, but only two are connected in the
+				 * adapter provided in the camera kit for the
+				 * MBa62xx.
+				 */
+				data-lanes = <1 2>;
+				clock-lanes = <0>;
+				clock-noncontinuous;
+				link-frequencies = /bits/ 64 <445500000 297000000>;
+			};
+		};
+	};
+};
+
+&ti_csi2rx0 {
+	status = "okay";
+};

@@ -230,6 +230,11 @@
 	};
 };
 
+&dss {
+	pinctrl-names = "default";
+	pinctrl-0 = <&dss_pins>;
+};
+
 &epwm0 {
 	status = "okay";
 };
