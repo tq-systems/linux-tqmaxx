@@ -135,7 +135,6 @@
 	se97b: temperature-sensor-eeprom@1e {
 		compatible = "nxp,se97", "jedec,jc-42.4-temp";
 		reg = <0x1e>;
-		status = "okay";
 	};
 
 	/* ST M24C64 */
@@ -144,14 +143,12 @@
 		read-only;
 		reg = <0x50>;
 		pagesize = <32>;
-		status = "okay";
 	};
 
 	at24c02: eeprom@56 {
 		compatible = "nxp,se97b", "atmel,24c02";
 		reg = <0x56>;
 		pagesize = <16>;
-		status = "okay";
 	};
 
 	ds1339: rtc@68 {
