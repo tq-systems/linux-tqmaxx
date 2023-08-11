@@ -1,0 +1,68 @@
+// SPDX-License-Identifier: GPL-2.0-only
+/*
+ * Copyright (c) 2023 TQ-Systems GmbH <linux@ew.tq-group.com>, D-82229 Seefeld, Germany.
+ * Author: Matthias Schiffer
+ */
+
+/dts-v1/;
+/plugin/;
+
+&dss_ports {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	port@0 {
+		reg = <0>;
+
+		oldi_out0: endpoint {
+			remote-endpoint = <&panel_in0>;
+		};
+	};
+
+	port@2 {
+		reg = <2>;
+
+		oldi_out1: endpoint {
+			remote-endpoint = <&panel_in1>;
+		};
+	};
+};
+
+&panel {
+	compatible = "panel-lvds";
+	#address-cells = <1>;
+	#size-cells = <0>;
+	data-mapping = "vesa-24";
+	width-mm = <476>;
+	height-mm = <268>;
+	status = "okay";
+
+	panel-timing {
+		/* 1920x1080@60Hz VESA Reduced Blanking */
+		clock-frequency = <136500000>;
+		hactive = <1920>;
+		vactive = <1080>;
+		hfront-porch = <32>;
+		hback-porch = <64>;
+		hsync-len = <32>;
+		vfront-porch = <1>;
+		vback-porch = <27>;
+		vsync-len = <3>;
+	};
+
+	port@0 {
+		dual-lvds-odd-pixels;
+
+		panel_in0: endpoint {
+			remote-endpoint = <&oldi_out0>;
+		};
+	};
+
+	port@1 {
+		dual-lvds-even-pixels;
+
+		panel_in1: endpoint {
+			remote-endpoint = <&oldi_out1>;
+		};
+	};
+};
