@@ -112,7 +112,7 @@
 			};
 
 			vgen4_reg: v33 {
-				regulator-min-microvolt = <2850000>;
+				regulator-min-microvolt = <3300000>;
 				regulator-max-microvolt = <3300000>;
 				regulator-always-on;
 			};
@@ -143,12 +143,14 @@
 		read-only;
 		reg = <0x50>;
 		pagesize = <32>;
+		vcc-supply = <&vgen4_reg>;
 	};
 
 	at24c02: eeprom@56 {
 		compatible = "nxp,se97b", "atmel,24c02";
 		reg = <0x56>;
 		pagesize = <16>;
+		vcc-supply = <&vgen4_reg>;
 	};
 
 	ds1339: rtc@68 {
