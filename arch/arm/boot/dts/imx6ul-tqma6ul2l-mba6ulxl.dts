@@ -196,6 +196,7 @@
 		reg = <0x22>;
 		gpio-controller;
 		#gpio-cells = <2>;
+		vcc-supply = <&reg_mba6ul_3v3>;
 		status = "okay";
 
 		boot-cfg-en-hog {
