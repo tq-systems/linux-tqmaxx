@@ -16,6 +16,7 @@
 
 	panel: panel {
 		backlight = <&backlight0>;
+		power-supply = <&reg_mba6ul_3v3>;
 
 		port {
 			panel_in: endpoint {
@@ -33,6 +34,8 @@
 		reg = <0x38>;
 		interrupts = <3 IRQ_TYPE_EDGE_FALLING>;
 		interrupt-parent = <&gpio1>;
+		iovcc-supply = <&reg_mba6ul_3v3>;
+		vcc-supply = <&reg_mba6ul_3v3>;
 		status = "disabled";
 	};
 };
