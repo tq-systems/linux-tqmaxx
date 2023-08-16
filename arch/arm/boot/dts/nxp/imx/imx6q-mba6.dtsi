@@ -10,6 +10,13 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_ecspi5_mba6x>;
 	cs-gpios = <&gpio1 17 GPIO_ACTIVE_LOW>;
+
+	spidev5_0: spidev5-0@0 {
+		compatible = "tq,testdev";
+		spi-max-frequency = <5000000>;
+		reg = <0>;
+		status = "okay";
+	};
 };
 
 &ethphy {
