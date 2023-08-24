@@ -39,18 +39,21 @@
 			label = "s14";
 			linux,code = <KEY_1>;
 			gpios = <&expander_in0 0 GPIO_ACTIVE_LOW>;
+			wakeup-source;
 		};
 
 		button2 {
 			label = "s6";
 			linux,code = <KEY_2>;
 			gpios = <&expander_in0 1 GPIO_ACTIVE_LOW>;
+			wakeup-source;
 		};
 
 		button3 {
 			label = "s7";
 			linux,code = <KEY_3>;
 			gpios = <&expander_in0 2 GPIO_ACTIVE_LOW>;
+			wakeup-source;
 		};
 
 		power-button {
@@ -170,6 +173,13 @@
 	pinctrl-0 = <&pinctrl_ecspi2>;
 	num-cs = <1>;
 	status = "okay";
+
+	spidev2_0: spidev2-0@0 {
+		compatible = "tq,testdev";
+		spi-max-frequency = <5000000>;
+		reg = <0>;
+		status = "okay";
+	};
 };
 
 &fec1 {
@@ -235,6 +245,7 @@
 		reg = <0x20>;
 		gpio-controller;
 		#gpio-cells = <2>;
+		vcc-supply = <&reg_mba6ul_3v3>;
 	};
 
 	expander_in0: gpio-expander@21 {
@@ -248,6 +259,7 @@
 		#interrupt-cells = <2>;
 		gpio-controller;
 		#gpio-cells = <2>;
+		vcc-supply = <&reg_mba6ul_3v3>;
 
 		enet1_int-hog {
 			gpio-hog;
@@ -267,6 +279,7 @@
 		reg = <0x22>;
 		gpio-controller;
 		#gpio-cells = <2>;
+		vcc-supply = <&reg_mba6ul_3v3>;
 	};
 
 	analog_touch: touchscreen@41 {
@@ -274,10 +287,9 @@
 		reg = <0x41>;
 		interrupts = <21 IRQ_TYPE_EDGE_FALLING>;
 		interrupt-parent = <&gpio4>;
-		interrupt-controller;
 		status = "disabled";
 
-		stmpe_touchscreen {
+		touchscreen {
 			compatible = "st,stmpe-ts";
 			st,adc-freq = <1>;      /* 3.25 MHz ADC clock speed */
 			st,ave-ctrl = <3>;      /* 8 sample average control */
@@ -300,6 +312,7 @@
 		compatible = "nxp,se97b", "atmel,24c02";
 		reg = <0x51>;
 		pagesize = <16>;
+		vcc-supply = <&reg_mba6ul_3v3>;
 	};
 };
 

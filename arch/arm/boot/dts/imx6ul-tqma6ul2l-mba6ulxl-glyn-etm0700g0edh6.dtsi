@@ -1,0 +1,47 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright (c) 2018-2023 TQ-Systems GmbH <linux@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Markus Niebel <Markus.Niebel@tq-group.com>
+ */
+
+&backlight0 {
+	/* 1 kHz as stated by GLYN FAE */
+	pwms = <&pwm4 0 1000000 0>;
+	brightness-levels = <255 200 180 160 128 96 64 32 16>;
+	default-brightness-level = <5>;
+	status = "okay";
+};
+
+&lcdif {
+	status = "okay";
+};
+
+&panel {
+	compatible = "edt,etm0700g0edh6_24bit";
+};
+
+&polytouch {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_analog_touch>, <&pinctrl_touch_rst>;
+	reset-gpios = <&gpio3 4 GPIO_ACTIVE_LOW>;
+	gain = <1>;
+	offset = <0>;
+	threshold = <0x0f>;
+
+	/*
+	 * do not use size settings, display touch reads
+	 * out and uses 1792 x 1024 (tested with ETM0700G0EDH6)
+	 */
+
+	status = "okay";
+};
+
+&iomuxc {
+	pinctrl_touch_rst: touch-rstgrp {
+		fsl,pins = <
+			MX6UL_PAD_LCD_RESET__GPIO3_IO04		0x1b099 /* Touch Reset */
+		>;
+	};
+
+};

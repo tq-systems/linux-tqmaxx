@@ -511,7 +511,21 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6dl-lanmcu.dtb \
 	imx6dl-mamoj.dtb \
 	imx6dl-mba6a.dtb \
+	imx6dl-mba6a-cdtech-dc44.dtb \
+	imx6dl-mba6a-cdtech-fc21.dtb \
+	imx6dl-mba6a-duallvds-tm070jvhg33.dtb \
+	imx6dl-mba6a-hdmi.dtb \
+	imx6dl-mba6a-multi.dtb \
+	imx6dl-mba6a-lvds-g133han01.dtb \
+	imx6dl-mba6a-lvds-tm070jvhg33.dtb \
 	imx6dl-mba6b.dtb \
+	imx6dl-mba6b-cdtech-dc44.dtb \
+	imx6dl-mba6b-cdtech-fc21.dtb \
+	imx6dl-mba6b-duallvds-tm070jvhg33.dtb \
+	imx6dl-mba6b-hdmi.dtb \
+	imx6dl-mba6b-multi.dtb \
+	imx6dl-mba6b-lvds-g133han01.dtb \
+	imx6dl-mba6b-lvds-tm070jvhg33.dtb \
 	imx6dl-nit6xlite.dtb \
 	imx6dl-nitrogen6x.dtb \
 	imx6dl-phytec-mira-rdk-nand.dtb \
@@ -616,7 +630,21 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6q-logicpd.dtb \
 	imx6q-marsboard.dtb \
 	imx6q-mba6a.dtb \
+	imx6q-mba6a-cdtech-dc44.dtb \
+	imx6q-mba6a-cdtech-fc21.dtb \
+	imx6q-mba6a-duallvds-tm070jvhg33.dtb \
+	imx6q-mba6a-hdmi.dtb \
+	imx6q-mba6a-multi.dtb \
+	imx6q-mba6a-lvds-g133han01.dtb \
+	imx6q-mba6a-lvds-tm070jvhg33.dtb \
 	imx6q-mba6b.dtb \
+	imx6q-mba6b-cdtech-dc44.dtb \
+	imx6q-mba6b-cdtech-fc21.dtb \
+	imx6q-mba6b-duallvds-tm070jvhg33.dtb \
+	imx6q-mba6b-hdmi.dtb \
+	imx6q-mba6b-multi.dtb \
+	imx6q-mba6b-lvds-g133han01.dtb \
+	imx6q-mba6b-lvds-tm070jvhg33.dtb \
 	imx6q-mccmon6.dtb \
 	imx6q-nitrogen6x.dtb \
 	imx6q-nitrogen6_max.dtb \
@@ -664,6 +692,13 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6q-yapp4-crux.dtb \
 	imx6q-zii-rdu2.dtb \
 	imx6qp-mba6b.dtb \
+	imx6qp-mba6b-cdtech-dc44.dtb \
+	imx6qp-mba6b-cdtech-fc21.dtb \
+	imx6qp-mba6b-duallvds-tm070jvhg33.dtb \
+	imx6qp-mba6b-hdmi.dtb \
+	imx6qp-mba6b-multi.dtb \
+	imx6qp-mba6b-lvds-g133han01.dtb \
+	imx6qp-mba6b-lvds-tm070jvhg33.dtb \
 	imx6qp-nitrogen6_max.dtb \
 	imx6qp-nitrogen6_som2.dtb \
 	imx6qp-phytec-mira-rdk-nand.dtb \
@@ -712,7 +747,15 @@ dtb-$(CONFIG_SOC_IMX6UL) += \
 	imx6ul-liteboard.dtb \
 	imx6ul-tqma6ul1-mba6ulx.dtb \
 	imx6ul-tqma6ul2-mba6ulx.dtb \
+	imx6ul-tqma6ul2-mba6ulx-cdtech-dc44.dtb \
+	imx6ul-tqma6ul2-mba6ulx-cdtech-fc21.dtb \
+	imx6ul-tqma6ul2-mba6ulx-lvds.dtb \
 	imx6ul-tqma6ul2l-mba6ulx.dtb \
+	imx6ul-tqma6ul2l-mba6ulx-cdtech-dc44.dtb \
+	imx6ul-tqma6ul2l-mba6ulx-cdtech-fc21.dtb \
+	imx6ul-tqma6ul2l-mba6ulx-lvds.dtb \
+	imx6ul-tqma6ul2l-mba6ulxl.dtb \
+	imx6ul-tqma6ul2l-mba6ulxl-glyn-etm0700g0edh6.dtb \
 	imx6ul-opos6uldev.dtb \
 	imx6ul-pico-dwarf.dtb \
 	imx6ul-pico-hobbit.dtb \
@@ -746,7 +789,13 @@ dtb-$(CONFIG_SOC_IMX6UL) += \
 	imx6ull-phytec-tauri-emmc.dtb \
 	imx6ull-phytec-tauri-nand.dtb \
 	imx6ull-tqma6ull2-mba6ulx.dtb \
+	imx6ull-tqma6ull2-mba6ulx-cdtech-dc44.dtb \
+	imx6ull-tqma6ull2-mba6ulx-cdtech-fc21.dtb \
+	imx6ull-tqma6ull2-mba6ulx-lvds.dtb \
 	imx6ull-tqma6ull2l-mba6ulx.dtb \
+	imx6ull-tqma6ull2l-mba6ulx-cdtech-dc44.dtb \
+	imx6ull-tqma6ull2l-mba6ulx-cdtech-fc21.dtb \
+	imx6ull-tqma6ull2l-mba6ulx-lvds.dtb \
 	imx6ulz-14x14-evk.dtb \
 	imx6ulz-bsh-smm-m2.dtb
 dtb-$(CONFIG_SOC_IMX7D) += \
@@ -762,6 +811,9 @@ dtb-$(CONFIG_SOC_IMX7D) += \
 	imx7d-flex-concentrator.dtb \
 	imx7d-flex-concentrator-mfg.dtb \
 	imx7d-mba7.dtb \
+	imx7d-mba7-lvds.dtb \
+	imx7d-mba7-cdtech-fc21.dtb \
+	imx7d-mba7-cdtech-dc44.dtb \
 	imx7d-meerkat96.dtb \
 	imx7d-nitrogen7.dtb \
 	imx7d-pico-dwarf.dtb \
@@ -781,6 +833,9 @@ dtb-$(CONFIG_SOC_IMX7D) += \
 	imx7s-colibri-iris.dtb \
 	imx7s-colibri-iris-v2.dtb \
 	imx7s-mba7.dtb \
+	imx7s-mba7-lvds.dtb \
+	imx7s-mba7-cdtech-fc21.dtb \
+	imx7s-mba7-cdtech-dc44.dtb \
 	imx7s-warp.dtb
 dtb-$(CONFIG_SOC_IMX7ULP) += \
 	imx7ulp-com.dtb \

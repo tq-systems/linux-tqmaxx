@@ -1192,6 +1192,13 @@ properties:
               - fsl,ls1043a-qds
           - const: fsl,ls1043a
 
+      - description: TQ-Systems LS1043A based Boards
+        items:
+          - enum:
+              - tq,ls1043a-tqmls1043a-mbls10xxa
+          - const: tq,ls1043a-tqmls1043a
+          - const: fsl,ls1043a
+
       - description: LS1046A based Boards
         items:
           - enum:
@@ -1200,11 +1207,25 @@ properties:
               - fsl,ls1046a-rdb
           - const: fsl,ls1046a
 
+      - description: TQ-Systems LS1046A based Boards
+        items:
+          - enum:
+              - tq,ls1046a-tqmls1046a-mbls10xxa
+          - const: tq,ls1046a-tqmls1046a
+          - const: fsl,ls1046a
+
       - description: LS1088A based Boards
         items:
           - enum:
               - fsl,ls1088a-qds
               - fsl,ls1088a-rdb
+          - const: fsl,ls1088a
+
+      - description: TQ-Systems LS1088A based Boards
+        items:
+          - enum:
+              - tq,ls1088a-tqmls1088a-mbls10xxa
+          - const: tq,ls1088a-tqmls1088a
           - const: fsl,ls1088a
 
       - description: LS2080A based Boards
