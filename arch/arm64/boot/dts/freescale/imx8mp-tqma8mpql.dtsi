@@ -41,11 +41,21 @@
 			alloc-ranges = <0 0x40000000 0 0x77000000>;
 			linux,cma-default;
 		};
+
+		isp0_reserved: isp0@55500000 {
+			no-map;
+			reg = <0 0x55500000 0 0x10000000>;
+		};
 	};
 };
 
 &A53_0 {
 	cpu-supply = <&buck2_reg>;
+};
+
+/* Remove DSP references to removed reserved memory regions */
+&dsp {
+	/delete-property/ memory-region;
 };
 
 &flexspi {
@@ -236,6 +246,10 @@
 	clock-frequency = <384000>;
 };
 
+&isp_0 {
+	memory-region = <&isp0_reserved>;
+};
+
 /* HACK begin:
  * The following nodes are required so that some essential clocks are enabled.
  * lcdif3 is absolutly required one, the others are dependencies.
@@ -259,6 +273,16 @@
 
 &mix_gpu_ml {
 	status = "okay";
+};
+
+/* Remove reserved memory referenced by unused DSP */
+&resmem {
+	/delete-node/ dsp@92400000;
+	/delete-node/ dsp_reserved_heap;
+	/delete-node/ vdev0vring0@942f0000;
+	/delete-node/ vdev0vring1@942f8000;
+	/delete-node/ vdev0buffer@94300000;
+	/delete-node/ isp0@94400000;
 };
 
 &sdma2 {
