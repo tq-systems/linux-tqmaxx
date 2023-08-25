@@ -21,6 +21,11 @@
 	cpu-supply = <&buck2_reg>;
 };
 
+/* Remove DSP references to removed reserved memory regions */
+&dsp {
+	/delete-property/ memory-region;
+};
+
 &flexspi {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_flexspi0>;
@@ -211,6 +216,15 @@
 
 &mix_gpu_ml {
 	status = "okay";
+};
+
+/* Remove reserved memory referenced by unused DSP */
+&resmem {
+	/delete-node/ dsp@92400000;
+	/delete-node/ dsp_reserved_heap;
+	/delete-node/ vdev0vring0@942f0000;
+	/delete-node/ vdev0vring1@942f8000;
+	/delete-node/ vdev0buffer@94300000;
 };
 
 &sdma2 {
