@@ -215,6 +215,10 @@
 		reset-deassert-us = <1000>;
 		ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
 		ti,clk-output-sel = <DP83867_CLK_O_SEL_OFF>;
+		/* LED0: 1Gbit/s, LED2: link+activity */
+		ti,led-function = <0x0b05>;
+		/* LED0/2: active high, driven by PHY function */
+		ti,led-ctrl = <0x1414>;
 	};
 
 	cpsw3g_phy3: ethernet-phy@3 {
@@ -225,6 +229,10 @@
 		reset-deassert-us = <1000>;
 		ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
 		ti,clk-output-sel = <DP83867_CLK_O_SEL_OFF>;
+		/* LED0: 1Gbit/s, LED2: link+activity */
+		ti,led-function = <0x0b05>;
+		/* LED0/2: active high, driven by PHY function */
+		ti,led-ctrl = <0x1414>;
 	};
 };
 
