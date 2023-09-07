@@ -404,7 +404,7 @@ static int imx_sec_dsim_bind(struct device *dev, struct device *master,
 	ret = sec_mipi_dsim_bind(dev, master, data, encoder,
 				 dsim_dev->base, dsim_dev->irq, pdata);
 	if (ret) {
-		dev_err(dev, "failed to bind sec dsim bridge: %d\n", ret);
+		dev_err_probe(dev, ret, "failed to bind sec dsim bridge\n");
 		drm_encoder_cleanup(encoder);
 
 		/* If no panel or bridge connected, just return 0
