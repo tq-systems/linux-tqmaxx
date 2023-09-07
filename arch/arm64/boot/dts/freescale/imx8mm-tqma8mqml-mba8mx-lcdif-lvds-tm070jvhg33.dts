@@ -11,3 +11,9 @@
 &display_subsystem {
 	status = "okay";
 };
+
+&panel {
+	/* specific Video PLL frequency required */
+	assigned-clocks = <&clk IMX8MM_VIDEO_PLL1>;
+	assigned-clock-rates = <594000000>;
+};
