@@ -8,6 +8,7 @@
 /dts-v1/;
 /plugin/;
 
+#include <dt-bindings/clock/imx8mm-clock.h>
 #include <dt-bindings/gpio/gpio.h>
 
 &{/} {
@@ -44,6 +45,9 @@
 };
 
 &panel {
+	/* specific Video PLL frequency required */
+	assigned-clocks = <&clk IMX8MM_VIDEO_PLL1>;
+	assigned-clock-rates = <594000000>;
 	compatible = "tianma,tm070jvhg33";
 	status = "okay";
 
