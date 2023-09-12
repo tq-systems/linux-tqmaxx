@@ -286,7 +286,7 @@
 		compatible = "ti,tlv320aic32x4";
 		reg = <0x18>;
 		reset-gpios = <&gpio6 28 GPIO_ACTIVE_LOW>;
-		clocks = <&rcar_sound>;
+		clocks = <&rcar_sound 3>;
 		clock-names = "mclk";
 		ldoin-supply = <&reg_3p3v>;
 		iov-supply = <&reg_3p3v>;
@@ -491,11 +491,12 @@
 
 	status = "okay";
 
-	/* Multiple DAIs */
-	#sound-dai-cells = <1>;
+	/* Single DAI */
+	#sound-dai-cells = <0>;
 
-	/* only one clkout */
-	#clock-cells = <0>;
+	/* audio_clkout0/1/2/3 */
+	#clock-cells = <1>;
+	clock-frequency = <12288000>;
 
 	ports {
 		#address-cells = <1>;
@@ -525,8 +526,8 @@
 				bitclock-master = <&rsnd_endpoint1>;
 				frame-master = <&rsnd_endpoint1>;
 
-				playback = <&ssi1 &src1 &dvc0>;
-				capture  = <&ssi0>;
+				playback = <&ssi0 &src0 &dvc0>;
+				capture  = <&ssi1>;
 			};
 		};
 	};
