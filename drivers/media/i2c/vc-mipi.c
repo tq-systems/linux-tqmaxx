@@ -257,7 +257,7 @@ static struct i2c_driver vc_mipi_driver = {
 		.name = "vc-mipi",
 		.of_match_table = of_match_ptr(vc_mipi_dt_ids),
 	},
-	.probe_new = vc_mipi_i2c_probe,
+	.probe = vc_mipi_i2c_probe,
 	.remove = vc_mipi_i2c_remove,
 };
 
