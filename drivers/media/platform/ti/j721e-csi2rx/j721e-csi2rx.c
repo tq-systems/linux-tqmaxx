@@ -276,6 +276,12 @@ static const struct ti_csi2rx_fmt formats[] = {
 		.csi_dt			= MIPI_CSI2_DT_RAW10,
 		.bpp			= 16,
 		.size			= SHIM_DMACNTX_SIZE_16,
+	}, {
+		.fourcc			= V4L2_PIX_FMT_GREY,
+		.code			= MEDIA_BUS_FMT_Y8_1X8,
+		.csi_dt			= MIPI_CSI2_DT_RAW8,
+		.bpp			= 8,
+		.size			= SHIM_DMACNTX_SIZE_8,
 	},
 
 	/* More formats can be supported but they are not listed for now. */
