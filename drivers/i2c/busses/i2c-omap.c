@@ -1002,6 +1002,9 @@ static void omap_i2c_receive_data(struct omap_i2c_dev *omap, u8 num_bytes,
 	u16		w;
 
 	while (num_bytes--) {
+		if (WARN_ON(omap->buf_len == 0))
+			return;
+
 		w = omap_i2c_read_reg(omap, OMAP_I2C_DATA_REG);
 		*omap->buf++ = w;
 		omap->buf_len--;
@@ -1011,6 +1014,9 @@ static void omap_i2c_receive_data(struct omap_i2c_dev *omap, u8 num_bytes,
 		 * omap4 is 8 bit wide
 		 */
 		if (omap->flags & OMAP_I2C_FLAG_16BIT_DATA_REG) {
+			if (WARN_ON(omap->buf_len == 0))
+				return;
+
 			*omap->buf++ = w >> 8;
 			omap->buf_len--;
 		}
@@ -1023,6 +1029,9 @@ static int omap_i2c_transmit_data(struct omap_i2c_dev *omap, u8 num_bytes,
 	u16		w;
 
 	while (num_bytes--) {
+		if (WARN_ON(omap->buf_len == 0))
+			return -EMSGSIZE;
+
 		w = *omap->buf++;
 		omap->buf_len--;
 
@@ -1031,6 +1040,9 @@ static int omap_i2c_transmit_data(struct omap_i2c_dev *omap, u8 num_bytes,
 		 * omap4 is 8 bit wide
 		 */
 		if (omap->flags & OMAP_I2C_FLAG_16BIT_DATA_REG) {
+			if (WARN_ON(omap->buf_len == 0))
+				return -EMSGSIZE;
+
 			w |= *omap->buf++ << 8;
 			omap->buf_len--;
 		}
