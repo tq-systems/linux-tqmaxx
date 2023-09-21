@@ -197,6 +197,7 @@ struct ov9282 {
 static const struct regmap_config ov9282_regmap_config = {
 	.reg_bits = 16,
 	.val_bits = 8,
+	.use_single_read = true,
 };
 
 static const s64 link_freq[] = {
