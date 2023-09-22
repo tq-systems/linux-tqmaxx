@@ -541,20 +541,8 @@ static enum usb_role dwc3_usb_role_switch_get(struct usb_role_switch *sw)
 static int dwc3_setup_role_switch(struct dwc3 *dwc)
 {
 	struct usb_role_switch_desc dwc3_role_switch = {NULL};
-	u32 mode;
 
 	dwc->role_switch_default_mode = usb_get_role_switch_default_mode(dwc->dev);
-	switch (dwc->role_switch_default_mode) {
-	case USB_DR_MODE_HOST:
-		mode = DWC3_GCTL_PRTCAP_HOST;
-		break;
-	case USB_DR_MODE_UNKNOWN:
-		mode = DWC3_GCTL_PRTCAP_NONE;
-		break;
-	default:
-		mode = DWC3_GCTL_PRTCAP_DEVICE;
-		break;
-	}
 
 	dwc3_role_switch.fwnode = dev_fwnode(dwc->dev);
 	dwc3_role_switch.set = dwc3_usb_role_switch_set;
@@ -576,7 +564,11 @@ static int dwc3_setup_role_switch(struct dwc3 *dwc)
 		}
 	}
 
-	dwc3_set_mode(dwc, mode);
+	/*
+	 * usb_role_switch should implement initial detection and call
+	 * dwc3_usb_role_switch_set to get the state machine running
+	 */
+
 	return 0;
 }
 #else
