@@ -1312,7 +1312,7 @@
 						reg = <1>;
 
 						imx8mm_mipi_csi_out: endpoint {
-							remote-endpoint = <&csi_in>;
+							remote-endpoint = <&csi1_bridge>;
 						};
 					};
 				};
