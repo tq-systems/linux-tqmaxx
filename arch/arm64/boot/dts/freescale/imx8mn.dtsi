@@ -1243,9 +1243,10 @@
 				#power-domain-cells = <1>;
 			};
 
-			display-subsystem {
+			display_subsystem: display-subsystem {
 				compatible = "fsl,imx-display-subsystem";
 				ports = <&lcdif_disp0>;
+				status = "disabled";
 			};
 
 			usbotg1: usb@32e40000 {
