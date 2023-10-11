@@ -1,0 +1,91 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright (c) 2021-2024 TQ-Systems GmbH <linux@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Alexander Stein
+ */
+
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/clock/imx8mq-clock.h>
+
+&{/} {
+	/* This voltage converter is located on the adapter board MBaxCA */
+	reg_mipi_csi_v3v3: regulator-mipi-csi-v3v3 {
+		compatible = "regulator-fixed";
+		regulator-name = "MIPI_CSI_V_3V3";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		vin-supply = <&reg_vcc_5v0>;
+	};
+};
+
+&csi1_bridge {
+	fsl,mipi-mode;
+	status = "okay";
+
+	port {
+		csi1: endpoint {
+			remote-endpoint = <&csi1_out>;
+		};
+	};
+};
+
+&mipi_csi_1 {
+	assigned-clocks = <&clk IMX8MQ_CLK_CSI1_CORE>,
+			  <&clk IMX8MQ_CLK_CSI1_PHY_REF>,
+			  <&clk IMX8MQ_CLK_CSI1_ESC>;
+	assigned-clock-rates = <266000000>, <333000000>, <66000000>;
+	status = "okay";
+
+	port {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		mipi_csi1_in: endpoint@0 {
+			reg = <0>;
+			remote-endpoint = <&camera_out>;
+			data-lanes = <1 2>;
+			bus-type = <4>;
+		};
+
+		csi1_out: endpoint@1 {
+			reg = <1>;
+			remote-endpoint = <&csi1>;
+		};
+	};
+};
+
+&i2c3 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	vc_ctrl: controller@10 {
+		compatible = "vision-components,mipi-module";
+		reg = <0x10>;
+		#clock-cells = <0>;
+		vcc-supply = <&reg_mipi_csi_v3v3>;
+		clock-frequency = <24000000>;
+	};
+
+	camera@60 {
+		compatible = "ovti,ov9281";
+		reg = <0x60>;
+		clocks = <&vc_ctrl>;
+
+		avdd-supply = <&vc_ctrl>;
+		dovdd-supply = <&vc_ctrl>;
+		dvdd-supply = <&vc_ctrl>;
+
+		port {
+			camera_out: endpoint {
+				remote-endpoint = <&mipi_csi1_in>;
+				data-lanes = <1 2>;
+				clock-lanes = <0>;
+				clock-noncontinuous = <1>;
+				link-frequencies = /bits/ 64 <400000000>;
+			};
+		};
+	};
+};
