@@ -250,9 +250,10 @@
 			      "sys_pll1_800m", "dram_pll_div";
 	};
 
-	display-subsystem {
+	display_subsystem: display-subsystem {
 		compatible = "fsl,imx-display-subsystem";
 		ports = <&lcdif_disp0>;
+		status = "disabled";
 	};
 
 	pmu {
