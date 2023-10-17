@@ -456,9 +456,10 @@
 	cd-gpios = <&gpio3 00 GPIO_ACTIVE_LOW>;
 	vmmc-supply = <&reg_usdhc2_vmmc>;
 	bus-width = <4>;
-	status = "okay";
 	no-sdio;
 	no-mmc;
+	disable-wp;
+	status = "okay";
 };
 
 &iomuxc {
