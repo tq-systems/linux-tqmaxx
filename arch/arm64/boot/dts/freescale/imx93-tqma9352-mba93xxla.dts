@@ -132,7 +132,7 @@
 
 &eqos {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_eqos>, <&pinctrl_eqos_phy>;
+	pinctrl-0 = <&pinctrl_eqos>;
 	phy-mode = "rgmii-id";
 	phy-handle = <&ethphy_eqos>;
 	status = "okay";
@@ -145,6 +145,10 @@
 		ethphy_eqos: ethernet-phy@0 {
 			compatible = "ethernet-phy-ieee802.3-c22";
 			reg = <0>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_eqos_phy>;
+			interrupt-parent = <&gpio3>;
+			interrupts = <26 IRQ_TYPE_EDGE_FALLING>;
 			reset-gpios = <&expander1 0 GPIO_ACTIVE_LOW>;
 			reset-assert-us = <500000>;
 			reset-deassert-us = <50000>;
@@ -164,7 +168,7 @@
 
 &fec {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_fec>, <&pinctrl_fec_phy>;
+	pinctrl-0 = <&pinctrl_fec>;
 	phy-mode = "rgmii-id";
 	phy-handle = <&ethphy_fec>;
 	fsl,magic-packet;
@@ -178,6 +182,10 @@
 		ethphy_fec: ethernet-phy@0 {
 			compatible = "ethernet-phy-ieee802.3-c22";
 			reg = <0>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_fec_phy>;
+			interrupt-parent = <&gpio3>;
+			interrupts = <27 IRQ_TYPE_EDGE_FALLING>;
 			reset-gpios = <&expander1 1 GPIO_ACTIVE_LOW>;
 			reset-assert-us = <500000>;
 			reset-deassert-us = <50000>;
@@ -222,6 +230,22 @@
 		gpios = <7 GPIO_ACTIVE_LOW>;
 		input;
 		line-name = "USB_C_ALERT#";
+	};
+};
+
+&gpio3 {
+	ethphy-eqos-irq-hog {
+		gpio-hog;
+		gpios = <26 GPIO_ACTIVE_LOW>;
+		input;
+		line-name = "ENET0_IRQ#";
+	};
+
+	ethphy-fec-irq-hog {
+		gpio-hog;
+		gpios = <27 GPIO_ACTIVE_LOW>;
+		input;
+		line-name = "ENET1_IRQ#";
 	};
 };
 
