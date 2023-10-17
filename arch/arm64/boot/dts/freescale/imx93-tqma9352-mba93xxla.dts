@@ -218,6 +218,13 @@
 };
 
 &gpio1 {
+	expander-irq-hog {
+		gpio-hog;
+		gpios = <12 GPIO_ACTIVE_LOW>;
+		input;
+		line-name = "PEX_INT#";
+	};
+
 	rtc-irq-hog {
 		gpio-hog;
 		gpios = <14 GPIO_ACTIVE_LOW>;
@@ -227,13 +234,6 @@
 };
 
 &gpio2 {
-	expander-irq-hog {
-		gpio-hog;
-		gpios = <3 GPIO_ACTIVE_LOW>;
-		input;
-		line-name = "PEXP_INT#";
-	};
-
 	tcpc-irq-hog {
 		gpio-hog;
 		gpios = <7 GPIO_ACTIVE_LOW>;
@@ -328,8 +328,8 @@
 		#gpio-cells = <2>;
 		interrupt-controller;
 		#interrupt-cells = <2>;
-		interrupt-parent = <&gpio2>;
-		interrupts = <3 IRQ_TYPE_LEVEL_LOW>;
+		interrupt-parent = <&gpio1>;
+		interrupts = <12 IRQ_TYPE_LEVEL_LOW>;
 		vcc-supply = <&reg_3v3>;
 		gpio-line-names = "3V8_EN", "",
 				  "", "IOT_PWRKEY",
@@ -612,7 +612,7 @@
 
 	pinctrl_pexp_irq: pexpirqgrp {
 		fsl,pins = <
-			MX93_PAD_GPIO_IO03__GPIO2_IO03		0x1306
+			MX93_PAD_SAI1_TXC__GPIO1_IO12		0x1306
 		>;
 	};
 
