@@ -218,6 +218,13 @@
 };
 
 &gpio1 {
+	tcpc-irq-hog {
+		gpio-hog;
+		gpios = <2 GPIO_ACTIVE_LOW>;
+		input;
+		line-name = "USB_C_ALERT#";
+	};
+
 	expander-irq-hog {
 		gpio-hog;
 		gpios = <12 GPIO_ACTIVE_LOW>;
@@ -230,15 +237,6 @@
 		gpios = <14 GPIO_ACTIVE_LOW>;
 		input;
 		line-name = "RTC_EVENT#";
-	};
-};
-
-&gpio2 {
-	tcpc-irq-hog {
-		gpio-hog;
-		gpios = <7 GPIO_ACTIVE_LOW>;
-		input;
-		line-name = "USB_C_ALERT#";
 	};
 };
 
@@ -287,11 +285,11 @@
 
 	tcpc: ptn5110@50 {
 		compatible = "nxp,ptn5110";
+		reg = <0x50>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_typec>;
-		reg = <0x50>;
-		interrupt-parent = <&gpio2>;
-		interrupts = <7 IRQ_TYPE_EDGE_FALLING>;
+		interrupt-parent = <&gpio1>;
+		interrupts = <2 IRQ_TYPE_EDGE_FALLING>;
 		status = "disabled";
 
 		port {
@@ -622,10 +620,9 @@
 		>;
 	};
 
-	/* TODO: */
 	pinctrl_typec: typecgrp {
 		fsl,pins = <
-			MX93_PAD_GPIO_IO07__GPIO2_IO07		0x1306
+			MX93_PAD_I2C2_SCL__GPIO1_IO02		0x1306
 		>;
 	};
 
