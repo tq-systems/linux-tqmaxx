@@ -302,7 +302,6 @@
 		pinctrl-0 = <&pinctrl_typec>;
 		interrupt-parent = <&gpio1>;
 		interrupts = <2 IRQ_TYPE_EDGE_FALLING>;
-		status = "disabled";
 
 		port {
 			typec_drd_sw: endpoint {
