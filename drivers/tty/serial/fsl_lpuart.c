@@ -2023,7 +2023,6 @@ static void lpuart32_shutdown(struct uart_port *port)
 		UARTCTRL_TCIE | UARTCTRL_RIE | UARTCTRL_ILIE |
 		UARTCTRL_LOOPS);
 	lpuart32_write(port, temp, UARTCTRL);
-	lpuart32_write(port, 0, UARTMODIR);
 
 	if (sport->lpuart_dma_rx_use)
 		sport->dma_rx_chan_active = false;
