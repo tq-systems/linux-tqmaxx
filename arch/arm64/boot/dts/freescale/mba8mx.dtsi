@@ -152,6 +152,12 @@
 	pinctrl-0 = <&pinctrl_ecspi1>;
 	cs-gpios = <&gpio5 9 GPIO_ACTIVE_LOW>;
 	status = "okay";
+
+	spidev1_0: spidev1@0 {
+		reg = <0>;
+		compatible = "tq,testdev";
+		spi-max-frequency = <5000000>;
+	};
 };
 
 &ecspi2 {
@@ -159,6 +165,12 @@
 	pinctrl-0 = <&pinctrl_ecspi2>;
 	cs-gpios = <&gpio5 13 GPIO_ACTIVE_LOW>;
 	status = "okay";
+
+	spidev2_0: spidev2@0 {
+		reg = <0>;
+		compatible = "tq,testdev";
+		spi-max-frequency = <5000000>;
+	};
 };
 
 &fec1 {
