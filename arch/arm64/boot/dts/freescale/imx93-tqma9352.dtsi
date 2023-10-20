@@ -84,6 +84,13 @@
 			no-map;
 			status = "disabled";
 		};
+
+		/* EdgeLock secure enclave  */
+		ele_reserved: ele-reserved@a4120000 {
+			compatible = "shared-dma-pool";
+			reg = <0 0xa4120000 0 0x100000>;
+			no-map;
+		};
 	};
 
 	/* SD2 RST# via PMIC SW_EN */
@@ -102,6 +109,10 @@
 
 &adc1 {
 	vref-supply = <&buck5>;
+};
+
+&ele_fw2 {
+	memory-region = <&ele_reserved>;
 };
 
 &flexspi1 {
