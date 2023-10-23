@@ -703,7 +703,6 @@ static long hantroenc_ioctl32(struct file *filp, unsigned int cmd, unsigned long
 	if (err) \
 		return err; \
 }
-#endif
 
 union {
 	unsigned long kux;
@@ -793,6 +792,7 @@ union {
 	}
 	return 0;
 }
+#endif
 
 /* VFS methods */
 static struct file_operations hantroenc_fops = {
