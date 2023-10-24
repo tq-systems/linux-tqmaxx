@@ -16,6 +16,9 @@
 	compatible = "tq,tqma335x", "ti,am33xx";
 
 	aliases {
+		mmc0 = &mmc2;
+		mmc1 = &mmc1;
+		/delete-property/ mmc2;
 		rtc0 = &tps;
 		rtc1 = &ds1339;
 		rtc2 = &rtc;
