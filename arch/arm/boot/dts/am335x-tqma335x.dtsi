@@ -162,6 +162,10 @@
 	status = "okay";
 };
 
+&mmc3 {
+	status = "disabled";
+};
+
 &rtc {
 	status = "disabled";
 };
