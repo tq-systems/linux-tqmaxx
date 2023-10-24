@@ -6,14 +6,10 @@
  * Based on:
  * Copyright (C) 2012 Texas Instruments Incorporated - http://www.ti.com/
  */
-
-/dts-v1/;
-
+#include "am335x-mba335x.dts"
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/interrupt-controller/irq.h>
 #include <dt-bindings/pwm/pwm.h>
-
-#include "am335x-mba335x.dtsi"
 
 / {
 	panel {
