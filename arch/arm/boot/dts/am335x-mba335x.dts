@@ -14,8 +14,8 @@
 #include "am335x-tqma335x.dtsi"
 
 / {
-	model = "TQ-Systems GmbH MBa335x";
-	compatible = "tq,mba335x", "tq,tqma335x", "ti,am33xx";
+	model = "TQ-Systems TQMa335x[L] SoM on MBa335x carrier board";
+	compatible = "tq,tqma3358-mba335x", "tq,tqma3358", "ti,am33xx";
 
 	backlight: backlight {
 		compatible = "pwm-backlight";
