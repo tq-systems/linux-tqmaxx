@@ -210,6 +210,7 @@ dma_subsys: bus@5a000000 {
 		assigned-clocks = <&clk IMX_SC_R_ADC_0 IMX_SC_PM_CLK_PER>;
 		assigned-clock-rates = <24000000>;
 		power-domains = <&pd IMX_SC_R_ADC_0>;
+		#io-channel-cells = <1>;
 		status = "disabled";
 	 };
 
