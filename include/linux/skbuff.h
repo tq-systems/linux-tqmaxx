@@ -505,6 +505,27 @@ int skb_zerocopy_iter_stream(struct sock *sk, struct sk_buff *skb,
 			     struct msghdr *msg, int len,
 			     struct ubuf_info *uarg);
 
+/* Bit fields of redundant info io_port */
+#define PTP_MSG_IN      (0x3 << 6)
+#define PTP_EVT_OUT     (0x2 << 6)
+#define DIRECTED_TX     (0x1 << 6)
+#define PORT_B          BIT(1)
+#define PORT_A          BIT(0)
+
+struct skb_redundant_info {
+	__u8  io_port;     /* tx/rx port of the skb */
+	__u8  pathid;      /* pathid in tag */
+	__u16 ethertype;   /* ethertype in tag */
+	__u16 lsdu_size;   /* lsdu size in tag */
+	__u16 seqnr;       /* seqnr in tag */
+};
+
+#define REDINFO_T(skb)      (skb_redinfo(skb)->io_port & (0x3 << 6))
+#define REDINFO_PORTS(skb)  (skb_redinfo(skb)->io_port & 0x3)
+#define REDINFO_PATHID(skb) (skb_redinfo(skb)->pathid)
+#define REDINFO_SEQNR(skb)  (skb_redinfo(skb)->seqnr)
+#define REDINFO_LSDU_SIZE(skb)  (skb_redinfo(skb)->lsdu_size)
+
 /* This data is invariant across clones and lives at
  * the end of the header data, ie. at skb->end.
  */
@@ -519,6 +540,8 @@ struct skb_shared_info {
 	struct sk_buff	*frag_list;
 	struct skb_shared_hwtstamps hwtstamps;
 	unsigned int	gso_type;
+	struct skb_shared_hwtstamps red_hwtstamps;
+	struct skb_redundant_info redinfo;
 	u32		tskey;
 
 	/*
@@ -1481,10 +1504,25 @@ static inline void skb_mark_not_on_list(struct sk_buff *skb)
 	skb->next = NULL;
 }
 
+/* Iterate through singly-linked GSO fragments of an skb. */
+#define skb_list_walk_safe(first, skb, next_skb)                               \
+	for ((skb) = (first), (next_skb) = (skb) ? (skb)->next : NULL; (skb);  \
+	     (skb) = (next_skb), (next_skb) = (skb) ? (skb)->next : NULL)
+
 static inline void skb_list_del_init(struct sk_buff *skb)
 {
 	__list_del_entry(&skb->list);
 	skb_mark_not_on_list(skb);
+}
+static inline struct skb_redundant_info *skb_redinfo(struct sk_buff *skb)
+{
+	return &skb_shinfo(skb)->redinfo;
+}
+
+static inline struct skb_shared_hwtstamps *
+skb_redinfo_hwtstamps(struct sk_buff *skb)
+{
+	return &skb_shinfo(skb)->red_hwtstamps;
 }
 
 /**
@@ -1818,6 +1856,18 @@ static inline __u32 skb_queue_len(const struct sk_buff_head *list_)
 }
 
 /**
+ *	skb_queue_len_lockless	- get queue length
+ *	@list_: list to measure
+ *
+ *	Return the length of an &sk_buff queue.
+ *	This variant can be used in lockless contexts.
+ */
+static inline __u32 skb_queue_len_lockless(const struct sk_buff_head *list_)
+{
+	return READ_ONCE(list_->qlen);
+}
+
+/**
  *	__skb_queue_head_init - initialize non-spinlock portions of sk_buff_head
  *	@list: queue to initialize
  *
@@ -2028,7 +2078,7 @@ static inline void __skb_unlink(struct sk_buff *skb, struct sk_buff_head *list)
 {
 	struct sk_buff *next, *prev;
 
-	list->qlen--;
+	WRITE_ONCE(list->qlen, list->qlen - 1);
 	next	   = skb->next;
 	prev	   = skb->prev;
 	skb->next  = skb->prev = NULL;
@@ -3192,8 +3242,9 @@ static inline int skb_padto(struct sk_buff *skb, unsigned int len)
  *	is untouched. Otherwise it is extended. Returns zero on
  *	success. The skb is freed on error if @free_on_error is true.
  */
-static inline int __skb_put_padto(struct sk_buff *skb, unsigned int len,
-				  bool free_on_error)
+static inline int __must_check __skb_put_padto(struct sk_buff *skb,
+					       unsigned int len,
+					       bool free_on_error)
 {
 	unsigned int size = skb->len;
 
@@ -3216,7 +3267,7 @@ static inline int __skb_put_padto(struct sk_buff *skb, unsigned int len,
  *	is untouched. Otherwise it is extended. Returns zero on
  *	success. The skb is freed on error.
  */
-static inline int skb_put_padto(struct sk_buff *skb, unsigned int len)
+static inline int __must_check skb_put_padto(struct sk_buff *skb, unsigned int len)
 {
 	return __skb_put_padto(skb, len, true);
 }

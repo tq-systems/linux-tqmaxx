@@ -32,7 +32,7 @@
 #include <linux/dma/k3-udma-glue.h>
 
 #include "icssg_config.h"
-#include "icssg_iep.h"
+#include "icss_iep.h"
 #include "icssg_switch_map.h"
 
 #define ICSS_SLICE0	0
@@ -87,25 +87,33 @@ enum prueth_mac {
 };
 
 struct prueth_tx_chn {
-	struct k3_knav_desc_pool *desc_pool;
+	struct napi_struct napi_tx;
+	struct k3_cppi_desc_pool *desc_pool;
 	struct k3_udma_glue_tx_channel *tx_chn;
+	struct prueth_emac *emac;
+	u32 id;
 	u32 descs_num;
-	spinlock_t lock;	/* to serialize */
 	unsigned int irq;
+	char name[32];
 };
 
 struct prueth_rx_chn {
 	struct device *dev;
-	struct k3_knav_desc_pool *desc_pool;
+	struct k3_cppi_desc_pool *desc_pool;
 	struct k3_udma_glue_rx_channel *rx_chn;
 	u32 descs_num;
-	spinlock_t lock;	/* to serialize */
 	unsigned int irq[ICSSG_MAX_RFLOWS];	/* separate irq per flow */
+	char name[32];
 };
 
 enum prueth_state_flags {
 	__STATE_TX_TS_IN_PROGRESS,
 };
+
+/* There are 4 Tx DMA channels, but the highest priority is CH3 (thread 3)
+ * and lower three are lower priority channels or threads.
+ */
+#define PRUETH_MAX_TX_QUEUES	4
 
 /* data for each emac port */
 struct prueth_emac {
@@ -114,7 +122,6 @@ struct prueth_emac {
 	struct prueth *prueth;
 	struct net_device *ndev;
 	u8 mac_addr[6];
-	struct napi_struct napi_tx;
 	struct napi_struct napi_rx;
 	u32 msg_enable;
 
@@ -127,17 +134,19 @@ struct prueth_emac {
 	int phy_if;
 	struct phy_device *phydev;
 	enum prueth_port port_id;
-	struct icssg_iep iep;
+	struct icss_iep *iep;
 	bool iep_initialized;
 	struct hwtstamp_config tstamp_config;
 	unsigned int rx_ts_enabled : 1;
 	unsigned int tx_ts_enabled : 1;
 
 	/* DMA related */
-	struct prueth_tx_chn tx_chns;
+	struct prueth_tx_chn tx_chns[PRUETH_MAX_TX_QUEUES];
 	struct completion tdown_complete;
+	atomic_t tdown_cnt;
 	struct prueth_rx_chn rx_chns;
 	int rx_flow_id_base;
+	int tx_ch_num;
 
 	/* SR1.0 Management channel */
 	struct prueth_rx_chn rx_mgm_chn;
@@ -234,10 +243,12 @@ static inline u64 icssg_ts_to_ns(u32 hi_sw, u32 hi, u32 lo, u32 cycle_time_ns)
 /* Classifier helpers */
 void icssg_class_set_mac_addr(struct regmap *miig_rt, int slice, u8 *mac);
 void icssg_class_disable(struct regmap *miig_rt, int slice);
-void icssg_class_default(struct regmap *miig_rt, int slice, bool allmulti);
-void icssg_class_promiscuous(struct regmap *miig_rt, int slice);
-void icssg_class_add_mcast(struct regmap *miig_rt, int slice,
-			   struct net_device *ndev);
+void icssg_class_default(struct regmap *miig_rt, int slice, bool allmulti,
+			 bool is_sr1);
+void icssg_class_promiscuous_sr1(struct regmap *miig_rt, int slice);
+void icssg_class_add_mcast_sr1(struct regmap *miig_rt, int slice,
+			       struct net_device *ndev);
+void icssg_ft1_set_mac_addr(struct regmap *miig_rt, int slice, u8 *mac_addr);
 
 /* Buffer queue helpers */
 int icssg_queue_pop(struct prueth *prueth, u8 queue);
@@ -263,8 +274,9 @@ void icssg_config_sr1(struct prueth *prueth, struct prueth_emac *emac,
 		      int slice);
 int icssg_config_sr2(struct prueth *prueth, struct prueth_emac *emac,
 		     int slice);
-int emac_send_command_sr2(struct prueth_emac *emac, struct icssg_cmd *cmd);
 int emac_set_port_state(struct prueth_emac *emac,
 			enum icssg_port_state_cmd state);
+#define prueth_napi_to_tx_chn(pnapi) \
+	container_of(pnapi, struct prueth_tx_chn, napi_tx)
 
 #endif /* __NET_TI_ICSSG_PRUETH_H */

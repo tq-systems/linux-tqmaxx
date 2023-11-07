@@ -59,6 +59,7 @@ static inline void mmdrop_delayed(struct mm_struct *mm)
 #else
 # define mmdrop_delayed(mm)	mmdrop(mm)
 #endif
+void mmdrop(struct mm_struct *mm);
 
 /*
  * This has to be called after a get_task_mm()/mmget_not_zero()
@@ -176,7 +177,8 @@ static inline bool in_vfork(struct task_struct *tsk)
 	 * another oom-unkillable task does this it should blame itself.
 	 */
 	rcu_read_lock();
-	ret = tsk->vfork_done && tsk->real_parent->mm == tsk->mm;
+	ret = tsk->vfork_done &&
+			rcu_dereference(tsk->real_parent)->mm == tsk->mm;
 	rcu_read_unlock();
 
 	return ret;

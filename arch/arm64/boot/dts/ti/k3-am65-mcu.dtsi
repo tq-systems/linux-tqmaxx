@@ -13,7 +13,7 @@
 		#size-cells = <1>;
 		ranges = <0x0 0x0 0x40f00000 0x20000>;
 
-		phy_gmii_sel: phy-gmii-sel {
+		phy_gmii_sel: phy@4040 {
 			compatible = "ti,am654-phy-gmii-sel";
 			reg = <0x4040 0x4>;
 			#phy-cells = <1>;
@@ -184,14 +184,14 @@
 			    "tx4", "tx5", "tx6", "tx7",
 			    "rx";
 
-		ports {
+		ethernet-ports {
 			#address-cells = <1>;
 			#size-cells = <0>;
 
 			cpsw_port1: port@1 {
 				reg = <1>;
 				ti,mac-only;
-				ti,label = "port1";
+				label = "port1";
 				ti,syscon-efuse = <&mcu_conf 0x200>;
 				phys = <&phy_gmii_sel 1>;
 			};
@@ -207,7 +207,9 @@
 			bus_freq = <1000000>;
 		};
 
-		cpts {
+		cpts@3d000 {
+			compatible = "ti,am65-cpts";
+			reg = <0x0 0x3d000 0x0 0x400>;
 			clocks = <&mcu_cpsw_cpts_mux>;
 			clock-names = "cpts";
 			interrupts-extended = <&gic500 GIC_SPI 570 IRQ_TYPE_LEVEL_HIGH>;
@@ -215,7 +217,7 @@
 			ti,cpts-ext-ts-inputs = <4>;
 			ti,cpts-periodic-outputs = <2>;
 
-			mcu_cpsw_cpts_mux: cpts_refclk_mux {
+			mcu_cpsw_cpts_mux: refclk-mux {
 				#clock-cells = <0>;
 				clocks = <&k3_clks 118 5>, <&k3_clks 118 11>,
 					<&k3_clks 157 91>, <&k3_clks 157 77>,
@@ -229,7 +231,7 @@
 
 	mcu_r5fss0: r5fss@41000000 {
 		compatible = "ti,am654-r5fss";
-		lockstep-mode = <1>;
+		ti,cluster-mode = <1>;
 		#address-cells = <1>;
 		#size-cells = <1>;
 		ranges = <0x41000000 0x00 0x41000000 0x20000>,
@@ -246,9 +248,9 @@
 			ti,sci-proc-ids = <0x01 0xFF>;
 			resets = <&k3_reset 159 1>;
 			firmware-name = "am65x-mcu-r5f0_0-fw";
-			atcm-enable = <1>;
-			btcm-enable = <1>;
-			loczrama = <1>;
+			ti,atcm-enable = <1>;
+			ti,btcm-enable = <1>;
+			ti,loczrama = <1>;
 			sram = <&mcu_r5fss0_core0_sram>;
 		};
 
@@ -262,9 +264,9 @@
 			ti,sci-proc-ids = <0x02 0xFF>;
 			resets = <&k3_reset 245 1>;
 			firmware-name = "am65x-mcu-r5f0_1-fw";
-			atcm-enable = <1>;
-			btcm-enable = <1>;
-			loczrama = <1>;
+			ti,atcm-enable = <1>;
+			ti,btcm-enable = <1>;
+			ti,loczrama = <1>;
 		};
 	};
 

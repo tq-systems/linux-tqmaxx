@@ -112,16 +112,16 @@
 		power-domains = <&k3_pds 148 TI_SCI_PD_EXCLUSIVE>;
 	};
 
-	crypto: crypto@4E00000 {
+	crypto: crypto@4e00000 {
 		compatible = "ti,sa2ul-crypto";
 		label = "crypto-aes-gbe";
-		reg = <0x0 0x4E00000 0x0 0x1200>;
+		reg = <0x0 0x4e00000 0x0 0x1200>;
 		power-domains = <&k3_pds 136 TI_SCI_PD_EXCLUSIVE>;
 		clocks = <&k3_clks 136 0>, <&k3_clks 136 1>, <&k3_clks 136 2>;
 		clock-names = "x2_clk", "pka_in_clk", "x1_clk";
 		#address-cells = <2>;
 		#size-cells = <2>;
-		ranges = <0x0 0x04E00000 0x00 0x04E00000 0x0 0x30000>;
+		ranges = <0x0 0x04e00000 0x00 0x04e00000 0x0 0x30000>;
 		status = "okay";
 
 		dmas = <&main_udmap 0xc000>, <&main_udmap 0x4000>,
@@ -653,13 +653,12 @@
 			ti,cpts-periodic-outputs = <6>;
 			ti,cpts-ext-ts-inputs = <8>;
 
-			main_cpts_mux: cpts_refclk_mux {
+			main_cpts_mux: refclk-mux {
 				#clock-cells = <0>;
 				clocks = <&k3_clks 118 5>, <&k3_clks 118 11>,
 					<&k3_clks 157 91>, <&k3_clks 157 77>,
 					<&k3_clks 157 102>, <&k3_clks 157 80>,
 					<&k3_clks 120 3>, <&k3_clks 121 3>;
-				cpts-mux-tbl = <0>, <1>;
 				assigned-clocks = <&main_cpts_mux>;
 				assigned-clock-parents = <&k3_clks 118 5>;
 			};
@@ -709,7 +708,7 @@
 		ti,syscon-pcie-mode = <&pcie0_mode>;
 		bus-range = <0x0 0xff>;
 		num-viewport = <16>;
-		max-link-speed = <3>;
+		max-link-speed = <2>;
 		dma-coherent;
 		interrupts = <GIC_SPI 340 IRQ_TYPE_EDGE_RISING>;
 		msi-map = <0x0 &gic_its 0x0 0x10000>;
@@ -736,7 +735,7 @@
 		ti,syscon-pcie-mode = <&pcie0_mode>;
 		num-ib-windows = <16>;
 		num-ob-windows = <16>;
-		max-link-speed = <3>;
+		max-link-speed = <2>;
 		dma-coherent;
 		interrupts = <GIC_SPI 340 IRQ_TYPE_EDGE_RISING>;
 	};
@@ -754,7 +753,7 @@
 		ti,syscon-pcie-mode = <&pcie1_mode>;
 		bus-range = <0x0 0xff>;
 		num-viewport = <16>;
-		max-link-speed = <3>;
+		max-link-speed = <2>;
 		dma-coherent;
 		interrupts = <GIC_SPI 355 IRQ_TYPE_EDGE_RISING>;
 		msi-map = <0x0 &gic_its 0x10000 0x10000>;
@@ -781,7 +780,7 @@
 		ti,syscon-pcie-mode = <&pcie1_mode>;
 		num-ib-windows = <16>;
 		num-ob-windows = <16>;
-		max-link-speed = <3>;
+		max-link-speed = <2>;
 		dma-coherent;
 		interrupts = <GIC_SPI 355 IRQ_TYPE_EDGE_RISING>;
 	};
@@ -863,16 +862,6 @@
 		power-domains = <&k3_pds 106 TI_SCI_PD_EXCLUSIVE>;
 
 		status = "disabled";
-	};
-
-	timesync_router: timesync_router@A40000 {
-		compatible = "pinctrl-single";
-		reg = <0x0 0xA40000 0x0 0x800>;
-		#address-cells = <1>;
-		#size-cells = <0>;
-		#pinctrl-cells = <1>;
-		pinctrl-single,register-width = <32>;
-		pinctrl-single,function-mask = <0x800007ff>;
 	};
 
 	dss: dss@04a00000 {
@@ -970,13 +959,13 @@
 		};
 
 		icssg0_iep0: iep@2e000 {
-			compatible = "syscon";
+			compatible = "ti,am654-icss-iep";
 			reg = <0x2e000 0x1000>;
 			clocks = <&icssg0_iepclk_mux>;
 		};
 
 		icssg0_iep1: iep@2f000 {
-			compatible = "syscon";
+			compatible = "ti,am654-icss-iep";
 			reg = <0x2f000 0x1000>;
 			clocks = <&icssg0_iepclk_mux>;
 		};
@@ -1128,13 +1117,13 @@
 		};
 
 		icssg1_iep0: iep@2e000 {
-			compatible = "syscon";
+			compatible = "ti,am654-icss-iep";
 			reg = <0x2e000 0x1000>;
 			clocks = <&icssg1_iepclk_mux>;
 		};
 
 		icssg1_iep1: iep@2f000 {
-			compatible = "syscon";
+			compatible = "ti,am654-icss-iep";
 			reg = <0x2f000 0x1000>;
 			clocks = <&icssg1_iepclk_mux>;
 		};
@@ -1286,13 +1275,13 @@
 		};
 
 		icssg2_iep0: iep@2e000 {
-			compatible = "syscon";
+			compatible = "ti,am654-icss-iep";
 			reg = <0x2e000 0x1000>;
 			clocks = <&icssg2_iepclk_mux>;
 		};
 
 		icssg2_iep1: iep@2f000 {
-			compatible = "syscon";
+			compatible = "ti,am654-icss-iep";
 			reg = <0x2f000 0x1000>;
 			clocks = <&icssg2_iepclk_mux>;
 		};

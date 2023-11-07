@@ -849,6 +849,8 @@ static inline int sk_memalloc_socks(void)
 {
 	return static_branch_unlikely(&memalloc_socks_key);
 }
+
+void __receive_sock(struct file *file);
 #else
 
 static inline int sk_memalloc_socks(void)
@@ -856,6 +858,8 @@ static inline int sk_memalloc_socks(void)
 	return 0;
 }
 
+static inline void __receive_sock(struct file *file)
+{ }
 #endif
 
 static inline gfp_t sk_gfp_mask(const struct sock *sk, gfp_t gfp_mask)
@@ -905,11 +909,11 @@ static inline void __sk_add_backlog(struct sock *sk, struct sk_buff *skb)
 	skb_dst_force(skb);
 
 	if (!sk->sk_backlog.tail)
-		sk->sk_backlog.head = skb;
+		WRITE_ONCE(sk->sk_backlog.head, skb);
 	else
 		sk->sk_backlog.tail->next = skb;
 
-	sk->sk_backlog.tail = skb;
+	WRITE_ONCE(sk->sk_backlog.tail, skb);
 	skb->next = NULL;
 }
 
@@ -1642,12 +1646,14 @@ struct sockcm_cookie {
 	u64 transmit_time;
 	u32 mark;
 	u16 tsflags;
+	struct skb_redundant_info redinfo;
 };
 
 static inline void sockcm_init(struct sockcm_cookie *sockc,
 			       const struct sock *sk)
 {
 	*sockc = (struct sockcm_cookie) { .tsflags = sk->sk_tsflags };
+	memset(&sockc->redinfo, 0, sizeof(sockc->redinfo));
 }
 
 int __sock_cmsg_send(struct sock *sk, struct msghdr *msg, struct cmsghdr *cmsg,
@@ -1803,7 +1809,6 @@ static inline int sk_rx_queue_get(const struct sock *sk)
 
 static inline void sk_set_socket(struct sock *sk, struct socket *sock)
 {
-	sk_tx_queue_clear(sk);
 	sk->sk_socket = sock;
 }
 
@@ -2366,6 +2371,8 @@ void __sock_recv_timestamp(struct msghdr *msg, struct sock *sk,
 			   struct sk_buff *skb);
 void __sock_recv_wifi_status(struct msghdr *msg, struct sock *sk,
 			     struct sk_buff *skb);
+void __sock_recv_redinfo_timestamp(struct msghdr *msg, struct sock *sk,
+				   struct sk_buff *skb);
 
 static inline void
 sock_recv_timestamp(struct msghdr *msg, struct sock *sk, struct sk_buff *skb)
@@ -2446,6 +2453,31 @@ static inline void skb_setup_tx_timestamp(struct sk_buff *skb, __u16 tsflags)
 {
 	_sock_tx_timestamp(skb->sk, tsflags, &skb_shinfo(skb)->tx_flags,
 			   &skb_shinfo(skb)->tskey);
+}
+
+static inline void sock_recv_redundant_info(struct msghdr *msg, struct sock *sk,
+					    struct sk_buff *skb)
+{
+	struct skb_redundant_info *sred;
+
+	sred = skb_redinfo(skb);
+	if (sred->lsdu_size)
+		put_cmsg(msg, SOL_SOCKET, SCM_REDUNDANT, sizeof(*sred), sred);
+
+	__sock_recv_redinfo_timestamp(msg, sk, skb);
+
+}
+
+static inline void sock_tx_redundant_info(const struct sock *sk,
+					  struct skb_redundant_info *redinfo,
+					  struct sk_buff *skb)
+{
+	struct skb_redundant_info *sred;
+
+	if (redinfo->io_port) {
+		sred = skb_redinfo(skb);
+		memcpy(sred, redinfo, sizeof(*sred));
+	}
 }
 
 /**

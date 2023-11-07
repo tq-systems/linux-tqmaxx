@@ -3,6 +3,8 @@
  *
  * Author(s):
  *	2011-2014 Arvid Brodin, arvid.brodin@alten.se
+ *
+ * include file for HSR and PRP.
  */
 
 #ifndef __HSR_FRAMEREG_H
@@ -14,8 +16,9 @@ struct hsr_node;
 
 void hsr_del_self_node(struct hsr_priv *hsr);
 void hsr_del_nodes(struct list_head *node_db);
-struct hsr_node *hsr_get_node(struct hsr_port *port, struct sk_buff *skb,
-			      bool is_sup);
+struct hsr_node *hsr_get_node(struct hsr_port *port, struct list_head *node_db,
+			      struct sk_buff *skb, bool is_sup,
+			      enum hsr_port_type rx_port);
 void hsr_handle_sup_frame(struct sk_buff *skb, struct hsr_node *node_curr,
 			  struct hsr_port *port);
 bool hsr_addr_is_self(struct hsr_priv *hsr, unsigned char *addr);
@@ -53,8 +56,15 @@ struct hsr_node {
 	unsigned char		macaddress_B[ETH_ALEN];
 	/* Local slave through which AddrB frames are received from this node */
 	enum hsr_port_type	addr_B_port;
+	u32			cnt_received_a;
+	u32			cnt_received_b;
+	u32			cnt_err_wrong_lan_a;
+	u32			cnt_err_wrong_lan_b;
 	unsigned long		time_in[HSR_PT_PORTS];
 	bool			time_in_stale[HSR_PT_PORTS];
+	/* if the node is a SAN */
+	bool			san_a;
+	bool			san_b;
 	u16			seq_out[HSR_PT_PORTS];
 	struct rcu_head		rcu_head;
 };

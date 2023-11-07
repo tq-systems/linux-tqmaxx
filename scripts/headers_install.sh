@@ -64,7 +64,7 @@ configs=$(sed -e '
 	d
 ' $OUTFILE)
 
-# The entries in the following list are not warned.
+# The entries in the following list do not result in an error.
 # Please do not add a new entry. This list is only for existing ones.
 # The list will be reduced gradually, and deleted eventually. (hopefully)
 #
@@ -94,22 +94,36 @@ include/uapi/linux/eventpoll.h:CONFIG_PM_SLEEP
 include/uapi/linux/hw_breakpoint.h:CONFIG_HAVE_MIXED_BREAKPOINTS_REGS
 include/uapi/linux/pktcdvd.h:CONFIG_CDROM_PKTCDVD_WCACHE
 include/uapi/linux/raw.h:CONFIG_MAX_RAW_DEVS
+include/uapi/linux/net_switch_config.h:CONFIG_SWITCH_INVALID
+include/uapi/linux/net_switch_config.h:CONFIG_SWITCH_ADD_MULTICAST
+include/uapi/linux/net_switch_config.h:CONFIG_SWITCH_DEL_MULTICAST
+include/uapi/linux/net_switch_config.h:CONFIG_SWITCH_ADD_VLAN
+include/uapi/linux/net_switch_config.h:CONFIG_SWITCH_DEL_VLAN
+include/uapi/linux/net_switch_config.h:CONFIG_SWITCH_SET_PORT_CONFIG
+include/uapi/linux/net_switch_config.h:CONFIG_SWITCH_GET_PORT_CONFIG
+include/uapi/linux/net_switch_config.h:CONFIG_SWITCH_ADD_UNKNOWN_VLAN_INFO
+include/uapi/linux/net_switch_config.h:CONFIG_SWITCH_GET_PORT_STATE
+include/uapi/linux/net_switch_config.h:CONFIG_SWITCH_SET_PORT_STATE
+include/uapi/linux/net_switch_config.h:CONFIG_SWITCH_GET_PORT_VLAN_CONFIG
+include/uapi/linux/net_switch_config.h:CONFIG_SWITCH_SET_PORT_VLAN_CONFIG
+include/uapi/linux/net_switch_config.h:CONFIG_SWITCH_RATELIMIT
 "
 
 for c in $configs
 do
-	warn=1
+	leak_error=1
 
 	for ignore in $config_leak_ignores
 	do
 		if echo "$INFILE:$c" | grep -q "$ignore$"; then
-			warn=
+			leak_error=
 			break
 		fi
 	done
 
-	if [ "$warn" = 1 ]; then
-		echo "warning: $INFILE: leak $c to user-space" >&2
+	if [ "$leak_error" = 1 ]; then
+		echo "error: $INFILE: leak $c to user-space" >&2
+		exit 1
 	fi
 done
 
