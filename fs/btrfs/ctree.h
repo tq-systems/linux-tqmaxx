@@ -482,8 +482,6 @@ struct btrfs_swapfile_pin {
 	bool is_block_group;
 };
 
-bool btrfs_pinned_by_swapfile(struct btrfs_fs_info *fs_info, void *ptr);
-
 enum {
 	BTRFS_FS_BARRIER,
 	BTRFS_FS_CLOSING_START,
@@ -504,11 +502,6 @@ enum {
 	 * (device replace, resize, device add/delete, balance)
 	 */
 	BTRFS_FS_EXCL_OP,
-	/*
-	 * To info transaction_kthread we need an immediate commit so it
-	 * doesn't need to wait for commit_interval
-	 */
-	BTRFS_FS_NEED_ASYNC_COMMIT,
 	/*
 	 * Indicate that balance has been set up from the ioctl and is in the
 	 * main phase. The fs_info::balance_ctl is initialized.
@@ -832,7 +825,10 @@ struct btrfs_fs_info {
 	 */
 	struct ulist *qgroup_ulist;
 
-	/* protect user change for quota operations */
+	/*
+	 * Protect user change for quota operations. If a transaction is needed,
+	 * it must be started before locking this lock.
+	 */
 	struct mutex qgroup_ioctl_lock;
 
 	/* list of dirty qgroups to be written at next commit */
@@ -945,6 +941,8 @@ enum {
 	BTRFS_ROOT_DEAD_TREE,
 	/* The root has a log tree. Used only for subvolume roots. */
 	BTRFS_ROOT_HAS_LOG_TREE,
+	/* Qgroup flushing is in progress */
+	BTRFS_ROOT_QGROUP_FLUSHING,
 };
 
 /*
@@ -1097,6 +1095,7 @@ struct btrfs_root {
 	spinlock_t qgroup_meta_rsv_lock;
 	u64 qgroup_meta_rsv_pertrans;
 	u64 qgroup_meta_rsv_prealloc;
+	wait_queue_head_t qgroup_flush_wait;
 
 	/* Number of active swapfiles */
 	atomic_t nr_swapfiles;
@@ -2726,7 +2725,7 @@ struct btrfs_dir_item *
 btrfs_lookup_dir_index_item(struct btrfs_trans_handle *trans,
 			    struct btrfs_root *root,
 			    struct btrfs_path *path, u64 dir,
-			    u64 objectid, const char *name, int name_len,
+			    u64 index, const char *name, int name_len,
 			    int mod);
 struct btrfs_dir_item *
 btrfs_search_dir_index_item(struct btrfs_root *root,

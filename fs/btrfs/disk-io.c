@@ -1154,6 +1154,7 @@ static void __setup_root(struct btrfs_root *root, struct btrfs_fs_info *fs_info,
 	mutex_init(&root->log_mutex);
 	mutex_init(&root->ordered_extent_mutex);
 	mutex_init(&root->delalloc_mutex);
+	init_waitqueue_head(&root->qgroup_flush_wait);
 	init_waitqueue_head(&root->log_writer_wait);
 	init_waitqueue_head(&root->log_commit_wait[0]);
 	init_waitqueue_head(&root->log_commit_wait[1]);
@@ -1747,8 +1748,7 @@ static int transaction_kthread(void *arg)
 		}
 
 		now = ktime_get_seconds();
-		if (cur->state < TRANS_STATE_BLOCKED &&
-		    !test_bit(BTRFS_FS_NEED_ASYNC_COMMIT, &fs_info->flags) &&
+		if (cur->state < TRANS_STATE_COMMIT_START &&
 		    (now < cur->start_time ||
 		     now - cur->start_time < fs_info->commit_interval)) {
 			spin_unlock(&fs_info->trans_lock);
@@ -2239,6 +2239,23 @@ static int btrfs_init_csum_hash(struct btrfs_fs_info *fs_info, u16 csum_type)
 
 	fs_info->csum_shash = csum_shash;
 
+	/*
+	 * Check if the checksum implementation is a fast accelerated one.
+	 * As-is this is a bit of a hack and should be replaced once the csum
+	 * implementations provide that information themselves.
+	 */
+	switch (csum_type) {
+	case BTRFS_CSUM_TYPE_CRC32:
+		if (!strstr(crypto_shash_driver_name(csum_shash), "generic"))
+			set_bit(BTRFS_FS_CSUM_IMPL_FAST, &fs_info->flags);
+		break;
+	default:
+		break;
+	}
+
+	btrfs_info(fs_info, "using %s (%s) checksum algorithm",
+			btrfs_super_csum_name(csum_type),
+			crypto_shash_driver_name(csum_shash));
 	return 0;
 }
 
@@ -2460,6 +2477,21 @@ static int validate_super(struct btrfs_fs_info *fs_info,
 	if (!IS_ALIGNED(btrfs_super_log_root(sb), sectorsize)) {
 		btrfs_warn(fs_info, "log_root block unaligned: %llu",
 			   btrfs_super_log_root(sb));
+		ret = -EINVAL;
+	}
+
+	if (memcmp(fs_info->fs_devices->fsid, sb->fsid, BTRFS_FSID_SIZE) != 0) {
+		btrfs_err(fs_info,
+		"superblock fsid doesn't match fsid of fs_devices: %pU != %pU",
+			  sb->fsid, fs_info->fs_devices->fsid);
+		ret = -EINVAL;
+	}
+
+	if (memcmp(fs_info->fs_devices->metadata_uuid, btrfs_sb_fsid_ptr(sb),
+		   BTRFS_FSID_SIZE) != 0) {
+		btrfs_err(fs_info,
+"superblock metadata_uuid doesn't match metadata uuid of fs_devices: %pU != %pU",
+			  btrfs_sb_fsid_ptr(sb), fs_info->fs_devices->metadata_uuid);
 		ret = -EINVAL;
 	}
 
@@ -2798,7 +2830,7 @@ int open_ctree(struct super_block *sb,
 	}
 
 	/*
-	 * Verify the type first, if that or the the checksum value are
+	 * Verify the type first, if that or the checksum value are
 	 * corrupted, we'll find out
 	 */
 	csum_type = btrfs_super_csum_type((struct btrfs_super_block *)bh->b_data);
@@ -2837,14 +2869,6 @@ int open_ctree(struct super_block *sb,
 
 	disk_super = fs_info->super_copy;
 
-	ASSERT(!memcmp(fs_info->fs_devices->fsid, fs_info->super_copy->fsid,
-		       BTRFS_FSID_SIZE));
-
-	if (btrfs_fs_incompat(fs_info, METADATA_UUID)) {
-		ASSERT(!memcmp(fs_info->fs_devices->metadata_uuid,
-				fs_info->super_copy->metadata_uuid,
-				BTRFS_FSID_SIZE));
-	}
 
 	features = btrfs_super_flags(disk_super);
 	if (features & BTRFS_SUPER_FLAG_CHANGING_FSID_V2) {
@@ -2884,6 +2908,29 @@ int open_ctree(struct super_block *sb,
 	 */
 	fs_info->compress_type = BTRFS_COMPRESS_ZLIB;
 
+	/*
+	 * Flag our filesystem as having big metadata blocks if they are bigger
+	 * than the page size
+	 */
+	if (btrfs_super_nodesize(disk_super) > PAGE_SIZE) {
+		if (!(features & BTRFS_FEATURE_INCOMPAT_BIG_METADATA))
+			btrfs_info(fs_info,
+				"flagging fs with big metadata feature");
+		features |= BTRFS_FEATURE_INCOMPAT_BIG_METADATA;
+	}
+
+	/* Set up fs_info before parsing mount options */
+	nodesize = btrfs_super_nodesize(disk_super);
+	sectorsize = btrfs_super_sectorsize(disk_super);
+	stripesize = sectorsize;
+	fs_info->dirty_metadata_batch = nodesize * (1 + ilog2(nr_cpu_ids));
+	fs_info->delalloc_batch = sectorsize * 512 * (1 + ilog2(nr_cpu_ids));
+
+	/* Cache block sizes */
+	fs_info->nodesize = nodesize;
+	fs_info->sectorsize = sectorsize;
+	fs_info->stripesize = stripesize;
+
 	ret = btrfs_parse_options(fs_info, options, sb->s_flags);
 	if (ret) {
 		err = ret;
@@ -2894,7 +2941,7 @@ int open_ctree(struct super_block *sb,
 		~BTRFS_FEATURE_INCOMPAT_SUPP;
 	if (features) {
 		btrfs_err(fs_info,
-		    "cannot mount because of unsupported optional features (%llx)",
+		    "cannot mount because of unsupported optional features (0x%llx)",
 		    features);
 		err = -EINVAL;
 		goto fail_csum;
@@ -2909,28 +2956,6 @@ int open_ctree(struct super_block *sb,
 
 	if (features & BTRFS_FEATURE_INCOMPAT_SKINNY_METADATA)
 		btrfs_info(fs_info, "has skinny extents");
-
-	/*
-	 * flag our filesystem as having big metadata blocks if
-	 * they are bigger than the page size
-	 */
-	if (btrfs_super_nodesize(disk_super) > PAGE_SIZE) {
-		if (!(features & BTRFS_FEATURE_INCOMPAT_BIG_METADATA))
-			btrfs_info(fs_info,
-				"flagging fs with big metadata feature");
-		features |= BTRFS_FEATURE_INCOMPAT_BIG_METADATA;
-	}
-
-	nodesize = btrfs_super_nodesize(disk_super);
-	sectorsize = btrfs_super_sectorsize(disk_super);
-	stripesize = sectorsize;
-	fs_info->dirty_metadata_batch = nodesize * (1 + ilog2(nr_cpu_ids));
-	fs_info->delalloc_batch = sectorsize * 512 * (1 + ilog2(nr_cpu_ids));
-
-	/* Cache block sizes */
-	fs_info->nodesize = nodesize;
-	fs_info->sectorsize = sectorsize;
-	fs_info->stripesize = stripesize;
 
 	/*
 	 * mixed block groups end up with duplicate but slightly offset
@@ -2954,11 +2979,25 @@ int open_ctree(struct super_block *sb,
 		~BTRFS_FEATURE_COMPAT_RO_SUPP;
 	if (!sb_rdonly(sb) && features) {
 		btrfs_err(fs_info,
-	"cannot mount read-write because of unsupported optional features (%llx)",
+	"cannot mount read-write because of unsupported optional features (0x%llx)",
 		       features);
 		err = -EINVAL;
 		goto fail_csum;
 	}
+	/*
+	 * We have unsupported RO compat features, although RO mounted, we
+	 * should not cause any metadata write, including log replay.
+	 * Or we could screw up whatever the new feature requires.
+	 */
+	if (unlikely(features && btrfs_super_log_root(disk_super) &&
+		     !btrfs_test_opt(fs_info, NOLOGREPLAY))) {
+		btrfs_err(fs_info,
+"cannot replay dirty log with unsupported compat_ro features (0x%llx), try rescue=nologreplay",
+			  features);
+		err = -EINVAL;
+		goto fail_alloc;
+	}
+
 
 	ret = btrfs_init_workqueues(fs_info, fs_devices);
 	if (ret) {
@@ -3134,7 +3173,8 @@ retry_root_backup:
 		goto fail_sysfs;
 	}
 
-	if (!sb_rdonly(sb) && !btrfs_check_rw_degradable(fs_info, NULL)) {
+	if (!sb_rdonly(sb) && fs_info->fs_devices->missing_devices &&
+	    !btrfs_check_rw_degradable(fs_info, NULL)) {
 		btrfs_warn(fs_info,
 		"writable mount is not allowed due to too many missing devices");
 		goto fail_sysfs;
@@ -3624,11 +3664,23 @@ static void btrfs_end_empty_barrier(struct bio *bio)
  */
 static void write_dev_flush(struct btrfs_device *device)
 {
-	struct request_queue *q = bdev_get_queue(device->bdev);
 	struct bio *bio = device->flush_bio;
 
+#ifndef CONFIG_BTRFS_FS_CHECK_INTEGRITY
+	/*
+	 * When a disk has write caching disabled, we skip submission of a bio
+	 * with flush and sync requests before writing the superblock, since
+	 * it's not needed. However when the integrity checker is enabled, this
+	 * results in reports that there are metadata blocks referred by a
+	 * superblock that were not properly flushed. So don't skip the bio
+	 * submission only when the integrity checker is enabled for the sake
+	 * of simplicity, since this is a debug tool and not meant for use in
+	 * non-debug builds.
+	 */
+	struct request_queue *q = bdev_get_queue(device->bdev);
 	if (!test_bit(QUEUE_FLAG_WC, &q->queue_flags))
 		return;
+#endif
 
 	bio_reset(bio);
 	bio->bi_end_io = btrfs_end_empty_barrier;
@@ -4051,6 +4103,11 @@ void close_ctree(struct btrfs_fs_info *fs_info)
 	ASSERT(list_empty(&fs_info->delayed_iputs));
 	set_bit(BTRFS_FS_CLOSING_DONE, &fs_info->flags);
 
+	if (btrfs_check_quota_leak(fs_info)) {
+		WARN_ON(IS_ENABLED(CONFIG_BTRFS_DEBUG));
+		btrfs_err(fs_info, "qgroup reserved space leaked");
+	}
+
 	btrfs_free_qgroup_config(fs_info);
 	ASSERT(list_empty(&fs_info->delalloc_roots));
 
@@ -4353,7 +4410,11 @@ static void btrfs_destroy_delalloc_inodes(struct btrfs_root *root)
 		 */
 		inode = igrab(&btrfs_inode->vfs_inode);
 		if (inode) {
+			unsigned int nofs_flag;
+
+			nofs_flag = memalloc_nofs_save();
 			invalidate_inode_pages2(inode->i_mapping);
+			memalloc_nofs_restore(nofs_flag);
 			iput(inode);
 		}
 		spin_lock(&root->delalloc_lock);
@@ -4471,7 +4532,12 @@ static void btrfs_cleanup_bg_io(struct btrfs_block_group_cache *cache)
 
 	inode = cache->io_ctl.inode;
 	if (inode) {
+		unsigned int nofs_flag;
+
+		nofs_flag = memalloc_nofs_save();
 		invalidate_inode_pages2(inode->i_mapping);
+		memalloc_nofs_restore(nofs_flag);
+
 		BTRFS_I(inode)->generation = 0;
 		cache->io_ctl.inode = NULL;
 		iput(inode);

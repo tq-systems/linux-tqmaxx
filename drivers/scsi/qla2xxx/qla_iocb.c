@@ -601,7 +601,8 @@ qla24xx_build_scsi_type_6_iocbs(srb_t *sp, struct cmd_type_6 *cmd_pkt,
 	put_unaligned_le32(COMMAND_TYPE_6, &cmd_pkt->entry_type);
 
 	/* No data transfer */
-	if (!scsi_bufflen(cmd) || cmd->sc_data_direction == DMA_NONE) {
+	if (!scsi_bufflen(cmd) || cmd->sc_data_direction == DMA_NONE ||
+	    tot_dsds == 0) {
 		cmd_pkt->byte_count = cpu_to_le32(0);
 		return 0;
 	}
@@ -2537,13 +2538,32 @@ qla2x00_els_dcmd_iocb_timeout(void *data)
 	fc_port_t *fcport = sp->fcport;
 	struct scsi_qla_host *vha = sp->vha;
 	struct srb_iocb *lio = &sp->u.iocb_cmd;
+	unsigned long flags = 0;
+	int res, h;
 
 	ql_dbg(ql_dbg_io, vha, 0x3069,
 	    "%s Timeout, hdl=%x, portid=%02x%02x%02x\n",
 	    sp->name, sp->handle, fcport->d_id.b.domain, fcport->d_id.b.area,
 	    fcport->d_id.b.al_pa);
 
-	complete(&lio->u.els_logo.comp);
+	/* Abort the exchange */
+	res = qla24xx_async_abort_cmd(sp, false);
+	if (res) {
+		ql_dbg(ql_dbg_io, vha, 0x3070,
+		    "mbx abort_command failed.\n");
+		spin_lock_irqsave(sp->qpair->qp_lock_ptr, flags);
+		for (h = 1; h < sp->qpair->req->num_outstanding_cmds; h++) {
+			if (sp->qpair->req->outstanding_cmds[h] == sp) {
+				sp->qpair->req->outstanding_cmds[h] = NULL;
+				break;
+			}
+		}
+		spin_unlock_irqrestore(sp->qpair->qp_lock_ptr, flags);
+		complete(&lio->u.els_logo.comp);
+	} else {
+		ql_dbg(ql_dbg_io, vha, 0x3071,
+		    "mbx abort_command success.\n");
+	}
 }
 
 static void qla2x00_els_dcmd_sp_done(srb_t *sp, int res)
@@ -2708,23 +2728,29 @@ qla2x00_els_dcmd2_iocb_timeout(void *data)
 	srb_t *sp = data;
 	fc_port_t *fcport = sp->fcport;
 	struct scsi_qla_host *vha = sp->vha;
-	struct qla_hw_data *ha = vha->hw;
 	unsigned long flags = 0;
-	int res;
+	int res, h;
 
 	ql_dbg(ql_dbg_io + ql_dbg_disc, vha, 0x3069,
 	    "%s hdl=%x ELS Timeout, %8phC portid=%06x\n",
 	    sp->name, sp->handle, fcport->port_name, fcport->d_id.b24);
 
 	/* Abort the exchange */
-	spin_lock_irqsave(&ha->hardware_lock, flags);
-	res = ha->isp_ops->abort_command(sp);
+	res = qla24xx_async_abort_cmd(sp, false);
 	ql_dbg(ql_dbg_io, vha, 0x3070,
 	    "mbx abort_command %s\n",
 	    (res == QLA_SUCCESS) ? "successful" : "failed");
-	spin_unlock_irqrestore(&ha->hardware_lock, flags);
-
-	sp->done(sp, QLA_FUNCTION_TIMEOUT);
+	if (res) {
+		spin_lock_irqsave(sp->qpair->qp_lock_ptr, flags);
+		for (h = 1; h < sp->qpair->req->num_outstanding_cmds; h++) {
+			if (sp->qpair->req->outstanding_cmds[h] == sp) {
+				sp->qpair->req->outstanding_cmds[h] = NULL;
+				break;
+			}
+		}
+		spin_unlock_irqrestore(sp->qpair->qp_lock_ptr, flags);
+		sp->done(sp, QLA_FUNCTION_TIMEOUT);
+	}
 }
 
 void qla2x00_els_dcmd2_free(scsi_qla_host_t *vha, struct els_plogi *els_plogi)
@@ -2769,9 +2795,8 @@ static void qla2x00_els_dcmd2_sp_done(srb_t *sp, int res)
 		case CS_COMPLETE:
 			memset(&ea, 0, sizeof(ea));
 			ea.fcport = fcport;
-			ea.data[0] = MBS_COMMAND_COMPLETE;
-			ea.sp = sp;
-			qla24xx_handle_plogi_done_event(vha, &ea);
+			ea.rc = res;
+			qla_handle_els_plogi_done(vha, &ea);
 			break;
 
 		case CS_IOCB_ERROR:
@@ -2835,6 +2860,7 @@ static void qla2x00_els_dcmd2_sp_done(srb_t *sp, int res)
 					set_bit(ISP_ABORT_NEEDED,
 					    &vha->dpc_flags);
 					qla2xxx_wake_dpc(vha);
+					break;
 				}
 				/* fall through */
 			default:
@@ -2844,8 +2870,7 @@ static void qla2x00_els_dcmd2_sp_done(srb_t *sp, int res)
 				    fw_status[0], fw_status[1], fw_status[2]);
 
 				fcport->flags &= ~FCF_ASYNC_SENT;
-				fcport->disc_state = DSC_LOGIN_FAILED;
-				set_bit(RELOGIN_NEEDED, &vha->dpc_flags);
+				qlt_schedule_sess_for_deletion(fcport);
 				break;
 			}
 			break;
@@ -2857,8 +2882,7 @@ static void qla2x00_els_dcmd2_sp_done(srb_t *sp, int res)
 			    fw_status[0], fw_status[1], fw_status[2]);
 
 			sp->fcport->flags &= ~FCF_ASYNC_SENT;
-			sp->fcport->disc_state = DSC_LOGIN_FAILED;
-			set_bit(RELOGIN_NEEDED, &vha->dpc_flags);
+			qlt_schedule_sess_for_deletion(fcport);
 			break;
 		}
 
@@ -2894,7 +2918,7 @@ qla24xx_els_dcmd2_iocb(scsi_qla_host_t *vha, int els_opcode,
 	}
 
 	fcport->flags |= FCF_ASYNC_SENT;
-	fcport->disc_state = DSC_LOGIN_PEND;
+	qla2x00_set_fcport_disc_state(fcport, DSC_LOGIN_PEND);
 	elsio = &sp->u.iocb_cmd;
 	ql_dbg(ql_dbg_io, vha, 0x3073,
 	    "Enter: PLOGI portid=%06x\n", fcport->d_id.b24);
@@ -3642,7 +3666,7 @@ qla2x00_start_sp(srb_t *sp)
 	spin_lock_irqsave(qp->qp_lock_ptr, flags);
 	pkt = __qla2x00_alloc_iocbs(sp->qpair, sp);
 	if (!pkt) {
-		rval = EAGAIN;
+		rval = -EAGAIN;
 		ql_log(ql_log_warn, vha, 0x700c,
 		    "qla2x00_alloc_iocbs failed.\n");
 		goto done;

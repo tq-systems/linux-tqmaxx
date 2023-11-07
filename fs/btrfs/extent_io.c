@@ -3152,7 +3152,7 @@ static int __do_readpage(struct extent_io_tree *tree,
 
 		/*
 		 * If we have a file range that points to a compressed extent
-		 * and it's followed by a consecutive file range that points to
+		 * and it's followed by a consecutive file range that points
 		 * to the same compressed extent (possibly with a different
 		 * offset and/or length, so it either points to the whole extent
 		 * or only part of it), we must make sure we do not submit a
@@ -3755,6 +3755,12 @@ static void set_btree_ioerr(struct page *page)
 		return;
 
 	/*
+	 * A read may stumble upon this buffer later, make sure that it gets an
+	 * error and knows there was an error.
+	 */
+	clear_bit(EXTENT_BUFFER_UPTODATE, &eb->bflags);
+
+	/*
 	 * If we error out, we should add back the dirty_metadata_bytes
 	 * to make it consistent.
 	 */
@@ -4018,11 +4024,12 @@ retry:
 			free_extent_buffer(eb);
 
 			/*
-			 * the filesystem may choose to bump up nr_to_write.
+			 * The filesystem may choose to bump up nr_to_write.
 			 * We have to make sure to honor the new nr_to_write
-			 * at any time
+			 * at any time.
 			 */
-			nr_to_write_done = wbc->nr_to_write <= 0;
+			nr_to_write_done = (wbc->sync_mode == WB_SYNC_NONE &&
+					    wbc->nr_to_write <= 0);
 		}
 		pagevec_release(&pvec);
 		cond_resched();
@@ -4648,7 +4655,7 @@ int extent_fiemap(struct inode *inode, struct fiemap_extent_info *fieinfo,
 		__u64 start, __u64 len)
 {
 	int ret = 0;
-	u64 off = start;
+	u64 off;
 	u64 max = start + len;
 	u32 flags = 0;
 	u32 found_type;
@@ -4684,6 +4691,11 @@ int extent_fiemap(struct inode *inode, struct fiemap_extent_info *fieinfo,
 		goto out_free_ulist;
 	}
 
+	/*
+	 * We can't initialize that to 'start' as this could miss extents due
+	 * to extent item merging
+	 */
+	off = 0;
 	start = round_down(start, btrfs_inode_sectorsize(inode));
 	len = round_up(max, btrfs_inode_sectorsize(inode)) - start;
 

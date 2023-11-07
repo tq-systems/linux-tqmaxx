@@ -829,15 +829,14 @@ static void destroy_cq_user(struct mlx5_ib_cq *cq, struct ib_udata *udata)
 	ib_umem_release(cq->buf.umem);
 }
 
-static void init_cq_frag_buf(struct mlx5_ib_cq *cq,
-			     struct mlx5_ib_cq_buf *buf)
+static void init_cq_frag_buf(struct mlx5_ib_cq_buf *buf)
 {
 	int i;
 	void *cqe;
 	struct mlx5_cqe64 *cqe64;
 
 	for (i = 0; i < buf->nent; i++) {
-		cqe = get_cqe(cq, i);
+		cqe = mlx5_frag_buf_get_wqe(&buf->fbc, i);
 		cqe64 = buf->cqe_size == 64 ? cqe : cqe + 64;
 		cqe64->op_own = MLX5_CQE_INVALID << 4;
 	}
@@ -863,7 +862,7 @@ static int create_cq_kernel(struct mlx5_ib_dev *dev, struct mlx5_ib_cq *cq,
 	if (err)
 		goto err_db;
 
-	init_cq_frag_buf(cq, &cq->buf);
+	init_cq_frag_buf(&cq->buf);
 
 	*inlen = MLX5_ST_SZ_BYTES(create_cq_in) +
 		 MLX5_FLD_SZ_BYTES(create_cq_in, pas[0]) *
@@ -917,8 +916,8 @@ int mlx5_ib_create_cq(struct ib_cq *ibcq, const struct ib_cq_init_attr *attr,
 	struct mlx5_ib_dev *dev = to_mdev(ibdev);
 	struct mlx5_ib_cq *cq = to_mcq(ibcq);
 	u32 out[MLX5_ST_SZ_DW(create_cq_out)];
-	int uninitialized_var(index);
-	int uninitialized_var(inlen);
+	int index;
+	int inlen;
 	u32 *cqb = NULL;
 	void *cqc;
 	int cqe_size;
@@ -1163,7 +1162,7 @@ static int resize_kernel(struct mlx5_ib_dev *dev, struct mlx5_ib_cq *cq,
 	if (err)
 		goto ex;
 
-	init_cq_frag_buf(cq, cq->resize_buf);
+	init_cq_frag_buf(cq->resize_buf);
 
 	return 0;
 
@@ -1238,7 +1237,7 @@ int mlx5_ib_resize_cq(struct ib_cq *ibcq, int entries, struct ib_udata *udata)
 	__be64 *pas;
 	int page_shift;
 	int inlen;
-	int uninitialized_var(cqe_size);
+	int cqe_size;
 	unsigned long flags;
 
 	if (!MLX5_CAP_GEN(dev->mdev, cq_resize)) {

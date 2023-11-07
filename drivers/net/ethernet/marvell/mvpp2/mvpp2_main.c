@@ -1073,7 +1073,7 @@ static void mvpp2_interrupts_unmask(void *arg)
 	u32 val;
 
 	/* If the thread isn't used, don't do anything */
-	if (smp_processor_id() > port->priv->nthreads)
+	if (smp_processor_id() >= port->priv->nthreads)
 		return;
 
 	val = MVPP2_CAUSE_MISC_SUM_MASK |
@@ -2078,7 +2078,7 @@ static void mvpp2_txq_sent_counter_clear(void *arg)
 	int queue;
 
 	/* If the thread isn't used, don't do anything */
-	if (smp_processor_id() > port->priv->nthreads)
+	if (smp_processor_id() >= port->priv->nthreads)
 		return;
 
 	for (queue = 0; queue < port->ntxqs; queue++) {
@@ -4233,6 +4233,11 @@ static int mvpp2_ethtool_get_rxnfc(struct net_device *dev,
 		break;
 	case ETHTOOL_GRXCLSRLALL:
 		for (i = 0; i < MVPP2_N_RFS_ENTRIES_PER_FLOW; i++) {
+			if (loc == info->rule_cnt) {
+				ret = -EMSGSIZE;
+				break;
+			}
+
 			if (port->rfs_rules[i])
 				rules[loc++] = i;
 		}
@@ -4545,7 +4550,7 @@ static int mvpp2_port_init(struct mvpp2_port *port)
 	struct mvpp2 *priv = port->priv;
 	struct mvpp2_txq_pcpu *txq_pcpu;
 	unsigned int thread;
-	int queue, err, val;
+	int queue, err;
 
 	/* Checks for hardware constraints */
 	if (port->first_rxq + port->nrxqs >
@@ -4558,18 +4563,6 @@ static int mvpp2_port_init(struct mvpp2_port *port)
 	/* Disable port */
 	mvpp2_egress_disable(port);
 	mvpp2_port_disable(port);
-
-	if (mvpp2_is_xlg(port->phy_interface)) {
-		val = readl(port->base + MVPP22_XLG_CTRL0_REG);
-		val &= ~MVPP22_XLG_CTRL0_FORCE_LINK_PASS;
-		val |= MVPP22_XLG_CTRL0_FORCE_LINK_DOWN;
-		writel(val, port->base + MVPP22_XLG_CTRL0_REG);
-	} else {
-		val = readl(port->base + MVPP2_GMAC_AUTONEG_CONFIG);
-		val &= ~MVPP2_GMAC_FORCE_LINK_PASS;
-		val |= MVPP2_GMAC_FORCE_LINK_DOWN;
-		writel(val, port->base + MVPP2_GMAC_AUTONEG_CONFIG);
-	}
 
 	port->tx_time_coal = MVPP2_TXDONE_COAL_USEC;
 
@@ -5740,6 +5733,10 @@ static int mvpp2_probe(struct platform_device *pdev)
 			return PTR_ERR(priv->lms_base);
 	} else {
 		res = platform_get_resource(pdev, IORESOURCE_MEM, 1);
+		if (!res) {
+			dev_err(&pdev->dev, "Invalid resource\n");
+			return -EINVAL;
+		}
 		if (has_acpi_companion(&pdev->dev)) {
 			/* In case the MDIO memory region is declared in
 			 * the ACPI, it can already appear as 'in-use'
@@ -5781,7 +5778,7 @@ static int mvpp2_probe(struct platform_device *pdev)
 
 	shared = num_present_cpus() - priv->nthreads;
 	if (shared > 0)
-		bitmap_fill(&priv->lock_map,
+		bitmap_set(&priv->lock_map, 0,
 			    min_t(int, shared, MVPP2_MAX_THREADS));
 
 	for (i = 0; i < MVPP2_MAX_THREADS; i++) {
@@ -5910,6 +5907,8 @@ static int mvpp2_probe(struct platform_device *pdev)
 	return 0;
 
 err_port_probe:
+	fwnode_handle_put(port_fwnode);
+
 	i = 0;
 	fwnode_for_each_available_child_node(fwnode, port_fwnode) {
 		if (priv->port_list[i])
@@ -6010,7 +6009,18 @@ static struct platform_driver mvpp2_driver = {
 	},
 };
 
-module_platform_driver(mvpp2_driver);
+static int __init mvpp2_driver_init(void)
+{
+	return platform_driver_register(&mvpp2_driver);
+}
+module_init(mvpp2_driver_init);
+
+static void __exit mvpp2_driver_exit(void)
+{
+	platform_driver_unregister(&mvpp2_driver);
+	mvpp2_dbgfs_exit();
+}
+module_exit(mvpp2_driver_exit);
 
 MODULE_DESCRIPTION("Marvell PPv2 Ethernet Driver - www.marvell.com");
 MODULE_AUTHOR("Marcin Wojtas <mw@semihalf.com>");

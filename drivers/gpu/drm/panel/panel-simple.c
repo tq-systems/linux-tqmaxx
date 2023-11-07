@@ -94,6 +94,7 @@ struct panel_desc {
 
 	u32 bus_format;
 	u32 bus_flags;
+	int connector_type;
 };
 
 struct panel_simple {
@@ -464,9 +465,8 @@ static int panel_simple_probe(struct device *dev, const struct panel_desc *desc)
 	if (!of_get_display_timing(dev->of_node, "panel-timing", &dt))
 		panel_simple_parse_panel_timing_node(dev, panel, &dt);
 
-	drm_panel_init(&panel->base);
-	panel->base.dev = dev;
-	panel->base.funcs = &panel_simple_funcs;
+	drm_panel_init(&panel->base, dev, &panel_simple_funcs,
+		       desc->connector_type);
 
 	err = drm_panel_add(&panel->base);
 	if (err < 0)
@@ -531,8 +531,8 @@ static const struct panel_desc ampire_am_480272h3tmqw_t01h = {
 	.num_modes = 1,
 	.bpc = 8,
 	.size = {
-		.width = 105,
-		.height = 67,
+		.width = 99,
+		.height = 58,
 	},
 	.bus_format = MEDIA_BUS_FMT_RGB888_1X24,
 };
@@ -833,6 +833,7 @@ static const struct panel_desc auo_g133han01 = {
 		.unprepare = 1000,
 	},
 	.bus_format = MEDIA_BUS_FMT_RGB888_1X7X4_JEIDA,
+	.connector_type = DRM_MODE_CONNECTOR_LVDS,
 };
 
 static const struct display_timing auo_g185han01_timings = {
@@ -862,6 +863,7 @@ static const struct panel_desc auo_g185han01 = {
 		.unprepare = 1000,
 	},
 	.bus_format = MEDIA_BUS_FMT_RGB888_1X7X4_SPWG,
+	.connector_type = DRM_MODE_CONNECTOR_LVDS,
 };
 
 static const struct display_timing auo_p320hvn03_timings = {
@@ -890,6 +892,7 @@ static const struct panel_desc auo_p320hvn03 = {
 		.unprepare = 500,
 	},
 	.bus_format = MEDIA_BUS_FMT_RGB888_1X7X4_SPWG,
+	.connector_type = DRM_MODE_CONNECTOR_LVDS,
 };
 
 static const struct drm_display_mode auo_t215hvn01_mode = {
@@ -916,7 +919,9 @@ static const struct panel_desc auo_t215hvn01 = {
 	.delay = {
 		.disable = 5,
 		.unprepare = 1000,
-	}
+	},
+	.bus_format = MEDIA_BUS_FMT_RGB888_1X7X4_SPWG,
+	.connector_type = DRM_MODE_CONNECTOR_LVDS,
 };
 
 static const struct drm_display_mode avic_tm070ddh03_mode = {
@@ -1257,6 +1262,7 @@ static const struct panel_desc dlc_dlc0700yzg_1 = {
 		.disable = 200,
 	},
 	.bus_format = MEDIA_BUS_FMT_RGB666_1X7X3_SPWG,
+	.connector_type = DRM_MODE_CONNECTOR_LVDS,
 };
 
 static const struct display_timing dlc_dlc1010gig_timing = {
@@ -1287,6 +1293,7 @@ static const struct panel_desc dlc_dlc1010gig = {
 		.unprepare = 60,
 	},
 	.bus_format = MEDIA_BUS_FMT_RGB888_1X7X4_SPWG,
+	.connector_type = DRM_MODE_CONNECTOR_LVDS,
 };
 
 static const struct drm_display_mode edt_et035012dm6_mode = {
@@ -1553,6 +1560,7 @@ static const struct panel_desc hannstar_hsd070pww1 = {
 		.height = 94,
 	},
 	.bus_format = MEDIA_BUS_FMT_RGB666_1X7X3_SPWG,
+	.connector_type = DRM_MODE_CONNECTOR_LVDS,
 };
 
 static const struct display_timing hannstar_hsd100pxn1_timing = {
@@ -1577,6 +1585,7 @@ static const struct panel_desc hannstar_hsd100pxn1 = {
 		.height = 152,
 	},
 	.bus_format = MEDIA_BUS_FMT_RGB666_1X7X3_SPWG,
+	.connector_type = DRM_MODE_CONNECTOR_LVDS,
 };
 
 static const struct drm_display_mode hitachi_tx23d38vm0caa_mode = {
@@ -1629,6 +1638,7 @@ static const struct panel_desc innolux_at043tn24 = {
 		.height = 54,
 	},
 	.bus_format = MEDIA_BUS_FMT_RGB888_1X24,
+	.connector_type = DRM_MODE_CONNECTOR_DPI,
 	.bus_flags = DRM_BUS_FLAG_DE_HIGH | DRM_BUS_FLAG_PIXDATA_DRIVE_POSEDGE,
 };
 
@@ -1671,7 +1681,7 @@ static const struct display_timing innolux_g070y2_l01_timing = {
 static const struct panel_desc innolux_g070y2_l01 = {
 	.timings = &innolux_g070y2_l01_timing,
 	.num_timings = 1,
-	.bpc = 6,
+	.bpc = 8,
 	.size = {
 		.width = 152,
 		.height = 91,
@@ -1683,6 +1693,7 @@ static const struct panel_desc innolux_g070y2_l01 = {
 		.unprepare = 800,
 	},
 	.bus_format = MEDIA_BUS_FMT_RGB888_1X7X4_SPWG,
+	.connector_type = DRM_MODE_CONNECTOR_LVDS,
 };
 
 static const struct display_timing innolux_g101ice_l01_timing = {
@@ -1711,6 +1722,7 @@ static const struct panel_desc innolux_g101ice_l01 = {
 		.disable = 200,
 	},
 	.bus_format = MEDIA_BUS_FMT_RGB888_1X7X4_SPWG,
+	.connector_type = DRM_MODE_CONNECTOR_LVDS,
 };
 
 static const struct display_timing innolux_g121i1_l01_timing = {
@@ -1738,6 +1750,7 @@ static const struct panel_desc innolux_g121i1_l01 = {
 		.disable = 20,
 	},
 	.bus_format = MEDIA_BUS_FMT_RGB888_1X7X4_SPWG,
+	.connector_type = DRM_MODE_CONNECTOR_LVDS,
 };
 
 static const struct drm_display_mode innolux_g121x1_l03_mode = {
@@ -1921,6 +1934,7 @@ static const struct panel_desc koe_tx31d200vm0baa = {
 		.height = 109,
 	},
 	.bus_format = MEDIA_BUS_FMT_RGB666_1X7X3_SPWG,
+	.connector_type = DRM_MODE_CONNECTOR_LVDS,
 };
 
 static const struct display_timing kyo_tcg121xglp_timing = {
@@ -1945,6 +1959,7 @@ static const struct panel_desc kyo_tcg121xglp = {
 		.height = 184,
 	},
 	.bus_format = MEDIA_BUS_FMT_RGB888_1X7X4_SPWG,
+	.connector_type = DRM_MODE_CONNECTOR_LVDS,
 };
 
 static const struct drm_display_mode lemaker_bl035_rgb_002_mode = {
@@ -1993,6 +2008,7 @@ static const struct panel_desc lg_lb070wv8 = {
 		.height = 91,
 	},
 	.bus_format = MEDIA_BUS_FMT_RGB888_1X7X4_SPWG,
+	.connector_type = DRM_MODE_CONNECTOR_LVDS,
 };
 
 static const struct drm_display_mode lg_lp079qx1_sp0v_mode = {
@@ -2149,6 +2165,7 @@ static const struct panel_desc mitsubishi_aa070mc01 = {
 		.disable = 400,
 	},
 	.bus_format = MEDIA_BUS_FMT_RGB888_1X7X4_SPWG,
+	.connector_type = DRM_MODE_CONNECTOR_LVDS,
 	.bus_flags = DRM_BUS_FLAG_DE_HIGH,
 };
 
@@ -2177,6 +2194,7 @@ static const struct panel_desc nec_nl12880bc20_05 = {
 		.disable = 50,
 	},
 	.bus_format = MEDIA_BUS_FMT_RGB888_1X7X4_SPWG,
+	.connector_type = DRM_MODE_CONNECTOR_LVDS,
 };
 
 static const struct drm_display_mode nec_nl4827hc19_05b_mode = {
@@ -2279,6 +2297,7 @@ static const struct panel_desc nlt_nl192108ac18_02d = {
 		.unprepare = 500,
 	},
 	.bus_format = MEDIA_BUS_FMT_RGB888_1X7X4_SPWG,
+	.connector_type = DRM_MODE_CONNECTOR_LVDS,
 };
 
 static const struct drm_display_mode nvd_9128_mode = {
@@ -2302,6 +2321,7 @@ static const struct panel_desc nvd_9128 = {
 		.height = 88,
 	},
 	.bus_format = MEDIA_BUS_FMT_RGB888_1X7X4_SPWG,
+	.connector_type = DRM_MODE_CONNECTOR_LVDS,
 };
 
 static const struct display_timing okaya_rs800480t_7x0gp_timing = {
@@ -2743,6 +2763,7 @@ static const struct panel_desc sharp_lq101k1ly04 = {
 		.height = 136,
 	},
 	.bus_format = MEDIA_BUS_FMT_RGB888_1X7X4_JEIDA,
+	.connector_type = DRM_MODE_CONNECTOR_LVDS,
 };
 
 static const struct display_timing sharp_lq123p1jx31_timing = {
@@ -2922,6 +2943,7 @@ static const struct panel_desc tianma_tm070jdhg30 = {
 		.height = 95,
 	},
 	.bus_format = MEDIA_BUS_FMT_RGB888_1X7X4_SPWG,
+	.connector_type = DRM_MODE_CONNECTOR_LVDS,
 };
 
 static const struct display_timing tianma_tm070jvhg33_timing = {
@@ -2971,6 +2993,7 @@ static const struct panel_desc tianma_tm070rvhg71 = {
 		.height = 86,
 	},
 	.bus_format = MEDIA_BUS_FMT_RGB888_1X7X4_SPWG,
+	.connector_type = DRM_MODE_CONNECTOR_LVDS,
 };
 
 static const struct drm_display_mode ti_nspire_cx_lcd_mode[] = {
@@ -3053,6 +3076,7 @@ static const struct panel_desc toshiba_lt089ac29000 = {
 	},
 	.bus_format = MEDIA_BUS_FMT_RGB888_1X24,
 	.bus_flags = DRM_BUS_FLAG_DE_HIGH | DRM_BUS_FLAG_PIXDATA_DRIVE_POSEDGE,
+	.connector_type = DRM_MODE_CONNECTOR_LVDS,
 };
 
 static const struct drm_display_mode tpk_f07a_0102_mode = {
@@ -3123,6 +3147,7 @@ static const struct panel_desc urt_umsh_8596md_lvds = {
 		.height = 91,
 	},
 	.bus_format = MEDIA_BUS_FMT_RGB666_1X7X3_SPWG,
+	.connector_type = DRM_MODE_CONNECTOR_LVDS,
 };
 
 static const struct panel_desc urt_umsh_8596md_parallel = {
