@@ -15,6 +15,13 @@
 	model = "TQ-Systems GmbH MBa335x";
 	compatible = "tq,mba335x", "tq,tqma335x", "ti,am33xx";
 
+	backlight: backlight {
+		compatible = "pwm-backlight";
+		power-supply = <&reg_mba335x_12v>;
+		enable-gpios = <&expander1 4 GPIO_ACTIVE_HIGH>;
+		status = "disabled";
+	};
+
 	chosen {
 		stdout-path = &uart4;
 	};
@@ -401,6 +408,11 @@
 	interrupts = <3 IRQ_TYPE_EDGE_RISING>;
 };
 
+&ecap2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&ecap2_pins>;
+};
+
 &gpio2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&expander1_pins>;
@@ -452,6 +464,18 @@
 		pagesize = <16>;
 		reg = <0x51>;
 	};
+};
+
+&i2c1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&i2c1_pins>;
+	clock-frequency = <100000>;
+};
+
+&lcdc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&lcd_pins>;
+	blue-and-red-wiring = "crossed";
 };
 
 &mac {

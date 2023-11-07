@@ -8,29 +8,17 @@
  */
 /dts-v1/;
 
-#include "am335x-mba335x.dtsi"
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/interrupt-controller/irq.h>
 #include <dt-bindings/pwm/pwm.h>
 
+#include "am335x-mba335x.dtsi"
+
 / {
-	backlight: backlight {
-		compatible = "pwm-backlight";
-
-		power-supply = <&reg_mba335x_12v>;
-		enable-gpios = <&expander1 4 GPIO_ACTIVE_HIGH>;
-
-		pwms = <&ecap2 0 50000 0>;
-		brightness-levels = <0 58 61 66 75 90 125 170 255>;
-		default-brightness-level = <7>;
-	};
-
 	panel {
 		compatible = "ti,tilcdc,panel";
-		status = "okay";
-
-		enable-gpios = <&expander1 3 GPIO_ACTIVE_HIGH>;
 		backlight = <&backlight>;
+		enable-gpios = <&expander1 3 GPIO_ACTIVE_HIGH>;
 
 		panel-info {
 			ac-bias           = <255>;
@@ -66,21 +54,20 @@
 	};
 };
 
+&backlight {
+	pwms = <&ecap2 0 50000 0>;
+	brightness-levels = <0 58 61 66 75 90 125 170 255>;
+	default-brightness-level = <7>;
+};
+
 &epwmss2 {
 	status = "okay";
 };
 
 &ecap2 {
 	status = "okay";
-	pinctrl-names = "default";
-	pinctrl-0 = <&ecap2_pins>;
 };
 
 &lcdc {
-	pinctrl-names = "default";
-	pinctrl-0 = <&lcd_pins>;
-
-	blue-and-red-wiring = "crossed";
-
 	status = "okay";
 };
