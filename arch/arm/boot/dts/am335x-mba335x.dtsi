@@ -321,6 +321,11 @@
 	interrupts = <3 IRQ_TYPE_EDGE_RISING>;
 };
 
+&gpio2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&expander1_pins>;
+};
+
 &i2c0 {
 	tlv320aic32x4: audio-codec@18 {
 		compatible = "ti,tlv320aic32x4";
@@ -345,13 +350,9 @@
 	expander1: gpio-expander@20 {
 		compatible = "nxp,pca9554";
 		reg = <0x20>;
-		pinctrl-names = "default";
-		pinctrl-0 = <&expander1_pins>;
 		vcc-supply = <&vcc3v3>;
 		gpio-controller;
 		#gpio-cells = <2>;
-		interrupt-parent = <&gpio2>;
-		interrupts = <0 IRQ_TYPE_EDGE_FALLING>;
 	};
 
 	expander2: gpio-expander@21 {
