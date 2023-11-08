@@ -15,8 +15,10 @@
 
 / {
 	aliases {
-		rtc1 = &tps659038_rtc;
+		mmc0 = &mmc2;
+		mmc1 = &mmc1;
 		rtc0 = &ds1339_rtc;
+		rtc1 = &tps659038_rtc;
 	};
 
 	reserved-memory {
