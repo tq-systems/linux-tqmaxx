@@ -55,6 +55,7 @@
 	pwms = <&ecap2 0 50000 0>;
 	brightness-levels = <0 58 61 66 75 90 125 170 255>;
 	default-brightness-level = <7>;
+	status = "okay";
 };
 
 &epwmss2 {
