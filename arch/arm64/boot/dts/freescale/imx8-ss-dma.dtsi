@@ -230,6 +230,8 @@ dma_subsys: bus@5a000000 {
 
 	i2c0: i2c@5a800000 {
 		reg = <0x5a800000 0x4000>;
+		#address-cells = <1>;
+		#size-cells = <0>;
 		interrupts = <GIC_SPI 340 IRQ_TYPE_LEVEL_HIGH>;
 		clocks = <&i2c0_lpcg 0>,
 			 <&i2c0_lpcg 1>;
@@ -242,6 +244,8 @@ dma_subsys: bus@5a000000 {
 
 	i2c1: i2c@5a810000 {
 		reg = <0x5a810000 0x4000>;
+		#address-cells = <1>;
+		#size-cells = <0>;
 		interrupts = <GIC_SPI 341 IRQ_TYPE_LEVEL_HIGH>;
 		clocks = <&i2c1_lpcg 0>,
 			 <&i2c1_lpcg 1>;
@@ -254,6 +258,8 @@ dma_subsys: bus@5a000000 {
 
 	i2c2: i2c@5a820000 {
 		reg = <0x5a820000 0x4000>;
+		#address-cells = <1>;
+		#size-cells = <0>;
 		interrupts = <GIC_SPI 342 IRQ_TYPE_LEVEL_HIGH>;
 		clocks = <&i2c2_lpcg 0>,
 			 <&i2c2_lpcg 1>;
@@ -266,6 +272,8 @@ dma_subsys: bus@5a000000 {
 
 	i2c3: i2c@5a830000 {
 		reg = <0x5a830000 0x4000>;
+		#address-cells = <1>;
+		#size-cells = <0>;
 		interrupts = <GIC_SPI 343 IRQ_TYPE_LEVEL_HIGH>;
 		clocks = <&i2c3_lpcg 0>,
 			 <&i2c3_lpcg 1>;
