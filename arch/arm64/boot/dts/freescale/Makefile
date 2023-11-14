@@ -321,7 +321,9 @@ dtb-$(CONFIG_ARCH_MXC) += imx8qm-mek-revd-esai.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8qm-mek-revd-root.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8qm-tqma8qm-mba8x.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8qm-tqma8qm-mba8x-dp.dtb
+dtb-$(CONFIG_ARCH_MXC) += imx8qm-tqma8qm-mba8x-lvds0-g133han01.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8qm-tqma8qm-mba8x-lvds0-tm070jvhg33.dtb
+dtb-$(CONFIG_ARCH_MXC) += imx8qm-tqma8qm-mba8x-lvds1-g133han01.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8qm-tqma8qm-mba8x-lvds1-tm070jvhg33.dtb
 
 dtb-$(CONFIG_ARCH_MXC) += imx8qxp-ai_ml.dtb
