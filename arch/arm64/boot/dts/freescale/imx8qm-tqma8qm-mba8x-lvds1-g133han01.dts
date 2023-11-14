@@ -1,0 +1,79 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright (c) 2018-2023 TQ-Systems GmbH <linux@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Alexander Stein
+ */
+#include "imx8qm-tqma8qm-mba8x.dts"
+
+/ {
+	backlight_lvds1: backlight-lvds1 {
+		compatible = "pwm-backlight";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_lvds1_blk>;
+		pwms = <&pwm_lvds1 0 100000 0>;
+		brightness-levels = <0 4 8 16 32 64 128 255>;
+		default-brightness-level = <7>;
+		power-supply = <&reg_mba8x_12v>;
+		enable-gpios = <&lsio_gpio1 12 GPIO_ACTIVE_HIGH>;
+	};
+
+	panel_lvds1: panel-lvds1 {
+		compatible = "auo,g133han01";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_lvds1_enable>;
+		backlight = <&backlight_lvds1>;
+		enable-gpios = <&lsio_gpio1 11 GPIO_ACTIVE_HIGH>;
+
+		port {
+			panel_in_lvds1: endpoint {
+				remote-endpoint = <&lvds1_out>;
+			};
+		};
+	};
+};
+
+&iomuxc {
+	pinctrl_lvds1_blk: lvds1_blk {
+		fsl,pins = <
+			IMX8QM_LVDS1_I2C0_SCL_LSIO_GPIO1_IO12	0x00000021
+		>;
+	};
+
+	pinctrl_lvds1_enable: lvds1_enable {
+		fsl,pins = <
+			IMX8QM_LVDS1_GPIO01_LSIO_GPIO1_IO11	0x00000021
+		>;
+	};
+
+	pinctrl_lvds1_pwm: lvds1pwm0grp {
+		fsl,pins = <
+			IMX8QM_LVDS1_GPIO00_LVDS1_PWM0_OUT	0x00000020
+		>;
+	};
+};
+
+&ldb2_phy {
+	status = "okay";
+};
+
+&ldb2 {
+	fsl,dual-channel;
+	status = "okay";
+
+	lvds-channel@0 {
+		status = "okay";
+
+		port@1 {
+			reg = <1>;
+
+			lvds1_out: endpoint {
+				remote-endpoint = <&panel_in_lvds1>;
+			};
+		};
+	};
+};
+
+&pwm_lvds1 {
+	status = "okay";
+};
