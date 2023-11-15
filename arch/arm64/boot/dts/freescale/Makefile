@@ -64,8 +64,11 @@ dtb-$(CONFIG_ARCH_LAYERSCAPE) += fsl-ls1028a-qds-9999.dtb
 
 dtb-$(CONFIG_ARCH_MXC) += imx8dxl-evk.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8dxp-tqma8xdp-mba8xx.dtb
+
+imx8dxp-tqma8xdp-mba8xx-lvds-g133han01-dtbs = imx8dxp-tqma8xdp-mba8xx.dtb tqma8xx-display.dtbo mba8xx-lvds-g133han01.dtbo
 imx8dxp-tqma8xdp-mba8xx-lvds0-tm070jvhg33-dtbs = imx8dxp-tqma8xdp-mba8xx.dtb tqma8xx-display.dtbo mba8xx-lvds0-tm070jvhg33.dtbo
 imx8dxp-tqma8xdp-mba8xx-lvds1-tm070jvhg33-dtbs = imx8dxp-tqma8xdp-mba8xx.dtb tqma8xx-display.dtbo mba8xx-lvds1-tm070jvhg33.dtbo
+dtb-$(CONFIG_ARCH_MXC) += imx8dxp-tqma8xdp-mba8xx-lvds-g133han01.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8dxp-tqma8xdp-mba8xx-lvds0-tm070jvhg33.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8dxp-tqma8xdp-mba8xx-lvds1-tm070jvhg33.dtb
 
