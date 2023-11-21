@@ -72,77 +72,6 @@
 		};
 	};
 
-	icssg1_eth: icssg1-eth {
-		compatible = "ti,am642-icssg-prueth";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pru_icssg1_rgmii1_pins>, <&pru_icssg1_rgmii2_pins>;
-
-		sram = <&oc_sram>;
-		ti,prus = <&pru1_0>, <&rtu1_0>, <&tx_pru1_0>, <&pru1_1>, <&rtu1_1>, <&tx_pru1_1>;
-		firmware-name = "ti-pruss/am65x-sr2-pru0-prueth-fw.elf",
-				"ti-pruss/am65x-sr2-rtu0-prueth-fw.elf",
-				"ti-pruss/am65x-sr2-txpru0-prueth-fw.elf",
-				"ti-pruss/am65x-sr2-pru1-prueth-fw.elf",
-				"ti-pruss/am65x-sr2-rtu1-prueth-fw.elf",
-				"ti-pruss/am65x-sr2-txpru1-prueth-fw.elf";
-
-		ti,pruss-gp-mux-sel = <2>,	/* MII mode */
-				      <2>,
-				      <2>,
-				      <2>,	/* MII mode */
-				      <2>,
-				      <2>;
-
-		ti,mii-g-rt = <&icssg1_mii_g_rt>;
-		ti,mii-rt = <&icssg1_mii_rt>;
-		ti,pa-stats = <&icssg1_pa_stats>;
-		iep = <&icssg1_iep0>,  <&icssg1_iep1>;
-
-		interrupt-parent = <&icssg1_intc>;
-		interrupts = <24 0 2>, <25 1 3>;
-		interrupt-names = "tx_ts0", "tx_ts1";
-
-		dmas = <&main_pktdma 0xc200 15>, /* egress slice 0 */
-		       <&main_pktdma 0xc201 15>, /* egress slice 0 */
-		       <&main_pktdma 0xc202 15>, /* egress slice 0 */
-		       <&main_pktdma 0xc203 15>, /* egress slice 0 */
-		       <&main_pktdma 0xc204 15>, /* egress slice 1 */
-		       <&main_pktdma 0xc205 15>, /* egress slice 1 */
-		       <&main_pktdma 0xc206 15>, /* egress slice 1 */
-		       <&main_pktdma 0xc207 15>, /* egress slice 1 */
-		       <&main_pktdma 0x4200 15>, /* ingress slice 0 */
-		       <&main_pktdma 0x4201 15>, /* ingress slice 1 */
-		       <&main_pktdma 0x4202 0>, /* mgmnt rsp slice 0 */
-		       <&main_pktdma 0x4203 0>; /* mgmnt rsp slice 1 */
-		dma-names = "tx0-0", "tx0-1", "tx0-2", "tx0-3",
-			    "tx1-0", "tx1-1", "tx1-2", "tx1-3",
-			    "rx0", "rx1";
-
-		ethernet-ports {
-			#address-cells = <1>;
-			#size-cells = <0>;
-			icssg1_emac0: port@0 {
-				reg = <0>;
-				phy-handle = <&icssg1_phy0c>;
-				/* Fixed up to rgmii-rxid by driver */
-				phy-mode = "rgmii-id";
-				ti,syscon-rgmii-delay = <&main_conf 0x4110>;
-				/* Filled in by bootloader */
-				local-mac-address = [00 00 00 00 00 00];
-			};
-
-			icssg1_emac1: port@1 {
-				reg = <1>;
-				phy-handle = <&icssg1_phy03>;
-				/* Fixed up to rgmii-rxid by driver */
-				phy-mode = "rgmii-id";
-				ti,syscon-rgmii-delay = <&main_conf 0x4114>;
-				/* Filled in by bootloader */
-				local-mac-address = [00 00 00 00 00 00];
-			};
-		};
-	};
-
 	fan0: pwm-fan {
 		compatible = "pwm-fan";
 		pinctrl-names = "default";
@@ -228,6 +157,79 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&epwm5_pins>;
 	status = "okay";
+};
+
+&icssg1 {
+	icssg1_eth: icssg1-eth {
+		compatible = "ti,am642-icssg-prueth";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pru_icssg1_rgmii1_pins>, <&pru_icssg1_rgmii2_pins>;
+
+		sram = <&oc_sram>;
+		ti,prus = <&pru1_0>, <&rtu1_0>, <&tx_pru1_0>, <&pru1_1>, <&rtu1_1>, <&tx_pru1_1>;
+		firmware-name = "ti-pruss/am65x-sr2-pru0-prueth-fw.elf",
+				"ti-pruss/am65x-sr2-rtu0-prueth-fw.elf",
+				"ti-pruss/am65x-sr2-txpru0-prueth-fw.elf",
+				"ti-pruss/am65x-sr2-pru1-prueth-fw.elf",
+				"ti-pruss/am65x-sr2-rtu1-prueth-fw.elf",
+				"ti-pruss/am65x-sr2-txpru1-prueth-fw.elf";
+
+		ti,pruss-gp-mux-sel = <2>,	/* MII mode */
+				      <2>,
+				      <2>,
+				      <2>,	/* MII mode */
+				      <2>,
+				      <2>;
+
+		ti,mii-g-rt = <&icssg1_mii_g_rt>;
+		ti,mii-rt = <&icssg1_mii_rt>;
+		ti,pa-stats = <&icssg1_pa_stats>;
+		iep = <&icssg1_iep0>,  <&icssg1_iep1>;
+
+		interrupt-parent = <&icssg1_intc>;
+		interrupts = <24 0 2>, <25 1 3>;
+		interrupt-names = "tx_ts0", "tx_ts1";
+
+		dmas = <&main_pktdma 0xc200 15>, /* egress slice 0 */
+		       <&main_pktdma 0xc201 15>, /* egress slice 0 */
+		       <&main_pktdma 0xc202 15>, /* egress slice 0 */
+		       <&main_pktdma 0xc203 15>, /* egress slice 0 */
+		       <&main_pktdma 0xc204 15>, /* egress slice 1 */
+		       <&main_pktdma 0xc205 15>, /* egress slice 1 */
+		       <&main_pktdma 0xc206 15>, /* egress slice 1 */
+		       <&main_pktdma 0xc207 15>, /* egress slice 1 */
+		       <&main_pktdma 0x4200 15>, /* ingress slice 0 */
+		       <&main_pktdma 0x4201 15>, /* ingress slice 1 */
+		       <&main_pktdma 0x4202 0>, /* mgmnt rsp slice 0 */
+		       <&main_pktdma 0x4203 0>; /* mgmnt rsp slice 1 */
+		dma-names = "tx0-0", "tx0-1", "tx0-2", "tx0-3",
+			    "tx1-0", "tx1-1", "tx1-2", "tx1-3",
+			    "rx0", "rx1";
+
+		ethernet-ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			icssg1_emac0: port@0 {
+				reg = <0>;
+				phy-handle = <&icssg1_phy0c>;
+				/* Fixed up to rgmii-rxid by driver */
+				phy-mode = "rgmii-id";
+				ti,syscon-rgmii-delay = <&main_conf 0x4110>;
+				/* Filled in by bootloader */
+				local-mac-address = [00 00 00 00 00 00];
+			};
+
+			icssg1_emac1: port@1 {
+				reg = <1>;
+				phy-handle = <&icssg1_phy03>;
+				/* Fixed up to rgmii-rxid by driver */
+				phy-mode = "rgmii-id";
+				ti,syscon-rgmii-delay = <&main_conf 0x4114>;
+				/* Filled in by bootloader */
+				local-mac-address = [00 00 00 00 00 00];
+			};
+		};
+	};
 };
 
 &icssg1_mdio {
