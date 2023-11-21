@@ -1,0 +1,111 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Copyright (c) 2023 TQ-Systems GmbH <linux@ew.tq-group.com>, D-82229 Seefeld, Germany.
+ * Author: Paul Gerber
+ *
+ */
+
+/ {
+	sensor_clk: sensor-clk {
+		#clock-cells = <0>;
+		compatible = "fixed-clock";
+		clock-frequency = <24000000>;
+	};
+};
+
+&csi20 {
+	status = "okay";
+
+	ports {
+		port@0 {
+			reg = <0>;
+			csi20_in: endpoint {
+				clock-lanes = <0>;
+				data-lanes = <1 2>;
+				remote-endpoint = <&ov9281_ep0>;
+			};
+		};
+	};
+};
+
+&i2c6 {
+	vc_fpga: fpga@10 {
+		reg = <0x10>;
+		compatible = "vc,fpga";
+
+		vc_fpga_reg: regulator {
+			regulator-name = "CAM_VCC";
+		};
+
+		vc_fpga_reset: reset {
+			#reset-cells = <0>;
+		};
+
+		vc_fpga_gpio: gpio-chip {
+			gpio-controller;
+			#gpio-cells = <2>;
+		};
+	};
+
+	ov9281: camera@60 {
+		#address-cells = <0x1>;
+		#size-cells = <0x0>;
+		reg = <0x60>;
+
+		compatible = "ovti,ov9281";
+
+		clock-names = "xvclk";
+		clocks = <&sensor_clk>;
+		clock-frequency = <24000000>;
+
+		avdd-supply = <&vc_fpga_reg>;
+		dovdd-supply = <&vc_fpga_reg>;
+		dvdd-supply = <&vc_fpga_reg>;
+
+		/* NOTE: driver implements a wrong logic! */
+		reset-gpios = <&vc_fpga_gpio 0 GPIO_ACTIVE_LOW>;
+
+		port@0 {
+			reg = <0>;
+
+			ov9281_ep0: endpoint {
+				remote-endpoint = <&csi20_in>;
+				data-lanes = <1 2>;
+				clock-lanes = <0>;
+				link-frequencies = /bits/ 64 <400000000>;
+			};
+		};
+	};
+};
+
+&vin0 {
+	status = "okay";
+};
+
+&vin1 {
+	status = "okay";
+};
+
+&vin2 {
+	status = "okay";
+};
+
+&vin3 {
+	status = "okay";
+};
+
+&vin4 {
+	status = "okay";
+};
+
+&vin5 {
+	status = "okay";
+};
+
+&vin6 {
+	status = "okay";
+};
+
+&vin7 {
+	status = "okay";
+};

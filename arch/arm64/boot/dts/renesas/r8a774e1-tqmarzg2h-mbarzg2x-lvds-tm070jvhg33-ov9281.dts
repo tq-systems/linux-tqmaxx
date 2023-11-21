@@ -1,0 +1,9 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Copyright (c) 2023 TQ-Systems GmbH <linux@ew.tq-group.com>, D-82229 Seefeld, Germany.
+ * Author: Paul Gerber
+ *
+ */
+
+#include "r8a774e1-tqmarzg2h-mbarzg2x-lvds-tm070jvhg33.dts"
+#include "mbarzg2x-ov9281.dtsi"
