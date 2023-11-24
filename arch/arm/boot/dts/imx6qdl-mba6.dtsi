@@ -167,11 +167,12 @@
 	pinctrl-0 = <&pinctrl_ecspi1>, <&pinctrl_ecspi1_mba6>;
 	cs-gpios = <&gpio3 19 0>, <&gpio3 24 0>;
 
+	/* this may only be enabled if no SPI NOR is assembled on TQMa6 */
 	spidev1_0: spidev1-0@0 {
 		compatible = "tq,testdev";
 		spi-max-frequency = <5000000>;
 		reg = <0>;
-		status = "okay";
+		status = "disabled";
 	};
 
 	spidev1_1: spidev1-1@1 {
