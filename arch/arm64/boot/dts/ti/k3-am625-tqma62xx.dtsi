@@ -134,6 +134,20 @@
 			<&wkup_r5fss0_core0_memory_region>;
 };
 
+&wkup_rtc0 {
+	/*
+	 * Erratum i2327: We can't guarantee that the TQMa62xx will boot fast
+	 * enough for U-Boot to apply the workaround within one second after
+	 * power-on. Keep the RTC disabled to avoid RTC interrupt issues.
+	 *
+	 * The external RTC of the TQMa62xx should be used instead.
+	 *
+	 * If needed, the RTC can be enabled in a baseboard DTS, as long as
+	 * boot is fast enough on all relevant boot media.
+	 */
+	status = "disabled";
+};
+
 &main_i2c0 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&main_i2c0_pins>;
