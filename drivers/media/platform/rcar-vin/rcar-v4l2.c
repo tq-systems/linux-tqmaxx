@@ -409,6 +409,11 @@ static int rvin_enum_fmt_vid_cap(struct file *file, void *priv,
 			return -EINVAL;
 		f->pixelformat = V4L2_PIX_FMT_SRGGB8;
 		return 0;
+	case MEDIA_BUS_FMT_Y8_1X8:
+		if (f->index)
+			return -EINVAL;
+		f->pixelformat = V4L2_PIX_FMT_GREY;
+		return 0;
 	default:
 		return -EINVAL;
 	}
