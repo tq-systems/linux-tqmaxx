@@ -27,3 +27,11 @@
 &rpc {
 	status = "disabled";
 };
+
+&vspb {
+	status = "okay";
+};
+
+&vspi0 {
+	status = "okay";
+};

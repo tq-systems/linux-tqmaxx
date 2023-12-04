@@ -27,3 +27,11 @@
 &sata {
 	status = "okay";
 };
+
+&vspb {
+	status = "okay";
+};
+
+&vspi0 {
+	status = "okay";
+};
