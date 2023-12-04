@@ -19,8 +19,10 @@ dtb-$(CONFIG_ARCH_R8A774A3) += r8a774a3-hihope-rzg2m-ex-mipi-2.4.dtb
 
 dtb-$(CONFIG_ARCH_R8A774A1) += r8a774a1-tqmarzg2m-mbarzg2x.dtb
 dtb-$(CONFIG_ARCH_R8A774A1) += r8a774a1-tqmarzg2m-mbarzg2x-ov9281.dtb
+dtb-$(CONFIG_ARCH_R8A774A1) += r8a774a1-tqmarzg2m-mbarzg2x-imx219.dtb
 dtb-$(CONFIG_ARCH_R8A774A1) += r8a774a1-tqmarzg2m-mbarzg2x-lvds-tm070jvhg33.dtb
 dtb-$(CONFIG_ARCH_R8A774A1) += r8a774a1-tqmarzg2m-mbarzg2x-lvds-tm070jvhg33-ov9281.dtb
+dtb-$(CONFIG_ARCH_R8A774A1) += r8a774a1-tqmarzg2m-mbarzg2x-lvds-tm070jvhg33-imx219.dtb
 
 dtb-$(CONFIG_ARCH_R8A774B1) += r8a774b1-hihope-rzg2n.dtb
 dtb-$(CONFIG_ARCH_R8A774B1) += r8a774b1-hihope-rzg2n-ex.dtb
@@ -35,8 +37,10 @@ dtb-$(CONFIG_ARCH_R8A774B1) += r8a774b1-hihope-rzg2n-rev2-ex-mipi-2.4.dtb
 
 dtb-$(CONFIG_ARCH_R8A774B1) += r8a774b1-tqmarzg2n-mbarzg2x.dtb
 dtb-$(CONFIG_ARCH_R8A774B1) += r8a774b1-tqmarzg2n-mbarzg2x-ov9281.dtb
+dtb-$(CONFIG_ARCH_R8A774B1) += r8a774b1-tqmarzg2n-mbarzg2x-imx219.dtb
 dtb-$(CONFIG_ARCH_R8A774B1) += r8a774b1-tqmarzg2n-mbarzg2x-lvds-tm070jvhg33.dtb
 dtb-$(CONFIG_ARCH_R8A774B1) += r8a774b1-tqmarzg2n-mbarzg2x-lvds-tm070jvhg33-ov9281.dtb
+dtb-$(CONFIG_ARCH_R8A774B1) += r8a774b1-tqmarzg2n-mbarzg2x-lvds-tm070jvhg33-imx219.dtb
 
 dtb-$(CONFIG_ARCH_R8A774C0) += r8a774c0-cat874.dtb
 dtb-$(CONFIG_ARCH_R8A774C0) += r8a774c0-ek874.dtb
@@ -62,8 +66,10 @@ dtb-$(CONFIG_ARCH_R8A774E1) += r8a774e1-hihope-rzg2h-ex-mipi-2.4.dtb
 
 dtb-$(CONFIG_ARCH_R8A774E1) += r8a774e1-tqmarzg2h-mbarzg2x.dtb
 dtb-$(CONFIG_ARCH_R8A774E1) += r8a774e1-tqmarzg2h-mbarzg2x-ov9281.dtb
+dtb-$(CONFIG_ARCH_R8A774E1) += r8a774e1-tqmarzg2h-mbarzg2x-imx219.dtb
 dtb-$(CONFIG_ARCH_R8A774E1) += r8a774e1-tqmarzg2h-mbarzg2x-lvds-tm070jvhg33.dtb
 dtb-$(CONFIG_ARCH_R8A774E1) += r8a774e1-tqmarzg2h-mbarzg2x-lvds-tm070jvhg33-ov9281.dtb
+dtb-$(CONFIG_ARCH_R8A774E1) += r8a774e1-tqmarzg2h-mbarzg2x-lvds-tm070jvhg33-imx219.dtb
 
 dtb-$(CONFIG_ARCH_R8A77950) += r8a77950-salvator-x.dtb
 dtb-$(CONFIG_ARCH_R8A77950) += r8a77950-ulcb.dtb
