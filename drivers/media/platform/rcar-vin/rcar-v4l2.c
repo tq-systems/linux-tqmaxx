@@ -131,6 +131,10 @@ static u32 rvin_format_bytesperline(struct rvin_dev *vin,
 	switch (pix->pixelformat) {
 	case V4L2_PIX_FMT_NV12:
 	case V4L2_PIX_FMT_NV16:
+	case V4L2_PIX_FMT_SBGGR8:
+	case V4L2_PIX_FMT_SGBRG8:
+	case V4L2_PIX_FMT_SGRBG8:
+	case V4L2_PIX_FMT_SRGGB8:
 		align = 0x20;
 		break;
 	default:
@@ -184,6 +188,10 @@ static void rvin_format_align(struct rvin_dev *vin, struct v4l2_pix_format *pix)
 	/* Multiple of 32 (2^5) for NV12/16. */
 	case V4L2_PIX_FMT_NV12:
 	case V4L2_PIX_FMT_NV16:
+	case V4L2_PIX_FMT_SBGGR8:
+	case V4L2_PIX_FMT_SGBRG8:
+	case V4L2_PIX_FMT_SGRBG8:
+	case V4L2_PIX_FMT_SRGGB8:
 		walign = 5;
 		break;
 	/* Multiple of 2 (2^1) for YUV. */
