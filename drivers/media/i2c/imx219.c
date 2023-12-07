@@ -470,6 +470,22 @@ static const u32 codes[] = {
 static const struct imx219_mode supported_modes[] = {
 	{
 		/* 8MPix 15fps mode */
+		.width = 3296,
+		.height = 2464,
+		.crop = {
+			.left = IMX219_PIXEL_ARRAY_LEFT,
+			.top = IMX219_PIXEL_ARRAY_TOP,
+			.width = 3296,
+			.height = 2464
+		},
+		.vts_def = IMX219_VTS_15FPS,
+		.reg_list = {
+			.num_of_regs = ARRAY_SIZE(mode_3280x2464_regs),
+			.regs = mode_3280x2464_regs,
+		},
+	},
+	{
+		/* 8MPix 15fps mode */
 		.width = 3280,
 		.height = 2464,
 		.crop = {
