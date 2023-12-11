@@ -40,6 +40,12 @@
 		status = "disabled";
 	};
 
+	clk_dp: clk-dp {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <26000000>;
+	};
+
 	display: display {
 		/*
 		 * Display is not fixed, so compatible has to be added from
@@ -370,6 +376,13 @@
 		/* 20 */ "", "", "", "",
 		/* 24 */ "", "", "", "",
 		/* 28 */ "", "DP_INT", "", "";
+
+	dp-int-hog {
+		gpio-hog;
+		gpios = <29 GPIO_ACTIVE_LOW>;
+		input;
+		line-name = "DP_INT";
+	};
 };
 
 &ldb {
@@ -561,6 +574,33 @@
 	pinctrl-0 = <&pinctrl_lpi2c5>;
 	pinctrl-1 = <&pinctrl_lpi2c5>;
 	status = "okay";
+
+	dp_bridge: dp-bridge@f {
+		compatible = "toshiba,tc9595", "toshiba,tc358767";
+		reg = <0x0f>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_tc9595>;
+		clock-names = "ref";
+		clocks = <&clk_dp>;
+		reset-gpios = <&expander2 3 GPIO_ACTIVE_HIGH>;
+		interrupt-parent = <&gpio4>;
+		interrupts = <29 IRQ_TYPE_EDGE_RISING>;
+		toshiba,hpd-pin = <0>;
+		status = "disabled";
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+
+				dp_dsi_in: endpoint {
+					data-lanes = <1 2 3 4>;
+				};
+			};
+		};
+	};
 };
 
 &lpspi6 {
