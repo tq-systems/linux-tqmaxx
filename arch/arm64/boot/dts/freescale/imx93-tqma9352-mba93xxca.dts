@@ -310,13 +310,6 @@
 		/* 24 */ "", "", "", "",
 		/* 28 */ "", "", "", "";
 
-	expander-irq-hog {
-		gpio-hog;
-		gpios = <12 GPIO_ACTIVE_LOW>;
-		input;
-		line-name = "PEX_INT#";
-	};
-
 	tcpc-irq-hog {
 		gpio-hog;
 		gpios = <2 GPIO_ACTIVE_LOW>;
@@ -329,6 +322,13 @@
 		gpios = <11 GPIO_ACTIVE_LOW>;
 		input;
 		line-name = "BM2_TEMP_EVENT_MOD#";
+	};
+
+	expander-irq-hog {
+		gpio-hog;
+		gpios = <12 GPIO_ACTIVE_LOW>;
+		input;
+		line-name = "PEX_INT#";
 	};
 
 	rtc-irq-hog {
@@ -364,6 +364,20 @@
 		/* 20 */ "", "", "", "",
 		/* 24 */ "", "", "ENET1_INT#", "ENET2_INT#",
 		/* 28 */ "", "", "", "";
+
+	ethphy-eqos-irq-hog {
+		gpio-hog;
+		gpios = <26 GPIO_ACTIVE_LOW>;
+		input;
+		line-name = "ENET1_INT#";
+	};
+
+	ethphy-fec-irq-hog {
+		gpio-hog;
+		gpios = <27 GPIO_ACTIVE_LOW>;
+		input;
+		line-name = "ENET2_INT#";
+	};
 };
 
 &gpio4 {
