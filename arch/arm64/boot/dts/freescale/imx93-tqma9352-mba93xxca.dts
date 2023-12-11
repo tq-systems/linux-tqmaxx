@@ -505,18 +505,6 @@
 				  "WLAN_PERST#", "12V_EN";
 
 		/*
-		 * Controls the on board USB Hub reset which is low
-		 * active as reset signal. The output-low states, the
-		 * signal is inactive, e.g. no reset
-		 */
-		usb-reset-hog {
-			gpio-hog;
-			gpios = <2 GPIO_ACTIVE_LOW>;
-			output-low;
-			line-name = "USB_RESET#";
-		};
-
-		/*
 		 * Controls the WiFi card PD pin which is low active
 		 * as power down signal. The output-low states, the signal
 		 * is inactive, e.g. not power down
@@ -688,8 +676,17 @@
 
 &usbotg2 {
 	dr_mode = "host";
+	#address-cells = <1>;
+	#size-cells = <0>;
 	disable-over-current;
 	status = "okay";
+
+	hub_2_0: hub@1 {
+		compatible = "usb424,2517";
+		reg = <1>;
+		reset-gpios = <&expander1 2 GPIO_ACTIVE_LOW>;
+		vdd-supply = <&reg_3v3>;
+	};
 };
 
 &usdhc2 {
