@@ -3,6 +3,7 @@
  * Copyright (c) 2022-2023 TQ-Systems GmbH <linux@ew.tq-group.com>,
  * D-82229 Seefeld, Germany.
  * Author: Markus Niebel
+ * Author: Alexander Stein
  */
 /dts-v1/;
 
@@ -17,6 +18,7 @@
 	model = "TQ-Systems i.MX93 TQMa93xxLA/TQMa93xxCA on MBa93xxCA starter kit";
 	compatible = "tq,imx93-tqma9352-mba93xxca",
 		     "tq,imx93-tqma9352", "fsl,imx93";
+	chassis-type = "embedded";
 
 	chosen {
 		stdout-path = &lpuart1;
@@ -67,8 +69,7 @@
 		pulses-per-revolution = <2>;
 		interrupt-parent = <&gpio2>;
 		interrupts = <9 IRQ_TYPE_EDGE_FALLING>;
-
-		status = "okay";
+		status = "disabled";
 	};
 
 	gpio-keys {
@@ -108,9 +109,14 @@
 		};
 	};
 
+	iio-hwmon {
+		compatible = "iio-hwmon";
+		io-channels = <&adc1 0>, <&adc1 1>, <&adc1 2>, <&adc1 3>;
+	};
+
 	reg_3v3: regulator-3v3 {
 		compatible = "regulator-fixed";
-		regulator-name = "V_3V3";
+		regulator-name = "V_3V3_MB";
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
 	};
@@ -124,9 +130,9 @@
 		enable-active-high;
 	};
 
-	reg_pcie_1v5: regulator-pcie-1v5 {
+	reg_mpcie_1v5: regulator-mpcie-1v5 {
 		compatible = "regulator-fixed";
-		regulator-name = "V_PCIE_1V5";
+		regulator-name = "V_1V5_MPCIE";
 		regulator-min-microvolt = <1500000>;
 		regulator-max-microvolt = <1500000>;
 		gpio = <&expander0 2 GPIO_ACTIVE_HIGH>;
@@ -134,9 +140,9 @@
 		regulator-always-on;
 	};
 
-	reg_pcie_3v3: regulator-pcie-3v3 {
+	reg_mpcie_3v3: regulator-mpcie-3v3 {
 		compatible = "regulator-fixed";
-		regulator-name = "V_PCIE_3V3";
+		regulator-name = "V_3V3_MPCIE";
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
 		gpio = <&expander0 3 GPIO_ACTIVE_HIGH>;
@@ -153,6 +159,47 @@
 		enable-active-high;
 		vin-supply = <&reg_12v0>;
 	};
+
+	thermal-zones {
+		cpu-thermal {
+			trips {
+				cpu_active0: trip-active0 {
+					temperature = <40000>;
+					hysteresis = <5000>;
+					type = "active";
+				};
+
+				cpu_active1: trip-active1 {
+					temperature = <48000>;
+					hysteresis = <3000>;
+					type = "active";
+				};
+
+				cpu_active2: trip-active2 {
+					temperature = <60000>;
+					hysteresis = <10000>;
+					type = "active";
+				};
+			};
+
+			cooling-maps {
+				map1 {
+					trip = <&cpu_active0>;
+					cooling-device = <&fan0 1 1>;
+				};
+
+				map2 {
+					trip = <&cpu_active1>;
+					cooling-device = <&fan0 2 2>;
+				};
+
+				map3 {
+					trip = <&cpu_active2>;
+					cooling-device = <&fan0 3 3>;
+				};
+			};
+		};
+	};
 };
 
 &adc1 {
@@ -161,7 +208,7 @@
 
 &eqos {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_eqos>, <&pinctrl_eqos_phy>;
+	pinctrl-0 = <&pinctrl_eqos>;
 	phy-mode = "rgmii-id";
 	phy-handle = <&ethphy_eqos>;
 	status = "okay";
@@ -174,15 +221,19 @@
 		ethphy_eqos: ethernet-phy@0 {
 			compatible = "ethernet-phy-ieee802.3-c22";
 			reg = <0>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_eqos_phy>;
 			reset-gpios = <&expander1 0 GPIO_ACTIVE_LOW>;
 			reset-assert-us = <500000>;
 			reset-deassert-us = <50000>;
+			interrupt-parent = <&gpio3>;
+			interrupts = <26 IRQ_TYPE_EDGE_FALLING>;
+			enet-phy-lane-no-swap;
 			ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_25_NS>;
 			ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_25_NS>;
 			ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
 			ti,dp83867-rxctrl-strap-quirk;
 			ti,clk-output-sel = <DP83867_CLK_O_SEL_OFF>;
-			enet-phy-lane-no-swap;
 			/* LED0: Link, LED2: activity */
 			ti,led-function = <0x0100>;
 			/* LED0/2: active High, driven by phy function */
@@ -193,7 +244,7 @@
 
 &fec {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_fec>, <&pinctrl_fec_phy>;
+	pinctrl-0 = <&pinctrl_fec>;
 	phy-mode = "rgmii-id";
 	phy-handle = <&ethphy_fec>;
 	fsl,magic-packet;
@@ -207,15 +258,19 @@
 		ethphy_fec: ethernet-phy@0 {
 			compatible = "ethernet-phy-ieee802.3-c22";
 			reg = <0>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_fec_phy>;
 			reset-gpios = <&expander1 1 GPIO_ACTIVE_LOW>;
 			reset-assert-us = <500000>;
 			reset-deassert-us = <50000>;
+			interrupt-parent = <&gpio3>;
+			interrupts = <27 IRQ_TYPE_EDGE_FALLING>;
+			enet-phy-lane-no-swap;
 			ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_25_NS>;
 			ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_25_NS>;
 			ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
 			ti,dp83867-rxctrl-strap-quirk;
 			ti,clk-output-sel = <DP83867_CLK_O_SEL_OFF>;
-			enet-phy-lane-no-swap;
 			/* LED0: Link, LED2: activity */
 			ti,led-function = <0x0100>;
 			/* LED0/2: active High, driven by phy function */
@@ -243,7 +298,7 @@
 		gpio-hog;
 		gpios = <12 GPIO_ACTIVE_LOW>;
 		input;
-		line-name = "PEXP_INT#";
+		line-name = "PEX_INT#";
 	};
 
 	tcpc-irq-hog {
@@ -275,7 +330,6 @@
 	pinctrl-1 = <&pinctrl_lpi2c3>;
 	status = "okay";
 
-	/* NXP SE97BTP with temperature sensor + eeprom */
 	temperature-sensor@1c {
 		compatible = "nxp,se97b", "jedec,jc-42.4-temp";
 		reg = <0x1c>;
@@ -448,14 +502,13 @@
 };
 
 &lpspi6 {
-	fsl,spi-num-chipselects = <1>;
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&pinctrl_lpspi6>;
 	pinctrl-1 = <&pinctrl_lpspi6>;
 	status = "okay";
 };
 
-&lpuart1 { /* console */
+&lpuart1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart1>;
 	status = "okay";
@@ -526,12 +579,13 @@
 	pinctrl-0 = <&pinctrl_usdhc2_hs>, <&pinctrl_usdhc2_gpio>;
 	pinctrl-1 = <&pinctrl_usdhc2_uhs>, <&pinctrl_usdhc2_gpio>;
 	pinctrl-2 = <&pinctrl_usdhc2_uhs>, <&pinctrl_usdhc2_gpio>;
-	cd-gpios = <&gpio3 00 GPIO_ACTIVE_LOW>;
+	cd-gpios = <&gpio3 0 GPIO_ACTIVE_LOW>;
 	vmmc-supply = <&reg_usdhc2_vmmc>;
 	bus-width = <4>;
-	status = "okay";
 	no-sdio;
 	no-mmc;
+	disable-wp;
+	status = "okay";
 };
 
 &iomuxc {
@@ -623,6 +677,15 @@
 		>;
 	};
 
+	pinctrl_lpspi6: lpspi6grp {
+		fsl,pins = <
+			MX93_PAD_GPIO_IO00__LPSPI6_PCS0		0x3fe
+			MX93_PAD_GPIO_IO01__LPSPI6_SIN		0x3fe
+			MX93_PAD_GPIO_IO02__LPSPI6_SOUT		0x3fe
+			MX93_PAD_GPIO_IO03__LPSPI6_SCK		0x3fe
+		>;
+	};
+
 	pinctrl_pexp_irq: pexpirqgrp {
 		fsl,pins = <
 			MX93_PAD_SAI1_TXC__GPIO1_IO12		0x1306
@@ -672,15 +735,6 @@
 		fsl,pins = <
 			MX93_PAD_GPIO_IO14__LPUART3_TX		0x31e
 			MX93_PAD_GPIO_IO15__LPUART3_RX		0x31e
-		>;
-	};
-
-	pinctrl_lpspi6: lpspi6grp {
-		fsl,pins = <
-			MX93_PAD_GPIO_IO00__LPSPI6_PCS0		0x3fe
-			MX93_PAD_GPIO_IO01__LPSPI6_SIN		0x3fe
-			MX93_PAD_GPIO_IO02__LPSPI6_SOUT		0x3fe
-			MX93_PAD_GPIO_IO03__LPSPI6_SCK		0x3fe
 		>;
 	};
 

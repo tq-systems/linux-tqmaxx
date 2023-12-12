@@ -78,10 +78,10 @@
 	};
 };
 
-&reg_pcie_1v5 {
+&reg_mpcie_1v5 {
 	status = "disabled";
 };
 
-&reg_pcie_3v3 {
+&reg_mpcie_3v3 {
 	status = "disabled";
 };
