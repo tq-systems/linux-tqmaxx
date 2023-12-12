@@ -244,6 +244,13 @@
 		/* 24 */ "", "", "", "",
 		/* 28 */ "", "", "", "";
 
+	temp-alarm-mod-hog {
+		gpio-hog;
+		gpios = <11 GPIO_ACTIVE_LOW>;
+		input;
+		line-name = "BM2_TEMP_EVENT_MOD#";
+	};
+
 	expander-irq-hog {
 		gpio-hog;
 		gpios = <12 GPIO_ACTIVE_LOW>;
