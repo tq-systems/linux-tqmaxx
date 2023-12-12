@@ -307,6 +307,20 @@
 		input;
 		line-name = "USB_C_ALERT#";
 	};
+
+	temp-alarm-mod-hog {
+		gpio-hog;
+		gpios = <11 GPIO_ACTIVE_LOW>;
+		input;
+		line-name = "BM2_TEMP_EVENT_MOD#";
+	};
+
+	rtc-irq-hog {
+		gpio-hog;
+		gpios = <14 GPIO_ACTIVE_LOW>;
+		input;
+		line-name = "RTC_EVENT#";
+	};
 };
 
 &gpio2 {
@@ -542,6 +556,22 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart8>;
 	status = "okay";
+};
+
+&pcf85063 {
+	/* RTC_EVENT# from SoM is connected on mainboard */
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pcf85063>;
+	interrupt-parent = <&gpio1>;
+	interrupts = <14 IRQ_TYPE_EDGE_FALLING>;
+};
+
+&se97_som {
+	/* TEMP_EVENT# from SoM is connected on mainboard */
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_temp_sensor_som>;
+	interrupt-parent = <&gpio1>;
+	interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
 };
 
 &tpm5 {
