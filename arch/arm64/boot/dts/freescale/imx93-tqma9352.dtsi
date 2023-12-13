@@ -22,12 +22,67 @@
 		#size-cells = <2>;
 		ranges;
 
+		/* default CMA, must not exceed assembled memory */
 		linux,cma {
 			compatible = "shared-dma-pool";
 			reusable;
-			alloc-ranges = <0 0x80000000 0 0x40000000>;
+			alloc-ranges = <0 0x80000000 0 0xa8000000>;
 			size = <0 0x10000000>;
 			linux,cma-default;
+		};
+
+		/* M33 System TCM (FlexRAM aliased), last page */
+		rsc_table: rsc-table@2021f000 {
+			reg = <0 0x2021f000 0 0x1000>;
+			no-map;
+			status = "disabled";
+		};
+
+		/* NPU shared region */
+		ethosu_mem: npu-region@93000000 {
+			compatible = "shared-dma-pool";
+			reusable;
+			reg = <0x0 0x93000000 0x0 0x10000000>;
+			status = "disabled";
+		};
+
+		/* carveout for Cortex M33 running in DDR, disabled by default */
+		m33_reserved: m33@a5000000 {
+			no-map;
+			reg = <0 0xa3000000 0 0x1000000>;
+			status = "disabled";
+		};
+
+		/* RPMSG interface for Cortex M33, disabled by default */
+		vdev0vring0: vdev0vring0@a4000000 {
+			reg = <0 0xa4000000 0 0x8000>;
+			no-map;
+			status = "disabled";
+		};
+
+		vdev0vring1: vdev0vring1@a4008000 {
+			reg = <0 0xa4008000 0 0x8000>;
+			no-map;
+			status = "disabled";
+		};
+
+		vdev1vring0: vdev1vring0@a4010000 {
+			reg = <0 0xa4010000 0 0x8000>;
+			no-map;
+			status = "disabled";
+		};
+
+		vdev1vring1: vdev1vring1@a4018000 {
+			reg = <0 0xa4018000 0 0x8000>;
+			no-map;
+			status = "disabled";
+		};
+
+		vdevbuffer: vdevbuffer@a4020000 {
+			compatible = "shared-dma-pool";
+			reg = <0 0xa4020000 0 0x100000>;
+			no-map;
+			status = "disabled";
 		};
 	};
 
