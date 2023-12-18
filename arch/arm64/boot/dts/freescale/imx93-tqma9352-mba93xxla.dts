@@ -275,7 +275,7 @@
 	pinctrl-0 = <&pinctrl_gpio2>;
 
 	gpio-line-names =
-		/* 00 */ "", "", "", "",
+		/* 00 */ "SPI6_PCS0#", "", "", "",
 		/* 04 */ "", "", "", "AFE_RESET#",
 		/* 08 */ "AFE_SYNC", "AFE_DRDY", "MIPI_CSI_TRIGGER", "MIPI_CSI_SYNC",
 		/* 12 */ "", "", "", "",
@@ -502,6 +502,14 @@
 	pinctrl-0 = <&pinctrl_lpspi6>, <&pinctrl_lpspi6_cs>;
 	cs-gpios = <&gpio2 0 GPIO_ACTIVE_LOW>;
 	status = "okay";
+
+	afe@0 {
+		compatible = "nxp,nafe13388";
+		reg = <0>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_afe>;
+		spi-max-frequency = <5000000>;
+	};
 };
 
 &lpuart1 {
