@@ -514,6 +514,7 @@ static int dwc3_setup_role_switch(struct dwc3 *dwc)
 		mode = DWC3_GCTL_PRTCAP_DEVICE;
 		break;
 	}
+	dwc3_set_mode(dwc, mode);
 
 	dwc3_role_switch.fwnode = dev_fwnode(dwc->dev);
 	dwc3_role_switch.set = dwc3_usb_role_switch_set;
@@ -535,7 +536,6 @@ static int dwc3_setup_role_switch(struct dwc3 *dwc)
 		}
 	}
 
-	dwc3_set_mode(dwc, mode);
 	return 0;
 }
 #else
