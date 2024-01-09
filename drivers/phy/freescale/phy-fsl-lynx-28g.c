@@ -344,6 +344,10 @@ struct lynx_28g_lane {
 struct lynx_28g_priv {
 	void __iomem *base;
 	struct device *dev;
+	/* Serialize concurrent access to registers shared between lanes,
+	 * like PCCn
+	 */
+	spinlock_t pcc_lock;
 	struct lynx_28g_pll pll[LYNX_28G_NUM_PLL];
 	struct lynx_28g_lane lane[LYNX_28G_NUM_LANE];
 
@@ -906,6 +910,12 @@ static int lynx_28g_set_lane_mode(struct phy *phy, enum lynx_28g_lane_mode lane_
 	case LANE_MODE_1000BASEX_SGMII:
 	case LANE_MODE_1000BASEKX:
 		lynx_28g_lane_set_1g(lane, lane_mode);
+	spin_lock(&priv->pcc_lock);
+
+	switch (submode) {
+	case PHY_INTERFACE_MODE_SGMII:
+	case PHY_INTERFACE_MODE_1000BASEX:
+		lynx_28g_lane_set_sgmii(lane);
 		break;
 	case LANE_MODE_10GBASER:
 	case LANE_MODE_USXGMII:
@@ -929,6 +939,8 @@ static int lynx_28g_set_lane_mode(struct phy *phy, enum lynx_28g_lane_mode lane_
 	lane->mode = lane_mode;
 
 out:
+	spin_unlock(&priv->pcc_lock);
+
 	/* Reset the lane if necessary */
 	if (powered_up)
 		lynx_28g_lane_reset(phy);
@@ -1360,6 +1372,8 @@ static int lynx_28g_probe(struct platform_device *pdev)
 	dev_set_drvdata(dev, priv);
 
 	INIT_DELAYED_WORK(&priv->cdr_check, lynx_28g_cdr_lock_check_work);
+	spin_lock_init(&priv->pcc_lock);
+	INIT_DELAYED_WORK(&priv->cdr_check, lynx_28g_cdr_lock_check);
 
 	queue_delayed_work(system_power_efficient_wq, &priv->cdr_check,
 			   msecs_to_jiffies(1000));
@@ -1370,6 +1384,14 @@ static int lynx_28g_probe(struct platform_device *pdev)
 	return PTR_ERR_OR_ZERO(provider);
 }
 
+static void lynx_28g_remove(struct platform_device *pdev)
+{
+	struct device *dev = &pdev->dev;
+	struct lynx_28g_priv *priv = dev_get_drvdata(dev);
+
+	cancel_delayed_work_sync(&priv->cdr_check);
+}
+
 static const struct of_device_id lynx_28g_of_match_table[] = {
 	{ .compatible = "fsl,lynx-28g" },
 	{ },
@@ -1378,6 +1400,7 @@ MODULE_DEVICE_TABLE(of, lynx_28g_of_match_table);
 
 static struct platform_driver lynx_28g_driver = {
 	.probe	= lynx_28g_probe,
+	.remove_new = lynx_28g_remove,
 	.driver	= {
 		.name = "lynx-28g",
 		.of_match_table = lynx_28g_of_match_table,
