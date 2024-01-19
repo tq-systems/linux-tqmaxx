@@ -56,6 +56,12 @@ Optional properties:
 - hw-caps-temp-alert	: Have this property if the controller
   has capability for generating SDRAM temperature alerts
 
+- ti,ocp-config		: Overwrite the OCP_CONFIG register with a given
+  value (ti,emif-am3352 and ti,emif-am4372 only). Optimal values depend
+  on the required display controller bandwidth for the used resolution and
+  pixel clock. Some explanation and suggested values can be found at:
+  https://source.denx.de/u-boot/u-boot/-/commit/8c17cbdf8a8023abdd0009af4dc9dbc0541b4a0f
+
 -Examples:
 
 emif1: emif@4c000000 {
