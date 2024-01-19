@@ -6,6 +6,7 @@
  *	Dave Gerlach
  */
 
+#include <linux/bitfield.h>
 #include <linux/err.h>
 #include <linux/genalloc.h>
 #include <linux/io.h>
@@ -191,6 +192,44 @@ static void ti_emif_configure_sr_delay(struct ti_emif_data *emif_data)
 		EMIF_POWER_MANAGEMENT_CTRL_SHDW));
 }
 
+/*
+ * See 7.3.3.5.2 "Command Starvation" in AM335x TRM (SPRUH73Q)
+ *
+ * The optimal configuration for OCP_CONFIG (Priority Raise Counter) depends
+ * on the transfer rate required by the display controller. Lower values are
+ * required to avoid FIFO underuns at higher resolutions and pixel clocks at the
+ * cost of hurting transfer prioritization.
+ *
+ * Arguments:
+ *   cos1 - Priority Raise Counter for class of service 1.
+ *          Number of m_clk cycles after which the EMIF momentarily raises the
+ *          priority of the class of service 1 commands in the Command FIFO.
+ *   cos2 - Priority Raise Counter for class of service 2.
+ *          Number of m_clk cycles after which the EMIF momentarily raises the
+ *          priority of the class of service 2 commands in the Command FIFO.
+ *   old  - Priority Raise Old Counter.
+ *          Number of m_clk cycles after which the EMIF momentarily raises the
+ *          priority of the oldest command in the OCP Command FIFO.
+ *
+ * Passing 0xffffffff for a PR counter leaves the value unchanged.
+ * All counts are given in units of 16 clocks.
+ */
+static void ti_emif_set_ocp_config(struct ti_emif_data *emif_data,
+				   u32 cos1, u32 cos2, u32 old)
+{
+	u32 ocp_config = readl(emif_data->pm_data.ti_emif_base_addr_virt + EMIF_OCP_CONFIG);
+
+	if (cos1 != 0xffffffff)
+		u32p_replace_bits(&ocp_config, cos1, GENMASK(23, 16));
+	if (cos2 != 0xffffffff)
+		u32p_replace_bits(&ocp_config, cos2, GENMASK(15, 8));
+	if (old != 0xffffffff)
+		u32p_replace_bits(&ocp_config, old, GENMASK(7, 0));
+
+	writel(ocp_config,
+	       emif_data->pm_data.ti_emif_base_addr_virt + EMIF_OCP_CONFIG);
+}
+
 /**
  * ti_emif_copy_pm_function_table - copy mapping of pm funcs in sram
  * @sram_pool: pointer to struct gen_pool where dst resides
@@ -272,12 +311,26 @@ static int ti_emif_suspend(struct device *dev)
 }
 #endif /* CONFIG_PM_SLEEP */
 
+/* Helper to read the Priority Raise flags from OF */
+static int ti_emif_of_pr_config(struct device *dev, const char *name, u32 *value)
+{
+	if (!of_property_read_u32(dev->of_node, name, value)) {
+		if (*value > 0xff)
+			return dev_err_probe(dev, -EINVAL, "invalid %s value\n", name);
+	} else {
+		*value = 0xffffffff;
+	}
+
+	return 0;
+}
+
 static int ti_emif_probe(struct platform_device *pdev)
 {
 	int ret;
 	struct resource *res;
 	struct device *dev = &pdev->dev;
 	struct ti_emif_data *emif_data;
+	u32 count_cos1, count_cos2, count_old;
 
 	emif_data = devm_kzalloc(dev, sizeof(*emif_data), GFP_KERNEL);
 	if (!emif_data)
@@ -296,6 +349,17 @@ static int ti_emif_probe(struct platform_device *pdev)
 	emif_data->pm_data.ti_emif_base_addr_phys = res->start;
 
 	ti_emif_configure_sr_delay(emif_data);
+
+	ret = ti_emif_of_pr_config(dev, "ti,pr-count-cos1", &count_cos1);
+	if (ret)
+		return ret;
+	ret = ti_emif_of_pr_config(dev, "ti,pr-count-cos2", &count_cos2);
+	if (ret)
+		return ret;
+	ret = ti_emif_of_pr_config(dev, "ti,pr-count-old", &count_old);
+	if (ret)
+		return ret;
+	ti_emif_set_ocp_config(emif_data, count_cos1, count_cos2, count_old);
 
 	ret = ti_emif_alloc_sram(dev, emif_data);
 	if (ret)
