@@ -56,6 +56,16 @@ Optional properties:
 - hw-caps-temp-alert	: Have this property if the controller
   has capability for generating SDRAM temperature alerts
 
+- ti,pr-count-cos1, ti,pr-count-cos2, ti-pr-count-old: Overwrite the Priority
+  Raise Counters for Class of Service 1, Class of Service 2 and oldest commands
+  (ti,emif-am3352 and ti,emif-am4372 only), as described in the OCP_CONFIG
+  register description of the relevant Technical Reference Manuals. Values are
+  given in units of 16 clocks.
+  Optimal values depend on the required display controller bandwidth for the
+  used resolution and pixel clock. Some explanation and suggested values can be
+  found at:
+  https://source.denx.de/u-boot/u-boot/-/commit/8c17cbdf8a8023abdd0009af4dc9dbc0541b4a0f
+
 -Examples:
 
 emif1: emif@4c000000 {
