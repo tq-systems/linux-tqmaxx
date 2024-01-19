@@ -59,6 +59,13 @@
 	status = "okay";
 };
 
+/*
+ * See also:
+ * https://source.denx.de/u-boot/u-boot/-/commit/8c17cbdf8a8023abdd0009af4dc9dbc0541b4a0f
+ */
+&emif {
+	ti,ocp-config = <0x003d3d3d>;
+};
 
 &epwmss2 {
 	status = "okay";
