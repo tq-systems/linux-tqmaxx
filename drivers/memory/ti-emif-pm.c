@@ -191,6 +191,21 @@ static void ti_emif_configure_sr_delay(struct ti_emif_data *emif_data)
 		EMIF_POWER_MANAGEMENT_CTRL_SHDW));
 }
 
+/*
+ * See 7.3.3.5.2 "Command Starvation" in AM335x TRM (SPRUH73Q)
+ *
+ * The optimal configuration for OCP_CONFIG (Priority Raise Counter) depends
+ * on the transfer rate required by the display controller. Lower values are
+ * required to avoid FIFO underuns at higher resolutions and pixel clocks at the
+ * cost of hurting transfer prioritization.
+ */
+static void ti_emif_set_ocp_config(struct ti_emif_data *emif_data,
+				   u32 ocp_config)
+{
+	writel(ocp_config,
+	       emif_data->pm_data.ti_emif_base_addr_virt + EMIF_OCP_CONFIG);
+}
+
 /**
  * ti_emif_copy_pm_function_table - copy mapping of pm funcs in sram
  * @sram_pool: pointer to struct gen_pool where dst resides
@@ -279,6 +294,7 @@ static int ti_emif_probe(struct platform_device *pdev)
 	struct device *dev = &pdev->dev;
 	const struct of_device_id *match;
 	struct ti_emif_data *emif_data;
+	u32 ocp_config;
 
 	emif_data = devm_kzalloc(dev, sizeof(*emif_data), GFP_KERNEL);
 	if (!emif_data)
@@ -301,6 +317,10 @@ static int ti_emif_probe(struct platform_device *pdev)
 	emif_data->pm_data.ti_emif_base_addr_phys = res->start;
 
 	ti_emif_configure_sr_delay(emif_data);
+
+	if (of_property_read_u32(dev->of_node, "ti,ocp-config", &ocp_config) ==
+	    0)
+		ti_emif_set_ocp_config(emif_data, ocp_config);
 
 	ret = ti_emif_alloc_sram(dev, emif_data);
 	if (ret)
