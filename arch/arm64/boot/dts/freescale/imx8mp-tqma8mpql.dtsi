@@ -245,6 +245,10 @@
 	status = "okay";
 };
 
+&ml_vipsi {
+	status = "okay";
+};
+
 /* Remove reserved memory referenced by unused DSP */
 &resmem {
 	/delete-node/ dsp@92400000;
