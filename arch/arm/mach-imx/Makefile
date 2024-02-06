@@ -96,7 +96,8 @@ obj-$(CONFIG_SOC_VF610) += mach-vf610.o
 
 obj-$(CONFIG_SOC_LS1021A) += mach-ls1021a.o
 
-ifneq ($(CONFIG_SOC_IMX6)$(CONFIG_SOC_IMX7),)
+ifneq ($(CONFIG_HAVE_IMX_BUSFREQ),)
 # Bus frequency by OPTEE OS
-obj-$(CONFIG_OPTEE) += busfreq_optee.o
+obj-$(CONFIG_OPTEE) += busfreq_optee.o smp_wfe_optee.o
+AFLAGS_smp_wfe_optee.o :=-Wa,-march=armv7-a
 endif
