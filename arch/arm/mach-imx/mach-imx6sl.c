@@ -34,7 +34,10 @@ static void __init imx6sl_fec_clk_init(void)
 static inline void imx6sl_fec_init(void)
 {
 	imx6sl_fec_clk_init();
-	imx6_enet_mac_init("fsl,imx6sl-fec", "fsl,imx6sl-ocotp");
+	if (cpu_is_imx6sll())
+		imx6_enet_mac_init("fsl,imx6sl-fec", "fsl,imx6sll-ocotp");
+	else
+		imx6_enet_mac_init("fsl,imx6sl-fec", "fsl,imx6sl-ocotp");
 }
 
 static void __init imx6sl_init_late(void)
