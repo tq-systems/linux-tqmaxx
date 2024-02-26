@@ -383,7 +383,7 @@ static int imx93_lpm_probe(struct platform_device *pdev)
 		0, 0, 0, 0, 0, &res);
 	num_fsp = res.a0;
 	if (num_fsp < 2) {
-		pr_info("no ddr frequency scaling can be supported");
+		dev_info(&pdev->dev, "no ddr frequency scaling can be supported");
 		return -EINVAL;
 	}
 
