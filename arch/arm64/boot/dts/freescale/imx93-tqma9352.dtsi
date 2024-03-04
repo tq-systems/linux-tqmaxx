@@ -31,9 +31,9 @@
 			linux,cma-default;
 		};
 
-		/* M33 System TCM (FlexRAM aliased), last page */
-		rsc_table: rsc-table@2021f000 {
-			reg = <0 0x2021f000 0 0x1000>;
+		/* M33 System TCM (FlexRAM aliased), last page is used by ROM */
+		rsc_table: rsc-table@2021e000 {
+			reg = <0 0x2021e000 0 0x1000>;
 			no-map;
 			status = "disabled";
 		};
