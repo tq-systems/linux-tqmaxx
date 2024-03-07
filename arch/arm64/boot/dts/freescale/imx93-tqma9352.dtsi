@@ -38,14 +38,6 @@
 			status = "disabled";
 		};
 
-		/* NPU shared region */
-		ethosu_mem: npu-region@93000000 {
-			compatible = "shared-dma-pool";
-			reusable;
-			reg = <0x0 0x93000000 0x0 0x10000000>;
-			status = "disabled";
-		};
-
 		/* carveout for Cortex M33 running in DDR, disabled by default */
 		m33_reserved: m33@a3000000 {
 			no-map;
@@ -90,6 +82,19 @@
 			compatible = "shared-dma-pool";
 			reg = <0 0xa4120000 0 0x100000>;
 			no-map;
+		};
+
+		/*
+		 * Cortex M33 NPU firmware shared region,
+		 * use NS area as per table 4 in i.MX93 reference manual
+		 * driver and firmware exchanging pointers into this region via
+		 * rpmsg.
+		 */
+		ethosu_mem: npu-region@a6000000 {
+			compatible = "shared-dma-pool";
+			reusable;
+			reg = <0x0 0xa6000000 0x0 0x8000000>;
+			status = "disabled";
 		};
 	};
 
