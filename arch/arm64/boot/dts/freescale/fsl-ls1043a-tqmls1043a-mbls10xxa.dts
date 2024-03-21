@@ -15,11 +15,10 @@
 
 / {
 	model = "TQ-Systems GmbH LS1043A TQMLS1043A SoM on MBLS10xxA board";
-	compatible = "tq,ls1043a-tqmls1043a-mbls10xxa", "tq,ls1043a-tqmls1043a", "fsl,ls1043a";
+	compatible = "tq,ls1043a-tqmls1043a-mbls10xxa", "tq,ls1043a-tqmls1043a",
+		     "fsl,ls1043a";
 
 	aliases {
-		serial0 = &duart0;
-		serial1 = &duart1;
 		qsgmii-s1-p1 = &qsgmii1_phy1;
 		qsgmii-s1-p2 = &qsgmii1_phy2;
 		qsgmii-s1-p3 = &qsgmii1_phy3;
@@ -28,10 +27,12 @@
 		qsgmii-s2-p2 = &qsgmii2_phy2;
 		qsgmii-s2-p3 = &qsgmii2_phy3;
 		qsgmii-s2-p4 = &qsgmii2_phy4;
+		serial0 = &duart0;
+		serial1 = &duart1;
 	};
 
 	chosen {
-		stdout-path = "serial1:115200n8";
+		stdout-path = &duart1;
 	};
 };
 

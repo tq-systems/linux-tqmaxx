@@ -40,6 +40,13 @@
 			linux,default-trigger = "heartbeat";
 		};
 	};
+
+	reg_3v3: regulator-3v3 {
+		compatible = "regulator-fixed";
+		regulator-name = "V_3V3_MB";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+	};
 };
 
 &duart0 {
@@ -54,19 +61,6 @@
 	status = "okay";
 };
 
-&sata {
-	status = "okay";
-};
-
-&usb0 {
-	status = "okay";
-};
-
-&usb1 {
-	status = "okay";
-	dr_mode = "otg";
-};
-
 &i2c3 {
 	status = "okay";
 
@@ -77,48 +71,66 @@
 		#size-cells = <0>;
 
 		i2c@0 {
+			reg = <0x0>;
 			#address-cells = <1>;
 			#size-cells = <0>;
-			reg = <0x0>;
 
-			gpioexp1: pca9555@20 {
+			gpioexp1: gpio@20 {
 				compatible = "nxp,pca9555";
 				reg = <0x20>;
+				vcc-supply = <&reg_3v3>;
 				gpio-controller;
 				#gpio-cells = <2>;
 			};
 
-			gpioexp2: pca9555@21 {
+			gpioexp2: gpio@21 {
 				compatible = "nxp,pca9555";
 				reg = <0x21>;
+				vcc-supply = <&reg_3v3>;
 				gpio-controller;
 				#gpio-cells = <2>;
 			};
 
-			gpioexp3: pca9555@22 {
+			gpioexp3: gpio@22 {
 				compatible = "nxp,pca9555";
 				reg = <0x22>;
+				vcc-supply = <&reg_3v3>;
 				gpio-controller;
 				#gpio-cells = <2>;
 			};
 		};
 
 		sfp1_i2c: i2c@1 {
+			reg = <0x1>;
 			#address-cells = <1>;
 			#size-cells = <0>;
-			reg = <0x1>;
+			status = "disabled";
 		};
 
 		sfp2_i2c: i2c@2 {
+			reg = <0x2>;
 			#address-cells = <1>;
 			#size-cells = <0>;
-			reg = <0x2>;
+			status = "disabled";
 		};
 
 		i2c@3 {
+			reg = <0x3>;
 			#address-cells = <1>;
 			#size-cells = <0>;
-			reg = <0x3>;
 		};
 	};
+};
+
+&sata {
+	status = "okay";
+};
+
+&usb0 {
+	status = "okay";
+};
+
+&usb1 {
+	dr_mode = "otg";
+	status = "okay";
 };

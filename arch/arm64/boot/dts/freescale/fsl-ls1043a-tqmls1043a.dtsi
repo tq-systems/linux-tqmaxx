@@ -15,13 +15,13 @@
 	status = "okay";
 
 	qflash0: flash@0 {
+		compatible = "jedec,spi-nor";
+		reg = <0>;
 		#address-cells = <1>;
 		#size-cells = <1>;
-		compatible = "jedec,spi-nor";
 		spi-max-frequency = <62500000>;
 		spi-rx-bus-width = <4>;
-		spi-tx-bus-width = <1>;
-		reg = <0>;
+		spi-tx-bus-width = <4>;
 
 		partitions {
 			compatible = "fixed-partitions";
