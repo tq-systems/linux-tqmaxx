@@ -772,7 +772,7 @@
 	bus-width = <4>;
 	no-1-8-v;
 	no-sdio;
-	no-emmc;
+	no-mmc;
 	status = "okay";
 };
 
