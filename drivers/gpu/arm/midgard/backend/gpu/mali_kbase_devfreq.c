@@ -703,7 +703,7 @@ int kbase_devfreq_init(struct kbase_device *kbdev)
 #if IS_ENABLED(CONFIG_DEVFREQ_THERMAL)
 	err = kbase_ipa_init(kbdev);
 	if (err) {
-		dev_err(kbdev->dev, "IPA initialization failed");
+		dev_err_probe(kbdev->dev, err, "IPA initialization failed");
 		goto ipa_init_failed;
 	}
 #endif
