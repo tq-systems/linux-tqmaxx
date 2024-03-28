@@ -4413,8 +4413,12 @@ int kbase_backend_devfreq_init(struct kbase_device *kbdev)
 	/* Devfreq uses hardware counters, so must be initialized after it. */
 	int err = kbase_devfreq_init(kbdev);
 
-	if (err)
+	if (err) {
+		if (err == -EPROBE_DEFER)
+			return err;
+
 		dev_err(kbdev->dev, "Continuing without devfreq\n");
+	}
 #endif /* CONFIG_MALI_DEVFREQ */
 	return 0;
 }
