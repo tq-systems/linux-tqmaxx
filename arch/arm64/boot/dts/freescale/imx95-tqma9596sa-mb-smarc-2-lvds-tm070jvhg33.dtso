@@ -1,0 +1,45 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright (c) 2024 TQ-Systems GmbH <linux@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Alexander Stein
+ */
+
+/dts-v1/;
+/plugin/;
+
+#include "imx95-clock.h"
+
+&backlight_lvds0 {
+	status = "okay";
+};
+
+&dpu {
+	status = "okay";
+};
+
+&ldb {
+	/* IMX95_CLK_LDBPLL: 7x display pixel clock */
+	/* IMX95_CLK_LDBPLL_VCO: 6x IMX95_CLK_LDBPLL */
+	assigned-clocks = <&scmi_clk IMX95_CLK_LDBPLL_VCO>,
+			  <&scmi_clk IMX95_CLK_LDBPLL>;
+	assigned-clock-rates = <2864400000>, <477400000>;
+	status = "okay";
+
+	channel@0 {
+		status = "okay";
+	};
+};
+
+&ldb0_phy {
+	status = "okay";
+};
+
+&panel_lvds0 {
+	compatible = "tianma,tm070jvhg33";
+	status = "okay";
+};
+
+&tpm3 {
+	status = "okay";
+};
