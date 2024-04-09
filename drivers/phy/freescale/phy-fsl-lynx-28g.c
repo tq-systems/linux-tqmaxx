@@ -1371,9 +1371,8 @@ static int lynx_28g_probe(struct platform_device *pdev)
 
 	dev_set_drvdata(dev, priv);
 
-	INIT_DELAYED_WORK(&priv->cdr_check, lynx_28g_cdr_lock_check_work);
 	spin_lock_init(&priv->pcc_lock);
-	INIT_DELAYED_WORK(&priv->cdr_check, lynx_28g_cdr_lock_check);
+	INIT_DELAYED_WORK(&priv->cdr_check, lynx_28g_cdr_lock_check_work);
 
 	queue_delayed_work(system_power_efficient_wq, &priv->cdr_check,
 			   msecs_to_jiffies(1000));
