@@ -185,7 +185,7 @@
 		interrupt-parent = <&gpio1>;
 		interrupts = <3 IRQ_TYPE_LEVEL_LOW>;
 
-		pca9451a_regulators: regulators {
+		regulators {
 			/* V_0V8_SOC - hw developer guide: 0.75 .. 0.9 */
 			buck1: BUCK1 {
 				regulator-name = "BUCK1";
