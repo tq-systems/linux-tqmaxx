@@ -230,6 +230,10 @@
 			retain-state-suspended;
 			default-state = "off";
 		};
+		led-red {
+			gpios = <&gpio1 2 0>;
+			default-state = "on";
+		};
 	};
 
 	v4l2_cap_0 {
