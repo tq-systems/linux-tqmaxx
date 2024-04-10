@@ -1,0 +1,57 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright (c) 2024 TQ-Systems GmbH <linux@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Markus Niebel
+ */
+
+/dts-v1/;
+/plugin/;
+
+&cm33 {
+	status = "okay";
+};
+
+&npu {
+	status = "okay";
+};
+
+/* NPU shared region */
+&ethosu_mem {
+	status = "okay";
+};
+
+/* disabled per default, console for M33 */
+&lpuart3 {
+	status = "disabled";
+};
+
+/* carveout for Cortex M33 running in DDR, disabled by default */
+&m33_reserved {
+	status = "okay";
+};
+
+&rsc_table {
+	status = "okay";
+};
+
+/* RPMSG interface for Cortex M33, disabled by default */
+&vdev0vring0 {
+	status = "okay";
+};
+
+&vdev0vring1 {
+	status = "okay";
+};
+
+&vdev1vring0 {
+	status = "okay";
+};
+
+&vdev1vring1 {
+	status = "okay";
+};
+
+&vdevbuffer {
+	status = "okay";
+};
