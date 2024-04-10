@@ -845,9 +845,13 @@ dtb-$(CONFIG_ARCH_MXC) += imx93-tqma9352-mba91xxca-lvds-tm070jvhg33.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx93-tqma9352-mba91xxca-rgb-cdtech-dc44.dtb
 
 imx93-tqma9352-mba93xxca-lvds-tm070jvhg33-dtbs := imx93-tqma9352-mba93xxca.dtb imx93-tqma9352-mba93xxca-lvds-tm070jvhg33.dtbo
+imx93-tqma9352-mba93xxca-rpmsg-dtbs := imx93-tqma9352-mba93xxca.dtb imx93-tqma9352-mba93xx-rpmsg.dtbo
 imx93-tqma9352-mba93xxla-lvds-tm070jvhg33-dtbs := imx93-tqma9352-mba93xxla.dtb imx93-tqma9352-mba93xxla-lvds-tm070jvhg33.dtbo
+imx93-tqma9352-mba93xxla-rpmsg-dtbs := imx93-tqma9352-mba93xxla.dtb imx93-tqma9352-mba93xx-rpmsg.dtbo
 dtb-$(CONFIG_ARCH_MXC) += imx93-tqma9352-mba93xxca-lvds-tm070jvhg33.dtb
+dtb-$(CONFIG_ARCH_MXC) += imx93-tqma9352-mba93xxca-rpmsg.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx93-tqma9352-mba93xxla-lvds-tm070jvhg33.dtb
+dtb-$(CONFIG_ARCH_MXC) += imx93-tqma9352-mba93xxla-rpmsg.dtb
 
 imx93-tqma9352-mba93xxla-mini-ezurio-wlan-dtbs += imx93-tqma9352-mba93xxla-mini.dtb imx93-tqma9352-mba93xxla-mini-ezurio-wlan.dtbo
 dtb-$(CONFIG_ARCH_MXC) += imx93-tqma9352-mba93xxla-mini-ezurio-wlan.dtb
