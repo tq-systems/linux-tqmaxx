@@ -1,0 +1,44 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright (c) 2023 TQ-Systems GmbH <linux@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Alexander Stein
+ */
+
+#include "imx93-tqma9352-mba91xxca.dts"
+
+&backlight {
+	status = "okay";
+};
+
+&display {
+	compatible = "cdtech,s070swv29hg-dc44";
+	status = "okay";
+};
+
+&dpi_out {
+	remote-endpoint = <&panel_in_dpi>;
+};
+
+&epxp {
+	status = "okay";
+};
+
+&lcdif {
+	status = "okay";
+};
+
+&panel_in_dpi {
+	remote-endpoint = <&dpi_out>;
+};
+
+&parallel_disp_fmt {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_rgbdisp>;
+	fsl,interface-pix-fmt = "rgb666";
+	status = "okay";
+};
+
+&polytouch {
+	status = "okay";
+};
