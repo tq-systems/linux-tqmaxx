@@ -451,7 +451,7 @@ int tidss_oldi_init(struct tidss_device *tidss)
 		/* Return gracefully */
 		return 0;
 
-	for_each_child_of_node(oldi_parent, child) {
+	for_each_available_child_of_node(oldi_parent, child) {
 		ret = get_parent_dss_vp(child, &parent_vp);
 		if (ret) {
 			if (ret == -ENODEV) {
