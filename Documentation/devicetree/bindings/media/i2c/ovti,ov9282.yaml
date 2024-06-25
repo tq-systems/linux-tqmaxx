@@ -18,6 +18,9 @@ description:
   sheet. Image data is sent through MIPI CSI-2.
   OV9281 has a different lens chief ray angle.
 
+allOf:
+  - $ref: /schemas/media/video-interface-devices.yaml#
+
 properties:
   compatible:
     enum:
@@ -74,7 +77,7 @@ required:
   - clocks
   - port
 
-additionalProperties: false
+unevaluatedProperties: false
 
 examples:
   - |
