@@ -5,5 +5,8 @@
  * Author: Alexander Stein
  */
 
-#include "imx8mp-tqma8mpql-mba8mpxl-hdmi.dts"
-#include "imx8mp-mba8mpxl-imx327.dtsi"
+/*
+ * Note: This is just a transitional device tree file and will be removed.
+ * Use the device tree included below instead.
+ */
+#include "imx8mp-tqma8mpql-mba8mpxl-imx327.dts"
