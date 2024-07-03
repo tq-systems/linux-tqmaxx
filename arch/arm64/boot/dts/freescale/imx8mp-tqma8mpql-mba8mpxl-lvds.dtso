@@ -32,27 +32,21 @@
 		vsync-len = <1>;
 		de-active = <1>;
 	};
-
-	port {
-		panel_in_lvds0: endpoint {
-			remote-endpoint = <&ldb_lvds_ch0>;
-		};
-	};
 };
 
 &lcdif2 {
 	status = "okay";
 };
 
-&lvds_bridge {
+&ldb_phy {
+	status = "okay";
+};
+
+&ldb {
 	status = "okay";
 
-	ports {
-		port@1 {
-			ldb_lvds_ch0: endpoint {
-				remote-endpoint = <&panel_in_lvds0>;
-			};
-		};
+	lvds-channel@0 {
+		status = "okay";
 	};
 };
 
