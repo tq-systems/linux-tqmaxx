@@ -18,6 +18,10 @@
 	status = "okay";
 };
 
+&display_subsystem {
+	status = "okay";
+};
+
 &dsi_lvds_bridge {
 	status = "okay";
 };
@@ -42,4 +46,22 @@
 &panel {
 	compatible = "tianma,tm070jvhg33";
 	status = "okay";
+
+	panel-timing {
+		/*
+		 * Override default timings from panel-simple
+		 * as i.MX8M requires special timings.
+		 */
+		clock-frequency = <68200000>;
+		hactive = <1280>;
+		vactive = <800>;
+		hfront-porch = <64>;
+		hback-porch = <5>;
+		hsync-len = <40>;
+		vback-porch = <2>;
+		vfront-porch = <40>;
+		vsync-len = <1>;
+
+		de-active = <1>;
+	};
 };
