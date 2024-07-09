@@ -1119,7 +1119,7 @@ static int mipi_csis_parse_dt(struct platform_device *pdev,
 				 &state->max_num_lanes))
 		return -EINVAL;
 
-	node = of_graph_get_next_endpoint(node, NULL);
+	node = of_graph_get_endpoint_by_regs(node, -1, 1);
 	if (!node) {
 		dev_err(&pdev->dev, "No port node at %s\n",
 				pdev->dev.of_node->full_name);
@@ -1155,21 +1155,16 @@ static const struct v4l2_async_notifier_operations mxc_mipi_csi_subdev_ops = {
 static int mipi_csis_subdev_host(struct csi_state *state)
 {
 	struct device_node *parent = state->dev->of_node;
-	struct device_node *node, *port, *rem;
+	struct device_node *port, *rem;
 	struct v4l2_async_connection *asd;
 	int ret;
 
 	v4l2_async_nf_init(&state->subdev_notifier, &state->v4l2_dev);
 
 	/* Attach sensors linked to csi receivers */
-	for_each_available_child_of_node(parent, node) {
-		if (of_node_cmp(node->name, "port"))
-			continue;
 
 		/* The csi node can have only port subnode. */
-		port = of_get_next_child(node, NULL);
-		if (!port)
-			continue;
+		port = of_graph_get_endpoint_by_regs(parent, -1, 1);
 		rem = of_graph_get_remote_port_parent(port);
 		of_node_put(port);
 		if (rem == NULL) {
@@ -1190,9 +1185,6 @@ static int mipi_csis_subdev_host(struct csi_state *state)
 		}
 
 		of_node_put(rem);
-		break;
-	}
-
 
 	state->subdev_notifier.v4l2_dev = &state->v4l2_dev;
 	state->subdev_notifier.ops = &mxc_mipi_csi_subdev_ops;
