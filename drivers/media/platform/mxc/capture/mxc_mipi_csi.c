@@ -1162,29 +1162,28 @@ static int mipi_csis_subdev_host(struct csi_state *state)
 	v4l2_async_nf_init(&state->subdev_notifier, &state->v4l2_dev);
 
 	/* Attach sensors linked to csi receivers */
+	/* The csi node can have only port subnode. */
+	port = of_graph_get_endpoint_by_regs(parent, -1, 1);
+	rem = of_graph_get_remote_port_parent(port);
+	of_node_put(port);
+	if (rem == NULL) {
+		v4l2_info(&state->v4l2_dev,
+					"Remote device at %s not found\n",
+					port->full_name);
+		return -1;
+	}
 
-		/* The csi node can have only port subnode. */
-		port = of_graph_get_endpoint_by_regs(parent, -1, 1);
-		rem = of_graph_get_remote_port_parent(port);
-		of_node_put(port);
-		if (rem == NULL) {
-			v4l2_info(&state->v4l2_dev,
-						"Remote device at %s not found\n",
-						port->full_name);
-			return -1;
-		}
-
-		state->fwnode = of_fwnode_handle(rem);
-		asd = v4l2_async_nf_add_fwnode(&state->subdev_notifier,
-						state->fwnode,
-						struct v4l2_async_connection);
-		if (IS_ERR(asd)) {
-			of_node_put(rem);
-			dev_err(state->dev, "failed to add subdev to a notifier\n");
-			return PTR_ERR(asd);
-		}
-
+	state->fwnode = of_fwnode_handle(rem);
+	asd = v4l2_async_nf_add_fwnode(&state->subdev_notifier,
+					state->fwnode,
+					struct v4l2_async_connection);
+	if (IS_ERR(asd)) {
 		of_node_put(rem);
+		dev_err(state->dev, "failed to add subdev to a notifier\n");
+		return PTR_ERR(asd);
+	}
+
+	of_node_put(rem);
 
 	state->subdev_notifier.v4l2_dev = &state->v4l2_dev;
 	state->subdev_notifier.ops = &mxc_mipi_csi_subdev_ops;
