@@ -8,6 +8,7 @@
 /dts-v1/;
 /plugin/;
 
+#include <dt-bindings/clock/imx8mn-clock.h>
 #include <dt-bindings/gpio/gpio.h>
 
 &{/} {
@@ -15,6 +16,10 @@
 };
 
 &backlight_lvds {
+	status = "okay";
+};
+
+&display_subsystem {
 	status = "okay";
 };
 
@@ -40,6 +45,27 @@
 };
 
 &panel {
+	/* specific Video PLL frequency required */
+	assigned-clocks = <&clk IMX8MN_VIDEO_PLL1>;
+	assigned-clock-rates = <594000000>;
 	compatible = "tianma,tm070jvhg33";
 	status = "okay";
+
+	panel-timing {
+		/*
+		 * Override default timings from panel-simple
+		 * as i.MX8MNano requires special timings.
+		 */
+		clock-frequency = <68200000>;
+		hactive = <1280>;
+		vactive = <800>;
+		hfront-porch = <64>;
+		hback-porch = <5>;
+		hsync-len = <40>;
+		vback-porch = <2>;
+		vfront-porch = <40>;
+		vsync-len = <1>;
+
+		de-active = <1>;
+	};
 };
