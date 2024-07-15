@@ -47,6 +47,59 @@
 		gpio = <&gpio2 19 GPIO_ACTIVE_HIGH>;
 		enable-active-high;
 	};
+
+	reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		/* global autoconfigured region for contiguous allocations */
+		linux,cma {
+			/*
+			 * 640 MiB total, SOM should have at least 1024 MiB
+			 * limit range to 1024 - 128 - 16 MiB, to leave room:
+			 * 128 MiB generic
+			 * 16 MiB: allow optional carve-out for M4 at 0x77000000
+			 */
+			alloc-ranges = <0 0x40000000 0 0x77000000>;
+		};
+
+		/*
+		 * 0x7700_0000 ~ 0x77FF_FFFF is reserved for M4
+		 * Must not be used from code running on Cortex-A cluster
+		 * Must be in sync with linker settings for M4
+		 */
+		m4_reserved: m4@77000000 {
+			reg = <0 0x77000000 0 0x1000000>;
+			no-map;
+			status = "disabled";
+		};
+
+		vdev0vring0: vdev0vring0@78100000 {
+			reg = <0 0x78100000 0 0x8000>;
+			no-map;
+			status = "disabled";
+		};
+
+		vdev0vring1: vdev0vring1@78108000 {
+			reg = <0 0x78108000 0 0x8000>;
+			no-map;
+			status = "disabled";
+		};
+
+		rsc_table: rsc-table@781ff000 {
+			reg = <0 0x781ff000 0 0x1000>;
+			no-map;
+			status = "disabled";
+		};
+
+		vdevbuffer: vdevbuffer@78500000 {
+			compatible = "shared-dma-pool";
+			reg = <0 0x78500000 0 0x100000>;
+			no-map;
+			status = "disabled";
+		};
+	};
 };
 
 &btn2 {
