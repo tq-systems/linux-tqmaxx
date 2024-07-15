@@ -533,7 +533,7 @@ static int mipi_csi2_parse_dt(struct mxc_mipi_csi2_dev *csi2dev)
 
 	csi2dev->vchannel = of_property_read_bool(node, "virtual-channel");
 
-	node = of_graph_get_next_endpoint(node, NULL);
+	node = of_graph_get_endpoint_by_regs(node, -1, 0);
 	if (!node) {
 		dev_err(dev, "No port node\n");
 		return -EINVAL;
@@ -648,21 +648,15 @@ static int mipi_csis_subdev_host(struct mxc_mipi_csi2_dev *csi2dev)
 {
 	struct device *dev = &csi2dev->pdev->dev;
 	struct device_node *parent = dev->of_node;
-	struct device_node *node, *port, *rem;
+	struct device_node *port, *rem;
 	struct v4l2_async_connection *asd;
 	int ret;
 
 	v4l2_async_nf_init(&csi2dev->subdev_notifier, &csi2dev->v4l2_dev);
 
 	/* Attach sensors linked to csi receivers */
-	for_each_available_child_of_node(parent, node) {
-		if (of_node_cmp(node->name, "port"))
-			continue;
 
-		/* The csi node can have only port subnode. */
-		port = of_get_next_child(node, NULL);
-		if (!port)
-			continue;
+		port = of_graph_get_endpoint_by_regs(parent, -1, 0);
 		rem = of_graph_get_remote_port_parent(port);
 		of_node_put(port);
 		if (rem == NULL) {
@@ -686,9 +680,6 @@ static int mipi_csis_subdev_host(struct mxc_mipi_csi2_dev *csi2dev)
 			return PTR_ERR(asd);
 		}
 		of_node_put(rem);
-
-		break;
-	}
 
 	csi2dev->subdev_notifier.v4l2_dev = &csi2dev->v4l2_dev;
 	csi2dev->subdev_notifier.ops = &subdev_notifier_ops;
