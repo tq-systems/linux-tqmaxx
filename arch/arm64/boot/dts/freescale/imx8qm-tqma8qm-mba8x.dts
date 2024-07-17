@@ -261,6 +261,81 @@
 			reg = <0 0x86200000 0 0x200000>;
 		};
 
+		vdev0vring0: vdev0vring0@90000000 {
+			compatible = "shared-dma-pool";
+			reg = <0 0x90000000 0 0x8000>;
+			no-map;
+			status = "disabled";
+		};
+
+		vdev0vring1: vdev0vring1@90008000 {
+			compatible = "shared-dma-pool";
+			reg = <0 0x90008000 0 0x8000>;
+			no-map;
+			status = "disabled";
+		};
+
+		vdev1vring0: vdev1vring0@90010000 {
+			compatible = "shared-dma-pool";
+			reg = <0 0x90010000 0 0x8000>;
+			no-map;
+			status = "disabled";
+		};
+
+		vdev1vring1: vdev1vring1@90018000 {
+			compatible = "shared-dma-pool";
+			reg = <0 0x90018000 0 0x8000>;
+			no-map;
+			status = "disabled";
+		};
+
+		rsc_table0: rsc-table@900ff000 {
+			reg = <0 0x900ff000 0 0x1000>;
+			no-map;
+			status = "disabled";
+		};
+
+		vdev2vring0: vdev0vring0@90100000 {
+			compatible = "shared-dma-pool";
+			reg = <0 0x90100000 0 0x8000>;
+			no-map;
+			status = "disabled";
+		};
+
+		vdev2vring1: vdev0vring1@90108000 {
+			compatible = "shared-dma-pool";
+			reg = <0 0x90108000 0 0x8000>;
+			no-map;
+			status = "disabled";
+		};
+
+		vdev3vring0: vdev1vring0@90110000 {
+			compatible = "shared-dma-pool";
+			reg = <0 0x90110000 0 0x8000>;
+			no-map;
+			status = "disabled";
+		};
+
+		vdev3vring1: vdev1vring1@90118000 {
+			compatible = "shared-dma-pool";
+			reg = <0 0x90118000 0 0x8000>;
+			no-map;
+			status = "disabled";
+		};
+
+		rsc_table1: rsc-table@901ff000 {
+			reg = <0 0x901ff000 0 0x1000>;
+			no-map;
+			status = "disabled";
+		};
+
+		vdevbuffer: vdevbuffer {
+			compatible = "shared-dma-pool";
+			reg = <0 0x90400000 0 0x100000>;
+			no-map;
+			status = "disabled";
+		};
+
 		decoder_rpc: decoder_rpc@92000000 {
 			no-map;
 			reg = <0 0x92000000 0 0x100000>;
