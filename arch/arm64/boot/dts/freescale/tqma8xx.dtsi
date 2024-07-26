@@ -79,7 +79,7 @@
 &i2c1 {
 	#address-cells = <1>;
 	#size-cells = <0>;
-	clock-frequency = <100000>;
+	clock-frequency = <400000>;
 	pinctrl-names = "default", "gpio";
 	pinctrl-0 = <&pinctrl_lpi2c1>;
 	pinctrl-1 = <&pinctrl_lpi2c1gpio>;
