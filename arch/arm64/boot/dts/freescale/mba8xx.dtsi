@@ -116,6 +116,24 @@
 		regulator-max-microvolt = <3300000>;
 	};
 
+	reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		/*
+		 * global autoconfigured region for contiguous allocations
+		 * must not exceed memory size and region
+		 */
+		linux,cma {
+			compatible = "shared-dma-pool";
+			reusable;
+			size = <0 0x20000000>;
+			alloc-ranges = <0 0x96000000 0 0x30000000>;
+			linux,cma-default;
+		};
+	};
+
 	sound {
 		compatible = "fsl,imx-audio-tlv320aic32x4";
 		model = "tqm-tlv320aic32";
