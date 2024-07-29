@@ -309,7 +309,7 @@
 	phy-mode = "rgmii-id";
 	phy-handle = <&ethphy3>;
 	/*
-	 * Reset in PHY node not possible as deffered probe for PHY from other
+	 * Reset in PHY node not possible as deferred probe for PHY from other
 	 * MDIO bus is not supported
 	 */
 	phy-reset-gpios = <&lsio_gpio3 3 GPIO_ACTIVE_LOW>;
