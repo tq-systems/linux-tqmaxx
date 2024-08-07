@@ -36,9 +36,17 @@ struct tidss_device {
 	spinlock_t wait_lock;	/* protects the irq masks */
 	dispc_irq_t irq_mask;	/* enabled irqs in addition to wait_list */
 
+	bool shared_mode; /* DSS resources shared between remote core and Linux */
+	/* 1: VP owned by Linux 0: VP is owned by remote and shared with Linux */
+	u32 shared_mode_owned_vps[TIDSS_MAX_PORTS];
+	bool shared_mode_own_oldi; /* Linux needs to configure OLDI in shared mode */
+
 	int num_domains; /* Handle attached PM domains */
 	struct device **pd_dev;
 	struct device_link **pd_link;
+
+	u32 boot_enabled_vp_mask;
+	bool simplefb_enabled;
 };
 
 #define to_tidss(__dev) container_of(__dev, struct tidss_device, ddev)

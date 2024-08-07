@@ -36,6 +36,7 @@ dtb-$(CONFIG_ARCH_K3) += k3-am62-lp-sk.dtb
 dtb-$(CONFIG_ARCH_K3) += k3-am62-lp-sk-lincolntech-lcd185-panel.dtbo
 dtb-$(CONFIG_ARCH_K3) += k3-am62-lp-sk-microtips-mf101hie-panel.dtbo
 dtb-$(CONFIG_ARCH_K3) += k3-am625-sk-mcspi-loopback.dtbo
+dtb-$(CONFIG_ARCH_K3) += k3-am62-lp-sk-nand.dtbo
 dtb-$(CONFIG_ARCH_K3) += k3-am625-tqma62xx-mba62xx.dtb
 
 k3-am625-tqma62xx-mba62xx-csi-imx327-dtbs := \
@@ -63,6 +64,7 @@ dtb-$(CONFIG_ARCH_K3) += k3-am62a7-sk-rpi-hdr-ehrpwm.dtbo
 # Boards with AM62Px SoC
 dtb-$(CONFIG_ARCH_K3) += k3-am62p5-sk.dtb
 dtb-$(CONFIG_ARCH_K3) += k3-am62p5-sk-dsi-rpi-7inch-panel.dtbo
+dtb-$(CONFIG_ARCH_K3) += k3-am62p5-sk-dss-shared-mode.dtbo
 dtb-$(CONFIG_ARCH_K3) += k3-am62p5-sk-eqep.dtbo
 dtb-$(CONFIG_ARCH_K3) += k3-am62p5-sk-m2-cc3301.dtbo
 dtb-$(CONFIG_ARCH_K3) += k3-am62p5-sk-mcan.dtbo
@@ -160,6 +162,7 @@ dtb-$(CONFIG_ARCH_K3) += k3-j722s-evm-dsi-rpi-7inch-panel.dtbo
 dtb-$(CONFIG_ARCH_K3) += k3-j722s-evm-fpdlink-fusion.dtbo
 dtb-$(CONFIG_ARCH_K3) += k3-j722s-evm-microtips-mf101hie-panel.dtbo
 dtb-$(CONFIG_ARCH_K3) += k3-j722s-evm-v3link-fusion.dtbo
+dtb-$(CONFIG_ARCH_K3) += k3-j722s-evm-pwm.dtbo
 
 # Boards with J784s4 SoC
 dtb-$(CONFIG_ARCH_K3) += k3-am69-sk.dtb
@@ -172,6 +175,9 @@ dtb-$(CONFIG_ARCH_K3) += k3-j784s4-evm-pcie0-pcie1-ep.dtbo
 dtb-$(CONFIG_ARCH_K3) += k3-j784s4-evm-quad-port-eth-exp1.dtbo
 dtb-$(CONFIG_ARCH_K3) += k3-j784s4-evm-usxgmii-exp1-exp2.dtbo
 dtb-$(CONFIG_ARCH_K3) += k3-am69-sk-rpi-hdr-ehrpwm.dtbo
+
+# Boards with J742S2 SoC
+dtb-$(CONFIG_ARCH_K3) += k3-j742s2-evm.dtb
 
 # Build time test only, enabled by CONFIG_OF_ALL_DTBS
 k3-am625-beagleplay-csi2-ov5640-dtbs := k3-am625-beagleplay.dtb \
@@ -227,6 +233,8 @@ k3-am62p5-sk-fastboot-disable-hdmi-dtbs := k3-am62p5-sk.dtb \
 	k3-am62x-sk-fastboot-disable-hdmi.dtbo
 k3-am62p5-sk-dsi-rpi-7inch-panel-dtbs := k3-am62p5-sk.dtb \
 	k3-am62p5-sk-dsi-rpi-7inch-panel.dtbo
+k3-am62p5-sk-dss-shared-mode-dtbs := k3-am62p5-sk.dtb \
+	k3-am62p5-sk-dss-shared-mode.dtbo
 k3-am62p5-sk-microtips-mf070zima-lcd3-dtbs := k3-am62p5-sk.dtb \
 	k3-am62p5-sk-microtips-mf070zima-lcd3.dtbo
 k3-am62p5-sk-microtips-mf101hie-panel-dtbs := k3-am62p5-sk.dtb \
@@ -309,6 +317,7 @@ dtb- += k3-am625-beagleplay-csi2-ov5640.dtb \
 	k3-am62p5-sk-csi2-ov5640.dtb \
 	k3-am62p5-sk-csi2-tevi-ov5640.dtb \
 	k3-am62p5-sk-dsi-rpi-7inch-panel.dtb \
+	k3-am62p5-sk-dss-shared-mode.dtb \
 	k3-am62p5-sk-fastboot-disable-hdmi.dtb \
 	k3-am62p5-sk-microtips-mf070zima-lcd3.dtb \
 	k3-am62p5-sk-microtips-mf101hie-panel.dtb \

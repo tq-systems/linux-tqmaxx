@@ -24,6 +24,8 @@
 		mmc1 = &sdhci1;
 		ethernet0 = &cpsw_port1;
 		spi0 = &ospi0;
+		rtc0 = &wkup_rtc0;
+		rtc1 = &tps659312;
 	};
 
 	chosen {
@@ -721,6 +723,11 @@
 	status = "reserved";
 };
 
+/* Main Timer2 is used by C7x DSP */
+&main_timer2 {
+	status = "reserved";
+};
+
 &usbss0 {
 	status = "okay";
 	ti,vbus-divider;
@@ -818,6 +825,7 @@
 };
 
 &mailbox0_cluster0 {
+	ti,mbox-num-fifos = <2>;
 	mbox_r5_0: mbox-r5-0 {
 		ti,mbox-rx = <0 0 0>;
 		ti,mbox-tx = <1 0 0>;
@@ -825,6 +833,7 @@
 };
 
 &mailbox0_cluster1 {
+	ti,mbox-num-fifos = <2>;
 	mbox_c7x_0: mbox-c7x-0 {
 		ti,mbox-rx = <0 0 0>;
 		ti,mbox-tx = <1 0 0>;
@@ -832,6 +841,7 @@
 };
 
 &mailbox0_cluster2 {
+	ti,mbox-num-fifos = <2>;
 	mbox_mcu_r5_0: mbox-mcu-r5-0 {
 		ti,mbox-rx = <0 0 0>;
 		ti,mbox-tx = <1 0 0>;
@@ -885,12 +895,12 @@
 		reg = <0x0>;
 		spi-tx-bus-width = <8>;
 		spi-rx-bus-width = <8>;
-		spi-max-frequency = <50000000>;
+		spi-max-frequency = <25000000>;
 		cdns,tshsl-ns = <60>;
 		cdns,tsd2d-ns = <60>;
 		cdns,tchsh-ns = <60>;
 		cdns,tslch-ns = <60>;
-		cdns,read-delay = <1>;
+		cdns,read-delay = <2>;
 
 		partitions {
 			compatible = "fixed-partitions";
