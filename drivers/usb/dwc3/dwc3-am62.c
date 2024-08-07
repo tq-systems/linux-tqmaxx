@@ -97,16 +97,22 @@
 #define USBSS_VBUS_STAT_SESSVALID	BIT(2)
 #define USBSS_VBUS_STAT_VBUSVALID	BIT(0)
 
-/* Mask for PHY PLL REFCLK */
+/* USB_PHY_CTRL register bits in CTRL_MMR */
+#define PHY_CORE_VOLTAGE_MASK	BIT(31)
 #define PHY_PLL_REFCLK_MASK	GENMASK(3, 0)
+
+/* USB PHY2 register offsets */
+#define	USB_PHY_PLL_REG12		0x130
+#define	USB_PHY_PLL_LDO_REF_EN		BIT(5)
+#define	USB_PHY_PLL_LDO_REF_EN_EN	BIT(4)
 
 #define DWC3_AM62_AUTOSUSPEND_DELAY	100
 
 struct dwc3_data {
 	struct device *dev;
 	void __iomem *usbss;
+	void __iomem *phy;
 	struct clk *usb2_refclk;
-	int rate_code;
 	struct regmap *syscon;
 	unsigned int offset;
 	unsigned int vbus_divider;
@@ -139,14 +145,26 @@ static inline void dwc3_ti_writel(struct dwc3_data *data, u32 offset, u32 value)
 	writel(value, (data->usbss) + offset);
 }
 
-static int phy_syscon_pll_refclk(struct dwc3_data *data)
+static inline u32 dwc3_ti_phy_readl(struct dwc3_data *data, u32 offset)
 {
-	struct device *dev = data->dev;
-	struct device_node *node = dev->of_node;
-	struct of_phandle_args args;
-	struct regmap *syscon;
-	int ret;
+	return readl((data->phy) + offset);
+}
 
+static inline void dwc3_ti_phy_writel(struct dwc3_data *data, u32 offset, u32 value)
+{
+	writel(value, (data->phy) + offset);
+}
+
+static int phy_syscon_pll_refclk_and_voltage(struct dwc3_data *data)
+{
+	int i, ret;
+	struct device *dev = data->dev;
+	struct of_phandle_args args;
+	struct device_node *node;
+	struct regmap *syscon;
+	unsigned long rate;
+
+	node = dev->of_node;
 	syscon = syscon_regmap_lookup_by_phandle(node, "ti,syscon-phy-pll-refclk");
 	if (IS_ERR(syscon)) {
 		dev_err(dev, "unable to get ti,syscon-phy-pll-refclk regmap\n");
@@ -162,7 +180,28 @@ static int phy_syscon_pll_refclk(struct dwc3_data *data)
 
 	data->offset = args.args[0];
 
-	ret = regmap_update_bits(data->syscon, data->offset, PHY_PLL_REFCLK_MASK, data->rate_code);
+	/* Core voltage. PHY_CORE_VOLTAGE bit Recommended to be 0 always */
+	ret = regmap_update_bits(data->syscon, data->offset,
+				 PHY_CORE_VOLTAGE_MASK, 0);
+	if (ret) {
+		dev_err(dev, "failed to set phy core voltage\n");
+		return ret;
+	}
+
+	/* PLL ref clock frequency selector */
+	rate = clk_get_rate(data->usb2_refclk);
+	rate /= 1000;	// To KHz
+	for (i = 0; i < ARRAY_SIZE(dwc3_ti_rate_table); i++) {
+		if (dwc3_ti_rate_table[i] == rate)
+			break;
+	}
+
+	if (i == ARRAY_SIZE(dwc3_ti_rate_table)) {
+		dev_err(dev, "unsupported usb2_refclk rate: %lu KHz\n", rate);
+		return -EINVAL;
+	}
+
+	ret = regmap_update_bits(data->syscon, data->offset, PHY_PLL_REFCLK_MASK, i);
 	if (ret) {
 		dev_err(dev, "failed to set phy pll reference clock rate\n");
 		return ret;
@@ -176,8 +215,7 @@ static int dwc3_ti_probe(struct platform_device *pdev)
 	struct device *dev = &pdev->dev;
 	struct device_node *node = pdev->dev.of_node;
 	struct dwc3_data *data;
-	int i, ret;
-	unsigned long rate;
+	int ret;
 	u32 reg;
 
 	data = devm_kzalloc(dev, sizeof(*data), GFP_KERNEL);
@@ -193,31 +231,42 @@ static int dwc3_ti_probe(struct platform_device *pdev)
 		return PTR_ERR(data->usbss);
 	}
 
+	data->phy = devm_platform_ioremap_resource(pdev, 1);
+	if (IS_ERR(data->phy)) {
+		dev_err(dev, "can't map PHY IOMEM resource\n");
+		return PTR_ERR(data->phy);
+	}
+
 	data->usb2_refclk = devm_clk_get(dev, "ref");
 	if (IS_ERR(data->usb2_refclk)) {
 		dev_err(dev, "can't get usb2_refclk\n");
 		return PTR_ERR(data->usb2_refclk);
 	}
 
-	/* Calculate the rate code */
-	rate = clk_get_rate(data->usb2_refclk);
-	rate /= 1000;	// To KHz
-	for (i = 0; i < ARRAY_SIZE(dwc3_ti_rate_table); i++) {
-		if (dwc3_ti_rate_table[i] == rate)
-			break;
-	}
+	clk_prepare_enable(data->usb2_refclk);
+	pm_runtime_set_active(dev);
+	pm_runtime_enable(dev);
 
-	if (i == ARRAY_SIZE(dwc3_ti_rate_table)) {
-		dev_err(dev, "unsupported usb2_refclk rate: %lu KHz\n", rate);
+	/* Turn OFF the USB power domain so we can set proper PHY clock and
+	 * core voltage before the USB power domain turns ON
+	 */
+	pm_runtime_suspend(dev);
+
+	/* Read the syscon property and set the rate code and voltage */
+	ret = phy_syscon_pll_refclk_and_voltage(data);
+	if (ret) {
+		pm_runtime_disable(dev);
+		pm_runtime_set_suspended(dev);
 		return -EINVAL;
 	}
 
-	data->rate_code = i;
+	/* Turn ON the USB power domain */
+	pm_runtime_resume(dev);
 
-	/* Read the syscon property and set the rate code */
-	ret = phy_syscon_pll_refclk(data);
-	if (ret)
-		return ret;
+	/* Workaround Errata i2409 */
+	reg = dwc3_ti_phy_readl(data, USB_PHY_PLL_REG12);
+	reg |= USB_PHY_PLL_LDO_REF_EN | USB_PHY_PLL_LDO_REF_EN_EN;
+	dwc3_ti_phy_writel(data, USB_PHY_PLL_REG12, reg);
 
 	/* VBUS divider select */
 	data->vbus_divider = device_property_read_bool(dev, "ti,vbus-divider");
@@ -227,13 +276,10 @@ static int dwc3_ti_probe(struct platform_device *pdev)
 
 	dwc3_ti_writel(data, USBSS_PHY_CONFIG, reg);
 
-	pm_runtime_set_active(dev);
-	pm_runtime_enable(dev);
 	/*
 	 * Don't ignore its dependencies with its children
 	 */
 	pm_suspend_ignore_children(dev, false);
-	clk_prepare_enable(data->usb2_refclk);
 	pm_runtime_get_noresume(dev);
 
 	ret = of_platform_populate(node, NULL, NULL, dev);
@@ -267,21 +313,18 @@ err_pm_disable:
 	return ret;
 }
 
-static int dwc3_ti_remove_core(struct device *dev, void *c)
-{
-	struct platform_device *pdev = to_platform_device(dev);
-
-	platform_device_unregister(pdev);
-	return 0;
-}
-
 static int dwc3_ti_remove(struct platform_device *pdev)
 {
 	struct device *dev = &pdev->dev;
 	struct dwc3_data *data = platform_get_drvdata(pdev);
 	u32 reg;
 
-	device_for_each_child(dev, NULL, dwc3_ti_remove_core);
+	pm_runtime_get_sync(dev);
+
+	device_wakeup_disable(dev);
+	device_set_wakeup_capable(dev, false);
+
+	of_platform_depopulate(dev);
 
 	/* Clear mode valid bit */
 	reg = dwc3_ti_readl(data, USBSS_MODE_CONTROL);
@@ -289,7 +332,6 @@ static int dwc3_ti_remove(struct platform_device *pdev)
 	dwc3_ti_writel(data, USBSS_MODE_CONTROL, reg);
 
 	pm_runtime_put_sync(dev);
-	clk_disable_unprepare(data->usb2_refclk);
 	pm_runtime_disable(dev);
 	pm_runtime_set_suspended(dev);
 

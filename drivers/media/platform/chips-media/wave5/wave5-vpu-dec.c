@@ -4,12 +4,17 @@
  *
  * Copyright (C) 2021 CHIPS&MEDIA INC
  */
+#include <linux/pm_runtime.h>
 
 #include "wave5-helper.h"
 
 #define VPU_DEC_DEV_NAME "C&M Wave5 VPU decoder"
 #define VPU_DEC_DRV_NAME "wave5-dec"
 #define V4L2_CID_VPU_THUMBNAIL_MODE (V4L2_CID_USER_BASE + 0x1001)
+
+#define DEFAULT_SRC_SIZE(width, height) ({			\
+	(width) * (height) / 8 * 3;					\
+})
 
 static const struct vpu_format dec_fmt_list[FMT_TYPES][MAX_FMTS] = {
 	[VPU_FMT_TYPE_CODEC] = {
@@ -302,7 +307,8 @@ static void wave5_update_pix_fmt(struct v4l2_pix_format_mplane *pix_mp, unsigned
 		pix_mp->width = width;
 		pix_mp->height = height;
 		pix_mp->plane_fmt[0].bytesperline = 0;
-		pix_mp->plane_fmt[0].sizeimage = width * height / 8 * 3;
+		pix_mp->plane_fmt[0].sizeimage = max(DEFAULT_SRC_SIZE(width, height),
+						     pix_mp->plane_fmt[0].sizeimage);
 		break;
 	}
 }
@@ -1036,7 +1042,7 @@ static int wave5_vpu_dec_queue_setup(struct vb2_queue *q, unsigned int *num_buff
 				__func__, ret);
 			goto free_bitstream_vbuf;
 		}
-	} else if (inst->state == VPU_INST_STATE_STOP &&
+	} else if ((inst->state == VPU_INST_STATE_STOP || inst->state == VPU_INST_STATE_PIC_RUN) &&
 		   q->type == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE) {
 		*num_buffers = 0;
 	}
@@ -1163,6 +1169,10 @@ static int wave5_vpu_dec_start_streaming_open(struct vpu_instance *inst)
 				      V4L2_CID_MIN_BUFFERS_FOR_CAPTURE);
 		if (ctrl)
 			v4l2_ctrl_s_ctrl(ctrl, inst->dst_buf_count);
+
+		inst->frame_rate = (initial_info.f_rate_numerator /
+					initial_info.f_rate_denominator);
+		wave5_instance_set_clk(inst);
 
 		if (initial_info.pic_width != inst->src_fmt.width ||
 		    initial_info.pic_height != inst->src_fmt.height) {
@@ -1571,7 +1581,7 @@ static int wave5_vpu_open_dec(struct file *filp)
 	struct video_device *vdev = video_devdata(filp);
 	struct vpu_device *dev = video_drvdata(filp);
 	struct vpu_instance *inst = NULL;
-	int ret = 0;
+	int ret = 0, err;
 
 	inst = kzalloc(sizeof(*inst), GFP_KERNEL);
 	if (!inst)
@@ -1640,6 +1650,13 @@ static int wave5_vpu_open_dec(struct file *filp)
 		goto cleanup_inst;
 	}
 	mutex_init(inst->inst_lock);
+
+	err = pm_runtime_resume_and_get(inst->dev->dev);
+	if (err) {
+		dev_err(inst->dev->dev, "runtime resume failed %d\n", err);
+		ret = -EINVAL;
+		goto cleanup_inst;
+	}
 
 	ret = mutex_lock_interruptible(&dev->dev_lock);
 	if (ret)

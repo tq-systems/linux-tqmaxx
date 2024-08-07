@@ -541,27 +541,27 @@
 
 			partition@0 {
 				label = "ospi.tiboot3";
-				reg = <0x0 0x80000>;
+				reg = <0x0 0x100000>;
 			};
 
-			partition@80000 {
+			partition@100000 {
 				label = "ospi.tispl";
-				reg = <0x80000 0x200000>;
+				reg = <0x100000 0x200000>;
 			};
 
-			partition@280000 {
+			partition@300000 {
 				label = "ospi.u-boot";
-				reg = <0x280000 0x400000>;
+				reg = <0x300000 0x400000>;
 			};
 
-			partition@680000 {
+			partition@700000 {
 				label = "ospi.env";
-				reg = <0x680000 0x40000>;
+				reg = <0x700000 0x40000>;
 			};
 
-			partition@6c0000 {
+			partition@740000 {
 				label = "ospi.env.backup";
-				reg = <0x6c0000 0x40000>;
+				reg = <0x740000 0x40000>;
 			};
 
 			partition@800000 {
@@ -647,6 +647,7 @@
 		reg = <0>;
 		cdns,num-lanes = <4>;
 		#phy-cells = <0>;
+		cdns,max-bit-rate = <2700>;
 		cdns,phy-type = <PHY_TYPE_DP>;
 		resets = <&serdes_wiz4 1>, <&serdes_wiz4 2>,
 			 <&serdes_wiz4 3>, <&serdes_wiz4 4>;
@@ -728,12 +729,19 @@
 
 &serdes0 {
 	status = "okay";
-	serdes0_pcie_link: phy@0 {
+	serdes0_pcie_link1: phy@0 {
 		reg = <0>;
-		cdns,num-lanes = <3>;
+		cdns,num-lanes = <2>;
 		#phy-cells = <0>;
 		cdns,phy-type = <PHY_TYPE_PCIE>;
-		resets = <&serdes_wiz0 1>, <&serdes_wiz0 2>, <&serdes_wiz0 3>;
+		resets = <&serdes_wiz0 1>, <&serdes_wiz0 2>;
+	};
+	serdes0_pcie_link2: phy@2 {
+		reg = <2>;
+		cdns,num-lanes = <1>;
+		#phy-cells = <0>;
+		cdns,phy-type = <PHY_TYPE_PCIE>;
+		resets = <&serdes_wiz0 3>;
 	};
 	serdes0_usb_link: phy@3 {
 		reg = <3>;
@@ -775,14 +783,14 @@
 &pcie1_rc {
 	status = "okay";
 	reset-gpios = <&exp1 5 GPIO_ACTIVE_HIGH>;
-	phys = <&serdes0_pcie_link>;
+	phys = <&serdes0_pcie_link1>;
 	phy-names = "pcie-phy";
 	num-lanes = <2>;
 };
 
 &pcie1_ep {
 	status = "disabled";
-	phys = <&serdes0_pcie_link>;
+	phys = <&serdes0_pcie_link1>;
 	phy-names = "pcie-phy";
 	num-lanes = <2>;
 };
@@ -790,98 +798,14 @@
 &pcie3_rc {
 	status = "okay";
 	reset-gpios = <&exp1 6 GPIO_ACTIVE_HIGH>;
-	phys = <&serdes0_pcie_link>;
+	phys = <&serdes0_pcie_link2>;
 	phy-names = "pcie-phy";
 	num-lanes = <1>;
 };
 
 &pcie3_ep {
 	status = "disabled";
-	phys = <&serdes0_pcie_link>;
-	phy-names = "pcie-phy";
-	num-lanes = <1>;
-};
-
-&serdes_refclk {
-	clock-frequency = <100000000>;
-};
-
-&serdes_ln_ctrl {
-	idle-states = <J784S4_SERDES0_LANE0_PCIE1_LANE0>, <J784S4_SERDES0_LANE1_PCIE1_LANE1>,
-		      <J784S4_SERDES0_LANE2_PCIE3_LANE0>, <J784S4_SERDES0_LANE3_USB>,
-			<J784S4_SERDES1_LANE0_PCIE0_LANE0>, <J784S4_SERDES1_LANE1_PCIE0_LANE1>,
-			<J784S4_SERDES1_LANE2_PCIE0_LANE2>, <J784S4_SERDES1_LANE3_PCIE0_LANE3>;
-};
-
-&serdes_wiz0 {
-	status = "okay";
-};
-
-&serdes0 {
-	status = "okay";
-	serdes0_pcie_link: phy@0 {
-		reg = <0>;
-		cdns,num-lanes = <3>;
-		#phy-cells = <0>;
-		cdns,phy-type = <PHY_TYPE_PCIE>;
-		resets = <&serdes_wiz0 1>, <&serdes_wiz0 2>, <&serdes_wiz0 3>;
-	};
-};
-
-&serdes1 {
-	status = "okay";
-	serdes1_pcie_link: phy@0 {
-		reg = <0>;
-		cdns,num-lanes = <4>;
-		#phy-cells = <0>;
-		cdns,phy-type = <PHY_TYPE_PCIE>;
-		resets = <&serdes_wiz1 1>, <&serdes_wiz1 2>, <&serdes_wiz1 3>, <&serdes_wiz1 4>;
-	};
-};
-
-&serdes_wiz1 {
-	status = "okay";
-};
-
-&pcie0_rc {
-	status = "okay";
-	reset-gpios = <&exp1 4 GPIO_ACTIVE_HIGH>;
-	phys = <&serdes1_pcie_link>;
-	phy-names = "pcie-phy";
-};
-
-&pcie0_ep {
-	status = "disabled";
-	phys = <&serdes1_pcie_link>;
-	phy-names = "pcie-phy";
-};
-
-&pcie1_rc {
-	status = "okay";
-	reset-gpios = <&exp1 5 GPIO_ACTIVE_HIGH>;
-	phys = <&serdes0_pcie_link>;
-	phy-names = "pcie-phy";
-	num-lanes = <2>;
-};
-
-&pcie1_ep {
-	status = "disabled";
-	phys = <&serdes0_pcie_link>;
-	phy-names = "pcie-phy";
-	num-lanes = <2>;
-};
-
-&pcie3_rc {
-	status = "okay";
-	reset-gpios = <&exp1 6 GPIO_ACTIVE_HIGH>;
-	phys = <&serdes0_pcie_link>;
-	phy-names = "pcie-phy";
-	num-lanes = <1>;
-};
-
-&pcie3_ep {
-	status = "disabled";
-	phys = <&serdes0_pcie_link>;
+	phys = <&serdes0_pcie_link2>;
 	phy-names = "pcie-phy";
 	num-lanes = <1>;
 };

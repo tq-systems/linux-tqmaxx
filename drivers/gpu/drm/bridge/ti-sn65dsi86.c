@@ -152,6 +152,7 @@
  * @ln_assign:    Value to program to the LN_ASSIGN register.
  * @ln_polrs:     Value for the 4-bit LN_POLRS field of SN_ENH_FRAME_REG.
  * @comms_enabled: If true then communication over the aux channel is enabled.
+ * @plugged:       Plug connection status
  * @comms_mutex:   Protects modification of comms_enabled.
  *
  * @gchip:        If we expose our GPIOs, this is used.
@@ -190,6 +191,7 @@ struct ti_sn65dsi86 {
 	u8				ln_assign;
 	u8				ln_polrs;
 	bool				comms_enabled;
+	bool				plugged;
 	struct mutex			comms_mutex;
 
 #if defined(CONFIG_OF_GPIO)
@@ -527,6 +529,7 @@ static ssize_t ti_sn_aux_transfer(struct drm_dp_aux *aux,
 	u32 request_val = AUX_CMD_REQ(msg->request);
 	u8 *buf = msg->buffer;
 	unsigned int len = msg->size;
+	unsigned int short_len;
 	unsigned int val;
 	int ret;
 	u8 addr_len[SN_AUX_LENGTH_REG + 1 - SN_AUX_ADDR_19_16_REG];
@@ -600,7 +603,8 @@ static ssize_t ti_sn_aux_transfer(struct drm_dp_aux *aux,
 	}
 
 	if (val & AUX_IRQ_STATUS_AUX_SHORT) {
-		ret = regmap_read(pdata->regmap, SN_AUX_LENGTH_REG, &len);
+		ret = regmap_read(pdata->regmap, SN_AUX_LENGTH_REG, &short_len);
+		len = min(len, short_len);
 		if (ret)
 			goto exit;
 	} else if (val & AUX_IRQ_STATUS_NAT_I2C_FAIL) {
@@ -673,7 +677,7 @@ static struct ti_sn65dsi86 *bridge_to_ti_sn65dsi86(struct drm_bridge *bridge)
 	return container_of(bridge, struct ti_sn65dsi86, bridge);
 }
 
-static int ti_sn_attach_host(struct ti_sn65dsi86 *pdata)
+static int ti_sn_attach_host(struct auxiliary_device *adev, struct ti_sn65dsi86 *pdata)
 {
 	int val;
 	struct mipi_dsi_host *host;
@@ -688,7 +692,7 @@ static int ti_sn_attach_host(struct ti_sn65dsi86 *pdata)
 	if (!host)
 		return -EPROBE_DEFER;
 
-	dsi = devm_mipi_dsi_device_register_full(dev, host, &info);
+	dsi = devm_mipi_dsi_device_register_full(&adev->dev, host, &info);
 	if (IS_ERR(dsi))
 		return PTR_ERR(dsi);
 
@@ -707,7 +711,7 @@ static int ti_sn_attach_host(struct ti_sn65dsi86 *pdata)
 
 	pdata->dsi = dsi;
 
-	return devm_mipi_dsi_attach(dev, dsi);
+	return devm_mipi_dsi_attach(&adev->dev, dsi);
 }
 
 static int ti_sn_bridge_attach(struct drm_bridge *bridge,
@@ -1166,14 +1170,19 @@ static void ti_sn_bridge_atomic_post_disable(struct drm_bridge *bridge,
 static enum drm_connector_status ti_sn_bridge_detect(struct drm_bridge *bridge)
 {
 	struct ti_sn65dsi86 *pdata = bridge_to_ti_sn65dsi86(bridge);
-	int val = 0;
+	int val;
+	u8 link_status[DP_LINK_STATUS_SIZE];
 
-	pm_runtime_get_sync(pdata->dev);
-	regmap_read(pdata->regmap, SN_HPD_DISABLE_REG, &val);
-	pm_runtime_put_autosuspend(pdata->dev);
+	if (!pdata->plugged) {
+		pm_runtime_get_sync(pdata->dev);
+		val = drm_dp_dpcd_read_link_status(&pdata->aux, link_status);
+		pm_runtime_put_autosuspend(pdata->dev);
+		if (val > 0)
+			pdata->plugged = true;
+	}
 
-	return val & HPD_DEBOUNCED_STATE ? connector_status_connected
-					 : connector_status_disconnected;
+	return pdata->plugged ? connector_status_connected
+			      : connector_status_disconnected;
 }
 
 static struct edid *ti_sn_bridge_get_edid(struct drm_bridge *bridge,
@@ -1269,9 +1278,9 @@ static int ti_sn_bridge_probe(struct auxiliary_device *adev,
 	struct device_node *np = pdata->dev->of_node;
 	int ret;
 
-	pdata->next_bridge = devm_drm_of_get_bridge(pdata->dev, np, 1, 0);
+	pdata->next_bridge = devm_drm_of_get_bridge(&adev->dev, np, 1, 0);
 	if (IS_ERR(pdata->next_bridge))
-		return dev_err_probe(pdata->dev, PTR_ERR(pdata->next_bridge),
+		return dev_err_probe(&adev->dev, PTR_ERR(pdata->next_bridge),
 				     "failed to create panel bridge\n");
 
 	ti_sn_bridge_parse_lanes(pdata, np);
@@ -1285,14 +1294,17 @@ static int ti_sn_bridge_probe(struct auxiliary_device *adev,
 	pdata->bridge.type = pdata->next_bridge->type == DRM_MODE_CONNECTOR_DisplayPort
 			   ? DRM_MODE_CONNECTOR_DisplayPort : DRM_MODE_CONNECTOR_eDP;
 
+	pdata->plugged = false;
+	pdata->bridge.ops |= DRM_BRIDGE_OP_DETECT;
+
 	if (pdata->bridge.type == DRM_MODE_CONNECTOR_DisplayPort)
-		pdata->bridge.ops = DRM_BRIDGE_OP_EDID | DRM_BRIDGE_OP_DETECT;
+		pdata->bridge.ops |= DRM_BRIDGE_OP_EDID;
 
 	drm_bridge_add(&pdata->bridge);
 
-	ret = ti_sn_attach_host(pdata);
+	ret = ti_sn_attach_host(adev, pdata);
 	if (ret) {
-		dev_err_probe(pdata->dev, ret, "failed to attach dsi host\n");
+		dev_err_probe(&adev->dev, ret, "failed to attach dsi host\n");
 		goto err_remove_bridge;
 	}
 

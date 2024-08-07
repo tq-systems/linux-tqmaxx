@@ -6,9 +6,11 @@
  *	Suman Anna <s-anna@ti.com>
  */
 
+#include <linux/delay.h>
 #include <linux/dma-mapping.h>
 #include <linux/err.h>
 #include <linux/interrupt.h>
+#include <linux/iopoll.h>
 #include <linux/kernel.h>
 #include <linux/mailbox_client.h>
 #include <linux/module.h>
@@ -21,6 +23,7 @@
 #include <linux/remoteproc.h>
 #include <linux/reset.h>
 #include <linux/slab.h>
+#include <linux/suspend.h>
 
 #include "omap_remoteproc.h"
 #include "remoteproc_internal.h"
@@ -102,12 +105,14 @@ struct k3_r5_soc_data {
  * @dev: cached device pointer
  * @mode: Mode to configure the Cluster - Split or LockStep
  * @cores: list of R5 cores within the cluster
+ * @core_transition: wait queue to sync core state changes
  * @soc_data: SoC-specific feature data for a R5FSS
  */
 struct k3_r5_cluster {
 	struct device *dev;
 	enum cluster_mode mode;
 	struct list_head cores;
+	wait_queue_head_t core_transition;
 	const struct k3_r5_soc_data *soc_data;
 };
 
@@ -127,6 +132,7 @@ struct k3_r5_cluster {
  * @atcm_enable: flag to control ATCM enablement
  * @btcm_enable: flag to control BTCM enablement
  * @loczrama: flag to dictate which TCM is at device address 0x0
+ * @released_from_reset: flag to signal when core is out of reset
  */
 struct k3_r5_core {
 	struct list_head elem;
@@ -143,6 +149,7 @@ struct k3_r5_core {
 	u32 atcm_enable;
 	u32 btcm_enable;
 	u32 loczrama;
+	bool released_from_reset;
 };
 
 /**
@@ -165,7 +172,31 @@ struct k3_r5_rproc {
 	struct k3_r5_core *core;
 	struct k3_r5_mem *rmem;
 	int num_rmems;
+	struct completion shut_comp;
+	struct completion suspend_comp;
+	struct notifier_block pm_notifier;
 };
+
+/**
+ * is_core_in_wfi - local utility function to check core status
+ * @core: remote core pointer used for checking core status
+ *
+ * This utility function is invoked by the shutdown sequence to ensure
+ * the remote core is in wfi, before asserting a reset.
+ */
+static int is_core_in_wfi(struct k3_r5_core *core)
+{
+	int ret;
+	u64 boot_vec = 0;
+	u32 cfg = 0, ctrl = 0, stat = 0;
+
+	ret = ti_sci_proc_get_status(core->tsp, &boot_vec, &cfg, &ctrl, &stat);
+
+	if (ret < 0)
+		return 0;
+
+	return (stat & PROC_BOOT_STATUS_FLAG_R5_WFI);
+}
 
 /**
  * k3_r5_rproc_mbox_callback() - inbound mailbox message handler
@@ -201,6 +232,14 @@ static void k3_r5_rproc_mbox_callback(struct mbox_client *client, void *data)
 		break;
 	case RP_MBOX_ECHO_REPLY:
 		dev_info(dev, "received echo reply from %s\n", name);
+		break;
+	case RP_MBOX_SHUTDOWN_ACK:
+		dev_dbg(dev, "received shutdown_ack from %s\n", name);
+		complete(&kproc->shut_comp);
+		break;
+	case RP_MBOX_SUSPEND_ACK:
+		dev_dbg(dev, "received suspend_ack from %s\n", name);
+		complete(&kproc->suspend_comp);
 		break;
 	default:
 		/* silently handle all other valid messages */
@@ -240,15 +279,6 @@ static int k3_r5_split_reset(struct k3_r5_core *core)
 		dev_err(core->dev, "local-reset assert failed, ret = %d\n",
 			ret);
 		return ret;
-	}
-
-	ret = core->ti_sci->ops.dev_ops.put_device(core->ti_sci,
-						   core->ti_sci_id);
-	if (ret) {
-		dev_err(core->dev, "module-reset assert failed, ret = %d\n",
-			ret);
-		if (reset_control_deassert(core->reset))
-			dev_warn(core->dev, "local-reset deassert back failed\n");
 	}
 
 	return ret;
@@ -418,6 +448,73 @@ static int k3_r5_rproc_request_mbox(struct rproc *rproc)
 	return 0;
 }
 
+
+/* PM notifier call.
+ * This is a callback function for PM notifications. On a resume completion
+ * i.e after all the resume driver calls are handled on PM_POST_SUSPEND,
+ * on a deep sleep the remote core is rebooted.
+ */
+static int r5f_pm_notifier_call(struct notifier_block *bl,
+				unsigned long state, void *unused)
+{
+	struct k3_r5_rproc *kproc = container_of(bl, struct k3_r5_rproc, pm_notifier);
+	unsigned long msg = RP_MBOX_SUSPEND_SYSTEM;
+	unsigned long to = msecs_to_jiffies(5000);
+	int ret;
+
+	switch (state) {
+	case PM_HIBERNATION_PREPARE:
+	case PM_RESTORE_PREPARE:
+	case PM_SUSPEND_PREPARE:
+		if (!device_may_wakeup(kproc->dev)) {
+			rproc_shutdown(kproc->rproc);
+			ret = kproc->core->ti_sci->ops.dev_ops.put_device(kproc->core->ti_sci,
+									kproc->core->ti_sci_id);
+			if (ret) {
+				dev_err(kproc->core->dev, "module-reset assert failed, ret = %d\n",
+						ret);
+				if (reset_control_deassert(kproc->core->reset))
+					dev_warn(kproc->core->dev, "local-reset deassert back failed\n");
+			}
+
+		} else {
+			reinit_completion(&kproc->suspend_comp);
+			ret = mbox_send_message(kproc->mbox, (void *)msg);
+			if (ret < 0) {
+				dev_err(kproc->dev, "PM mbox_send_message failed: %d\n", ret);
+				return ret;
+			}
+			ret = wait_for_completion_timeout(&kproc->suspend_comp, to);
+			if (ret == 0) {
+				dev_err(kproc->dev,
+					"%s: timedout waiting for rproc completion event\n", __func__);
+				return -EBUSY;
+			};
+		}
+		kproc->rproc->state = RPROC_SUSPENDED;
+		break;
+	case PM_POST_HIBERNATION:
+	case PM_POST_RESTORE:
+	case PM_POST_SUSPEND:
+		if (kproc->rproc->state == RPROC_SUSPENDED) {
+			if (!device_may_wakeup(kproc->dev)) {
+				rproc_boot(kproc->rproc);
+			} else {
+				msg = RP_MBOX_ECHO_REQUEST;
+				ret = mbox_send_message(kproc->mbox, (void *)msg);
+				if (ret < 0) {
+					dev_err(kproc->dev,
+						"PM mbox_send_message failed: %d\n", ret);
+					return ret;
+				}
+			}
+			kproc->rproc->state = RPROC_RUNNING;
+		}
+		break;
+	}
+	return 0;
+}
+
 /*
  * The R5F cores have controls for both a reset and a halt/run. The code
  * execution from DDR requires the initial boot-strapping code to be run
@@ -459,6 +556,8 @@ static int k3_r5_rproc_prepare(struct rproc *rproc)
 			ret);
 		return ret;
 	}
+	core->released_from_reset = true;
+	wake_up_interruptible(&cluster->core_transition);
 
 	/*
 	 * Newer IP revisions like on J7200 SoCs support h/w auto-initialization
@@ -610,10 +709,14 @@ put_mbox:
  */
 static int k3_r5_rproc_stop(struct rproc *rproc)
 {
+	unsigned long to  = msecs_to_jiffies(5000);
 	struct k3_r5_rproc *kproc = rproc->priv;
 	struct k3_r5_cluster *cluster = kproc->cluster;
 	struct k3_r5_core *core = kproc->core;
+	struct device *dev = kproc->dev;
+	unsigned long msg = RP_MBOX_SHUTDOWN;
 	int ret;
+	u32 stat = 0;
 
 	/* halt all applicable cores */
 	if (cluster->mode == CLUSTER_MODE_LOCKSTEP) {
@@ -625,12 +728,28 @@ static int k3_r5_rproc_stop(struct rproc *rproc)
 			}
 		}
 	} else {
+		reinit_completion(&kproc->shut_comp);
+		ret = mbox_send_message(kproc->mbox, (void *)msg);
+		if (ret < 0) {
+			dev_err(dev, "PM mbox_send_message failed: %d\n", ret);
+			return ret;
+		}
+
+		ret = wait_for_completion_timeout(&kproc->shut_comp, to);
+		if (ret == 0) {
+			dev_err(dev, "%s: timeout waiting for rproc completion event\n", __func__);
+			return -EBUSY;
+		}
+
+		mbox_free_channel(kproc->mbox);
+		ret = readx_poll_timeout(is_core_in_wfi, core, stat, stat, 200, 2000);
+		if (ret)
+			goto out;
+
 		ret = k3_r5_core_halt(core);
 		if (ret)
 			goto out;
 	}
-
-	mbox_free_channel(kproc->mbox);
 
 	return 0;
 
@@ -1139,6 +1258,7 @@ static int k3_r5_rproc_configure_mode(struct k3_r5_rproc *kproc)
 		return ret;
 	}
 
+	core->released_from_reset = c_state;
 	ret = ti_sci_proc_get_status(core->tsp, &boot_vec, &cfg, &ctrl,
 				     &stat);
 	if (ret < 0) {
@@ -1256,6 +1376,8 @@ static int k3_r5_cluster_rproc_init(struct platform_device *pdev)
 			goto err_config;
 		}
 
+		init_completion(&kproc->shut_comp);
+		init_completion(&kproc->suspend_comp);
 init_rmem:
 		k3_r5_adjust_tcm_sizes(kproc);
 
@@ -1272,6 +1394,9 @@ init_rmem:
 			goto err_add;
 		}
 
+		kproc->pm_notifier.notifier_call = r5f_pm_notifier_call;
+		register_pm_notifier(&kproc->pm_notifier);
+
 		/* create only one rproc in lockstep, single-cpu or
 		 * single core mode
 		 */
@@ -1279,6 +1404,21 @@ init_rmem:
 		    cluster->mode == CLUSTER_MODE_SINGLECPU ||
 		    cluster->mode == CLUSTER_MODE_SINGLECORE)
 			break;
+
+		/* R5 cores require to be powered on sequentially, core0
+		 * should be in higher power state than core1 in a cluster
+		 * So, wait for current core to power up before proceeding
+		 * to next core and put timeout of 2sec for each core.
+		 */
+		ret = wait_event_interruptible_timeout(cluster->core_transition,
+						       core->released_from_reset,
+						       msecs_to_jiffies(2000));
+		if (ret <= 0) {
+			dev_err(dev,
+				"Timed out waiting for %s core to power up!\n",
+				rproc->name);
+			return ret;
+		}
 	}
 
 	return 0;
@@ -1341,9 +1481,8 @@ static void k3_r5_cluster_rproc_exit(void *data)
 		}
 
 		rproc_del(rproc);
-
 		k3_r5_reserved_mem_exit(kproc);
-
+		unregister_pm_notifier(&kproc->pm_notifier);
 		rproc_free(rproc);
 		core->rproc = NULL;
 	}
@@ -1566,6 +1705,11 @@ static int k3_r5_core_of_init(struct platform_device *pdev)
 		goto err;
 	}
 
+	if (device_property_present(dev, "wakeup-source")) {
+		dev_dbg(dev, "registering as wakeup source\n");
+		device_set_wakeup_capable(dev, true);
+	}
+
 	core->reset = devm_reset_control_get_exclusive(dev, NULL);
 	if (IS_ERR_OR_NULL(core->reset)) {
 		ret = PTR_ERR_OR_ZERO(core->reset);
@@ -1708,6 +1852,7 @@ static int k3_r5_probe(struct platform_device *pdev)
 	cluster->dev = dev;
 	cluster->soc_data = data;
 	INIT_LIST_HEAD(&cluster->cores);
+	init_waitqueue_head(&cluster->core_transition);
 
 	ret = of_property_read_u32(np, "ti,cluster-mode", &cluster->mode);
 	if (ret < 0 && ret != -EINVAL) {

@@ -126,6 +126,7 @@ enum prueth_devlink_param_id {
 	PRUETH_DEVLINK_PARAM_ID_BASE = DEVLINK_PARAM_GENERIC_ID_MAX,
 	PRUETH_DL_PARAM_SWITCH_MODE,
 	PRUETH_DL_PARAM_HSR_OFFLOAD_MODE,
+	PRUETH_DL_PARAM_CUT_THRU_EN,
 };
 
 struct prueth_devlink {
@@ -222,6 +223,7 @@ struct prueth_emac {
 
 	struct pruss_mem_region dram;
 
+	u8 cut_thru_queue_map;
 	bool offload_fwd_mark;
 	struct devlink_port devlink_port;
 	int port_vlan;
@@ -233,6 +235,8 @@ struct prueth_emac {
 
 	struct bpf_prog *xdp_prog;
 	struct xdp_attachment_info xdpi;
+
+	struct netdev_hw_addr_list mcast_list;
 };
 
 /* The buf includes headroom compatible with both skb and xdpf */
@@ -273,7 +277,7 @@ struct prueth_pdata {
  * @pdev: pointer to ICSSG platform device
  * @pdata: pointer to platform data for ICSSG driver
  * @icssg_hwcmdseq: seq counter or HWQ messages
- * @emacs_initialized: num of EMACs/ext ports that are up/running
+ * @num_emacs_initialized: num of EMACs/ext ports that are up/running
  * @iep0: pointer to IEP0 device
  * @iep1: pointer to IEP1 device
  * @vlan_tbl: VLAN-FID table pointer
@@ -311,7 +315,7 @@ struct prueth {
 	struct platform_device *pdev;
 	struct prueth_pdata pdata;
 	u8 icssg_hwcmdseq;
-	int emacs_initialized;
+	int num_emacs_initialized;
 	struct icss_iep *iep0;
 	struct icss_iep *iep1;
 	struct prueth_vlan_tbl *vlan_tbl;
@@ -328,6 +332,7 @@ struct prueth {
 	unsigned char switch_id[MAX_PHYS_ITEM_ID_LEN];
 	int default_vlan;
 	struct devlink *devlink;
+	spinlock_t vtbl_lock; /* Lock for vtbl in shared memory */
 };
 
 struct emac_tx_ts_response {
@@ -383,6 +388,7 @@ u16 icssg_get_pvid(struct prueth_emac *emac);
 void icssg_set_pvid(struct prueth *prueth, u8 vid, u8 port);
 int emac_fdb_erase_all(struct prueth_emac *emac);
 int emac_fdb_flush_multicast(struct prueth_emac *emac);
+int emac_fdb_flow_id_updated(struct prueth_emac *emac);
 #define prueth_napi_to_tx_chn(pnapi) \
 	container_of(pnapi, struct prueth_tx_chn, napi_tx)
 

@@ -129,6 +129,9 @@ struct ti_sci_info {
 	u64 fw_caps;
 	/* protected by ti_sci_list_mutex */
 	int users;
+
+	int nr_wakeup_sources;
+	struct device_node **wakeup_source_nodes;
 };
 
 #define cl_to_ti_sci_info(c)	container_of(c, struct ti_sci_info, cl)
@@ -175,7 +178,7 @@ static int ti_sci_debugfs_create(struct platform_device *pdev,
 {
 	struct device *dev = &pdev->dev;
 	struct resource *res;
-	char debug_name[50] = "ti_sci_debug@";
+	char debug_name[50];
 
 	/* Debug region is optional */
 	res = platform_get_resource_byname(pdev, IORESOURCE_MEM,
@@ -192,10 +195,10 @@ static int ti_sci_debugfs_create(struct platform_device *pdev,
 	/* Setup NULL termination */
 	info->debug_buffer[info->debug_region_size] = 0;
 
-	info->d = debugfs_create_file(strncat(debug_name, dev_name(dev),
-					      sizeof(debug_name) -
-					      sizeof("ti_sci_debug@")),
-				      0444, NULL, info, &ti_sci_debug_fops);
+	snprintf(debug_name, sizeof(debug_name), "ti_sci_debug@%s",
+		 dev_name(dev));
+	info->d = debugfs_create_file(debug_name, 0444, NULL, info,
+				      &ti_sci_debug_fops);
 	if (IS_ERR(info->d))
 		return PTR_ERR(info->d);
 
@@ -204,29 +207,11 @@ static int ti_sci_debugfs_create(struct platform_device *pdev,
 	return 0;
 }
 
-/**
- * ti_sci_debugfs_destroy() - clean up log debug file
- * @pdev:	platform device pointer
- * @info:	Pointer to SCI entity information
- */
-static void ti_sci_debugfs_destroy(struct platform_device *pdev,
-				   struct ti_sci_info *info)
-{
-	if (IS_ERR(info->debug_region))
-		return;
-
-	debugfs_remove(info->d);
-}
 #else /* CONFIG_DEBUG_FS */
 static inline int ti_sci_debugfs_create(struct platform_device *dev,
 					struct ti_sci_info *info)
 {
 	return 0;
-}
-
-static inline void ti_sci_debugfs_destroy(struct platform_device *dev,
-					  struct ti_sci_info *info)
-{
 }
 #endif /* CONFIG_DEBUG_FS */
 
@@ -405,6 +390,28 @@ static void ti_sci_put_one_xfer(struct ti_sci_xfers_info *minfo,
 
 	/* Increment the count for the next user to get through */
 	up(&minfo->sem_xfer_count);
+}
+
+/**
+ * ti_sci_do_send() - Do one send, do not expect a response
+ * @info:	Pointer to SCI entity information
+ * @xfer:	Transfer to initiate
+ *
+ * Return: If send error, return corresponding error, else
+ *	   if all goes well, return 0.
+ */
+static inline int ti_sci_do_send(struct ti_sci_info *info,
+				 struct ti_sci_xfer *xfer)
+{
+	int ret;
+
+	ret = mbox_send_message(info->chan_tx, &xfer->tx_message);
+	if (ret < 0)
+		return ret;
+
+	mbox_client_txdone(info->chan_tx, ret);
+
+	return 0;
 }
 
 /**
@@ -3605,12 +3612,87 @@ static const struct dev_pm_ops ti_sci_pm_ops = {
 	.resume_noirq = ti_sci_resume,
 };
 
+/* Does not return if successful */
+static int tisci_enter_partial_io(struct ti_sci_info *info)
+{
+	struct ti_sci_msg_req_prepare_sleep *req;
+	struct ti_sci_xfer *xfer;
+	struct device *dev = info->dev;
+	u32 ctx_lo = (u32)(info->ctx_mem_addr & 0xffffffff);
+	u32 ctx_hi = (u32)((u64)info->ctx_mem_addr >> 32);
+	int ret = 0;
+
+	xfer = ti_sci_get_one_xfer(info, TI_SCI_MSG_PREPARE_SLEEP,
+				   TI_SCI_FLAG_REQ_ACK_ON_PROCESSED,
+				   sizeof(*req), sizeof(struct ti_sci_msg_hdr));
+	if (IS_ERR(xfer)) {
+		ret = PTR_ERR(xfer);
+		dev_err(dev, "Message alloc failed(%d)\n", ret);
+		return ret;
+	}
+
+	req = (struct ti_sci_msg_req_prepare_sleep *)xfer->xfer_buf;
+	req->mode = TISCI_MSG_VALUE_SLEEP_MODE_PARTIAL_IO;
+	req->ctx_lo = ctx_lo;
+	req->ctx_hi = ctx_hi;
+	req->debug_flags = 0;
+
+	ret = ti_sci_do_send(info, xfer);
+	if (ret) {
+		dev_err(dev, "Mbox send fail %d\n", ret);
+		goto fail;
+	}
+
+fail:
+	ti_sci_put_one_xfer(&info->minfo, xfer);
+
+	return ret;
+}
+
+static int tisci_sys_off_handler(struct sys_off_data *data)
+{
+	struct ti_sci_info *info = data->cb_data;
+	int i;
+	int ret;
+	bool enter_partial_io = false;
+
+	for (i = 0; i != info->nr_wakeup_sources; ++i) {
+		struct platform_device *pdev =
+			of_find_device_by_node(info->wakeup_source_nodes[i]);
+
+		if (!pdev)
+			continue;
+
+		if (device_may_wakeup(&pdev->dev)) {
+			dev_dbg(info->dev, "%pOFp identified as wakeup source\n",
+				info->wakeup_source_nodes[i]);
+			enter_partial_io = true;
+		}
+	}
+
+	if (!enter_partial_io)
+		return NOTIFY_DONE;
+
+	ret = tisci_enter_partial_io(info);
+
+	if (ret)
+		dev_err(info->dev,
+			"Failed to enter Partial-IO %pe, halting system\n",
+			ERR_PTR(ret));
+
+	/* Halt system/code execution */
+	while (1)
+		;
+
+	return NOTIFY_DONE;
+}
+
 static int ti_sci_init_suspend(struct platform_device *pdev,
 			       struct ti_sci_info *info)
 {
 	struct device *dev = &pdev->dev;
 
-	dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64));
+	dma_set_mask_and_coherent(dev, DMA_BIT_MASK(32));
 	info->ctx_mem_buf = dma_alloc_attrs(info->dev, LPM_CTX_MEM_SIZE,
 					    &info->ctx_mem_addr,
 					    GFP_KERNEL,
@@ -3776,6 +3858,35 @@ static int ti_sci_probe(struct platform_device *pdev)
 		}
 	}
 
+	if (of_property_read_bool(dev->of_node, "ti,partial-io-wakeup-sources")) {
+		info->nr_wakeup_sources =
+			of_count_phandle_with_args(dev->of_node,
+						   "ti,partial-io-wakeup-sources",
+						   NULL);
+		info->wakeup_source_nodes =
+			devm_kzalloc(dev, sizeof(*info->wakeup_source_nodes),
+				     GFP_KERNEL);
+
+		for (i = 0; i != info->nr_wakeup_sources; ++i) {
+			struct device_node *devnode =
+				of_parse_phandle(dev->of_node,
+						 "ti,partial-io-wakeup-sources",
+						 i);
+			info->wakeup_source_nodes[i] = devnode;
+		}
+
+		ret = devm_register_sys_off_handler(dev,
+						    SYS_OFF_MODE_POWER_OFF,
+						    SYS_OFF_PRIO_FIRMWARE,
+						    tisci_sys_off_handler,
+						    info);
+		if (ret) {
+			dev_err(dev, "Failed to register sys_off_handler %pe\n",
+				ERR_PTR(ret));
+			goto unregister_restart;
+		}
+	}
+
 	/*
 	 * Check if the firmware supports any optional low power modes
 	 * and initialize them if present. Old revisions of TIFS (< 08.04)
@@ -3794,7 +3905,17 @@ static int ti_sci_probe(struct platform_device *pdev)
 	list_add_tail(&info->node, &ti_sci_list);
 	mutex_unlock(&ti_sci_list_mutex);
 
-	return of_platform_populate(dev->of_node, NULL, NULL, dev);
+	ret = of_platform_populate(dev->of_node, NULL, NULL, dev);
+	if (ret) {
+		dev_err(dev, "platform_populate failed %pe\n", ERR_PTR(ret));
+		goto unregister_restart;
+	}
+	return 0;
+
+unregister_restart:
+	if (info->nb.notifier_call)
+		unregister_restart_handler(&info->nb);
+
 out:
 	if (!IS_ERR(info->chan_tx))
 		mbox_free_channel(info->chan_tx);
@@ -3804,47 +3925,12 @@ out:
 	return ret;
 }
 
-static int ti_sci_remove(struct platform_device *pdev)
-{
-	struct ti_sci_info *info;
-	struct device *dev = &pdev->dev;
-	int ret = 0;
-
-	of_platform_depopulate(dev);
-
-	info = platform_get_drvdata(pdev);
-
-	if (info->nb.notifier_call)
-		unregister_restart_handler(&info->nb);
-
-	mutex_lock(&ti_sci_list_mutex);
-	if (info->users)
-		ret = -EBUSY;
-	else
-		list_del(&info->node);
-	mutex_unlock(&ti_sci_list_mutex);
-
-	if (!ret) {
-		ti_sci_debugfs_destroy(pdev, info);
-
-		/* Safe to free channels since no more users */
-		mbox_free_channel(info->chan_tx);
-		mbox_free_channel(info->chan_rx);
-	}
-
-	if (info->ctx_mem_buf)
-		dma_free_coherent(info->dev, LPM_CTX_MEM_SIZE,
-				  info->ctx_mem_buf,
-				  info->ctx_mem_addr);
-	return ret;
-}
-
 static struct platform_driver ti_sci_driver = {
 	.probe = ti_sci_probe,
-	.remove = ti_sci_remove,
 	.driver = {
 		   .name = "ti-sci",
 		   .of_match_table = of_match_ptr(ti_sci_of_match),
+		   .suppress_bind_attrs = true,
 		   .pm = &ti_sci_pm_ops,
 	},
 };

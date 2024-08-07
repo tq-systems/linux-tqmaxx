@@ -969,21 +969,21 @@ static const struct panel_desc auo_g104sn02 = {
 	.connector_type = DRM_MODE_CONNECTOR_LVDS,
 };
 
-static const struct drm_display_mode auo_g121ean01_mode = {
-	.clock = 66700,
-	.hdisplay = 1280,
-	.hsync_start = 1280 + 58,
-	.hsync_end = 1280 + 58 + 8,
-	.htotal = 1280 + 58 + 8 + 70,
-	.vdisplay = 800,
-	.vsync_start = 800 + 6,
-	.vsync_end = 800 + 6 + 4,
-	.vtotal = 800 + 6 + 4 + 10,
+static const struct display_timing auo_g121ean01_timing = {
+	.pixelclock = { 60000000, 74400000, 90000000 },
+	.hactive = { 1280, 1280, 1280 },
+	.hfront_porch = { 20, 50, 100 },
+	.hback_porch = { 20, 50, 100 },
+	.hsync_len = { 30, 100, 200 },
+	.vactive = { 800, 800, 800 },
+	.vfront_porch = { 2, 10, 25 },
+	.vback_porch = { 2, 10, 25 },
+	.vsync_len = { 4, 18, 50 },
 };
 
 static const struct panel_desc auo_g121ean01 = {
-	.modes = &auo_g121ean01_mode,
-	.num_modes = 1,
+	.timings = &auo_g121ean01_timing,
+	.num_timings = 1,
 	.bpc = 8,
 	.size = {
 		.width = 261,
@@ -1159,7 +1159,9 @@ static const struct panel_desc auo_t215hvn01 = {
 	.delay = {
 		.disable = 5,
 		.unprepare = 1000,
-	}
+	},
+	.bus_format = MEDIA_BUS_FMT_RGB888_1X7X4_SPWG,
+	.connector_type = DRM_MODE_CONNECTOR_LVDS,
 };
 
 static const struct drm_display_mode avic_tm070ddh03_mode = {
@@ -2203,13 +2205,13 @@ static const struct panel_desc innolux_g070y2_t02 = {
 static const struct display_timing innolux_g101ice_l01_timing = {
 	.pixelclock = { 60400000, 71100000, 74700000 },
 	.hactive = { 1280, 1280, 1280 },
-	.hfront_porch = { 41, 80, 100 },
-	.hback_porch = { 40, 79, 99 },
-	.hsync_len = { 1, 1, 1 },
+	.hfront_porch = { 30, 60, 70 },
+	.hback_porch = { 30, 60, 70 },
+	.hsync_len = { 22, 40, 60 },
 	.vactive = { 800, 800, 800 },
-	.vfront_porch = { 5, 11, 14 },
-	.vback_porch = { 4, 11, 14 },
-	.vsync_len = { 1, 1, 1 },
+	.vfront_porch = { 3, 8, 14 },
+	.vback_porch = { 3, 8, 14 },
+	.vsync_len = { 4, 7, 12 },
 	.flags = DISPLAY_FLAGS_DE_HIGH,
 };
 
@@ -2226,6 +2228,7 @@ static const struct panel_desc innolux_g101ice_l01 = {
 		.disable = 200,
 	},
 	.bus_format = MEDIA_BUS_FMT_RGB888_1X7X4_SPWG,
+	.bus_flags = DRM_BUS_FLAG_DE_HIGH,
 	.connector_type = DRM_MODE_CONNECTOR_LVDS,
 };
 
@@ -2719,6 +2722,35 @@ static const struct panel_desc microtips_mf_101hiebcaf0 = {
 	.size = {
 		.width = 217,
 		.height = 136,
+	},
+	.delay = {
+		.prepare = 50,
+		.disable = 50,
+	},
+	.bus_flags = DRM_BUS_FLAG_DE_HIGH,
+	.bus_format = MEDIA_BUS_FMT_RGB888_1X7X4_SPWG,
+	.connector_type = DRM_MODE_CONNECTOR_LVDS,
+};
+
+static const struct drm_display_mode microtips_mf_103hieb0ga0_mode = {
+	.clock = 93301,
+	.hdisplay = 1920,
+	.hsync_start = 1920 + 72,
+	.hsync_end = 1920 + 72 + 72,
+	.htotal = 1920 + 72 + 72 + 72,
+	.vdisplay = 720,
+	.vsync_start = 720 + 3,
+	.vsync_end = 720 + 3 + 3,
+	.vtotal = 720 + 3 + 3 + 2,
+};
+
+static const struct panel_desc microtips_mf_103hieb0ga0 = {
+	.modes = &microtips_mf_103hieb0ga0_mode,
+	.bpc = 8,
+	.num_modes = 1,
+	.size = {
+		.width = 244,
+		.height = 92,
 	},
 	.delay = {
 		.prepare = 50,
@@ -3248,6 +3280,42 @@ static const struct panel_desc qishenglong_gopher2b_lcd = {
 	.connector_type = DRM_MODE_CONNECTOR_DPI,
 };
 
+static const struct drm_display_mode raspberrypi_7inch_mode = {
+	.clock = 28569600 / 1000,
+	.hdisplay = 800,
+	.hsync_start = 800 + 48, //848
+	.hsync_end = 800 + 48 + 32, //880
+	.htotal = 800 + 48 + 32 + 80, //960
+	.vdisplay = 480,
+	.vsync_start = 480 + 3, //487
+	.vsync_end = 480 + 3 + 7, //450
+	.vtotal = 480 + 3 + 7 + 6, //496
+
+	.crtc_clock = 28569600 / 1000,
+	.crtc_hdisplay = 800,
+	.crtc_hsync_start = 800 + 48, //848
+	.crtc_hsync_end = 800 + 48 + 32, //880
+	.crtc_htotal = 800 + 48 + 32 + 80, //960
+	.crtc_vdisplay = 480,
+	.crtc_vsync_start = 480 + 3, //487
+	.crtc_vsync_end = 480 + 3 + 7, //450
+	.crtc_vtotal = 480 + 3 + 7 + 6, //496
+
+	.flags = DRM_MODE_FLAG_NVSYNC | DRM_MODE_FLAG_NHSYNC,
+};
+
+static const struct panel_desc raspberrypi_7inch = {
+	.modes = &raspberrypi_7inch_mode,
+	.num_modes = 1,
+	.bpc = 8,
+	.size = {
+		.width = 154,
+		.height = 86,
+	},
+	.bus_format = MEDIA_BUS_FMT_RGB888_1X24,
+	.connector_type = DRM_MODE_CONNECTOR_DSI,
+};
+
 static const struct display_timing rocktech_rk070er9427_timing = {
 	.pixelclock = { 26400000, 33300000, 46800000 },
 	.hactive = { 800, 800, 800 },
@@ -3658,6 +3726,7 @@ static const struct panel_desc tianma_tm070jdhg30 = {
 	},
 	.bus_format = MEDIA_BUS_FMT_RGB888_1X7X4_SPWG,
 	.connector_type = DRM_MODE_CONNECTOR_LVDS,
+	.bus_flags = DRM_BUS_FLAG_DE_HIGH,
 };
 
 static const struct panel_desc tianma_tm070jvhg33 = {
@@ -3670,6 +3739,7 @@ static const struct panel_desc tianma_tm070jvhg33 = {
 	},
 	.bus_format = MEDIA_BUS_FMT_RGB888_1X7X4_SPWG,
 	.connector_type = DRM_MODE_CONNECTOR_LVDS,
+	.bus_flags = DRM_BUS_FLAG_DE_HIGH,
 };
 
 static const struct display_timing tianma_tm070rvhg71_timing = {
@@ -4222,6 +4292,9 @@ static const struct of_device_id platform_of_match[] = {
 		.compatible = "microtips,mf-101hiebcaf0",
 		.data = &microtips_mf_101hiebcaf0,
 	}, {
+		.compatible = "microtips,mf-103hieb0ga0",
+		.data = &microtips_mf_103hieb0ga0,
+	}, {
 		.compatible = "mitsubishi,aa070mc01-ca1",
 		.data = &mitsubishi_aa070mc01,
 	}, {
@@ -4284,6 +4357,9 @@ static const struct of_device_id platform_of_match[] = {
 	}, {
 		.compatible = "qishenglong,gopher2b-lcd",
 		.data = &qishenglong_gopher2b_lcd,
+	}, {
+		.compatible = "raspberrypi,7inch-dsi",
+		.data = &raspberrypi_7inch,
 	}, {
 		.compatible = "rocktech,rk070er9427",
 		.data = &rocktech_rk070er9427,

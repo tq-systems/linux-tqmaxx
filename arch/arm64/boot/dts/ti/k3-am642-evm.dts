@@ -490,8 +490,12 @@
 	};
 };
 
-/* mcu_gpio0 is reserved for mcu firmware usage */
+/* mcu_gpio0 and mcu_gpio_intr are reserved for mcu firmware usage */
 &mcu_gpio0 {
+	status = "reserved";
+};
+
+&mcu_gpio_intr {
 	status = "reserved";
 };
 
@@ -511,7 +515,7 @@
 
 &sdhci0 {
 	/* emmc */
-	bus-width = <8>;
+	status = "okay";
 	non-removable;
 	ti,driver-strength-ohm = <50>;
 	disable-wp;
@@ -519,11 +523,10 @@
 
 &sdhci1 {
 	/* SD/MMC */
+	status = "okay";
 	vmmc-supply = <&vdd_mmc1>;
 	pinctrl-names = "default";
-	bus-width = <4>;
 	pinctrl-0 = <&main_mmc1_pins_default>;
-	ti,driver-strength-ohm = <50>;
 	disable-wp;
 };
 

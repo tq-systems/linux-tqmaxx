@@ -17,6 +17,8 @@
 	model = "Texas Instruments AM62A7 SK";
 
 	aliases {
+		serial0 = &mcu_uart0;
+		serial1 = &wkup_uart0;
 		serial2 = &main_uart0;
 		mmc0 = &sdhci0;
 		mmc1 = &sdhci1;
@@ -241,7 +243,7 @@
 		};
 	};
 
-	hdmi: connector {
+	hdmi0: connector {
 		compatible = "hdmi-connector";
 		label = "hdmi";
 		type = "a";
@@ -653,7 +655,6 @@
 	vqmmc-supply = <&vddshv_sdio>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&main_mmc1_pins_default>;
-	ti,driver-strength-ohm = <50>;
 	disable-wp;
 };
 
@@ -673,6 +674,9 @@
 	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&main_uart0_pins_default>;
+	interrupts-extended = <&gic500 GIC_SPI 178 IRQ_TYPE_LEVEL_HIGH>,
+			<&main_pmx0 0x1c8>; /* (D14) UART0_RXD PADCONFIG114 */
+	interrupt-names = "irq", "wakeup";
 };
 
 &usbss0 {
@@ -750,8 +754,8 @@
 	       0 0 0 0
 	       0 0 0 0
 	>;
-	tx-num-evt = <32>;
-	rx-num-evt = <32>;
+	tx-num-evt = <0>;
+	rx-num-evt = <0>;
 };
 
 &ti_csi2rx0 {
@@ -769,7 +773,7 @@
 
 &dss_ports {
 	/* VP2: DPI Output */
-	port@0 {
+	hdmi0_dss: port@0 {
 		reg = <0>;
 
 		dpi1_out: endpoint {
@@ -843,6 +847,7 @@
 };
 
 &mailbox0_cluster0 {
+	ti,mbox-num-fifos = <2>;
 	mbox_r5_0: mbox-r5-0 {
 		ti,mbox-rx = <0 0 0>;
 		ti,mbox-tx = <1 0 0>;
@@ -850,6 +855,7 @@
 };
 
 &mailbox0_cluster1 {
+	ti,mbox-num-fifos = <2>;
 	mbox_c7x_0: mbox-c7x-0 {
 		ti,mbox-rx = <0 0 0>;
 		ti,mbox-tx = <1 0 0>;
@@ -857,6 +863,7 @@
 };
 
 &mailbox0_cluster2 {
+	ti,mbox-num-fifos = <2>;
 	mbox_mcu_r5_0: mbox-mcu_r5-0 {
 		ti,mbox-rx = <0 0 0>;
 		ti,mbox-tx = <1 0 0>;
@@ -901,6 +908,5 @@
 	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&main_mmc0_pins_default>;
-	ti,driver-strength-ohm = <50>;
 	disable-wp;
 };

@@ -29,6 +29,7 @@
 #include <linux/sched.h>
 #include <linux/spi/spi.h>
 #include <linux/spi/spi-mem.h>
+#include <linux/sys_soc.h>
 #include <linux/timer.h>
 
 #define CQSPI_NAME			"cadence-qspi"
@@ -617,7 +618,7 @@ static int cqspi_phy_calibrate(struct cqspi_flash_pdata *f_pdata,
 
 	rxhigh.tx = rxlow.tx;
 	rxhigh.read_delay = rxlow.read_delay;
-	cqspi_find_rx_high(f_pdata, mem, &rxhigh);
+	ret = cqspi_find_rx_high(f_pdata, mem, &rxhigh);
 	if (ret)
 		goto out;
 	dev_dbg(dev, "rxhigh: RX: %d TX: %d RD: %d\n", rxhigh.rx, rxhigh.tx,
@@ -1275,6 +1276,7 @@ static int cqspi_read_setup(struct cqspi_flash_pdata *f_pdata,
 	reg &= ~CQSPI_REG_SIZE_ADDRESS_MASK;
 	reg |= (op->addr.nbytes - 1);
 	writel(reg, reg_base + CQSPI_REG_SIZE);
+	readl(reg_base + CQSPI_REG_SIZE); /* Flush posted write. */
 	return 0;
 }
 
@@ -1570,6 +1572,7 @@ static int cqspi_write_setup(struct cqspi_flash_pdata *f_pdata,
 	reg &= ~CQSPI_REG_SIZE_ADDRESS_MASK;
 	reg |= (op->addr.nbytes - 1);
 	writel(reg, reg_base + CQSPI_REG_SIZE);
+	readl(reg_base + CQSPI_REG_SIZE); /* Flush posted write. */
 	return 0;
 }
 
@@ -2009,6 +2012,46 @@ err_unmap:
 	return ret;
 }
 
+static void cqspi_memcpy_fromio(const struct spi_mem_op *op, void *to,
+				const void __iomem *from, size_t count)
+{
+	if (op->data.buswidth == 8 && op->data.dtr) {
+		/*
+		 * 8D-8D-8D ops with odd length should be rejected by
+		 * supports_op() so no need to worry about that.
+		 */
+		while (count && !IS_ALIGNED((unsigned long)from, 4)) {
+			*(u16 *)to = __raw_readw(from);
+			from += 2;
+			to += 2;
+			count -= 2;
+		}
+
+		/*
+		 * The controller can work with both 32-bit and 64-bit
+		 * platforms. 32-bit platforms won't have a readq. So use a
+		 * readl instead.
+		 */
+		while (count >= 4) {
+			*(u32 *)to = __raw_readl(from);
+			from += 4;
+			to += 4;
+			count -= 4;
+		}
+
+		while (count) {
+			*(u16 *)to = __raw_readw(from);
+			from += 2;
+			to += 2;
+			count -= 2;
+		}
+
+		return;
+	}
+
+	memcpy_fromio(to, from, count);
+}
+
 static int cqspi_direct_read_execute(struct cqspi_flash_pdata *f_pdata,
 				     const struct spi_mem_op *op)
 {
@@ -2020,8 +2063,8 @@ static int cqspi_direct_read_execute(struct cqspi_flash_pdata *f_pdata,
 	u_char *buf = op->data.buf.in;
 	int ret;
 
-	if (!cqspi->rx_chan || !virt_addr_valid(buf)) {
-		memcpy_fromio(buf, cqspi->ahb_base + from, len);
+	if (!cqspi->rx_chan || !virt_addr_valid(buf) || len <= 16) {
+		cqspi_memcpy_fromio(op, buf, cqspi->ahb_base + from, len);
 		return 0;
 	}
 
@@ -2415,6 +2458,11 @@ static int cqspi_setup_flash(struct cqspi_st *cqspi)
 	return 0;
 }
 
+static const struct soc_device_attribute k3_soc_devices[] = {
+	{ .family = "AM64X", .revision = "SR1.0" },
+	{ /* sentinel */ }
+};
+
 static int cqspi_probe(struct platform_device *pdev)
 {
 	const struct cqspi_driver_platdata *ddata;
@@ -2569,7 +2617,7 @@ static int cqspi_probe(struct platform_device *pdev)
 		goto probe_setup_failed;
 	}
 
-	if (cqspi->use_direct_mode) {
+	if (cqspi->use_direct_mode && !soc_device_match(k3_soc_devices)) {
 		ret = cqspi_request_mmap_dma(cqspi);
 		if (ret == -EPROBE_DEFER)
 			goto probe_setup_failed;

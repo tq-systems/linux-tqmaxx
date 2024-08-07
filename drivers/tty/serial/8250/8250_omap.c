@@ -27,11 +27,14 @@
 #include <linux/pm_qos.h>
 #include <linux/pm_wakeirq.h>
 #include <linux/dma-mapping.h>
+#include <linux/reboot.h>
 #include <linux/sys_soc.h>
+#include <linux/pm_domain.h>
 
 #include "8250.h"
 
 #define DEFAULT_CLK_SPEED	48000000
+#define OMAP_UART_REGSHIFT	2
 
 #define UART_ERRATA_i202_MDR1_ACCESS	(1 << 0)
 #define OMAP_UART_WER_HAS_TX_WAKEUP	(1 << 1)
@@ -108,7 +111,14 @@
 /* RX FIFO occupancy indicator */
 #define UART_OMAP_RX_LVL		0x19
 
+/*
+ * Copy of the genpd flags for the console.
+ * Only used if console suspend is disabled
+ */
+static unsigned int genpd_flags_console;
+
 struct omap8250_priv {
+	void __iomem *membase;
 	int line;
 	u8 habit;
 	u8 mdr1;
@@ -124,7 +134,6 @@ struct omap8250_priv {
 	u8 rx_trigger;
 	bool is_suspending;
 	int wakeirq;
-	int wakeups_enabled;
 	u32 latency;
 	u32 calc_latency;
 	struct pm_qos_request pm_qos_request;
@@ -133,6 +142,10 @@ struct omap8250_priv {
 	spinlock_t rx_dma_lock;
 	bool rx_dma_broken;
 	bool throttled;
+
+	struct pinctrl *pinctrl;
+	struct pinctrl_state *pinctrl_default;
+	struct pinctrl_state *pinctrl_wakeup;
 };
 
 struct omap8250_dma_params {
@@ -152,9 +165,9 @@ static void omap_8250_rx_dma_flush(struct uart_8250_port *p);
 static inline void omap_8250_rx_dma_flush(struct uart_8250_port *p) { }
 #endif
 
-static u32 uart_read(struct uart_8250_port *up, u32 reg)
+static u32 uart_read(struct omap8250_priv *priv, u32 reg)
 {
-	return readl(up->port.membase + (reg << up->port.regshift));
+	return readl(priv->membase + (reg << OMAP_UART_REGSHIFT));
 }
 
 /*
@@ -538,7 +551,7 @@ static void omap_serial_fill_features_erratas(struct uart_8250_port *up,
 	u32 mvr, scheme;
 	u16 revision, major, minor;
 
-	mvr = uart_read(up, UART_OMAP_MVER);
+	mvr = uart_read(priv, UART_OMAP_MVER);
 
 	/* Check revision register scheme */
 	scheme = mvr >> OMAP_UART_MVR_SCHEME_SHIFT;
@@ -823,7 +836,7 @@ static void __dma_rx_do_complete(struct uart_8250_port *p)
 	if (priv->habit & UART_HAS_RHR_IT_DIS) {
 		reg = serial_in(p, UART_OMAP_IER2);
 		reg &= ~UART_OMAP_IER2_RHR_IT_DIS;
-		serial_out(p, UART_OMAP_IER2, UART_OMAP_IER2_RHR_IT_DIS);
+		serial_out(p, UART_OMAP_IER2, reg);
 	}
 
 	dmaengine_tx_status(rxchan, cookie, &state);
@@ -965,7 +978,7 @@ static int omap_8250_rx_dma(struct uart_8250_port *p)
 	if (priv->habit & UART_HAS_RHR_IT_DIS) {
 		reg = serial_in(p, UART_OMAP_IER2);
 		reg |= UART_OMAP_IER2_RHR_IT_DIS;
-		serial_out(p, UART_OMAP_IER2, UART_OMAP_IER2_RHR_IT_DIS);
+		serial_out(p, UART_OMAP_IER2, reg);
 	}
 
 	dma_async_issue_pending(dma->rxchan);
@@ -1184,10 +1197,12 @@ static int omap_8250_dma_handle_irq(struct uart_port *port)
 
 	status = serial_port_in(port, UART_LSR);
 
-	if (priv->habit & UART_HAS_EFR2)
-		am654_8250_handle_rx_dma(up, iir, status);
-	else
-		status = omap_8250_handle_rx_dma(up, iir, status);
+	if ((iir & 0x3f) != UART_IIR_THRI) {
+		if (priv->habit & UART_HAS_EFR2)
+			am654_8250_handle_rx_dma(up, iir, status);
+		else
+			status = omap_8250_handle_rx_dma(up, iir, status);
+	}
 
 	serial8250_modem_status(up);
 	if (status & UART_LSR_THRE && up->dma->tx_err) {
@@ -1229,6 +1244,28 @@ static int omap8250_no_handle_irq(struct uart_port *port)
 	/* IRQ has not been requested but handling irq? */
 	WARN_ONCE(1, "Unexpected irq handling before port startup\n");
 	return 0;
+}
+
+static int omap8250_sysoff_handler(struct sys_off_data *data)
+{
+	struct omap8250_priv *priv = dev_get_drvdata(data->dev);
+	int ret;
+
+	dev_dbg(data->dev, "sysoff handler\n");
+
+	if (IS_ERR_OR_NULL(priv->pinctrl_wakeup))
+		return NOTIFY_DONE;
+
+	if (!device_may_wakeup(data->dev))
+		return NOTIFY_DONE;
+
+	ret = pinctrl_select_state(priv->pinctrl, priv->pinctrl_wakeup);
+	if (ret)
+		dev_err(data->dev, "Failed to select pinctrl state 'wakeup', continuing poweroff\n");
+
+	dev_dbg(data->dev, "Setup wakeup pinctrl\n");
+
+	return NOTIFY_DONE;
 }
 
 static struct omap8250_dma_params am654_dma = {
@@ -1319,7 +1356,7 @@ static int omap8250_probe(struct platform_device *pdev)
 		UPF_HARD_FLOW;
 	up.port.private_data = priv;
 
-	up.port.regshift = 2;
+	up.port.regshift = OMAP_UART_REGSHIFT;
 	up.port.fifosize = 64;
 	up.tx_loadsz = 64;
 	up.capabilities = UART_CAP_FIFO;
@@ -1381,6 +1418,8 @@ static int omap8250_probe(struct platform_device *pdev)
 			 DEFAULT_CLK_SPEED);
 	}
 
+	priv->membase = membase;
+	priv->line = -ENODEV;
 	priv->latency = PM_QOS_CPU_LATENCY_DEFAULT_VALUE;
 	priv->calc_latency = PM_QOS_CPU_LATENCY_DEFAULT_VALUE;
 	cpu_latency_qos_add_request(&priv->pm_qos_request, priv->latency);
@@ -1388,7 +1427,9 @@ static int omap8250_probe(struct platform_device *pdev)
 
 	spin_lock_init(&priv->rx_dma_lock);
 
-	device_init_wakeup(&pdev->dev, true);
+	platform_set_drvdata(pdev, priv);
+
+	device_set_wakeup_capable(&pdev->dev, true);
 	pm_runtime_enable(&pdev->dev);
 	pm_runtime_use_autosuspend(&pdev->dev);
 
@@ -1449,9 +1490,20 @@ static int omap8250_probe(struct platform_device *pdev)
 		goto err;
 	}
 	priv->line = ret;
-	platform_set_drvdata(pdev, priv);
 	pm_runtime_mark_last_busy(&pdev->dev);
 	pm_runtime_put_autosuspend(&pdev->dev);
+
+	priv->pinctrl = devm_pinctrl_get(&pdev->dev);
+	if (!IS_ERR_OR_NULL(priv->pinctrl)) {
+		priv->pinctrl_default = pinctrl_lookup_state(priv->pinctrl, "default");
+		priv->pinctrl_wakeup = pinctrl_lookup_state(priv->pinctrl, "wakeup");
+	}
+
+	devm_register_sys_off_handler(&pdev->dev,
+				      SYS_OFF_MODE_POWER_OFF_PREPARE,
+				      SYS_OFF_PRIO_DEFAULT,
+				      omap8250_sysoff_handler, NULL);
+
 	return 0;
 err:
 	pm_runtime_dont_use_autosuspend(&pdev->dev);
@@ -1469,19 +1521,19 @@ static int omap8250_remove(struct platform_device *pdev)
 
 	err = pm_runtime_resume_and_get(&pdev->dev);
 	if (err)
-		return err;
+		dev_err(&pdev->dev, "Failed to resume hardware\n");
 
+	serial8250_unregister_port(priv->line);
+	priv->line = -ENODEV;
 	pm_runtime_dont_use_autosuspend(&pdev->dev);
 	pm_runtime_put_sync(&pdev->dev);
 	flush_work(&priv->qos_work);
 	pm_runtime_disable(&pdev->dev);
-	serial8250_unregister_port(priv->line);
 	cpu_latency_qos_remove_request(&priv->pm_qos_request);
 	device_init_wakeup(&pdev->dev, false);
 	return 0;
 }
 
-#ifdef CONFIG_PM_SLEEP
 static int omap8250_prepare(struct device *dev)
 {
 	struct omap8250_priv *priv = dev_get_drvdata(dev);
@@ -1505,7 +1557,8 @@ static int omap8250_suspend(struct device *dev)
 {
 	struct omap8250_priv *priv = dev_get_drvdata(dev);
 	struct uart_8250_port *up = serial8250_get_port(priv->line);
-	int err;
+	struct generic_pm_domain *genpd = pd_to_genpd(dev->pm_domain);
+	int err = 0;
 
 	serial8250_suspend_port(priv->line);
 
@@ -1515,7 +1568,19 @@ static int omap8250_suspend(struct device *dev)
 	if (!device_may_wakeup(dev))
 		priv->wer = 0;
 	serial_out(up, UART_OMAP_WER, priv->wer);
-	err = pm_runtime_force_suspend(dev);
+	if (uart_console(&up->port)) {
+		if (console_suspend_enabled)
+			err = pm_runtime_force_suspend(dev);
+		else {
+			/*
+			 * The pd shall not be powered-off (no console suspend).
+			 * Make copy of genpd flags before to set it always on.
+			 * The original value is restored during the resume.
+			 */
+			genpd_flags_console = genpd->flags;
+			genpd->flags |= GENPD_FLAG_ALWAYS_ON;
+		}
+	}
 	flush_work(&priv->qos_work);
 
 	return err;
@@ -1524,11 +1589,19 @@ static int omap8250_suspend(struct device *dev)
 static int omap8250_resume(struct device *dev)
 {
 	struct omap8250_priv *priv = dev_get_drvdata(dev);
+	struct uart_8250_port *up = serial8250_get_port(priv->line);
+	struct generic_pm_domain *genpd = pd_to_genpd(dev->pm_domain);
 	int err;
 
-	err = pm_runtime_force_resume(dev);
-	if (err)
-		return err;
+	if (uart_console(&up->port) && console_suspend_enabled) {
+		if (console_suspend_enabled) {
+			err = pm_runtime_force_resume(dev);
+			if (err)
+				return err;
+		} else
+			genpd->flags = genpd_flags_console;
+	}
+
 	serial8250_resume_port(priv->line);
 	/* Paired with pm_runtime_resume_and_get() in omap8250_suspend() */
 	pm_runtime_mark_last_busy(dev);
@@ -1536,12 +1609,7 @@ static int omap8250_resume(struct device *dev)
 
 	return 0;
 }
-#else
-#define omap8250_prepare NULL
-#define omap8250_complete NULL
-#endif
 
-#ifdef CONFIG_PM
 static int omap8250_lost_context(struct uart_8250_port *up)
 {
 	u32 val;
@@ -1557,11 +1625,15 @@ static int omap8250_lost_context(struct uart_8250_port *up)
 	return 0;
 }
 
+static void uart_write(struct omap8250_priv *priv, u32 reg, u32 val)
+{
+	writel(val, priv->membase + (reg << OMAP_UART_REGSHIFT));
+}
+
 /* TODO: in future, this should happen via API in drivers/reset/ */
 static int omap8250_soft_reset(struct device *dev)
 {
 	struct omap8250_priv *priv = dev_get_drvdata(dev);
-	struct uart_8250_port *up = serial8250_get_port(priv->line);
 	int timeout = 100;
 	int sysc;
 	int syss;
@@ -1575,20 +1647,20 @@ static int omap8250_soft_reset(struct device *dev)
 	 * needing omap8250_soft_reset() quirk. Do it in two writes as
 	 * recommended in the comment for omap8250_update_scr().
 	 */
-	serial_out(up, UART_OMAP_SCR, OMAP_UART_SCR_DMAMODE_1);
-	serial_out(up, UART_OMAP_SCR,
+	uart_write(priv, UART_OMAP_SCR, OMAP_UART_SCR_DMAMODE_1);
+	uart_write(priv, UART_OMAP_SCR,
 		   OMAP_UART_SCR_DMAMODE_1 | OMAP_UART_SCR_DMAMODE_CTL);
 
-	sysc = serial_in(up, UART_OMAP_SYSC);
+	sysc = uart_read(priv, UART_OMAP_SYSC);
 
 	/* softreset the UART */
 	sysc |= OMAP_UART_SYSC_SOFTRESET;
-	serial_out(up, UART_OMAP_SYSC, sysc);
+	uart_write(priv, UART_OMAP_SYSC, sysc);
 
 	/* By experiments, 1us enough for reset complete on AM335x */
 	do {
 		udelay(1);
-		syss = serial_in(up, UART_OMAP_SYSS);
+		syss = uart_read(priv, UART_OMAP_SYSS);
 	} while (--timeout && !(syss & OMAP_UART_SYSS_RESETDONE));
 
 	if (!timeout) {
@@ -1602,23 +1674,10 @@ static int omap8250_soft_reset(struct device *dev)
 static int omap8250_runtime_suspend(struct device *dev)
 {
 	struct omap8250_priv *priv = dev_get_drvdata(dev);
-	struct uart_8250_port *up;
+	struct uart_8250_port *up = NULL;
 
-	/* In case runtime-pm tries this before we are setup */
-	if (!priv)
-		return 0;
-
-	up = serial8250_get_port(priv->line);
-	/*
-	 * When using 'no_console_suspend', the console UART must not be
-	 * suspended. Since driver suspend is managed by runtime suspend,
-	 * preventing runtime suspend (by returning error) will keep device
-	 * active during suspend.
-	 */
-	if (priv->is_suspending && !console_suspend_enabled) {
-		if (uart_console(&up->port))
-			return -EBUSY;
-	}
+	if (priv->line >= 0)
+		up = serial8250_get_port(priv->line);
 
 	if (priv->habit & UART_ERRATA_CLOCK_DISABLE) {
 		int ret;
@@ -1627,13 +1686,15 @@ static int omap8250_runtime_suspend(struct device *dev)
 		if (ret)
 			return ret;
 
-		/* Restore to UART mode after reset (for wakeup) */
-		omap8250_update_mdr1(up, priv);
-		/* Restore wakeup enable register */
-		serial_out(up, UART_OMAP_WER, priv->wer);
+		if (up) {
+			/* Restore to UART mode after reset (for wakeup) */
+			omap8250_update_mdr1(up, priv);
+			/* Restore wakeup enable register */
+			serial_out(up, UART_OMAP_WER, priv->wer);
+		}
 	}
 
-	if (up->dma && up->dma->rxchan)
+	if (up && up->dma && up->dma->rxchan)
 		omap_8250_rx_dma_flush(up);
 
 	priv->latency = PM_QOS_CPU_LATENCY_DEFAULT_VALUE;
@@ -1645,25 +1706,21 @@ static int omap8250_runtime_suspend(struct device *dev)
 static int omap8250_runtime_resume(struct device *dev)
 {
 	struct omap8250_priv *priv = dev_get_drvdata(dev);
-	struct uart_8250_port *up;
+	struct uart_8250_port *up = NULL;
 
-	/* In case runtime-pm tries this before we are setup */
-	if (!priv)
-		return 0;
+	if (priv->line >= 0)
+		up = serial8250_get_port(priv->line);
 
-	up = serial8250_get_port(priv->line);
-
-	if (omap8250_lost_context(up))
+	if (up && omap8250_lost_context(up))
 		omap8250_restore_regs(up);
 
-	if (up->dma && up->dma->rxchan && !(priv->habit & UART_HAS_EFR2))
+	if (up && up->dma && up->dma->rxchan && !(priv->habit & UART_HAS_EFR2))
 		omap_8250_rx_dma(up);
 
 	priv->latency = priv->calc_latency;
 	schedule_work(&priv->qos_work);
 	return 0;
 }
-#endif
 
 #ifdef CONFIG_SERIAL_8250_OMAP_TTYO_FIXUP
 static int __init omap8250_console_fixup(void)
@@ -1706,17 +1763,17 @@ console_initcall(omap8250_console_fixup);
 #endif
 
 static const struct dev_pm_ops omap8250_dev_pm_ops = {
-	SET_SYSTEM_SLEEP_PM_OPS(omap8250_suspend, omap8250_resume)
-	SET_RUNTIME_PM_OPS(omap8250_runtime_suspend,
+	SYSTEM_SLEEP_PM_OPS(omap8250_suspend, omap8250_resume)
+	RUNTIME_PM_OPS(omap8250_runtime_suspend,
 			   omap8250_runtime_resume, NULL)
-	.prepare        = omap8250_prepare,
-	.complete       = omap8250_complete,
+	.prepare        = pm_sleep_ptr(omap8250_prepare),
+	.complete       = pm_sleep_ptr(omap8250_complete),
 };
 
 static struct platform_driver omap8250_platform_driver = {
 	.driver = {
 		.name		= "omap8250",
-		.pm		= &omap8250_dev_pm_ops,
+		.pm		= pm_ptr(&omap8250_dev_pm_ops),
 		.of_match_table = omap8250_dt_ids,
 	},
 	.probe			= omap8250_probe,

@@ -63,10 +63,10 @@ static struct vxe_enc_fmt vxe_enc_formats[] = {
 		.csc_preset = IMG_CSC_NONE,
 	},
 	{
-		.fourcc = V4L2_PIX_FMT_RGB32,
+		.fourcc = V4L2_PIX_FMT_ARGB32,
 		.num_planes = 1,
 		.type = V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE,
-		.fmt = IMG_CODEC_ABCX,
+		.fmt = IMG_CODEC_XBCA,
 		.min_bufs = 2,
 		.size_num[0] = 1,
 		.size_den[0] = 1,
@@ -870,6 +870,9 @@ static int vxe_open(struct file *file)
 			  V4L2_CID_MPEG_VIDEO_GOP_SIZE,
 			  0, 2047, 1, 30);
 	v4l2_ctrl_new_std(v4l2_ctrl_hdl, &vxe_enc_ctrl_ops,
+			  V4L2_CID_MPEG_VIDEO_H264_I_PERIOD,
+			  0, 2047, 1, 30);
+	v4l2_ctrl_new_std(v4l2_ctrl_hdl, &vxe_enc_ctrl_ops,
 			  V4L2_CID_MPEG_VIDEO_MAX_REF_PIC,
 			  1, 16, 1, 1);
 	v4l2_ctrl_new_std_menu(v4l2_ctrl_hdl, &vxe_enc_ctrl_ops,
@@ -1328,9 +1331,9 @@ static int vxe_s_fmt(struct file *file, void *priv, struct v4l2_format *f)
 			return -EINVAL;
 		}
 		if (V4L2_TYPE_IS_OUTPUT(f->type)) {
-			ctx->sh_params.width_in_mbs_minus1 = ((queue->width +
+			ctx->sh_params.width_in_mbs_minus1 = ((ALIGN_16(queue->width) +
 				(MB_SIZE - 1))/MB_SIZE)-1;
-			ctx->sh_params.height_in_maps_units_minus1 = ((queue->height +
+			ctx->sh_params.height_in_maps_units_minus1 = ((ALIGN_16(queue->height) +
 					(MB_SIZE - 1))/MB_SIZE) - 1;
 			pr_debug("h264_sequence_header_params: width_in_mbs_minus1=%d\n",
 				 ctx->sh_params.width_in_mbs_minus1);
@@ -1846,7 +1849,7 @@ static int vxe_enc_probe(struct platform_device *pdev)
 		goto out_vid_dev;
 	}
 
-	ret = video_register_device(vfd, VFL_TYPE_VIDEO, 0);
+	ret = video_register_device(vfd, VFL_TYPE_VIDEO, 1);
 	if (ret) {
 		dev_err(&pdev->dev, "Failed to register video device\n");
 		goto out_vid_reg;

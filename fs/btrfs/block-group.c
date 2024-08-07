@@ -1318,6 +1318,7 @@ out:
  */
 void btrfs_delete_unused_bgs(struct btrfs_fs_info *fs_info)
 {
+	LIST_HEAD(retry_list);
 	struct btrfs_block_group *block_group;
 	struct btrfs_space_info *space_info;
 	struct btrfs_trans_handle *trans;
@@ -1339,6 +1340,7 @@ void btrfs_delete_unused_bgs(struct btrfs_fs_info *fs_info)
 
 	spin_lock(&fs_info->unused_bgs_lock);
 	while (!list_empty(&fs_info->unused_bgs)) {
+		u64 used;
 		int trimming;
 
 		block_group = list_first_entry(&fs_info->unused_bgs,
@@ -1374,9 +1376,9 @@ void btrfs_delete_unused_bgs(struct btrfs_fs_info *fs_info)
 			goto next;
 		}
 
+		spin_lock(&space_info->lock);
 		spin_lock(&block_group->lock);
-		if (block_group->reserved || block_group->pinned ||
-		    block_group->used || block_group->ro ||
+		if (btrfs_is_block_group_used(block_group) || block_group->ro ||
 		    list_is_singular(&block_group->list)) {
 			/*
 			 * We want to bail if we made new allocations or have
@@ -1386,10 +1388,49 @@ void btrfs_delete_unused_bgs(struct btrfs_fs_info *fs_info)
 			 */
 			trace_btrfs_skip_unused_block_group(block_group);
 			spin_unlock(&block_group->lock);
+			spin_unlock(&space_info->lock);
 			up_write(&space_info->groups_sem);
 			goto next;
 		}
+
+		/*
+		 * The block group may be unused but there may be space reserved
+		 * accounting with the existence of that block group, that is,
+		 * space_info->bytes_may_use was incremented by a task but no
+		 * space was yet allocated from the block group by the task.
+		 * That space may or may not be allocated, as we are generally
+		 * pessimistic about space reservation for metadata as well as
+		 * for data when using compression (as we reserve space based on
+		 * the worst case, when data can't be compressed, and before
+		 * actually attempting compression, before starting writeback).
+		 *
+		 * So check if the total space of the space_info minus the size
+		 * of this block group is less than the used space of the
+		 * space_info - if that's the case, then it means we have tasks
+		 * that might be relying on the block group in order to allocate
+		 * extents, and add back the block group to the unused list when
+		 * we finish, so that we retry later in case no tasks ended up
+		 * needing to allocate extents from the block group.
+		 */
+		used = btrfs_space_info_used(space_info, true);
+		if (space_info->total_bytes - block_group->length < used) {
+			/*
+			 * Add a reference for the list, compensate for the ref
+			 * drop under the "next" label for the
+			 * fs_info->unused_bgs list.
+			 */
+			btrfs_get_block_group(block_group);
+			list_add_tail(&block_group->bg_list, &retry_list);
+
+			trace_btrfs_skip_unused_block_group(block_group);
+			spin_unlock(&block_group->lock);
+			spin_unlock(&space_info->lock);
+			up_write(&space_info->groups_sem);
+			goto next;
+		}
+
 		spin_unlock(&block_group->lock);
+		spin_unlock(&space_info->lock);
 
 		/* We don't want to force the issue, only flip if it's ok. */
 		ret = inc_block_group_ro(block_group, 0);
@@ -1513,12 +1554,16 @@ next:
 		btrfs_put_block_group(block_group);
 		spin_lock(&fs_info->unused_bgs_lock);
 	}
+	list_splice_tail(&retry_list, &fs_info->unused_bgs);
 	spin_unlock(&fs_info->unused_bgs_lock);
 	mutex_unlock(&fs_info->reclaim_bgs_lock);
 	return;
 
 flip_async:
 	btrfs_end_transaction(trans);
+	spin_lock(&fs_info->unused_bgs_lock);
+	list_splice_tail(&retry_list, &fs_info->unused_bgs);
+	spin_unlock(&fs_info->unused_bgs_lock);
 	mutex_unlock(&fs_info->reclaim_bgs_lock);
 	btrfs_put_block_group(block_group);
 	btrfs_discard_punt_unused_bgs_list(fs_info);
@@ -1533,6 +1578,10 @@ void btrfs_mark_bg_unused(struct btrfs_block_group *bg)
 		btrfs_get_block_group(bg);
 		trace_btrfs_add_unused_block_group(bg);
 		list_add_tail(&bg->bg_list, &fs_info->unused_bgs);
+	} else if (!test_bit(BLOCK_GROUP_FLAG_NEW, &bg->runtime_flags)) {
+		/* Pull out the block group from the reclaim_bgs list. */
+		trace_btrfs_add_unused_block_group(bg);
+		list_move_tail(&bg->bg_list, &fs_info->unused_bgs);
 	}
 	spin_unlock(&fs_info->unused_bgs_lock);
 }
@@ -2493,6 +2542,7 @@ void btrfs_create_pending_block_groups(struct btrfs_trans_handle *trans)
 next:
 		btrfs_delayed_refs_rsv_release(fs_info, 1);
 		list_del_init(&block_group->bg_list);
+		clear_bit(BLOCK_GROUP_FLAG_NEW, &block_group->runtime_flags);
 	}
 	btrfs_trans_release_chunk_metadata(trans);
 }
@@ -2532,6 +2582,13 @@ struct btrfs_block_group *btrfs_make_block_group(struct btrfs_trans_handle *tran
 	if (!cache)
 		return ERR_PTR(-ENOMEM);
 
+	/*
+	 * Mark it as new before adding it to the rbtree of block groups or any
+	 * list, so that no other task finds it and calls btrfs_mark_bg_unused()
+	 * before the new flag is set.
+	 */
+	set_bit(BLOCK_GROUP_FLAG_NEW, &cache->runtime_flags);
+
 	cache->length = size;
 	set_free_space_tree_thresholds(cache);
 	cache->used = bytes_used;
@@ -2540,7 +2597,7 @@ struct btrfs_block_group *btrfs_make_block_group(struct btrfs_trans_handle *tran
 	cache->global_root_id = calculate_global_root_id(fs_info, cache->start);
 
 	if (btrfs_fs_compat_ro(fs_info, FREE_SPACE_TREE))
-		cache->needs_free_space = 1;
+		set_bit(BLOCK_GROUP_FLAG_NEEDS_FREE_SPACE, &cache->runtime_flags);
 
 	ret = btrfs_load_block_group_zone_info(cache, true);
 	if (ret) {

@@ -127,7 +127,7 @@ int intel_pasid_alloc_table(struct device *dev)
 	info->pasid_table = pasid_table;
 
 	if (!ecap_coherent(info->iommu->ecap))
-		clflush_cache_range(pasid_table->table, size);
+		clflush_cache_range(pasid_table->table, (1 << order) * PAGE_SIZE);
 
 	return 0;
 }
@@ -433,6 +433,9 @@ devtlb_invalidation_with_pasid(struct intel_iommu *iommu,
 
 	info = dev_iommu_priv_get(dev);
 	if (!info || !info->ats_enabled)
+		return;
+
+	if (pci_dev_is_disconnected(to_pci_dev(dev)))
 		return;
 
 	sid = info->bus << 8 | info->devfn;

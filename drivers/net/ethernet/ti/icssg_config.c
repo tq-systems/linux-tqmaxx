@@ -217,6 +217,23 @@ static void icssg_miig_queues_init(struct prueth *prueth, int slice)
 	}
 }
 
+static void icssg_config_cut_thru(struct prueth_emac *emac)
+{
+	void *config = emac->dram.va + ICSSG_CONFIG_OFFSET;
+	u8 mask = BIT(7);
+	u8 val;
+	int i;
+
+	for (i = 0; i < PRUETH_MAX_TX_QUEUES * PRUETH_NUM_MACS; i++) {
+		val = readb(config + EXPRESS_PRE_EMPTIVE_Q_MAP + i);
+		val &= ~mask;
+		if (emac->cut_thru_queue_map & BIT(i))
+			val |= mask;
+
+		writeb(val, config + EXPRESS_PRE_EMPTIVE_Q_MAP + i);
+	}
+}
+
 void icssg_config_ipg(struct prueth_emac *emac)
 {
 	struct prueth *prueth = emac->prueth;
@@ -301,11 +318,17 @@ static int prueth_switch_buffer_setup(struct prueth_emac *emac)
 		addr += PRUETH_SW_NUM_BUF_POOLS_HOST * PRUETH_SW_BUF_POOL_SIZE_HOST;
 
 	for (i = PRUETH_NUM_BUF_POOLS;
-	     i <  PRUETH_SW_NUM_BUF_POOLS_HOST + PRUETH_NUM_BUF_POOLS;
+	     i <  2 * PRUETH_SW_NUM_BUF_POOLS_HOST + PRUETH_NUM_BUF_POOLS;
 	     i++) {
-		bpool_cfg[i].addr = cpu_to_le32(addr);
-		bpool_cfg[i].len = cpu_to_le32(PRUETH_SW_BUF_POOL_SIZE_HOST);
-		addr += PRUETH_SW_BUF_POOL_SIZE_HOST;
+		/* The driver only uses first 4 queues per PRU so only initialize them */
+		if (i % PRUETH_SW_NUM_BUF_POOLS_HOST < PRUETH_SW_NUM_BUF_POOLS_PER_PRU) {
+			bpool_cfg[i].addr = cpu_to_le32(addr);
+			bpool_cfg[i].len = cpu_to_le32(PRUETH_SW_BUF_POOL_SIZE_HOST);
+			addr += PRUETH_SW_BUF_POOL_SIZE_HOST;
+		} else {
+			bpool_cfg[i].addr = 0;
+			bpool_cfg[i].len = 0;
+		}
 	}
 
 	if (!slice)
@@ -401,7 +424,7 @@ static void icssg_init_emac_mode(struct prueth *prueth)
 	 */
 	u8 mac[ETH_ALEN] = { 0 };
 
-	if (prueth->emacs_initialized)
+	if (prueth->num_emacs_initialized)
 		return;
 
 	/* Set VLAN TABLE address base */
@@ -425,7 +448,7 @@ static void icssg_init_switch_mode(struct prueth *prueth)
 	int i;
 	u32 addr = prueth->shram.pa + EMAC_ICSSG_SWITCH_DEFAULT_VLAN_TABLE_OFFSET;
 
-	if (prueth->emacs_initialized)
+	if (prueth->num_emacs_initialized)
 		return;
 
 	/* Set VLAN TABLE address base */
@@ -493,10 +516,13 @@ int icssg_config(struct prueth *prueth, struct prueth_emac *emac, int slice)
 	*(cfg_byte_ptr + SPL_PKT_DEFAULT_PRIORITY) = 0;
 	*(cfg_byte_ptr + QUEUE_NUM_UNTAGGED) = 0x0;
 
-	if (prueth->is_switch_mode || prueth->is_hsr_offload_mode)
+	if (prueth->is_switch_mode || prueth->is_hsr_offload_mode) {
+		icssg_config_cut_thru(emac);
 		ret = prueth_switch_buffer_setup(emac);
-	else
+	} else {
 		ret = prueth_emac_buffer_setup(emac);
+	}
+
 	if (ret)
 		return ret;
 
@@ -507,9 +533,9 @@ int icssg_config(struct prueth *prueth, struct prueth_emac *emac, int slice)
 
 /* Bitmask for ICSSG r30 commands */
 static const struct icssg_r30_cmd emac_r32_bitmask[] = {
-	{{0xffff0004, 0xffff0100, 0xffff0100, EMAC_NONE}},	/* EMAC_PORT_DISABLE */
+	{{0xffff0004, 0xffff0100, 0xffff0004, EMAC_NONE}},	/* EMAC_PORT_DISABLE */
 	{{0xfffb0040, 0xfeff0200, 0xfeff0200, EMAC_NONE}},	/* EMAC_PORT_BLOCK */
-	{{0xffbb0000, 0xfcff0000, 0xdcff0000, EMAC_NONE}},	/* EMAC_PORT_FORWARD */
+	{{0xffbb0000, 0xfcff0000, 0xdcfb0000, EMAC_NONE}},	/* EMAC_PORT_FORWARD */
 	{{0xffbb0000, 0xfcff0000, 0xfcff2000, EMAC_NONE}},	/* EMAC_PORT_FORWARD_WO_LEARNING */
 	{{0xffff0001, EMAC_NONE,  EMAC_NONE, EMAC_NONE}},	/* ACCEPT ALL */
 	{{0xfffe0002, EMAC_NONE,  EMAC_NONE, EMAC_NONE}},	/* ACCEPT TAGGED */
@@ -525,7 +551,9 @@ static const struct icssg_r30_cmd emac_r32_bitmask[] = {
 	{{EMAC_NONE,  0xffff4000, EMAC_NONE, EMAC_NONE}},	/* Preemption on Tx ENABLE*/
 	{{EMAC_NONE,  0xbfff0000, EMAC_NONE, EMAC_NONE}},	/* Preemption on Tx DISABLE*/
 	{{0xffff0010,  EMAC_NONE, 0xffff0010, EMAC_NONE}},	/* VLAN AWARE*/
-	{{0xffef0000,  EMAC_NONE, 0xffef0000, EMAC_NONE}}	/* VLAN UNWARE*/
+	{{0xffef0000,  EMAC_NONE, 0xffef0000, EMAC_NONE}},	/* VLAN UNWARE*/
+	{{0xffff2000, EMAC_NONE, EMAC_NONE, EMAC_NONE}},	/* HSR_RX_OFFLOAD_ENABLE */
+	{{0xdfff0000, EMAC_NONE, EMAC_NONE, EMAC_NONE}}		/* HSR_RX_OFFLOAD_DISABLE */
 };
 
 int emac_set_port_state(struct prueth_emac *emac,
@@ -743,7 +771,10 @@ void icssg_vtbl_modify(struct prueth_emac *emac, u8 vid, u8 port_mask,
 {
 	struct prueth *prueth = emac->prueth;
 	struct prueth_vlan_tbl *tbl = prueth->vlan_tbl;
-	u8 fid_c1 = tbl[vid].fid_c1;
+	u8 fid_c1;
+
+	spin_lock(&prueth->vtbl_lock);
+	fid_c1 = tbl[vid].fid_c1;
 
 	/* FID_C1: bit0..2 port membership mask,
 	 * bit3..5 tagging mask for each port
@@ -758,6 +789,7 @@ void icssg_vtbl_modify(struct prueth_emac *emac, u8 vid, u8 port_mask,
 	}
 
 	tbl[vid].fid_c1 = fid_c1;
+	spin_unlock(&prueth->vtbl_lock);
 }
 
 u16 icssg_get_pvid(struct prueth_emac *emac)
@@ -820,15 +852,45 @@ int emac_fdb_erase_all(struct prueth_emac *emac)
 int emac_fdb_flush_multicast(struct prueth_emac *emac)
 {
 	struct prueth *prueth = emac->prueth;
+	u8 port_mask = BIT(emac->port_id);
 	int ret = 0;
 	int i;
 
 	ret = emac_fdb_erase_all(emac);
 
+	spin_lock(&prueth->vtbl_lock);
 	for (i = 0; i < SZ_4K - 1; i++) {
 		prueth->vlan_tbl[i].fid = i;
-		prueth->vlan_tbl[i].fid_c1 = 0;
+		prueth->vlan_tbl[i].fid_c1 &= ~(port_mask | port_mask << 3);
 	}
+	spin_unlock(&prueth->vtbl_lock);
 
 	return ret;
+}
+
+int emac_fdb_flow_id_updated(struct prueth_emac *emac)
+{
+	struct mgmt_cmd_rsp fdb_cmd_rsp = { 0 };
+	int slice = prueth_emac_slice(emac);
+	struct mgmt_cmd fdb_cmd = { 0 };
+	int ret = 0;
+
+	fdb_cmd.header = ICSSG_FW_MGMT_CMD_HEADER;
+	fdb_cmd.type   = ICSSG_FW_MGMT_FDB_CMD_TYPE_RX_FLOW;
+	fdb_cmd.seqnum = ++(emac->prueth->icssg_hwcmdseq);
+	fdb_cmd.param  = 0;
+
+	fdb_cmd.param |= (slice << 4);
+	fdb_cmd.cmd_args[0] = 0;
+
+	ret = icssg_send_fdb_msg(emac, &fdb_cmd, &fdb_cmd_rsp);
+
+	if (ret)
+		return ret;
+
+	WARN_ON(fdb_cmd.seqnum != fdb_cmd_rsp.seqnum);
+	if (fdb_cmd_rsp.status == 1)
+		return 0;
+
+	return -EINVAL;
 }

@@ -388,8 +388,6 @@
 
 	wkup_uart0_pins_default: wkup-uart0-pins-default {
 		pinctrl-single,pins = <
-			J784S4_WKUP_IOPAD(0x070, PIN_INPUT, 0) /* (E25) WKUP_UART0_CTSn */
-			J784S4_WKUP_IOPAD(0x074, PIN_OUTPUT, 0) /* (F28) WKUP_UART0_RTSn */
 			J784S4_WKUP_IOPAD(0x048, PIN_INPUT, 0) /* (K35) WKUP_UART0_RXD */
 			J784S4_WKUP_IOPAD(0x04c, PIN_OUTPUT, 0) /* (K34) WKUP_UART0_TXD */
 		>;
@@ -714,7 +712,7 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&mcu_fss0_ospi0_pins_default>;
 
-	flash@0 {
+	ospi0_nor: flash@0 {
 		compatible = "jedec,spi-nor";
 		reg = <0x0>;
 		spi-tx-bus-width = <8>;
@@ -733,27 +731,27 @@
 
 			partition@0 {
 				label = "ospi.tiboot3";
-				reg = <0x0 0x80000>;
+				reg = <0x0 0x100000>;
 			};
 
-			partition@80000 {
+			partition@100000 {
 				label = "ospi.tispl";
-				reg = <0x80000 0x200000>;
+				reg = <0x100000 0x200000>;
 			};
 
-			partition@280000 {
+			partition@300000 {
 				label = "ospi.u-boot";
-				reg = <0x280000 0x400000>;
+				reg = <0x300000 0x400000>;
 			};
 
-			partition@680000 {
+			partition@700000 {
 				label = "ospi.env";
-				reg = <0x680000 0x40000>;
+				reg = <0x700000 0x40000>;
 			};
 
-			partition@6c0000 {
+			partition@740000 {
 				label = "ospi.env.backup";
-				reg = <0x6c0000 0x40000>;
+				reg = <0x740000 0x40000>;
 			};
 
 			partition@800000 {
@@ -764,6 +762,63 @@
 			partition@3fc0000 {
 				label = "ospi.phypattern";
 				reg = <0x3fc0000 0x40000>;
+			};
+		};
+	};
+
+	ospi0_nand: nand@0 {
+		compatible = "spi-nand";
+		reg = <0x0>;
+		spi-tx-bus-width = <8>;
+		spi-rx-bus-width = <8>;
+		spi-max-frequency = <25000000>;
+		cdns,tshsl-ns = <60>;
+		cdns,tsd2d-ns = <60>;
+		cdns,tchsh-ns = <60>;
+		cdns,tslch-ns = <60>;
+		cdns,read-delay = <2>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		status = "disabled";
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			partition@0 {
+				label = "ospi_nand.tiboot3";
+				reg = <0x0 0x100000>;
+			};
+
+			partition@100000 {
+				label = "ospi_nand.tispl";
+				reg = <0x100000 0x200000>;
+			};
+
+			partition@300000 {
+				label = "ospi_nand.u-boot";
+				reg = <0x300000 0x400000>;
+			};
+
+			partition@700000 {
+				label = "ospi_nand.env";
+				reg = <0x700000 0x40000>;
+			};
+
+			partition@740000 {
+				label = "ospi_nand.env.backup";
+				reg = <0x740000 0x40000>;
+			};
+
+			partition@2000000 {
+				label = "ospi_nand.rootfs";
+				reg = <0x2000000 0x5fc0000>;
+			};
+
+			partition@7fc0000 {
+				label = "ospi_nand.phypattern";
+				reg = <0x7fc0000 0x40000>;
 			};
 		};
 	};
@@ -793,27 +848,27 @@
 
 			partition@0 {
 				label = "qspi.tiboot3";
-				reg = <0x0 0x80000>;
+				reg = <0x0 0x100000>;
 			};
 
-			partition@80000 {
+			partition@100000 {
 				label = "qspi.tispl";
-				reg = <0x80000 0x200000>;
+				reg = <0x100000 0x200000>;
 			};
 
-			partition@280000 {
+			partition@300000 {
 				label = "qspi.u-boot";
-				reg = <0x280000 0x400000>;
+				reg = <0x300000 0x400000>;
 			};
 
-			partition@680000 {
+			partition@700000 {
 				label = "qspi.env";
-				reg = <0x680000 0x40000>;
+				reg = <0x700000 0x40000>;
 			};
 
-			partition@6c0000 {
+			partition@740000 {
 				label = "qspi.env.backup";
-				reg = <0x6c0000 0x40000>;
+				reg = <0x740000 0x40000>;
 			};
 
 			partition@800000 {
@@ -1058,6 +1113,7 @@
 		cdns,num-lanes = <4>;
 		#phy-cells = <0>;
 		cdns,phy-type = <PHY_TYPE_DP>;
+		cdns,max-bit-rate = <2700>;
 		resets = <&serdes_wiz4 1>, <&serdes_wiz4 2>,
 			 <&serdes_wiz4 3>, <&serdes_wiz4 4>;
 	};
@@ -1419,6 +1475,10 @@
 };
 
 &dphy_tx0 {
+	status = "okay";
+};
+
+&dsi0 {
 	status = "okay";
 };
 
