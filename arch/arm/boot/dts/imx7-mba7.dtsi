@@ -75,6 +75,12 @@
 		};
 	};
 
+	iio-hwmon {
+		compatible = "iio-hwmon";
+		io-channels = <&adc1 0>, <&adc1 1>, <&adc1 2>, <&adc1 3>,
+			      <&adc2 0>, <&adc2 1>, <&adc2 2>, <&adc2 3>;
+	};
+
 	reg_fec1_pwdn: regulator-fec1-pwdn {
 		compatible = "regulator-fixed";
 		regulator-name = "PWDN_FEC1";
@@ -344,7 +350,7 @@
 
 &i2c1 {
 	lm75: temperature-sensor@49 {
-		compatible = "national,lm75";
+		compatible = "national,lm75a";
 		reg = <0x49>;
 		vs-supply = <&reg_mba_3v3>;
 	};
