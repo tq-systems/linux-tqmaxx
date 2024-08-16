@@ -49,6 +49,7 @@
 #include <linux/refcount.h>
 #include <linux/irqdomain.h>
 #include <linux/acpi.h>
+#include <linux/sizes.h>
 #include <asm/mshyperv.h>
 
 /*
@@ -465,7 +466,7 @@ struct pci_eject_response {
 	u32 status;
 } __packed;
 
-static int pci_ring_size = (4 * PAGE_SIZE);
+static int pci_ring_size = VMBUS_RING_SIZE(SZ_16K);
 
 /*
  * Driver specific state.
@@ -3929,6 +3930,9 @@ static int hv_pci_restore_msi_msg(struct pci_dev *pdev, void *arg)
 	struct irq_data *irq_data;
 	struct msi_desc *entry;
 	int ret = 0;
+
+	if (!pdev->msi_enabled && !pdev->msix_enabled)
+		return 0;
 
 	msi_lock_descs(&pdev->dev);
 	msi_for_each_desc(entry, &pdev->dev, MSI_DESC_ASSOCIATED) {
