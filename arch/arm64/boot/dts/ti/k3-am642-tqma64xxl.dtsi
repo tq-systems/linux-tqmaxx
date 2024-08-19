@@ -253,6 +253,7 @@
 	no-sdio;
 	no-sd;
 	ti,driver-strength-ohm = <50>;
+	status = "okay";
 };
 
 &main_pmx0 {
