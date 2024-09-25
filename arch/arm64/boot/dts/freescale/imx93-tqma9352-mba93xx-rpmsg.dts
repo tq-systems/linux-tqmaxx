@@ -12,10 +12,6 @@
 	status = "okay";
 };
 
-&npu {
-	status = "okay";
-};
-
 /* NPU shared region */
 &ethosu_mem {
 	status = "okay";
@@ -28,6 +24,16 @@
 
 /* carveout for Cortex M33 running in DDR, disabled by default */
 &m33_reserved {
+	status = "okay";
+};
+
+/* mailbox to communicate with Cortex M33 */
+&mu1 {
+	status = "okay";
+};
+
+/* NPU only usable with Cortex M33 */
+&npu {
 	status = "okay";
 };
 
