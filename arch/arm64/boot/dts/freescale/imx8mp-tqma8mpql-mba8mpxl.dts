@@ -291,6 +291,18 @@
 		status = "okay";
 	};
 
+	sound-xcvr {
+		compatible = "fsl,imx-audio-card";
+		model = "imx-audio-xcvr";
+
+		pri-dai-link {
+			link-name = "XCVR PCM";
+			cpu {
+				sound-dai = <&xcvr>;
+			};
+		};
+	};
+
 	thermal-zones {
 		soc-thermal {
 			trips {
@@ -858,6 +870,11 @@
 	no-sdio;
 	disable-wp;
 	bus-width = <4>;
+	status = "okay";
+};
+
+&xcvr {
+	#sound-dai-cells = <0>;
 	status = "okay";
 };
 
