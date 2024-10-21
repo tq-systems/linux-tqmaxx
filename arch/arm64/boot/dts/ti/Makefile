@@ -20,6 +20,7 @@ dtb-$(CONFIG_ARCH_K3) += k3-am625-sk-microtips-mf101hie-panel.dtbo
 dtb-$(CONFIG_ARCH_K3) += k3-am625-sk-ecap-capture.dtbo
 dtb-$(CONFIG_ARCH_K3) += k3-am625-sk-m2-cc3351.dtbo
 dtb-$(CONFIG_ARCH_K3) += k3-am625-sk-rpi-hdr-ehrpwm.dtbo
+dtb-$(CONFIG_ARCH_K3) += k3-am625-tqma62xx-mba62xx.dtb
 dtb-$(CONFIG_ARCH_K3) += k3-am625-verdin-nonwifi-dahlia.dtb
 dtb-$(CONFIG_ARCH_K3) += k3-am625-verdin-nonwifi-dev.dtb
 dtb-$(CONFIG_ARCH_K3) += k3-am625-verdin-nonwifi-ivy.dtb
