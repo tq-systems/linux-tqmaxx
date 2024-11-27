@@ -1,0 +1,53 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright (c) 2024 TQ-Systems GmbH <linux@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Markus Niebel
+ */
+
+/dts-v1/;
+/plugin/;
+
+&backlight {
+	status = "okay";
+};
+
+&display {
+	compatible = "tianma,tm070jvhg33";
+	status = "okay";
+};
+
+&display_subsystem {
+	status = "okay";
+};
+
+&dpi_out {
+	remote-endpoint = <&lvds_encoder_input>;
+};
+
+&lcdif {
+	status = "okay";
+};
+
+&lvds_encoder {
+	status = "okay";
+};
+
+&lvds_encoder_input {
+	remote-endpoint = <&dpi_out>;
+};
+
+&lvds_encoder_output {
+	remote-endpoint = <&panel_in>;
+};
+
+&panel_in {
+	remote-endpoint = <&lvds_encoder_output>;
+};
+
+&parallel_disp_fmt {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_rgbdisp>;
+	fsl,interface-pix-fmt = "rgb888";
+	status = "okay";
+};
