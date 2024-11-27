@@ -396,19 +396,6 @@
 		reg = <0x1c>;
 	};
 
-	polytouch: touchscreen@38 {
-		compatible = "edt,edt-ft5406";
-		reg = <0x38>;
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_touch>;
-		interrupt-parent = <&gpio1>;
-		interrupts = <11 IRQ_TYPE_EDGE_FALLING>;
-		reset-gpios = <&expander2 0 GPIO_ACTIVE_LOW>;
-		iovcc-supply = <&reg_3v3>;
-		vcc-supply = <&reg_3v3>;
-		status = "disabled";
-	};
-
 	tcpc: ptn5110@50 {
 		compatible = "nxp,ptn5110";
 		reg = <0x50>;
