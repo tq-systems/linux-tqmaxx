@@ -396,29 +396,29 @@
 		reg = <0x1c>;
 	};
 
-	tcpc: ptn5110@50 {
-		compatible = "nxp,ptn5110";
+	ptn5110: usb-typec@50 {
+		compatible = "nxp,ptn5110", "tcpci";
 		reg = <0x50>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_typec>;
 		interrupt-parent = <&gpio1>;
 		interrupts = <10 IRQ_TYPE_EDGE_FALLING>;
 
-		port {
-			typec_drd_sw: endpoint {
-				remote-endpoint = <&usb1_drd_sw>;
-			};
-		};
-
 		connector {
 			compatible = "usb-c-connector";
-			label = "USB-C";
+			label = "X17";
 			power-role = "dual";
 			data-role = "dual";
 			try-power-role = "sink";
 			typec-power-opmode = "default";
 			pd-disable;
 			self-powered;
+
+			port {
+				typec_con_hs: endpoint {
+					remote-endpoint = <&typec_hs>;
+				};
+			};
 		};
 	};
 
@@ -589,8 +589,8 @@
 	status = "okay";
 
 	port {
-		usb1_drd_sw: endpoint {
-			remote-endpoint = <&typec_drd_sw>;
+		typec_hs: endpoint {
+			remote-endpoint = <&typec_con_hs>;
 		};
 	};
 };
