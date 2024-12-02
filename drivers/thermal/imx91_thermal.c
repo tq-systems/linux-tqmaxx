@@ -14,6 +14,8 @@
 #include <linux/nvmem-consumer.h>
 #include <linux/thermal.h>
 
+#include "thermal_hwmon.h"
+
 #define CTRL0			0x0
 
 #define STAT0			0x10
@@ -227,6 +229,8 @@ static int imx91_tmu_probe(struct platform_device *pdev)
 		else if (trip.type == THERMAL_TRIP_PASSIVE)
 			tmu->sensors.temp_passive = trip.temperature;
 	}
+
+	devm_thermal_add_hwmon_sysfs(&pdev->dev, tmu->sensors.tzd);
 
 	platform_set_drvdata(pdev, tmu);
 
