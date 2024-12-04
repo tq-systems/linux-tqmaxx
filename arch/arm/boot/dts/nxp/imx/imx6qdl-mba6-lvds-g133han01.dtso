@@ -1,0 +1,45 @@
+// SPDX-License-Identifier: GPL-2.0-only
+/*
+ * Copyright (c) 2018-2026 TQ-Systems GmbH <linux@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Markus Niebel
+ * Author: Alexander Stein
+ */
+
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/clock/imx6qdl-clock.h>
+
+&panel0 {
+	compatible = "auo,g133han01";
+	status = "okay";
+};
+
+&backlight {
+	pwms = <&pwm1 0 62500 0>;
+	brightness-levels = <0 16 32 64 96 128 160 192 224 255>;
+	default-brightness-level = <5>;
+	status = "okay";
+};
+
+&clks {
+	assigned-clocks = <&clks IMX6QDL_CLK_LDB_DI0_SEL>,
+			  <&clks IMX6QDL_CLK_LDB_DI1_SEL>;
+	assigned-clock-parents = <&clks IMX6QDL_CLK_PLL5_VIDEO_DIV>,
+				 <&clks IMX6QDL_CLK_PLL5_VIDEO_DIV>;
+};
+
+&ldb {
+	fsl,dual-channel;
+	status = "okay";
+
+	lvds-channel@0 {
+		status = "okay";
+	};
+
+	lvds-channel@1 {
+		status = "disabled";
+	};
+};
+
