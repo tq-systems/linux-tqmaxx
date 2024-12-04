@@ -1,0 +1,54 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright (c) 2014-2026 TQ-Systems GmbH <linux@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Markus Niebel
+ * Author: Alexander Stein
+ */
+
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/interrupt-controller/irq.h>
+
+&backlight {
+	pwms = <&pwm1 0 20000 0>;
+	brightness-levels = <0 2 4 8 16 32 64 128 255>;
+	default-brightness-level = <8>;
+	status = "okay";
+};
+
+&display0 {
+	status = "okay";
+};
+
+&i2c1 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	polytouch: touchscreen@38 {
+		compatible = "edt,edt-ft5406";
+		reg = <0x38>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_polytouch>;
+		interrupt-parent = <&gpio3>;
+		interrupts = <25 IRQ_TYPE_NONE>;
+		/* LCD.PWR_EN -> TSC /WAKE */
+		wake-gpios = <&gpio7 11 GPIO_ACTIVE_HIGH>;
+		/* LCD.RESET -> TSC /RST */
+		reset-gpios = <&gpio1 7 GPIO_ACTIVE_LOW>;
+		iovcc-supply = <&reg_mba6_3p3v>;
+		vcc-supply = <&reg_mba6_3p3v>;
+		gain = <20>;
+		touchscreen-size-x = <800>;
+		touchscreen-size-y = <480>;
+        };
+};
+
+&panel_rgb {
+	compatible = "cdtech,s070swv29hg-dc44";
+	backlight = <&backlight>;
+	status = "okay";
+};
+

@@ -313,6 +313,28 @@ dtb-$(CONFIG_SOC_IMX6Q) += imx6q-mba6a-lvds-tm070jvhg33.dtb
 dtb-$(CONFIG_SOC_IMX6Q) += imx6q-mba6b-lvds-tm070jvhg33.dtb
 dtb-$(CONFIG_SOC_IMX6Q) += imx6qp-mba6b-lvds-tm070jvhg33.dtb
 
+imx6dl-mba6a-rgb-cdtech-dc44-dtbs = imx6dl-mba6a.dtb imx6qdl-mba6-rgb-cdtech-dc44.dtbo
+imx6dl-mba6b-rgb-cdtech-dc44-dtbs = imx6dl-mba6b.dtb imx6qdl-mba6-rgb-cdtech-dc44.dtbo
+imx6q-mba6a-rgb-cdtech-dc44-dtbs = imx6q-mba6a.dtb imx6qdl-mba6-rgb-cdtech-dc44.dtbo
+imx6q-mba6b-rgb-cdtech-dc44-dtbs = imx6q-mba6b.dtb imx6qdl-mba6-rgb-cdtech-dc44.dtbo
+imx6qp-mba6b-rgb-cdtech-dc44-dtbs = imx6qp-mba6b.dtb imx6qdl-mba6-rgb-cdtech-dc44.dtbo
+dtb-$(CONFIG_SOC_IMX6Q) += imx6dl-mba6a-rgb-cdtech-dc44.dtb
+dtb-$(CONFIG_SOC_IMX6Q) += imx6dl-mba6b-rgb-cdtech-dc44.dtb
+dtb-$(CONFIG_SOC_IMX6Q) += imx6q-mba6a-rgb-cdtech-dc44.dtb
+dtb-$(CONFIG_SOC_IMX6Q) += imx6q-mba6b-rgb-cdtech-dc44.dtb
+dtb-$(CONFIG_SOC_IMX6Q) += imx6qp-mba6b-rgb-cdtech-dc44.dtb
+
+imx6dl-mba6a-rgb-cdtech-fc21-dtbs = imx6dl-mba6a.dtb imx6qdl-mba6-rgb-cdtech-fc21.dtbo
+imx6dl-mba6b-rgb-cdtech-fc21-dtbs = imx6dl-mba6b.dtb imx6qdl-mba6-rgb-cdtech-fc21.dtbo
+imx6q-mba6a-rgb-cdtech-fc21-dtbs = imx6q-mba6a.dtb imx6qdl-mba6-rgb-cdtech-fc21.dtbo
+imx6q-mba6b-rgb-cdtech-fc21-dtbs = imx6q-mba6b.dtb imx6qdl-mba6-rgb-cdtech-fc21.dtbo
+imx6qp-mba6b-rgb-cdtech-fc21-dtbs = imx6qp-mba6b.dtb imx6qdl-mba6-rgb-cdtech-fc21.dtbo
+dtb-$(CONFIG_SOC_IMX6Q) += imx6dl-mba6a-rgb-cdtech-fc21.dtb
+dtb-$(CONFIG_SOC_IMX6Q) += imx6dl-mba6b-rgb-cdtech-fc21.dtb
+dtb-$(CONFIG_SOC_IMX6Q) += imx6q-mba6a-rgb-cdtech-fc21.dtb
+dtb-$(CONFIG_SOC_IMX6Q) += imx6q-mba6b-rgb-cdtech-fc21.dtb
+dtb-$(CONFIG_SOC_IMX6Q) += imx6qp-mba6b-rgb-cdtech-fc21.dtb
+
 dtb-$(CONFIG_SOC_IMX6SL) += \
 	imx6sl-evk.dtb \
 	imx6sl-kobo-aura2.dtb \
