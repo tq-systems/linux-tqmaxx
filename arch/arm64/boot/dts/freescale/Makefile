@@ -201,6 +201,7 @@ dtb-$(CONFIG_ARCH_MXC) += imx8mp-ab2.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8mp-navq.dtb imx8mp-navq-ov5640-ov5645.dtb imx8mp-navq-ov5647-ov5640.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8mp-ddr4-evk.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8mp-evk-ndm.dtb
+dtb-$(CONFIG_ARCH_MXC) += imx8mp-olimex.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8mp-tqma8mpql-mba8mpxl.dtb
 
 imx8mp-tqma8mpql-mba8mpxl-imx327-dtbs += imx8mp-tqma8mpql-mba8mpxl.dtb imx8mp-tqma8mpql-mba8mpxl-imx327.dtbo
@@ -262,7 +263,6 @@ dtb-$(CONFIG_ARCH_MXC) += imx8mp-evk-revb4-basler-ov2775.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8mp-evk-revb4-dual-basler.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8mp-evk-revb4-dual-ov2775.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8mp-evk-revb4-spdif-lb.dtb
-dtb-$(CONFIG_ARCH_MXC) += imx8mp-evk-revb4-os08a20-ov5640.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8mp-evk-revb4-os08a20.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8mp-evk-revb4-dual-os08a20.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8mp-evk-revb4-iqaudio-dacplus.dtb
