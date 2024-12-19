@@ -26,6 +26,8 @@
 
 	aliases {
 		eeprom0 = &eeprom0;
+		ethernet0 = &eqos;
+		ethernet1 = &fec;
 		rtc0 = &pcf85063;
 		rtc1 = &bbnsm_rtc;
 	};
