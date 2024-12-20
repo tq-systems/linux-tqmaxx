@@ -357,6 +357,10 @@ static int fsl_lpspi_set_bitrate(struct fsl_lpspi_data *fsl_lpspi)
 	u8 prescale;
 
 	perclk_rate = clk_get_rate(fsl_lpspi->clk_per);
+	if (!perclk_rate) {
+		dev_err(fsl_lpspi->dev, "per-clk rate was not set\n");
+		return -EINVAL;
+	}
 	prescale_max = fsl_lpspi->devtype_data->prescale_max;
 
 	if (!config.speed_hz) {
@@ -1035,7 +1039,6 @@ static int fsl_lpspi_probe(struct platform_device *pdev)
 	platform_set_drvdata(pdev, controller);
 
 	fsl_lpspi = spi_controller_get_devdata(controller);
-	devtype_data =	of_device_get_match_data(&pdev->dev);
 	fsl_lpspi->dev = &pdev->dev;
 	fsl_lpspi->is_target = is_target;
 	fsl_lpspi->is_only_cs1 = of_property_read_bool((&pdev->dev)->of_node,

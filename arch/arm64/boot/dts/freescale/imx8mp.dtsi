@@ -800,15 +800,6 @@
 						clocks = <&clk IMX8MP_CLK_ML_AXI>,
 							 <&clk IMX8MP_CLK_ML_AHB>,
 							 <&clk IMX8MP_CLK_NPU_ROOT>;
-						assigned-clocks = <&clk IMX8MP_CLK_ML_CORE>,
-								  <&clk IMX8MP_CLK_ML_AXI>,
-								  <&clk IMX8MP_CLK_ML_AHB>;
-						assigned-clock-parents = <&clk IMX8MP_SYS_PLL1_800M>,
-									 <&clk IMX8MP_SYS_PLL1_800M>,
-									 <&clk IMX8MP_SYS_PLL1_800M>;
-						assigned-clock-rates = <800000000>,
-								       <800000000>,
-								       <300000000>;
 					};
 
 					pgc_audio: power-domain@5 {
@@ -824,13 +815,6 @@
 								       <600000000>;
 					};
 
-					pgc_gpu2d: power-domain@6 {
-						#power-domain-cells = <0>;
-						reg = <IMX8MP_POWER_DOMAIN_GPU2D>;
-						clocks = <&clk IMX8MP_CLK_GPU2D_ROOT>;
-						power-domains = <&pgc_gpumix>;
-					};
-
 					pgc_gpumix: power-domain@7 {
 						#power-domain-cells = <0>;
 						reg = <IMX8MP_POWER_DOMAIN_GPUMIX>;
@@ -842,6 +826,17 @@
 						assigned-clock-parents = <&clk IMX8MP_SYS_PLL1_800M>,
 									 <&clk IMX8MP_SYS_PLL1_800M>;
 						assigned-clock-rates = <800000000>, <400000000>;
+					};
+
+					/*
+					 * gpu driver not handle defer probe, but gpu2d pd will defer probe is
+					 *  put above gpumix, so move below gpumix
+					 */
+					pgc_gpu2d: power-domain@6 {
+						#power-domain-cells = <0>;
+						reg = <IMX8MP_POWER_DOMAIN_GPU2D>;
+						clocks = <&clk IMX8MP_CLK_GPU2D_ROOT>;
+						power-domains = <&pgc_gpumix>;
 					};
 
 					pgc_vpumix: power-domain@8 {
@@ -877,7 +872,6 @@
 						power-domains = <&pgc_vpumix>;
 						reg = <IMX8MP_POWER_DOMAIN_VPU_G2>;
 						clocks = <&clk IMX8MP_CLK_VPU_G2_ROOT>;
-
 					};
 
 					pgc_vpu_vc8000e: power-domain@13 {
