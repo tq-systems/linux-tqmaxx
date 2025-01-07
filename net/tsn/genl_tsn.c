@@ -3690,7 +3690,7 @@ static int tsn_multicast_to_user(unsigned long event,
 	(void)genlmsg_end(skb, nlh);
 
 	res = genlmsg_multicast_allns(&tsn_family, skb, 0,
-				      TSN_MCGRP_QBV, GFP_KERNEL);
+				      TSN_MCGRP_QBV);
 	skb = NULL;
 	if (res && res != -ESRCH) {
 		pr_err("genlmsg_multicast_allns error: %d\n", res);

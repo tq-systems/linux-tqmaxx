@@ -509,8 +509,10 @@ static int fsl_micfil_startup(struct snd_pcm_substream *substream,
 		}
 	}
 
-	snd_pcm_hw_constraint_list(substream->runtime, 0, SNDRV_PCM_HW_PARAM_RATE,
-				   &micfil->constraint_rates);
+	if (micfil->constraint_rates.count > 0)
+		snd_pcm_hw_constraint_list(substream->runtime, 0,
+					   SNDRV_PCM_HW_PARAM_RATE,
+					   &micfil->constraint_rates);
 
 	return 0;
 }

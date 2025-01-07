@@ -2129,8 +2129,7 @@ static int tcmu_netlink_event_send(struct tcmu_dev *udev,
 		return ret;
 	}
 
-	ret = genlmsg_multicast_allns(&tcmu_genl_family, skb, 0,
-				      TCMU_MCGRP_CONFIG, GFP_KERNEL);
+	ret = genlmsg_multicast_allns(&tcmu_genl_family, skb, 0,TCMU_MCGRP_CONFIG);
 
 	/* Wait during an add as the listener may not be up yet */
 	if (ret == 0 ||
