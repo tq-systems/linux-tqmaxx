@@ -20,6 +20,10 @@
 	status = "okay";
 };
 
+&display_subsystem {
+	status = "okay";
+};
+
 &dpi_out {
 	remote-endpoint = <&panel_in_dpi>;
 };

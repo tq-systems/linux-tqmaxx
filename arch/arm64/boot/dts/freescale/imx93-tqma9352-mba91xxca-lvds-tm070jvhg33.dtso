@@ -17,6 +17,10 @@
 	status = "okay";
 };
 
+&display_subsystem {
+	status = "okay";
+};
+
 &dpi_out {
 	remote-endpoint = <&lvds_encoder_input>;
 };

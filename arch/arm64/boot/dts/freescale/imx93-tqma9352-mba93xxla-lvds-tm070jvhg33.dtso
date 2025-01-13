@@ -17,6 +17,10 @@
 	status = "okay";
 };
 
+&display_subsystem {
+	status = "okay";
+};
+
 &dphy {
 	status = "disabled";
 };
