@@ -32,17 +32,6 @@
 	status = "okay";
 };
 
-&panel_in_dpi {
-	remote-endpoint = <&dpi_out>;
-};
-
-&parallel_disp_fmt {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_rgbdisp>;
-	fsl,interface-pix-fmt = "rgb666";
-	status = "okay";
-};
-
 &lpi2c3 {
 	polytouch: touchscreen@38 {
 		compatible = "edt,edt-ft5406";
@@ -58,4 +47,15 @@
 		touchscreen-size-x = <800>;
 		touchscreen-size-y = <480>;
 	};
+};
+
+&panel_in_dpi {
+	remote-endpoint = <&dpi_out>;
+};
+
+&parallel_disp_fmt {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_rgbdisp>;
+	fsl,interface-pix-fmt = "rgb666";
+	status = "okay";
 };
