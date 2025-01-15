@@ -53,7 +53,7 @@
 		status = "disabled";
 
 		port {
-			panel_in_dpi: endpoint {
+			panel_in: endpoint {
 			};
 		};
 	};

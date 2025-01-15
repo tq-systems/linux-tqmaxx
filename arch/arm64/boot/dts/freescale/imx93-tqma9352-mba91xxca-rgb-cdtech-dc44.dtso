@@ -25,7 +25,7 @@
 };
 
 &dpi_out {
-	remote-endpoint = <&panel_in_dpi>;
+	remote-endpoint = <&panel_in>;
 };
 
 &epxp {
@@ -53,7 +53,7 @@
 	};
 };
 
-&panel_in_dpi {
+&panel_in {
 	remote-endpoint = <&dpi_out>;
 };
 

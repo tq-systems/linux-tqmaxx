@@ -42,10 +42,10 @@
 };
 
 &lvds_encoder_output {
-	remote-endpoint = <&panel_in_dpi>;
+	remote-endpoint = <&panel_in>;
 };
 
-&panel_in_dpi {
+&panel_in {
 	remote-endpoint = <&lvds_encoder_output>;
 };
 
