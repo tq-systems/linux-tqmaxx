@@ -1273,11 +1273,6 @@
 					clocks = <&clk IMX93_CLK_ISI_GATE>,
 						 <&clk IMX93_CLK_MEDIA_AXI>;
 					clock-names = "per", "axi";
-					assigned-clocks = <&clk IMX93_CLK_MEDIA_AXI>,
-							  <&clk IMX93_CLK_MEDIA_APB>;
-					assigned-clock-parents = <&clk IMX93_CLK_SYS_PLL_PFD1>,
-								 <&clk IMX93_CLK_SYS_PLL_PFD1_DIV2>;
-					assigned-clock-rates = <400000000>, <133333333>;
 					interface = <2 0 2>;
 					no-reset-control;
 					power-domains = <&media_blk_ctrl IMX93_MEDIABLK_PD_ISI>;
@@ -1435,6 +1430,11 @@
 				 <&clk IMX93_CLK_MIPI_DSI_GATE>;
 			clock-names = "apb", "axi", "nic", "disp", "cam",
 				      "pxp", "lcdif", "isi", "csi", "dsi";
+			assigned-clocks = <&clk IMX93_CLK_MEDIA_AXI>,
+					  <&clk IMX93_CLK_MEDIA_APB>;
+			assigned-clock-parents = <&clk IMX93_CLK_SYS_PLL_PFD1>,
+						 <&clk IMX93_CLK_SYS_PLL_PFD1_DIV2>;
+			assigned-clock-rates = <400000000>, <133333333>;
 			#power-domain-cells = <1>;
 
 			dphy: dphy {
@@ -1500,11 +1500,9 @@
 				 <&clk IMX93_CLK_MIPI_DSI_GATE>,
 				 <&clk IMX93_CLK_MEDIA_DISP_PIX>;
 			clock-names = "byte", "pclk", "pixel";
-			assigned-clocks = <&clk IMX93_CLK_MIPI_TEST_BYTE>,
-					  <&clk IMX93_CLK_MEDIA_APB>;
-			assigned-clock-parents = <&clk IMX93_CLK_SYS_PLL_PFD0>,
-						 <&clk IMX93_CLK_SYS_PLL_PFD1_DIV2>;
-			assigned-clock-rates = <20000000>, <133333333>;
+			assigned-clocks = <&clk IMX93_CLK_MIPI_TEST_BYTE>;
+			assigned-clock-parents = <&clk IMX93_CLK_SYS_PLL_PFD0>;
+			assigned-clock-rates = <20000000>;
 			phys = <&dphy>;
 			phy-names = "dphy";
 			power-domains = <&media_blk_ctrl IMX93_MEDIABLK_PD_MIPI_DSI>;
@@ -1540,13 +1538,9 @@
 				 <&clk IMX93_CLK_LCDIF_GATE>;
 			clock-names = "pix", "disp-axi", "disp-apb";
 			assigned-clocks = <&clk IMX93_CLK_VIDEO_PLL>,
-					  <&clk IMX93_CLK_MEDIA_DISP_PIX>,
-					  <&clk IMX93_CLK_MEDIA_AXI>,
-					  <&clk IMX93_CLK_MEDIA_APB>;
+					  <&clk IMX93_CLK_MEDIA_DISP_PIX>;
 			assigned-clock-parents = <&clk IMX93_CLK_24M>,
-						 <&clk IMX93_CLK_VIDEO_PLL>,
-						 <&clk IMX93_CLK_SYS_PLL_PFD1>,
-						 <&clk IMX93_CLK_SYS_PLL_PFD1_DIV2>;
+						 <&clk IMX93_CLK_VIDEO_PLL>;
 			power-domains = <&media_blk_ctrl IMX93_MEDIABLK_PD_LCDIF>;
 			status = "disabled";
 
