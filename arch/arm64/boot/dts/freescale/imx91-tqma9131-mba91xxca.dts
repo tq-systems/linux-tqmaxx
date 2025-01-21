@@ -584,6 +584,8 @@
 	adp-disable;
 	usb-role-switch;
 	disable-over-current;
+	samsung,picophy-pre-emp-curr-control = <3>;
+	samsung,picophy-dc-vol-level-adjust = <7>;
 	status = "okay";
 
 	port {
@@ -598,6 +600,8 @@
 	#address-cells = <1>;
 	#size-cells = <0>;
 	disable-over-current;
+	samsung,picophy-pre-emp-curr-control = <3>;
+	samsung,picophy-dc-vol-level-adjust = <7>;
 	status = "okay";
 
 	hub_2_0: hub@1 {
