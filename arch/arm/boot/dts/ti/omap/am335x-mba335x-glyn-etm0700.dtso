@@ -1,0 +1,78 @@
+// SPDX-License-Identifier: GPL-2.0-only
+/*
+ * Copyright (c) 2021-2025 TQ-Systems GmbH <linux@ew.tq-group.com>, D-82229 Seefeld, Germany.
+ * Author: Matthias Schiffer
+ *
+ * Based on:
+ * Copyright (C) 2012 Texas Instruments Incorporated - http://www.ti.com/
+ */
+
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/interrupt-controller/irq.h>
+#include <dt-bindings/pwm/pwm.h>
+
+&{/} {
+	panel {
+		compatible = "edt,etm0700g0edh6";
+		backlight = <&backlight>;
+		enable-gpios = <&expander1 1 GPIO_ACTIVE_HIGH>;
+
+		port {
+			panel_in: endpoint {
+				remote-endpoint = <&lcdc_out>;
+			};
+		};
+	};
+};
+
+&backlight {
+	pwms = <&ecap2 0 50000 PWM_POLARITY_INVERTED>;
+	status = "okay";
+};
+
+/*
+ * See also:
+ * https://source.denx.de/u-boot/u-boot/-/commit/8c17cbdf8a8023abdd0009af4dc9dbc0541b4a0f
+ */
+&emif {
+	ti,pr-count-cos1 = <0x14>;
+	ti,pr-count-cos2 = <0x14>;
+	ti,pr-count-old = <0x14>;
+};
+
+&epwmss2 {
+	status = "okay";
+};
+
+&ecap2 {
+	status = "okay";
+};
+
+&i2c1 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	polytouch: touch@38 {
+		compatible = "edt,edt-ft5406", "edt,edt-ft5x06";
+		reg = <0x38>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&polytouch_pins>;
+		gain = <20>;
+		interrupt-parent = <&gpio2>;
+		interrupts = <1 IRQ_TYPE_EDGE_FALLING>;
+		wake-gpios = <&expander1 0 0>;
+	};
+};
+
+&lcdc {
+	status = "okay";
+
+	port {
+		lcdc_out: endpoint {
+			remote-endpoint = <&panel_in>;
+		};
+	};
+};

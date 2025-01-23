@@ -82,6 +82,10 @@ dtb-$(CONFIG_ARCH_OMAP4) += \
 	omap4-var-stk-om44.dtb \
 	omap4-xyboard-mz609.dtb \
 	omap4-xyboard-mz617.dtb
+
+am335x-mba335x-dmb-ct44-dtbs := am335x-mba335x.dtb am335x-mba335x-dmb-ct44.dtbo
+am335x-mba335x-glyn-etm0700-dtbs := am335x-mba335x.dtb am335x-mba335x-glyn-etm0700.dtbo
+
 dtb-$(CONFIG_SOC_AM33XX) += \
 	am335x-baltos-ir2110.dtb \
 	am335x-baltos-ir3220.dtb \
@@ -100,6 +104,9 @@ dtb-$(CONFIG_SOC_AM33XX) += \
 	am335x-guardian.dtb \
 	am335x-icev2.dtb \
 	am335x-lxm.dtb \
+	am335x-mba335x.dtb \
+	am335x-mba335x-dmb-ct44.dtb \
+	am335x-mba335x-glyn-etm0700.dtb \
 	am335x-moxa-uc-2101.dtb \
 	am335x-moxa-uc-8100-me-t.dtb \
 	am335x-myirtech-myd.dtb \
