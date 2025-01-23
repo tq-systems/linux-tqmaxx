@@ -70,6 +70,22 @@ struct regulator *devm_regulator_get_exclusive(struct device *dev,
 }
 EXPORT_SYMBOL_GPL(devm_regulator_get_exclusive);
 
+/**
+ * devm_regulator_get_exclusive_optional - Resource managed regulator_get_exclusive_optional()
+ * @dev: device to supply
+ * @id:  supply name or regulator ID.
+ *
+ * Managed regulator_get_exclusive_optional(). Regulators returned from this
+ * function are automatically regulator_put() on driver detach. See
+ * regulator_get() for more information.
+ */
+struct regulator *devm_regulator_get_exclusive_optional(struct device *dev,
+					       const char *id)
+{
+	return _devm_regulator_get(dev, id, EXCLUSIVE_OPTIONAL_GET);
+}
+EXPORT_SYMBOL_GPL(devm_regulator_get_exclusive_optional);
+
 static void regulator_action_disable(void *d)
 {
 	struct regulator *r = (struct regulator *)d;

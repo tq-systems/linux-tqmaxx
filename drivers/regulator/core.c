@@ -2187,7 +2187,7 @@ struct regulator *_regulator_get_common(struct regulator_dev *rdev, struct devic
 		return regulator;
 	}
 
-	if (get_type == EXCLUSIVE_GET && rdev->open_count) {
+	if ((get_type == EXCLUSIVE_GET || get_type == EXCLUSIVE_OPTIONAL_GET) && rdev->open_count) {
 		regulator = ERR_PTR(-EBUSY);
 		put_device(&rdev->dev);
 		return regulator;
@@ -2227,7 +2227,7 @@ struct regulator *_regulator_get_common(struct regulator_dev *rdev, struct devic
 	}
 
 	rdev->open_count++;
-	if (get_type == EXCLUSIVE_GET) {
+	if (get_type == EXCLUSIVE_GET || get_type == EXCLUSIVE_OPTIONAL_GET) {
 		rdev->exclusive = 1;
 
 		ret = _regulator_is_enabled(rdev);
@@ -2345,6 +2345,35 @@ struct regulator *regulator_get_optional(struct device *dev, const char *id)
 	return _regulator_get(dev, id, OPTIONAL_GET);
 }
 EXPORT_SYMBOL_GPL(regulator_get_optional);
+
+/**
+ * regulator_get_exclusive_optional - obtain exclusive optional access to a regulator.
+ * @dev: device for regulator "consumer"
+ * @id: Supply name or regulator ID.
+ *
+ * Other consumers will be unable to obtain this regulator while this
+ * reference is held and the use count for the regulator will be
+ * initialised to reflect the current state of the regulator.
+ *
+ * This is intended for use by consumers which cannot tolerate shared
+ * use of the regulator such as those which need to force the
+ * regulator off for correct operation of the hardware they are
+ * controlling, while avoiding error messages in cases where a
+ * regulator may not actually exist.
+ *
+ * Use of supply names configured via set_consumer_device_supply() is
+ * strongly encouraged.  It is recommended that the supply name used
+ * should match the name used for the supply and/or the relevant
+ * device pins in the datasheet.
+ *
+ * Return: Pointer to a &struct regulator corresponding to the regulator
+ *	   producer, or an ERR_PTR() encoded negative error number.
+ */
+struct regulator *regulator_get_exclusive_optional(struct device *dev, const char *id)
+{
+	return _regulator_get(dev, id, EXCLUSIVE_OPTIONAL_GET);
+}
+EXPORT_SYMBOL_GPL(regulator_get_exclusive_optional);
 
 static void destroy_regulator(struct regulator *regulator)
 {
