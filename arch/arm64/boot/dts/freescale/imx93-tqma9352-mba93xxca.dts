@@ -330,9 +330,8 @@
 	#address-cells = <1>;
 	#size-cells = <0>;
 	clock-frequency = <400000>;
-	pinctrl-names = "default", "sleep";
+	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpi2c3>;
-	pinctrl-1 = <&pinctrl_lpi2c3>;
 	status = "okay";
 
 	temperature-sensor@1c {
@@ -487,16 +486,14 @@
 	#address-cells = <1>;
 	#size-cells = <0>;
 	clock-frequency = <400000>;
-	pinctrl-names = "default", "sleep";
+	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpi2c5>;
-	pinctrl-1 = <&pinctrl_lpi2c5>;
 	status = "okay";
 };
 
 &lpspi6 {
-	pinctrl-names = "default", "sleep";
+	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpspi6>;
-	pinctrl-1 = <&pinctrl_lpspi6>;
 	status = "okay";
 };
 
