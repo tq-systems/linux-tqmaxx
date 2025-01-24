@@ -285,20 +285,6 @@
 		/* 20 */ "", "", "", "",
 		/* 24 */ "", "", "", "",
 		/* 28 */ "", "", "", "";
-
-	expander-irq-hog {
-		gpio-hog;
-		gpios = <12 GPIO_ACTIVE_LOW>;
-		input;
-		line-name = "PEX_INT#";
-	};
-
-	tcpc-irq-hog {
-		gpio-hog;
-		gpios = <2 GPIO_ACTIVE_LOW>;
-		input;
-		line-name = "USB_C_ALERT#";
-	};
 };
 
 &gpio2 {
