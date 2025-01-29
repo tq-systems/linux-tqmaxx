@@ -10,6 +10,7 @@
 #include <linux/module.h>
 #include <linux/of.h>
 #include <linux/phy.h>
+#include <linux/property.h>
 #include <linux/delay.h>
 #include <linux/netdevice.h>
 #include <linux/etherdevice.h>
@@ -734,6 +735,7 @@ static int dp83867_probe(struct phy_device *phydev)
 static int dp83867_config_init(struct phy_device *phydev)
 {
 	struct dp83867_private *dp83867 = phydev->priv;
+	struct device *dev = &phydev->mdio.dev;
 	int ret, val, bs;
 
 	/* Force speed optimization for the PHY even if it strapped */
@@ -879,7 +881,7 @@ static int dp83867_config_init(struct phy_device *phydev)
 
 	val = phy_read(phydev, DP83867_CFG3);
 	/* Enable Interrupt output INT_OE in CFG3 register */
-	if (phy_interrupt_is_valid(phydev))
+	if (phy_interrupt_is_valid(phydev) || device_property_read_bool(dev, "ti,no-powerdown"))
 		val |= DP83867_CFG3_INT_OE;
 
 	val |= DP83867_CFG3_ROBUST_AUTO_MDIX;
