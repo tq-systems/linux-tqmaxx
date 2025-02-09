@@ -1,0 +1,61 @@
+# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/media/i2c/vision-components,mipi-module-controller.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Vision Components MIPI Camera Module Controller
+
+maintainers:
+  - Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+
+description: |-
+  The MIPI camera module controller is an FPGA-based, I2C-accessible system
+  controller found on MIPI camera modules from Vision Components. It abstracts
+  the camera sensor behind a unified register interface, and controls and
+  sequences the on-board power supplies and clocks.
+
+  The camera sensor abstraction is optional, the controller allows all sensor
+  registers to be directly written from the host. This binding models the clock
+  and power supply functions of the controller.
+
+properties:
+  compatible:
+    const: vision-components,mipi-module-controller
+
+  reg:
+    maxItems: 1
+
+  '#clock-cells':
+    const: 0
+
+  clock-frequency: true
+
+  vcc-supply:
+    description: Power supply (3.3V)
+
+required:
+  - compatible
+  - reg
+  - '#clock-cells'
+  - clock-frequency
+  - vcc-supply
+
+unevaluatedProperties: false
+
+examples:
+  - |
+    i2c {
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        vc_ctrl: controller@10 {
+            compatible = "vision-components,mipi-module-controller";
+            reg = <0x10>;
+            #clock-cells = <0>;
+            clock-frequency = <37125000>;
+            vcc-supply = <&cam_3v3>;
+        };
+    };
+...
+
