@@ -151,15 +151,6 @@ static int shared_count_pdm;
 		reg, width, shift, shcount				\
 	}
 
-#define CLK_GATE_PARENT(gname, cname, pname)						\
-	{								\
-		gname"_cg",						\
-		IMX8MP_CLK_AUDIOMIX_##cname,				\
-		{ .fw_name = pname, .name = pname }, NULL, 1,		\
-		CLKEN0 + 4 * !!(AUDIOMIX_##cname / 32),	\
-		1, AUDIOMIX_##cname % 32			\
-	}
-
 #define CLK_SAIn(n)							\
 	{								\
 		"sai"__stringify(n)"_mclk1_sel",			\
