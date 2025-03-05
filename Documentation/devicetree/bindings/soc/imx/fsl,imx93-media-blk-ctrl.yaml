@@ -92,6 +92,14 @@ properties:
       - compatible
       - ports
 
+  ldb-bridge:
+    type: object
+    additionalProperties: true
+    properties:
+      compatible:
+        contains:
+          const: fsl,imx93-ldb
+
 allOf:
   - if:
       properties:
@@ -133,6 +141,7 @@ allOf:
             - const: isi
             - const: csi
             - const: dsi
+
 required:
   - compatible
   - reg
@@ -186,6 +195,33 @@ examples:
             pdfc_to_panel: endpoint {
               remote-endpoint = <&panel_from_pdfc>;
               bus-width = <18>;
+            };
+          };
+        };
+      };
+
+      ldb-bridge {
+        compatible = "fsl,imx93-ldb";
+        clocks = <&clk IMX93_CLK_LVDS_GATE>;
+        clock-names = "ldb";
+
+        ports {
+          #address-cells = <1>;
+          #size-cells = <0>;
+
+          port@0 {
+            reg = <0>;
+
+            ldb_from_lcdif: endpoint {
+                remote-endpoint = <&lcdif_to_ldb>;
+            };
+          };
+
+          port@1 {
+            reg = <1>;
+
+            ldb_lvds: endpoint {
+                remote-endpoint = <&ldb_to_panel>;
             };
           };
         };
