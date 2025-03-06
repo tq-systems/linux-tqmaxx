@@ -218,6 +218,8 @@ struct edma_chan {
 	struct edma_cc			*ecc;
 	struct edma_tc			*tc;
 	int				ch_num;
+	bool				device_channel;
+	bool				memcpy_channel;
 	bool				alloced;
 	bool				hw_triggered;
 	int				slot[EDMA_MAX_SLOTS];
@@ -258,7 +260,6 @@ struct edma_cc {
 	unsigned long *channels_mask;
 
 	struct dma_device		dma_slave;
-	struct dma_device		*dma_memcpy;
 	struct edma_chan		*slave_chans;
 	struct edma_tc			*tc_list;
 	int				dummy_slot;
@@ -1913,6 +1914,16 @@ static bool edma_is_memcpy_channel(int ch_num, s32 *memcpy_channels)
 	return false;
 }
 
+static void edma_device_caps(struct dma_chan *chan, struct dma_slave_caps *caps)
+{
+	struct edma_chan *echan = to_edma_chan(chan);
+
+	if (!echan->device_channel)
+		caps->directions &= ~(BIT(DMA_DEV_TO_MEM) | BIT(DMA_MEM_TO_DEV));
+	if (!echan->memcpy_channel)
+		caps->directions &= ~BIT(DMA_MEM_TO_MEM);
+}
+
 #define EDMA_DMA_BUSWIDTHS	(BIT(DMA_SLAVE_BUSWIDTH_1_BYTE) | \
 				 BIT(DMA_SLAVE_BUSWIDTH_2_BYTES) | \
 				 BIT(DMA_SLAVE_BUSWIDTH_3_BYTES) | \
@@ -1921,28 +1932,22 @@ static bool edma_is_memcpy_channel(int ch_num, s32 *memcpy_channels)
 static void edma_dma_init(struct edma_cc *ecc, bool legacy_mode)
 {
 	struct dma_device *s_ddev = &ecc->dma_slave;
-	struct dma_device *m_ddev = NULL;
 	s32 *memcpy_channels = ecc->info->memcpy_channels;
 	int i, j;
 
 	dma_cap_zero(s_ddev->cap_mask);
 	dma_cap_set(DMA_SLAVE, s_ddev->cap_mask);
 	dma_cap_set(DMA_CYCLIC, s_ddev->cap_mask);
-	if (ecc->legacy_mode && !memcpy_channels) {
-		dev_warn(ecc->dev,
-			 "Legacy memcpy is enabled, things might not work\n");
-
-		dma_cap_set(DMA_MEMCPY, s_ddev->cap_mask);
-		dma_cap_set(DMA_INTERLEAVE, s_ddev->cap_mask);
-		s_ddev->device_prep_dma_memcpy = edma_prep_dma_memcpy;
-		s_ddev->device_prep_interleaved_dma = edma_prep_dma_interleaved;
-		s_ddev->directions = BIT(DMA_MEM_TO_MEM);
-	}
+	dma_cap_set(DMA_MEMCPY, s_ddev->cap_mask);
+	dma_cap_set(DMA_INTERLEAVE, s_ddev->cap_mask);
 
 	s_ddev->device_prep_slave_sg = edma_prep_slave_sg;
 	s_ddev->device_prep_dma_cyclic = edma_prep_dma_cyclic;
+	s_ddev->device_prep_dma_memcpy = edma_prep_dma_memcpy;
+	s_ddev->device_prep_interleaved_dma = edma_prep_dma_interleaved;
 	s_ddev->device_alloc_chan_resources = edma_alloc_chan_resources;
 	s_ddev->device_free_chan_resources = edma_free_chan_resources;
+	s_ddev->device_caps = edma_device_caps;
 	s_ddev->device_issue_pending = edma_issue_pending;
 	s_ddev->device_tx_status = edma_tx_status;
 	s_ddev->device_config = edma_slave_config;
@@ -1953,60 +1958,37 @@ static void edma_dma_init(struct edma_cc *ecc, bool legacy_mode)
 
 	s_ddev->src_addr_widths = EDMA_DMA_BUSWIDTHS;
 	s_ddev->dst_addr_widths = EDMA_DMA_BUSWIDTHS;
-	s_ddev->directions |= (BIT(DMA_DEV_TO_MEM) | BIT(DMA_MEM_TO_DEV));
+	s_ddev->directions = BIT(DMA_DEV_TO_MEM) | BIT(DMA_MEM_TO_DEV) | BIT(DMA_MEM_TO_MEM);
 	s_ddev->residue_granularity = DMA_RESIDUE_GRANULARITY_BURST;
 	s_ddev->max_burst = SZ_32K - 1; /* CIDX: 16bit signed */
 
 	s_ddev->dev = ecc->dev;
 	INIT_LIST_HEAD(&s_ddev->channels);
 
-	if (memcpy_channels) {
-		m_ddev = devm_kzalloc(ecc->dev, sizeof(*m_ddev), GFP_KERNEL);
-		if (!m_ddev) {
-			dev_warn(ecc->dev, "memcpy is disabled due to OoM\n");
-			memcpy_channels = NULL;
-			goto ch_setup;
-		}
-		ecc->dma_memcpy = m_ddev;
-
-		dma_cap_zero(m_ddev->cap_mask);
-		dma_cap_set(DMA_MEMCPY, m_ddev->cap_mask);
-		dma_cap_set(DMA_INTERLEAVE, m_ddev->cap_mask);
-
-		m_ddev->device_prep_dma_memcpy = edma_prep_dma_memcpy;
-		m_ddev->device_prep_interleaved_dma = edma_prep_dma_interleaved;
-		m_ddev->device_alloc_chan_resources = edma_alloc_chan_resources;
-		m_ddev->device_free_chan_resources = edma_free_chan_resources;
-		m_ddev->device_issue_pending = edma_issue_pending;
-		m_ddev->device_tx_status = edma_tx_status;
-		m_ddev->device_config = edma_slave_config;
-		m_ddev->device_pause = edma_dma_pause;
-		m_ddev->device_resume = edma_dma_resume;
-		m_ddev->device_terminate_all = edma_terminate_all;
-		m_ddev->device_synchronize = edma_synchronize;
-
-		m_ddev->src_addr_widths = EDMA_DMA_BUSWIDTHS;
-		m_ddev->dst_addr_widths = EDMA_DMA_BUSWIDTHS;
-		m_ddev->directions = BIT(DMA_MEM_TO_MEM);
-		m_ddev->residue_granularity = DMA_RESIDUE_GRANULARITY_BURST;
-
-		m_ddev->dev = ecc->dev;
-		INIT_LIST_HEAD(&m_ddev->channels);
-	} else if (!ecc->legacy_mode) {
-		dev_info(ecc->dev, "memcpy is disabled\n");
+	if (!memcpy_channels) {
+		if (ecc->legacy_mode)
+			dev_warn(ecc->dev,
+				 "Legacy memcpy is enabled, things might not work\n");
+		else
+			dev_info(ecc->dev, "memcpy is disabled\n");
 	}
 
-ch_setup:
 	for (i = 0; i < ecc->num_channels; i++) {
 		struct edma_chan *echan = &ecc->slave_chans[i];
 		echan->ch_num = EDMA_CTLR_CHAN(ecc->id, i);
 		echan->ecc = ecc;
 		echan->vchan.desc_free = edma_desc_free;
 
-		if (m_ddev && edma_is_memcpy_channel(i, memcpy_channels))
-			vchan_init(&echan->vchan, m_ddev);
-		else
-			vchan_init(&echan->vchan, s_ddev);
+		if (ecc->legacy_mode && !memcpy_channels) {
+			echan->memcpy_channel = true;
+			echan->device_channel = true;
+		} else if (edma_is_memcpy_channel(i, memcpy_channels)) {
+			echan->memcpy_channel = true;
+		} else {
+			echan->device_channel = true;
+		}
+
+		vchan_init(&echan->vchan, s_ddev);
 
 		INIT_LIST_HEAD(&echan->node);
 		for (j = 0; j < EDMA_MAX_SLOTS; j++)
@@ -2523,16 +2505,6 @@ static int edma_probe(struct platform_device *pdev)
 		goto err_reg1;
 	}
 
-	if (ecc->dma_memcpy) {
-		ret = dma_async_device_register(ecc->dma_memcpy);
-		if (ret) {
-			dev_err(dev, "memcpy ddev registration failed (%d)\n",
-				ret);
-			dma_async_device_unregister(&ecc->dma_slave);
-			goto err_reg1;
-		}
-	}
-
 	if (node)
 		of_dma_controller_register(node, of_edma_xlate, ecc);
 
@@ -2572,8 +2544,6 @@ static void edma_remove(struct platform_device *pdev)
 	if (dev->of_node)
 		of_dma_controller_free(dev->of_node);
 	dma_async_device_unregister(&ecc->dma_slave);
-	if (ecc->dma_memcpy)
-		dma_async_device_unregister(ecc->dma_memcpy);
 	edma_free_slot(ecc, ecc->dummy_slot);
 	pm_runtime_put_sync(dev);
 	pm_runtime_disable(dev);
