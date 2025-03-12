@@ -35,7 +35,7 @@
 #define MAX_12BIT		((1 << 12) - 1)
 #define COORDINATE_READOUTS_MAX	7
 
-#define TSC_IRQENB_MASK		(IRQENB_FIFO0THRES | IRQENB_EOS | IRQENB_HW_PEN)
+#define TSC_IRQENB_MASK		(IRQENB_FIFO0THRES | IRQENB_EOS | IRQENB_HW_PEN | IRQENB_PENUP)
 
 static const int config_pins[] = {
 	STEPCONFIG_XPP,
@@ -453,8 +453,7 @@ static int titsc_probe(struct platform_device *pdev)
 		dev_err(&pdev->dev, "irq wake enable failed.\n");
 
 	titsc_writel(ts_dev, REG_IRQSTATUS, TSC_IRQENB_MASK);
-	titsc_writel(ts_dev, REG_IRQENABLE, IRQENB_FIFO0THRES);
-	titsc_writel(ts_dev, REG_IRQENABLE, IRQENB_EOS);
+	titsc_writel(ts_dev, REG_IRQENABLE, IRQENB_FIFO0THRES | IRQENB_EOS | IRQENB_PENUP);
 	err = titsc_config_wires(ts_dev);
 	if (err) {
 		dev_err(&pdev->dev, "wrong i/p wire configuration\n");
