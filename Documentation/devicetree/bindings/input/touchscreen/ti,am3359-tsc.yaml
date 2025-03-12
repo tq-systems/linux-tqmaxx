@@ -31,7 +31,7 @@ properties:
       available. The remaining 4 can be used by the ADC.
     $ref: /schemas/types.yaml#/definitions/uint32
     minimum: 1
-    maximum: 6
+    maximum: 7
 
   ti,wire-config:
     description: Different boards could have a different order for connecting
