@@ -33,6 +33,7 @@
 #define ADCFSM_STEPID		0x10
 #define SEQ_SETTLE		275
 #define MAX_12BIT		((1 << 12) - 1)
+#define COORDINATE_READOUTS_MAX	7
 
 #define TSC_IRQENB_MASK		(IRQENB_FIFO0THRES | IRQENB_EOS | IRQENB_HW_PEN)
 
@@ -223,7 +224,7 @@ static int titsc_cmp_coord(const void *a, const void *b)
 static void titsc_read_coordinates(struct titsc *ts_dev,
 		u32 *x, u32 *y, u32 *z1, u32 *z2)
 {
-	unsigned int yvals[7], xvals[7];
+	unsigned int yvals[COORDINATE_READOUTS_MAX], xvals[COORDINATE_READOUTS_MAX];
 	unsigned int i, xsum = 0, ysum = 0;
 	unsigned int creads = ts_dev->coordinate_readouts;
 
@@ -385,7 +386,8 @@ static int titsc_parse_dt(struct platform_device *pdev,
 	if (err < 0)
 		return err;
 
-	if (ts_dev->coordinate_readouts <= 0) {
+	if (ts_dev->coordinate_readouts <= 0 ||
+	    ts_dev->coordinate_readouts > COORDINATE_READOUTS_MAX) {
 		dev_warn(&pdev->dev,
 			 "invalid co-ordinate readouts, resetting it to 5\n");
 		ts_dev->coordinate_readouts = 5;
