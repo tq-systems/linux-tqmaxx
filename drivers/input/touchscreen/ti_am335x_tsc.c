@@ -277,28 +277,25 @@ static irqreturn_t titsc_irq(int irq, void *dev)
 {
 	struct titsc *ts_dev = dev;
 	struct input_dev *input_dev = ts_dev->input;
-	unsigned int fsm, status, irqclr = 0;
+	unsigned int status, irqclr = 0;
 	unsigned int x = 0, y = 0;
 	unsigned int z1, z2, z;
 
 	status = titsc_readl(ts_dev, REG_RAWIRQSTATUS);
 	if (status & IRQENB_HW_PEN) {
-		ts_dev->pen_down = true;
+		if (!(status & IRQENB_PENUP)) {
+			ts_dev->pen_down = true;
+			pm_stay_awake(ts_dev->dev);
+		}
 		irqclr |= IRQENB_HW_PEN;
-		pm_stay_awake(ts_dev->dev);
 	}
 
 	if (status & IRQENB_PENUP) {
-		fsm = titsc_readl(ts_dev, REG_ADCFSM);
-		if (fsm == ADCFSM_STEPID) {
-			ts_dev->pen_down = false;
-			input_report_key(input_dev, BTN_TOUCH, 0);
-			input_report_abs(input_dev, ABS_PRESSURE, 0);
-			input_sync(input_dev);
-			pm_relax(ts_dev->dev);
-		} else {
-			ts_dev->pen_down = true;
-		}
+		ts_dev->pen_down = false;
+		input_report_key(input_dev, BTN_TOUCH, 0);
+		input_report_abs(input_dev, ABS_PRESSURE, 0);
+		input_sync(input_dev);
+		pm_relax(ts_dev->dev);
 		irqclr |= IRQENB_PENUP;
 	}
 
