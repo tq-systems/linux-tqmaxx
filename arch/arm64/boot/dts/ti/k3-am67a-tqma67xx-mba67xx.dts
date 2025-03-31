@@ -591,8 +591,11 @@
 	reset-gpios = <&gpio_exp1 10 GPIO_ACTIVE_HIGH>;
 	phys = <&serdes1_link>;
 	phy-names = "pcie-phy";
+	vpcie1v5-supply = <&reg_1v5>;
+	vpcie3v3-supply = <&reg_3v3_mpcie>;
 	status = "okay";
 
+#if 0
 	pcie@0,0 {
 		reg = <0 0 0 0 0>;
 		compatible = "pciclass,0604";
@@ -603,6 +606,7 @@
 		vpcie1v5-supply = <&reg_1v5>;
 		vpcie3v3-supply = <&reg_3v3_mpcie>;
 	};
+#endif
 };
 
 &main_uart0 {

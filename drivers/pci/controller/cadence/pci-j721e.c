@@ -564,6 +564,22 @@ static int j721e_pcie_probe(struct platform_device *pdev)
 		}
 		pcie->reset_gpio = gpiod;
 
+		ret = devm_regulator_get_enable_optional(dev, "vpcie12v");
+		if (ret && ret != -ENODEV) {
+			dev_err_probe(dev, ret, "Failed to get vpcie12v regulator\n");
+			goto err_get_sync;
+		}
+		ret = devm_regulator_get_enable_optional(dev, "vpcie3v3");
+		if (ret && ret != -ENODEV) {
+			dev_err_probe(dev, ret, "Failed to get vpcie3v3 regulator\n");
+			goto err_get_sync;
+		}
+		ret = devm_regulator_get_enable_optional(dev, "vpcie1v5");
+		if (ret && ret != -ENODEV) {
+			dev_err_probe(dev, ret, "Failed to get vpcie1v5 regulator\n");
+			goto err_get_sync;
+		}
+
 		ret = cdns_pcie_init_phy(dev, cdns_pcie);
 		if (ret) {
 			dev_err_probe(dev, ret, "Failed to init phy\n");
