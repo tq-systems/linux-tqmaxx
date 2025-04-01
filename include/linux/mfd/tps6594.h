@@ -18,8 +18,23 @@ enum pmic_id {
 	TPS6594,
 	TPS6593,
 	LP8764,
+	TPS652G2,
+	TPS652G4,
+	TPS65222,
 	TPS65224,
 };
+
+static inline bool pmic_is_tps652xx(enum pmic_id id) {
+	switch (id) {
+	case TPS652G2:
+	case TPS652G4:
+	case TPS65222:
+	case TPS65224:
+		return true;
+	default:
+		return false;
+	}
+}
 
 /* Macro to get page index from register address */
 #define TPS6594_REG_TO_PAGE(reg)	((reg) >> 8)
