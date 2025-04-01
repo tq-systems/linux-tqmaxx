@@ -579,7 +579,7 @@ static int tps6594_regulator_probe(struct platform_device *pdev)
 	const struct regulator_desc *ldo_regs;
 	size_t interrupt_count;
 
-	if (tps->chip_id == TPS65224) {
+	if (pmic_is_tps652xx(tps->chip_id)) {
 		bucks_irq_types = tps65224_bucks_irq_types;
 		interrupt_count = ARRAY_SIZE(tps65224_buck1_irq_types);
 		multi_regs = tps65224_multi_regs;
@@ -653,7 +653,7 @@ static int tps6594_regulator_probe(struct platform_device *pdev)
 		}
 	}
 
-	if (tps->chip_id == TPS65224) {
+	if (pmic_is_tps652xx(tps->chip_id)) {
 		nr_buck = ARRAY_SIZE(tps65224_buck_regs);
 		nr_ldo = ARRAY_SIZE(tps65224_ldo_regs);
 		nr_types = TPS65224_REGS_INT_NB;
@@ -718,7 +718,7 @@ static int tps6594_regulator_probe(struct platform_device *pdev)
 		if (buck_configured[i])
 			continue;
 
-		const struct regulator_desc *buck_cfg = (tps->chip_id == TPS65224) ?
+		const struct regulator_desc *buck_cfg = pmic_is_tps652xx(tps->chip_id) ?
 							 tps65224_buck_regs : buck_regs;
 
 		rdev = devm_regulator_register(&pdev->dev, &buck_cfg[i], &config);
@@ -749,7 +749,7 @@ static int tps6594_regulator_probe(struct platform_device *pdev)
 		}
 	}
 
-	if (tps->chip_id == TPS65224) {
+	if (pmic_is_tps652xx(tps->chip_id)) {
 		irq_types = tps65224_ext_regulator_irq_types;
 		irq_count = ARRAY_SIZE(tps65224_ext_regulator_irq_types);
 	} else {
