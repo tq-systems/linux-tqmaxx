@@ -335,6 +335,12 @@ static const struct resource tps65224_adc_resources[] = {
 	DEFINE_RES_IRQ_NAMED(TPS65224_IRQ_ADC_CONV_READY, TPS65224_IRQ_NAME_ADC_CONV_READY),
 };
 
+static const struct mfd_cell tps65222_common_cells[] = {
+	MFD_CELL_RES("tps6594-pfsm", tps65224_pfsm_resources),
+	MFD_CELL_RES("tps6594-pinctrl", tps65224_pinctrl_resources),
+	MFD_CELL_RES("tps6594-regulator", tps65224_regulator_resources),
+};
+
 static const struct mfd_cell tps65224_common_cells[] = {
 	MFD_CELL_RES("tps65224-adc", tps65224_adc_resources),
 	MFD_CELL_RES("tps6594-pfsm", tps65224_pfsm_resources),
@@ -443,7 +449,7 @@ static int tps6594_handle_post_irq(void *irq_drv_data)
 	 * a new interrupt.
 	 */
 	if (tps->use_crc) {
-		if (tps->chip_id == TPS65224) {
+		if (pmic_is_tps652xx(tps->chip_id)) {
 			regmap_reg = TPS6594_REG_INT_FSM_ERR;
 			mask_val = TPS6594_BIT_COMM_ERR_INT;
 		} else {
@@ -507,7 +513,7 @@ static int tps6594_check_crc_mode(struct tps6594 *tps, bool primary_pmic)
 	int ret;
 	unsigned int regmap_reg, mask_val;
 
-	if (tps->chip_id == TPS65224) {
+	if (pmic_is_tps652xx(tps->chip_id)) {
 		regmap_reg = TPS6594_REG_CONFIG_2;
 		mask_val = TPS65224_BIT_I2C1_SPI_CRC_EN;
 	} else {
@@ -537,7 +543,7 @@ static int tps6594_set_crc_feature(struct tps6594 *tps)
 	int ret;
 	unsigned int regmap_reg, mask_val;
 
-	if (tps->chip_id == TPS65224) {
+	if (pmic_is_tps652xx(tps->chip_id)) {
 		regmap_reg = TPS6594_REG_CONFIG_2;
 		mask_val = TPS65224_BIT_I2C1_SPI_CRC_EN;
 	} else {
@@ -624,11 +630,20 @@ int tps6594_device_init(struct tps6594 *tps, bool enable_crc)
 	if (ret)
 		return dev_err_probe(dev, ret, "Failed to set PMIC state\n");
 
-	if (tps->chip_id == TPS65224) {
+	switch (tps->chip_id) {
+	case TPS652G2:
+	case TPS65222:
+		irq_chip = &tps65224_irq_chip;
+		n_cells = ARRAY_SIZE(tps65222_common_cells);
+		cells = tps65222_common_cells;
+		break;
+	case TPS652G4:
+	case TPS65224:
 		irq_chip = &tps65224_irq_chip;
 		n_cells = ARRAY_SIZE(tps65224_common_cells);
 		cells = tps65224_common_cells;
-	} else {
+		break;
+	default:
 		irq_chip = &tps6594_irq_chip;
 		n_cells = ARRAY_SIZE(tps6594_common_cells);
 		cells = tps6594_common_cells;
@@ -651,8 +666,8 @@ int tps6594_device_init(struct tps6594 *tps, bool enable_crc)
 	if (ret)
 		return dev_err_probe(dev, ret, "Failed to add common child devices\n");
 
-	/* No RTC for LP8764 and TPS65224 */
-	if (tps->chip_id != LP8764 && tps->chip_id != TPS65224) {
+	/* No RTC for LP8764 and TPS652xx */
+	if (tps->chip_id != LP8764 && !pmic_is_tps652xx(tps->chip_id)) {
 		ret = devm_mfd_add_devices(dev, PLATFORM_DEVID_AUTO, tps6594_rtc_cells,
 					   ARRAY_SIZE(tps6594_rtc_cells), NULL, 0,
 					   regmap_irq_get_domain(tps->irq_data));

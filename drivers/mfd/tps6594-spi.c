@@ -81,6 +81,9 @@ static const struct of_device_id tps6594_spi_of_match_table[] = {
 	{ .compatible = "ti,tps6594-q1", .data = (void *)TPS6594, },
 	{ .compatible = "ti,tps6593-q1", .data = (void *)TPS6593, },
 	{ .compatible = "ti,lp8764-q1",  .data = (void *)LP8764,  },
+	{ .compatible = "ti,tps652g2",   .data = (void *)TPS652G2, },
+	{ .compatible = "ti,tps652g4",   .data = (void *)TPS652G4, },
+	{ .compatible = "ti,tps65222-q1", .data = (void *)TPS65222, },
 	{ .compatible = "ti,tps65224-q1", .data = (void *)TPS65224, },
 	{}
 };
@@ -107,7 +110,7 @@ static int tps6594_spi_probe(struct spi_device *spi)
 		return dev_err_probe(dev, -EINVAL, "Failed to find matching chip ID\n");
 	tps->chip_id = (unsigned long)match->data;
 
-	if (tps->chip_id == TPS65224)
+	if (pmic_is_tps652xx(tps->chip_id))
 		tps6594_spi_regmap_config.volatile_table = &tps65224_volatile_table;
 
 	tps->regmap = devm_regmap_init(dev, NULL, spi, &tps6594_spi_regmap_config);
