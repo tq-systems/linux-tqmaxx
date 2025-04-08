@@ -10,6 +10,11 @@
 
 #include "imx6ul-tqma6ul2l.dtsi"
 
+/* we do not use SOM variants using gpio4 line 24 as IRQ line */
+&gpio4 {
+	/delete-node/ pmic-int-hog;
+};
+
 / {
 	model = "TQ Systems TQMa6UL2L SoM on MBa6ULxL board";
 	compatible = "tq,imx6ul-tqma6ul2l-mba6ulxl", "tq,imx6ul-tqma6ul2l", "fsl,imx6ul";
@@ -179,6 +184,21 @@
 	};
 };
 
+&gpio4 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_gpio4_x23>;
+
+	gpio-line-names =
+		/*  0 */ "", "", "", "",
+		/*  4 */ "", "", "", "",
+		/*  8 */ "", "", "", "",
+		/* 12 */ "", "", "", "",
+		/* 16 */ "", "", "", "",
+		/* 20 */ "", "X23_6", "X23_8", "X23_10",
+		/* 24 */ "X23_12", "X23_5", "X23_7", "X23_9",
+		/* 24 */ "X23_11", "", "", "";
+};
+
 &i2c2 {
 	clock-frequency = <100000>;
 	pinctrl-names = "default", "gpio";
@@ -310,9 +330,6 @@
 };
 
 &iomuxc {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_hog_mba6ulxl>;
-
 	pinctrl_analog_touch: analogtouchgrp {
 		fsl,pins = <
 			MX6UL_PAD_GPIO1_IO03__GPIO1_IO03	0x4001b020
@@ -371,16 +388,12 @@
 		>;
 	};
 
-	pinctrl_hog_mba6ulxl: hogmba6ulxlgrp {
+	pinctrl_gpio4_x23: gpio4x23grp {
 		fsl,pins = <
 			MX6UL_PAD_CSI_DATA00__GPIO4_IO21	0x4001b020
 			MX6UL_PAD_CSI_DATA01__GPIO4_IO22	0x4001b020
 			MX6UL_PAD_CSI_DATA02__GPIO4_IO23	0x4001b020
-			/*
-			 * GPIO4_IO24 is connected to PMIC IRQ by default
-			 * Already claimed in imx6ul-tqma6ul-common.dtsi
-			 */
-			/* MX6UL_PAD_CSI_DATA03__GPIO4_IO24	0x4001b020 */
+			MX6UL_PAD_CSI_DATA03__GPIO4_IO24	0x4001b020
 			MX6UL_PAD_CSI_DATA04__GPIO4_IO25	0x4001b020
 			MX6UL_PAD_CSI_DATA05__GPIO4_IO26	0x4001b020
 			MX6UL_PAD_CSI_DATA06__GPIO4_IO27	0x4001b020
