@@ -89,18 +89,6 @@
 		regulator-always-on;
 	};
 
-	reg_otg2vbus_5v0: regulator-otg2-vbus-5v0 {
-		compatible = "regulator-fixed";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_usb_otg2>;
-		gpio = <&gpio3 21 GPIO_ACTIVE_HIGH>;
-		enable-active-high;
-		regulator-name = "otg2-vbus-supply-5v0";
-		regulator-min-microvolt = <5000000>;
-		regulator-max-microvolt = <5000000>;
-		vin-supply = <&reg_mba6ul_5v0>;
-	};
-
 	reserved-memory {
 		#address-cells = <1>;
 		#size-cells = <1>;
@@ -307,10 +295,20 @@
 /* 4-port usb hub */
 /* id, pwr, oc pins not connected */
 &usbotg2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usbhub>;
 	disable-over-current;
-	vbus-supply = <&reg_otg2vbus_5v0>;
 	dr_mode = "host";
+	#address-cells = <1>;
+	#size-cells = <0>;
 	status = "okay";
+
+	hub@1 {
+		compatible = "usb424,2514";
+		reg = <1>;
+		vdd-supply = <&reg_mba6ul_3v3>;
+		reset-gpios = <&gpio3 21 GPIO_ACTIVE_LOW>;
+	};
 };
 
 &usdhc1 {
@@ -470,7 +468,7 @@
 		>;
 	};
 
-	pinctrl_usb_otg2: usbotg2grp {
+	pinctrl_usbhub: usbhubgrp {
 		fsl,pins = <
 			/* reset */
 			MX6UL_PAD_LCD_DATA16__GPIO3_IO21	0x0001b099
