@@ -255,6 +255,12 @@
 	};
 };
 
+&pwm2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm2>;
+	status = "disabled";
+};
+
 &pwm4 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pwm4>;
@@ -412,6 +418,13 @@
 		fsl,pins = <
 			MX6UL_PAD_CSI_HSYNC__GPIO4_IO20		0x4001b8b0
 			MX6UL_PAD_CSI_VSYNC__GPIO4_IO19		0x4001b8b0
+		>;
+	};
+
+	pinctrl_pwm2: pwm2grp {
+		fsl,pins = <
+			/* 100 k PD, DSE 120 OHM, SPPEED LO */
+			MX6UL_PAD_GPIO1_IO09__PWM2_OUT		0x00003050
 		>;
 	};
 
