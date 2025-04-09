@@ -48,7 +48,7 @@
 		vin-supply = <&reg_mba6ul_3v3>;
 	};
 
-	reg_lcd_pwr: regulator-lcd-pwr {
+	reg_display_3v3: regulator-display-3v3 {
 		compatible = "regulator-fixed";
 		regulator-name = "lcd-pwr";
 		gpio = <&pca9554 3 GPIO_ACTIVE_HIGH>;
@@ -220,6 +220,8 @@
 		reg = <0x41>;
 		interrupts = <3 IRQ_TYPE_EDGE_FALLING>;
 		interrupt-parent = <&gpio1>;
+		vio-supply = <&reg_mba6ul_3v3>;
+		vcc-supply = <&reg_display_3v3>;
 		status = "disabled";
 
 		touchscreen {

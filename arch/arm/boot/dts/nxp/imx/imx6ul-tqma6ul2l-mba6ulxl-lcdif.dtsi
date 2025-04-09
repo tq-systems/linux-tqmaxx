@@ -9,14 +9,14 @@
 / {
 	backlight0: pwm_backlight {
 		compatible = "pwm-backlight";
-		power-supply = <&reg_lcd_pwr>;
+		power-supply = <&reg_display_3v3>;
 		enable-gpios = <&pca9554 5 GPIO_ACTIVE_HIGH>;
 		status = "disabled";
 	};
 
 	panel: panel {
 		backlight = <&backlight0>;
-		power-supply = <&reg_mba6ul_3v3>;
+		power-supply = <&reg_display_3v3>;
 
 		port {
 			panel_in: endpoint {
@@ -34,8 +34,8 @@
 		reg = <0x38>;
 		interrupts = <3 IRQ_TYPE_EDGE_FALLING>;
 		interrupt-parent = <&gpio1>;
-		iovcc-supply = <&reg_mba6ul_3v3>;
-		vcc-supply = <&reg_mba6ul_3v3>;
+		iovcc-supply = <&reg_display_3v3>;
+		vcc-supply = <&reg_display_3v3>;
 		status = "disabled";
 	};
 };
