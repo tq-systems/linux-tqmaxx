@@ -51,11 +51,9 @@
 	reg_lcd_pwr: regulator-lcd-pwr {
 		compatible = "regulator-fixed";
 		regulator-name = "lcd-pwr";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_regdisp3v3>;
-		gpio = <&gpio1 2 GPIO_ACTIVE_HIGH>;
+		gpio = <&pca9554 3 GPIO_ACTIVE_HIGH>;
 		enable-active-high;
-		/* always on -> VIO for STMPE, otherwise I2C stall */
+		/* always on -> VCC for STMPE, otherwise I2C stall */
 		regulator-always-on;
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
@@ -430,12 +428,6 @@
 		fsl,pins = <
 			/* 100 k PD, DSE 120 OHM, SPPEED LO */
 			MX6UL_PAD_GPIO1_IO05__PWM4_OUT		0x00003050
-		>;
-	};
-
-	pinctrl_regdisp3v3: regdisp3v3grp {
-		fsl,pins = <
-			MX6UL_PAD_GPIO1_IO02__GPIO1_IO02	0x4001b020
 		>;
 	};
 
