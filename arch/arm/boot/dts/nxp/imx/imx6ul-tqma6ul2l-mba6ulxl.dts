@@ -32,7 +32,7 @@
 
 	reg_display_3v3: regulator-display-3v3 {
 		compatible = "regulator-fixed";
-		regulator-name = "lcd-pwr";
+		regulator-name = "VCC3V3_DISPLAY";
 		gpio = <&pca9554 3 GPIO_ACTIVE_HIGH>;
 		enable-active-high;
 		/* always on -> VCC for STMPE, otherwise I2C stall */
@@ -44,7 +44,7 @@
 
 	reg_mba6ul_3v3: regulator-mba6ul-3v3 {
 		compatible = "regulator-fixed";
-		regulator-name = "supply-mba6ul-3v3";
+		regulator-name = "VCC3V3";
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
 		regulator-always-on;
@@ -52,7 +52,7 @@
 
 	reg_mba6ul_5v0: regulator-mba6ul-5v0 {
 		compatible = "regulator-fixed";
-		regulator-name = "supply-mba6ul-5v0";
+		regulator-name = "VCC5V0";
 		regulator-min-microvolt = <5000000>;
 		regulator-max-microvolt = <5000000>;
 		regulator-always-on;
@@ -60,7 +60,7 @@
 
 	reg_mpcie: regulator-mpcie-1v5 {
 		compatible = "regulator-fixed";
-		regulator-name = "mpcie-1v5";
+		regulator-name = "VCC1V5";
 		gpio = <&pca9554 4 GPIO_ACTIVE_HIGH>;
 		enable-active-high;
 		regulator-min-microvolt = <1500000>;
