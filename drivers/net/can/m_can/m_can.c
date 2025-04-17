@@ -2437,7 +2437,7 @@ static int m_can_class_sysoff_handler(struct sys_off_data *data)
 	struct device *dev = data->dev;
 	int ret;
 
-	if (device_may_wakeup(dev) && !IS_ERR(cdev->pinctrl_state_wakeup))
+	if (device_may_wakeup(dev) && cdev->pinctrl_state_wakeup)
 		ret = pinctrl_select_state(cdev->pinctrl, cdev->pinctrl_state_wakeup);
 
 	if (ret)
@@ -2613,7 +2613,7 @@ int m_can_class_suspend(struct device *dev)
 		m_can_clk_stop(cdev);
 	}
 
-	if (device_may_wakeup(dev) && !IS_ERR(cdev->pinctrl_state_wakeup))
+	if (device_may_wakeup(dev) && cdev->pinctrl_state_wakeup)
 		pinctrl_select_state(cdev->pinctrl, cdev->pinctrl_state_wakeup);
 	else
 		pinctrl_pm_select_sleep_state(dev);
