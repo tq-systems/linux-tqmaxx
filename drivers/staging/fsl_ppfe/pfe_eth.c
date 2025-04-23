@@ -2129,7 +2129,7 @@ static struct sk_buff *pfe_eth_rx_skb(struct net_device *ndev,
 
 		/* First frag */
 		if (desc_ctrl & CL_DESC_FIRST) {
-			skb = build_skb(buf_addr, 0);
+			skb = slab_build_skb(buf_addr);
 			if (unlikely(!skb))
 				goto pkt_drop;
 
@@ -2151,7 +2151,7 @@ static struct sk_buff *pfe_eth_rx_skb(struct net_device *ndev,
 				goto pkt_drop;
 			}
 
-			skb_frag = build_skb(buf_addr, 0);
+			skb_frag = slab_build_skb(buf_addr);
 
 			if (unlikely(!skb_frag)) {
 				kfree(buf_addr);
