@@ -581,6 +581,7 @@ DTC_FLAGS_imx95-15x15-evk-boe-wxga-lvds1-panel := -@
 dtb-$(CONFIG_ARCH_MXC) += imx95-15x15-evk-boe-wxga-lvds0-panel.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx95-15x15-evk-boe-wxga-lvds1-panel.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx95-15x15-evk-boe-wxga-lvds-two-panels.dtb
+dtb-$(CONFIG_ARCH_MXC) += imx95-tqma9596sa-mb-smarc-2.dtb
 
 imx95-15x15-evk-adv7535-dtbs := imx95-15x15-evk.dtb imx95-15x15-evk-adv7535.dtbo
 dtb-${CONFIG_ARCH_MXC} += imx95-15x15-evk-adv7535.dtb
