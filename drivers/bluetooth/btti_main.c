@@ -149,7 +149,7 @@ static int btti_hci_if_tx_frame(struct hci_dev *hdev, struct sk_buff *skb)
 {
 	struct btti_private *private_data = hci_get_drvdata(hdev);
 
-	BT_INFO("[bt sdio hci] TX from HCI received ,type=%d, opcode: 0x%x len=%d ble_enable=%d",
+	BT_DBG("[bt sdio hci] TX from HCI received ,type=%d, opcode: 0x%x len=%d ble_enable=%d",
 		hci_skb_pkt_type(skb), hci_skb_opcode(skb),
 		skb->len, private_data->hci_adapter->ble_enable);
 
@@ -241,7 +241,7 @@ static int btti_service_work_thread(void *data)
 	struct sk_buff *skb;
 	ulong flags;
 
-	BT_INFO("[bt sdio hci] work thread is started");
+	BT_DBG("[bt sdio hci] work thread is started");
 
 	init_waitqueue_entry(&wait, current);
 
@@ -259,7 +259,7 @@ static int btti_service_work_thread(void *data)
 		if (!private_data->hci_adapter->ble_enable ||
 		    (!hci_adapter->num_of_interrupt &&
 		     skb_queue_empty(&hci_adapter->tx_queue))) {
-			BT_INFO("[bt sdio hci] work thread is sleeping...");
+			BT_DBG("[bt sdio hci] work thread is sleeping...");
 			schedule();
 		}
 
@@ -270,7 +270,7 @@ static int btti_service_work_thread(void *data)
 		BT_DBG("[bt sdio hci] work thread woke up");
 
 		if (kthread_should_stop() || private_data->sdio_dev_removed) {
-			BT_INFO("[bt sdio hci] work_thread: break from main thread");
+			BT_DBG("[bt sdio hci] work_thread: break from main thread");
 			break;
 		}
 
@@ -376,7 +376,7 @@ struct btti_private *btti_hci_add_sdio_dev(void *sdiodev)
 
 	btti_hci_init_hci_adapter(private_data);
 
-	BT_INFO("[bt sdio hci] Starting work thread...");
+	BT_DBG("[bt sdio hci] Starting work thread...");
 	private_data->work_thread.private_data = private_data;
 	spin_lock_init(&private_data->irq_cnt_lock);
 
@@ -405,7 +405,7 @@ int btti_hci_remove_sdio_dev(struct btti_private *private_data)
 {
 	struct hci_dev *hdev;
 
-	BT_INFO("[bt sdio hci] remove sdio dev");
+	BT_DBG("[bt sdio hci] remove sdio dev");
 
 	hdev = private_data->btti_dev.hcidev;
 
@@ -413,7 +413,7 @@ int btti_hci_remove_sdio_dev(struct btti_private *private_data)
 		kthread_stop(private_data->work_thread.task);
 
 	if (hdev) {
-		BT_INFO("[bt sdio hci] unregister hci");
+		BT_DBG("[bt sdio hci] unregister hci");
 #ifdef CONFIG_DEBUG_FS
 		btti_debugfs_remove(hdev);
 #endif

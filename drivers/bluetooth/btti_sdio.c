@@ -192,7 +192,7 @@ static int btti_sdio_register_dev(struct btti_sdio_dev *sdiodev)
 		//is not set on this sage
 		BT_DBG("[bt sdio] sdio_enable_func: %d failed: ret=%d", func->num, ret);
 	} else {
-		BT_INFO("[bt sdio] sdio_enable_func: %d success", func->num);
+		BT_DBG("[bt sdio] sdio_enable_func: %d success", func->num);
 	}
 
 	//set block size
@@ -385,7 +385,7 @@ static int btti_sdio_power_dn_fw(struct btti_private *private_data)
 	struct btti_sdio_dev *sdiodev = private_data->btti_dev.sdiodev;
 	int ret = 0;
 
-	BT_DBG("[bt sdio] power up FW");
+	BT_DBG("[bt sdio] power down FW");
 
 	if (!sdiodev || !sdiodev->func) {
 		BT_ERR("[bt sdio] sdiodev or function is NULL!");
@@ -404,7 +404,7 @@ static int btti_sdio_power_dn_fw(struct btti_private *private_data)
 
 	sdio_release_host(sdiodev->func);
 
-	BT_INFO("[bt sdio] wake up firmware");
+	BT_DBG("[bt sdio] powered down firmware");
 
 	return ret;
 }
@@ -479,7 +479,7 @@ static int btti_sdio_rx_packet(struct btti_private *private_data)
 	packet_len = sdio_header[0] | (sdio_header[1] << 8) | (sdio_header[2] << 16);
 	packet_type = sdio_header[3];
 
-	BT_INFO("[bt sdio] RX packet_len:%d packet_type:%d packet header hex: %*ph",
+	BT_DBG("[bt sdio] RX packet_len:%d packet_type:%d packet header hex: %*ph",
 		packet_len, packet_type, SDIO_HEADER_LEN, sdio_header);
 
 	if (packet_len <= SDIO_HEADER_LEN || packet_len > HCI_MAX_FRAME_SIZE) {
@@ -516,7 +516,7 @@ static int btti_sdio_rx_packet(struct btti_private *private_data)
 		ret = -EIO;
 		goto exit;
 	}
-	BT_INFO("[bt sdio] packet data hex: %*ph", data_read_size, skb->data);
+	BT_DBG("[bt sdio] packet data hex: %*ph", data_read_size, skb->data);
 
 	switch (packet_type) {
 	case HCI_ACLDATA_PKT:
@@ -539,14 +539,14 @@ static int btti_sdio_rx_packet(struct btti_private *private_data)
 		break;
 
 	case HCI_VENDOR_PKT:
-		BT_INFO("[bt sdio] vendor packet received");
+		BT_DBG("[bt sdio] vendor packet received");
 		ret = btti_handle_rx_vendor_event(private_data, skb);
 		if (!ret) {
 			//if hdev was just created read it
 			hdev = private_data->btti_dev.hcidev;
 			if (hdev) {
 				btti_acknldg_packet(sdiodev, 0);//ack
-				BT_INFO("[bt sdio] Hdev was created");
+				BT_DBG("[bt sdio] Hdev was created");
 				hdev->stat.byte_rx += data_read_size;
 				hci_skb_pkt_type(skb) = HCI_EVENT_PKT;
 				ret = hci_recv_frame(hdev, skb);
@@ -602,7 +602,7 @@ static int btti_handle_rx_vendor_event(struct btti_private *private_data,
 	vendor_event = (struct btti_vendor_event *)skb->data;
 	switch (vendor_event->event_opcode) {
 	case BTTI_BLE_FIRMWARE_UP:
-		BT_INFO("[bt sdio] vendor packet- ble is up");
+		BT_DBG("[bt sdio] vendor packet- ble is up");
 		private_data->hci_adapter->ble_enable = 1;
 		if (btti_hci_register_hdev(private_data)) {
 			BT_ERR("[bt sdio] Register hdev failed!");
@@ -673,7 +673,7 @@ static int btti_sdio_tx_packet(struct btti_private *private_data,
 			if (i > MAX_SDIO_TX_RETRY)
 				goto exit;
 		}
-		BT_INFO("[bt sdio] TX to SDIO sdiodev done : %*ph ",
+		BT_DBG("[bt sdio] TX to SDIO sdiodev done : %*ph ",
 			data_send_size, tmpbuf);
 
 	} while (ret);
