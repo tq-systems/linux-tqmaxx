@@ -184,7 +184,7 @@ struct cc33xx_cmd_dfs_radar_debug {
 #define MAX_VERSIONS_LEN	59
 #define MAX_VERSIONS_EXTENDED_LEN	86
 
-int cc33xx_cmd_radar_detection_debug(struct cc33xx *wl, u8 channel)
+static int cc33xx_cmd_radar_detection_debug(struct cc33xx *wl, u8 channel)
 {
 	struct cc33xx_cmd_dfs_radar_debug *cmd;
 	int ret = 0;
@@ -2007,8 +2007,8 @@ static const struct file_operations antenna_diversity_select_default_antenna_ops
 	.llseek = default_llseek,
 };
 
-int cc33xx_debugfs_add_files(struct cc33xx *wl,
-			     struct dentry *rootdir)
+static int cc33xx_debugfs_add_files(struct cc33xx *wl,
+				    struct dentry *rootdir)
 {
 	struct dentry *stats, *moddir;
 

@@ -78,13 +78,15 @@ static ssize_t sub## _ ##name## _read(struct file *file,		\
 	struct cc33xx *wl = file->private_data;				\
 	struct struct_type *stats = wl->stats.fw_stats;			\
 	char buf[DEBUGFS_FORMAT_BUFFER_SIZE] = "";			\
-	int res, i;							\
+	size_t pos = 0;							\
+	int i;								\
 									\
 	cc33xx_debugfs_update_stats(wl);				\
 									\
 	for (i = 0; i < len; i++)					\
-		res = snprintf(buf, sizeof(buf), "%s[%d] = %d\n",	\
-			       buf, i, stats->sub.name[i]);		\
+		pos += scnprintf(buf + pos, sizeof(buf) - pos,		\
+				 "[%d] = %d\n",				\
+				 i, stats->sub.name[i]);		\
 									\
 	return cc33xx_format_buffer(userbuf, count, ppos, "%s", buf);	\
 }									\
