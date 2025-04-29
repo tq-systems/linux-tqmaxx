@@ -82,4 +82,7 @@ void btti_hci_irq_handler(struct btti_private *private_data);
 #ifdef CONFIG_DEBUG_FS
 void btti_debugfs_init(struct hci_dev *hdev);
 void btti_debugfs_remove(struct hci_dev *hdev);
+int btti_debugfs_if_prepare_command(u8 cmd_type,
+				    struct btti_private *private_data);
+
 #endif

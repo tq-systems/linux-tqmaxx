@@ -27,14 +27,10 @@ struct btti_debugfs_dir {
 	struct dentry *status_dir;
 };
 
-int btti_debugfs_if_prepare_command(u8 cmd_type,\
-		struct btti_private *private_data);
-
-
 #define DEBUGFS_FORMAT_BUFFER_SIZE 256
 
-int btti_format_buffer(char __user *userbuf, size_t count,
-			 loff_t *ppos, char *fmt, ...)
+static int btti_format_buffer(char __user *userbuf, size_t count,
+			      loff_t *ppos, char *fmt, ...)
 {
 	va_list args;
 	char buf[DEBUGFS_FORMAT_BUFFER_SIZE];

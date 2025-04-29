@@ -50,9 +50,9 @@ void btti_hci_irq_handler(struct btti_private *private_data)
 }
 EXPORT_SYMBOL_GPL(btti_hci_irq_handler);
 
-
-int btti_debugfs_if_prepare_command(u8 cmd_type,\
-		struct btti_private *private_data)
+#ifdef CONFIG_DEBUG_FS
+int btti_debugfs_if_prepare_command(u8 cmd_type,
+				    struct btti_private *private_data)
 {
 	int ret = 0;
 	switch(cmd_type){
@@ -67,6 +67,7 @@ int btti_debugfs_if_prepare_command(u8 cmd_type,\
 	}
 	return ret;
 }
+#endif
 
 static int btti_hci_tx_pkt(struct btti_private *private_data,\
 		struct sk_buff *skb)
