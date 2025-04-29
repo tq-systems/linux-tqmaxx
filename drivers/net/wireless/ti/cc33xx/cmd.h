@@ -137,12 +137,12 @@ enum cc33xx_cmd {
 	CMD_DOWNLOAD_INI_PARAMS = 37,
 	CMD_SET_BD_ADDR = 38,
 	CMD_BLE_COMMANDS = 39,
+	CMD_SET_PS_MODE = 40,
 
 	CMD_LAST_SUPPORTED_COMMAND,
 
 	/* The following commands are legacy and are not yet supported */
 
-	CMD_SET_PS_MODE,
 	CMD_DFS_CHANNEL_CONFIG,
 	CMD_CONFIG_FWLOGGER,
 	CMD_START_FWLOGGER,
@@ -258,7 +258,7 @@ struct cc33xx_cmd_role_start {
 	u8 role_type;
 	u8 band;
 	u8 channel;
-
+	u8 is_dfs_channel;
 	u8 channel_type;
 
 	union {
@@ -316,7 +316,7 @@ struct cc33xx_cmd_role_start {
 			u8 padding_1[42];
 		} __packed ap;
 	};
-	u8 padding;
+	u8 padding[4];
 } __packed;
 
 struct cc33xx_cmd_complete_role_start {
@@ -640,8 +640,8 @@ struct cmd_channel_switch {
 
 	u8 channel_type;
 	u8 band;
-
-	u8 padding[2];
+	u8 is_dfs_channel;
+	u8 padding;
 } __packed;
 
 struct cmd_set_bd_addr {

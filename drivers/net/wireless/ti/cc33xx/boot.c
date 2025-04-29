@@ -126,6 +126,14 @@ static int wait_for_boot_irq(struct cc33xx *cc, u32 boot_irq_mask,
 
 	fw_download = cc->fw_download;
 
+	/**
+	 * Hosts can miss boot-done signal after powerup or internal reset.
+	 * Work around this by explicitly triggering IRQ handler which will
+	 * check current device status after a safe delay.
+	 */
+	msleep(10);
+	cc33xx_irq(cc);
+
 	ret = wait_for_completion_interruptible_timeout(&fw_download->wait_on_irq,
 							msecs_to_jiffies(timeout));
 

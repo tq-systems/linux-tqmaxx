@@ -398,15 +398,6 @@ struct cc33xx_acx_fw_tsf_information {
 	u8 padding2[3];
 } __packed;
 
-struct cc33xx_acx_config_ps {
-	struct acx_header header;
-
-	u8 exit_retries;
-	u8 enter_retries;
-	u8 padding[2];
-	__le32 null_data_rate;
-} __packed;
-
 #define ACX_RATE_MGMT_ALL_PARAMS 0xff
 
 struct acx_default_rx_filter {
@@ -521,16 +512,13 @@ enum interrogate_opt {
 	GET_PREAMBLE_AND_TX_RATE_INTR = 4,
 	GET_MAC_ADDRESS = 5,
 	READ_COEX_STATISTICS = 6,
+	GET_ANT_DIV_STATUS = 7,
+	GET_ANT_DIV_RSSI_THRESHOLD = 8,
+	GET_ANT_DIV_DEFAULT_ANTENNA = 9,
 	LAST_IE_VALUE,
 	MAX_DOT11_IE = LAST_IE_VALUE,
 
 	MAX_IE = 0xFFFF /*force enumeration to 16bits*/
-};
-
-enum {
-	ACX_STATISTICS = LAST_CFG_VALUE,
-	ACX_CONFIG_PS,
-	ACX_CLEAR_STATISTICS		 = 0x0054,
 };
 
 struct cc33xx_acx_error_stats {
@@ -775,11 +763,121 @@ struct cc33xx_acx_peer_cap {
 	u8 padding;
 } __packed;
 
+struct acx_antenna_select {
+	struct acx_header header;
+
+	u8 selection;
+	u8 padding[3];
+} __packed;
+
+struct debug_set_tsf {
+	struct debug_header header;
+
+	__le64 tsf_val;
+} __packed;
+
+struct debug_burst_mode_cfg {
+	struct debug_header header;
+
+	u8 burst_disable;
+	u8 padding[3];
+} __packed;
+struct acx_twt_setup {
+	struct acx_header header;
+	__le32 min_wake_duration_usec;
+	__le32 min_wake_interval_mantissa;
+	__le32 min_wake_interval_exponent;
+	__le32 max_wake_interval_mantissa;
+	__le32 max_wake_interval_exponent;
+	u8 valid_params;
+	u8 padding [3];
+} __packed;
+
+#define MIN_WAKE_DURATION_VALID				BIT(0)
+#define MIN_WAKE_INTERVAL_MANTISSA_VALID	BIT(1)
+#define MIN_WAKE_INTERVAL_EXPONENT_VALID	BIT(2)
+#define MAX_WAKE_INTERVAL_MANTISSA_VALID	BIT(3)
+#define MAX_WAKE_INTERVAL_EXPONENT_VALID	BIT(4)
+
+struct acx_twt_terminate {
+	struct acx_header header;
+} __packed;
+
 struct acx_preamble_and_tx_rate {
 	struct acx_header header;
 	u16 tx_rate;
 	u8 preamble;
 	u8 role_id;
+} __packed;
+
+static const u16 cc33xx_idx_to_rate_100Kbps[] =
+{
+    10, 20, 55, 110, 60, 90, 120, 180, 240, 360, 480, 540
+};
+
+struct cc33xx_coex_statistics {
+	__le32 wifi_request_assertion_log;
+	__le32 wifi_request_de_assertion_log;
+	__le32 wifi_grant_assertion_log;
+	__le32 wifi_grant_deassertion_log;
+	__le32 wifi_prio_reject_log;
+	__le32 wifi_grant_during_dual_ant_assertion_log;
+	__le32 wifi_grant_during_dual_ant_deassertion_log;
+	__le32 ble_request_assertion_log;
+	__le32 ble_request_deassertion_log;
+	__le32 ble_grant_assertion_log;
+	__le32 ble_grant_deassertion_log;
+	__le32 ble_tx_high_prio_reject_log;
+	__le32 ble_tx_low_prio_reject_log;
+	__le32 ble_rx_high_prio_reject_log;
+	__le32 ble_rx_low_prio_reject_log;
+	__le32 soc_request_assertion_log;
+	__le32 soc_request_deassertion_log;
+	__le32 soc_grant_assertion_log;
+	__le32 soc_grant_deassertion_log;
+	__le32 soc_high_prio_reject_log;
+	__le32 soc_low_prio_reject_log;
+} __packed;
+
+struct cc33xx_coex_stat_and_entities {
+	__u8 coex_entities_bitmap;
+	__u8 padding[3];
+	struct cc33xx_coex_statistics coex_statistics;
+} __packed;
+
+
+struct cc33xx_acx_coex_statistics {
+	struct acx_header header;
+
+	struct cc33xx_coex_stat_and_entities coex_stat;
+} __packed;
+
+struct cc33xx_acx_coex_statistics_cfg {
+	struct acx_header header;
+
+	__u8 coex_statictics;
+	__u8 padding[3];
+} __packed;
+
+struct acx_diversity_status {
+	struct acx_header header;
+
+    u8 enable;
+	u8 padding[3];
+} __packed;
+
+struct acx_diversity_rssi_threshold {
+	struct acx_header header;
+
+    s8 rssi_threshold;
+	u8 padding[3];
+} __packed;
+
+struct acx_diversity_default_antenna {
+	struct acx_header header;
+
+    u8 default_antenna;
+	u8 padding[3];
 } __packed;
 
 int cc33xx_acx_wake_up_conditions(struct cc33xx *cc, struct cc33xx_vif *wlvif,
@@ -799,7 +897,6 @@ int cc33xx_acx_set_preamble(struct cc33xx *cc, struct cc33xx_vif *wlvif,
 			    enum acx_preamble_type preamble);
 int cc33xx_acx_cts_protect(struct cc33xx *cc, struct cc33xx_vif *wlvif,
 			   enum acx_ctsprotect_type ctsprotect);
-int cc33xx_acx_statistics(struct cc33xx *cc, void *stats);
 int cc33xx_tx_param_cfg(struct cc33xx *cc, struct cc33xx_vif *wlvif, u8 ac,
 			u8 cw_min, u16 cw_max, u8 aifsn, u16 txop, bool acm,
 			u8 ps_scheme, u8 is_mu_edca, u8 mu_edca_aifs,
@@ -813,9 +910,6 @@ int cc33xx_acx_set_ht_information(struct cc33xx *cc, struct cc33xx_vif *wlvif,
 				  u16 he_oper_nss_set);
 int cc33xx_acx_set_ba_receiver_session(struct cc33xx *cc, u8 tid_index, u16 ssn,
 				       bool enable, u8 peer_hlid, u8 win_size);
-int cc33xx_acx_tsf_info(struct cc33xx *cc,
-			struct cc33xx_vif *wlvif, u64 *mactime);
-int cc33xx_acx_config_ps(struct cc33xx *cc, struct cc33xx_vif *wlvif);
 int cc33xx_acx_get_tx_rate(struct cc33xx *cc, struct cc33xx_vif *wlvif,
 			   struct station_info *sinfo);
 int cc33xx_acx_average_rssi(struct cc33xx *cc,
@@ -824,12 +918,30 @@ int cc33xx_acx_default_rx_filter_enable(struct cc33xx *cc, bool enable,
 					enum rx_filter_action action);
 int cc33xx_acx_set_rx_filter(struct cc33xx *cc, u8 index, bool enable,
 			     struct cc33xx_rx_filter *filter);
-int cc33xx_acx_clear_statistics(struct cc33xx *cc);
 int cc33xx_acx_set_peer_cap(struct cc33xx *cc,
 			    struct ieee80211_sta_ht_cap *ht_cap,
 			    struct ieee80211_sta_he_cap *he_cap,
 			    struct cc33xx_vif *wlvif, bool allow_ht_operation,
 			    u32 rate_set, u8 hlid);
+int cc33xx_acx_set_antenna_select(struct cc33xx *cc, u8 selection);
+int cc33xx_acx_set_tsf(struct cc33xx *cc, u64 tsf_val);
 int cc33xx_acx_trigger_fw_assert(struct cc33xx *cc);
+int cc33xx_acx_burst_mode_cfg(struct cc33xx *cc, u8 burst_disable);
+int cc33xx_acx_get_antenna_diversity_status(struct cc33xx *cc);
+int cc33xx_acx_set_antenna_diversity_status(struct cc33xx *cc, u8 enable);
+int cc33xx_acx_antenna_diversity_get_rssi_threshold(struct cc33xx *cc, s8 *threshold);
+int cc33xx_acx_antenna_diversity_set_rssi_threshold(struct cc33xx *cc, s8 rssi_threshold);
+int cc33xx_acx_antenna_diversity_get_default_antenna(struct cc33xx *cc);
+int cc33xx_acx_antenna_diversity_select_default_antenna(struct cc33xx *cc, u8 default_antenna);
+int cc33xx_acx_twt_setup(struct cc33xx *wl,
+			 u32 min_wake_duration_usec,
+			 u32 min_wake_interval_mantissa,
+			 u32 min_wake_interval_exponent,
+			 u32 max_wake_interval_mantissa,
+			 u32 max_wake_interval_exponent,
+			 u8 valid_params);
+int cc33xx_acx_twt_terminate(struct cc33xx *wl);
+int cc33xx_acx_twt_resume(struct cc33xx *wl);
+int cc33xx_acx_twt_suspend(struct cc33xx *wl);
 
 #endif /* __CC33XX_ACX_H__ */
