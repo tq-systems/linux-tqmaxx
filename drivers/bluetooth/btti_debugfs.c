@@ -30,8 +30,8 @@ struct btti_debugfs_dir {
 
 #define DEBUGFS_FORMAT_BUFFER_SIZE 256
 
-int btti_format_buffer(char __user *userbuf, size_t count,
-		       loff_t *ppos, char *fmt, ...)
+static int btti_format_buffer(char __user *userbuf, size_t count,
+			      loff_t *ppos, char *fmt, ...)
 {
 	va_list args;
 	char buf[DEBUGFS_FORMAT_BUFFER_SIZE];
