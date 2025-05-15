@@ -1,0 +1,64 @@
+// SPDX-License-Identifier: GPL-2.0-only OR MIT
+/*
+ * Copyright (c) 2025 TQ-Systems GmbH <linux@ew.tq-group.com>, D-82229 Seefeld, Germany.
+ * Author: Matthias Schiffer
+ */
+
+#include <dt-bindings/media/video-interfaces.h>
+
+/dts-v1/;
+/plugin/;
+
+&csi0_port0 {
+	status = "okay";
+
+	csi0_port0_in: endpoint {
+		remote-endpoint = <&camera_csi0_out>;
+		bus-type = <MEDIA_BUS_TYPE_CSI2_DPHY>;
+		clock-lanes = <0>;
+		data-lanes = <1 2>;
+	};
+};
+
+&dphy0 {
+	status = "okay";
+};
+
+&main_i2c2 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	vc_ctrl_csi0: controller@10 {
+		compatible = "vision-components,mipi-module";
+		reg = <0x10>;
+		#clock-cells = <0>;
+		vcc-supply = <&reg_3v3>;
+		clock-frequency = <24000000>;
+	};
+
+	camera_csi0: camera@60 {
+		compatible = "ovti,ov9281";
+		reg = <0x60>;
+		avdd-supply = <&vc_ctrl_csi0>;
+		clocks = <&vc_ctrl_csi0>;
+		dovdd-supply = <&vc_ctrl_csi0>;
+		dvdd-supply = <&vc_ctrl_csi0>;
+		orientation = <2>;
+		rotation = <0>;
+		use-single-read;
+
+		port {
+			camera_csi0_out: endpoint {
+				remote-endpoint = <&csi0_port0_in>;
+				data-lanes = <1 2>;
+				clock-lanes = <0>;
+				clock-noncontinuous;
+				link-frequencies = /bits/ 64 <400000000>;
+			};
+		};
+	};
+};
+
+&ti_csi2rx0 {
+	status = "okay";
+};

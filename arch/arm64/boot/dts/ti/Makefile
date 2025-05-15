@@ -215,6 +215,14 @@ dtb-$(CONFIG_ARCH_K3) += k3-j722s-evm-microtips-mf101hie-panel.dtbo
 dtb-$(CONFIG_ARCH_K3) += k3-j722s-evm-pwm.dtbo
 dtb-$(CONFIG_ARCH_K3) += k3-j722s-evm-v3link-fusion.dtbo
 
+k3-am67a-tqma67xx-mba67xx-csi0-imx327-dtbs := \
+	k3-am67a-tqma67xx-mba67xx.dtb k3-am67a-tqma67xx-mba67xx-csi0-imx327.dtbo
+k3-am67a-tqma67xx-mba67xx-csi0-ov9281-dtbs := \
+	k3-am67a-tqma67xx-mba67xx.dtb k3-am67a-tqma67xx-mba67xx-csi0-ov9281.dtbo
+k3-am67a-tqma67xx-mba67xx-csi2-imx219-dtbs := \
+	k3-am67a-tqma67xx-mba67xx.dtb k3-am67a-tqma67xx-mba67xx-csi2-imx219.dtbo
+k3-am67a-tqma67xx-mba67xx-csi3-imx219-dtbs := \
+	k3-am67a-tqma67xx-mba67xx.dtb k3-am67a-tqma67xx-mba67xx-csi3-imx219.dtbo
 k3-am67a-tqma67xx-mba67xx-dsi-rpi-7inch-panel-dtbs := \
 	k3-am67a-tqma67xx-mba67xx.dtb k3-am67a-tqma67xx-mba67xx-dsi-rpi-7inch-panel.dtbo
 k3-am67a-tqma67xx-mba67xx-lvds-tm070jdhg30-dtbs := \
@@ -222,6 +230,10 @@ k3-am67a-tqma67xx-mba67xx-lvds-tm070jdhg30-dtbs := \
 k3-am67a-tqma67xx-mba67xx-lvds-vesa-fhd-dtbs := \
 	k3-am67a-tqma67xx-mba67xx.dtb k3-am67a-tqma67xx-mba67xx-lvds-vesa-fhd.dtbo
 
+dtb-$(CONFIG_ARCH_K3) += k3-am67a-tqma67xx-mba67xx-csi0-imx327.dtb
+dtb-$(CONFIG_ARCH_K3) += k3-am67a-tqma67xx-mba67xx-csi0-ov9281.dtb
+dtb-$(CONFIG_ARCH_K3) += k3-am67a-tqma67xx-mba67xx-csi2-imx219.dtb
+dtb-$(CONFIG_ARCH_K3) += k3-am67a-tqma67xx-mba67xx-csi3-imx219.dtb
 dtb-$(CONFIG_ARCH_K3) += k3-am67a-tqma67xx-mba67xx-dsi-rpi-7inch-panel.dtb
 dtb-$(CONFIG_ARCH_K3) += k3-am67a-tqma67xx-mba67xx-lvds-tm070jdhg30.dtb
 dtb-$(CONFIG_ARCH_K3) += k3-am67a-tqma67xx-mba67xx-lvds-vesa-fhd.dtb
