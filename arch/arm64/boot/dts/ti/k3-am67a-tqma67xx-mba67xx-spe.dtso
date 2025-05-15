@@ -1,0 +1,60 @@
+// SPDX-License-Identifier: GPL-2.0-only OR MIT
+/*
+ * Copyright (c) 2023-2024 TQ-Systems GmbH <linux@ew.tq-group.com>, D-82229 Seefeld, Germany.
+ * Author: Matthias Schiffer
+ *
+ * Device Tree overlay for Single-pair Ethernet
+ *
+ * Enabling this overlay disables RGMII1 and PCIe and enables SGMII for the
+ * SPE PHY instead.
+ */
+
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/phy/phy.h>
+#include "k3-serdes.h"
+
+&cpsw3g_phy00 {
+	status = "disabled";
+};
+
+&cpsw3g_phy0c {
+	status = "okay";
+};
+
+&cpsw_port1 {
+	phy-handle = <&cpsw3g_phy0c>;
+	phy-mode = "sgmii";
+	phy-names = "mac", "serdes";
+	phys = <&phy_gmii_sel 1>, <&serdes1_link>;
+};
+
+&hog_reset_rgmii1 {
+	status = "okay";
+};
+
+&hog_reset_spe {
+	status = "disabled";
+};
+
+&hog_serdes1_select_pcie {
+	status = "disabled";
+};
+
+&hog_serdes1_select_sgmii {
+	status = "okay";
+};
+
+&pcie0_rc {
+	status = "disabled";
+};
+
+&serdes1_link {
+	cdns,phy-type = <PHY_TYPE_SGMII>;
+};
+
+&serdes_ln_ctrl {
+	idle-states = <J722S_SERDES0_LANE0_USB>,
+		      <J722S_SERDES1_LANE0_QSGMII_LANE1>;
+};
