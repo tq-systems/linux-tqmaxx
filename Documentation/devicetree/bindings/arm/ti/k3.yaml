@@ -165,6 +165,13 @@ properties:
               - ti,j722s-evm
           - const: ti,j722s
 
+      - description: K3 J722S SoC on TQ-Systems TQMa67xx SoM
+        items:
+          - enum:
+              - tq,am67a-tqma6754-mba67xx
+          - const: tq,am67a-tqma6754
+          - const: ti,j722s
+
       - description: K3 J742S2 SoC
         items:
           - enum:
