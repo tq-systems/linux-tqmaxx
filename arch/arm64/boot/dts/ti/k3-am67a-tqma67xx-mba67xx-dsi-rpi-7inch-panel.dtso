@@ -1,0 +1,189 @@
+// SPDX-License-Identifier: GPL-2.0
+/**
+ * DT Overlay for RPi 7inch touchscreen panel interfaced with DSI on
+ * MBa67xx
+ *
+ * RPi DSI Panel: https://www.raspberrypi.com/products/raspberry-pi-touch-display/
+ *
+ * Copyright (C) 2024 Texas Instruments Incorporated - https://www.ti.com/
+ * Copyright (c) 2025 TQ-Systems GmbH <linux@ew.tq-group.com>, D-82229 Seefeld, Germany.
+ * Author: Matthias Schiffer
+ */
+
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/interrupt-controller/irq.h>
+
+#include "k3-pinctrl.h"
+
+&{/} {
+	panel-dsi {
+		compatible = "yeebo,yb-tg800480c43b-c-a2", "panel-dpi";
+		backlight = <&display_reg>;
+		power-supply = <&display_reg>;
+
+		panel-timing {
+			clock-frequency = <34375000>;
+			hactive = <800>;
+			vactive = <480>;
+			hfront-porch = <32>;
+			hsync-len = <32>;
+			hback-porch = <64>;
+			vfront-porch = <121>;
+			vsync-len = <3>;
+			vback-porch = <14>;
+
+			hsync-active = <0>;
+			vsync-active = <0>;
+			de-active = <1>;
+			pixelclk-active = <1>;
+		};
+
+		port {
+			panel_in: endpoint {
+				remote-endpoint = <&panel_bridge_out>;
+			};
+		};
+	};
+
+	bridge_reg: bridge-regulator {
+		compatible = "regulator-fixed";
+		regulator-name = "bridge-reg";
+		gpio = <&display_reg 0 GPIO_ACTIVE_HIGH>;
+		vin-supply = <&display_reg>;
+		enable-active-high;
+	};
+};
+
+&hog_dsi0_select_dp {
+	status = "disabled";
+};
+
+&hog_dsi0_select_dsi {
+	status = "okay";
+};
+
+&hog_dsi0_en {
+	status = "okay";
+};
+
+&dphy_tx0 {
+	status = "okay";
+};
+
+&main_i2c3 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	ft5406: touchscreen@38 {
+		compatible = "edt,edt-ft5506";
+		reg = <0x38>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&ft5406_pins>;
+		interrupt-parent = <&main_gpio0>;
+		interrupts = <48 IRQ_TYPE_EDGE_FALLING>;
+		touchscreen-inverted-x;
+		touchscreen-inverted-y;
+		touchscreen-size-x = <800>;
+		touchscreen-size-y = <480>;
+	};
+
+	display_reg: regulator@45 {
+		compatible = "raspberrypi,7inch-touchscreen-panel-regulator";
+		reg = <0x45>;
+		gpio-controller;
+		#gpio-cells = <2>;
+	};
+};
+
+&dsi0 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port@0 {
+			reg = <0>;
+
+			dsi0_out: endpoint {
+				remote-endpoint = <&panel_bridge_in>;
+			};
+		};
+
+		port@1 {
+			reg = <1>;
+
+			dsi0_in: endpoint {
+				remote-endpoint = <&dss1_dpi1_out>;
+			};
+		};
+	};
+
+	bridge@0 {
+		compatible = "toshiba,tc358762";
+		reg = <0>;
+		vddc-supply = <&bridge_reg>;
+		status = "okay";
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+
+				panel_bridge_in: endpoint {
+					remote-endpoint = <&dsi0_out>;
+				};
+			};
+
+			port@1 {
+				reg = <1>;
+
+				panel_bridge_out: endpoint {
+					remote-endpoint = <&panel_in>;
+				};
+			};
+		};
+	};
+};
+
+&dss1 {
+	clocks = <&k3_clks 232 8>,
+		 <&k3_clks 232 0>,
+		 <&k3_clks 232 4>;
+	assigned-clocks = <&k3_clks 241 0>,     /* DSS1-VP0 */
+			  <&k3_clks 240 0>,     /* DSS1-VP1 */
+			  <&k3_clks 245 0>;     /* DPI Output */
+	assigned-clock-parents = <&k3_clks 241 2>,      /* PLL 17 HDMI */
+				 <&k3_clks 240 1>,      /* PLL 18 DSI */
+				 <&k3_clks 245 2>;      /* DSS1-DPI0 */
+	status = "okay";
+};
+
+&dss1_ports {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	/* DSS1-VP1: DSI Output */
+	port@1 {
+		reg = <1>;
+
+		dss1_dpi1_out: endpoint {
+			remote-endpoint = <&dsi0_in>;
+		};
+	};
+};
+
+&main_pmx0 {
+	ft5406_pins: ft5406-pins {
+		pinctrl-single,pins = <
+			J722S_IOPAD(0x00c4, PIN_INPUT, 7) /* (W23) VOUT0_DATA3.GPIO0_48 */
+		>;
+	};
+};
