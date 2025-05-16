@@ -1448,8 +1448,7 @@ err_disable_clk:
 err_put_ctrl:
 	spi_controller_put(ctlr);
 
-	dev_err(dev, "NXP FSPI probe failed\n");
-	return ret;
+	return dev_err_probe(dev, ret, "NXP FSPI probe failed\n");
 }
 
 static void nxp_fspi_remove(struct platform_device *pdev)
