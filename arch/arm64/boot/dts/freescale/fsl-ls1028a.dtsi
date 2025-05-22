@@ -886,8 +886,7 @@
 			};
 		};
 
-		/* Remove the upstream node to add node from SDK driver */
-/*		gpu: gpu@f0c0000 {
+		gpu: gpu@f0c0000 {
 			compatible = "vivante,gc";
 			reg = <0x0 0xf0c0000 0x0 0x10000>;
 			interrupts = <GIC_SPI 220 IRQ_TYPE_LEVEL_HIGH>;
@@ -895,20 +894,6 @@
 				 <&clockgen QORIQ_CLK_HWACCEL 2>,
 				 <&clockgen QORIQ_CLK_HWACCEL 2>;
 			clock-names = "core", "shader", "bus";
-			#cooling-cells = <2>;
-		};
-*/
-
-		gpu: gpu@f0c0000 {
-			compatible = "fsl,ls1028a-gpu";
-			reg = <0x0 0x0f0c0000 0x0 0x10000>,
-				<0x0 0x80000000 0x0 0x80000000>,
-				<0x0 0x0 0x0 0x3000000>;
-			reg-names = "base", "phys_baseaddr",
-				"contiguous_mem";
-			interrupts = <GIC_SPI 220 IRQ_TYPE_LEVEL_HIGH>;
-
-			throttle,max_state = <1>;
 			#cooling-cells = <2>;
 		};
 
