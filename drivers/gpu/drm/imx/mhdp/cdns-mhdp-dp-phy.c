@@ -197,6 +197,10 @@ static void dp_phy_pma_cmn_pll0_24mhz(struct cdns_mhdp_device *mhdp)
 		cdns_phy_reg_write(mhdp, (XCVR_DIAG_HSCLK_SEL | (k << 9)), val);
 	}
 
+	/* No link (yet) */
+	if (!link_rate)
+		return;
+
 	/* DP PHY PLL 24MHz configuration */
 	index = link_rate_index(link_rate);
 	if (index < 0) {
@@ -322,6 +326,10 @@ static void dp_phy_pma_cmn_pll0_27mhz(struct cdns_mhdp_device *mhdp)
 			val |= 0x1000;
 		cdns_phy_reg_write(mhdp, (XCVR_DIAG_HSCLK_SEL | (k << 9)), val);
 	}
+
+	/* No link (yet) */
+	if (!link_rate)
+		return;
 
 	/* DP PHY PLL 27MHz configuration */
 	index = link_rate_index(link_rate);
