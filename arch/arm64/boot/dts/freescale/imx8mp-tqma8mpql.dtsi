@@ -29,6 +29,14 @@
 		vin-supply = <&ldo5_reg>;
 		status = "disabled";
 	};
+
+	reg_5v_in: regulator-5v-in {
+		compatible = "regulator-fixed";
+		regulator-name = "V_5V_IN";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		regulator-boot-on;
+	};
 };
 
 &A53_0 {
@@ -85,6 +93,7 @@
 				regulator-name = "BUCK1";
 				regulator-min-microvolt = <850000>;
 				regulator-max-microvolt = <950000>;
+				vin-supply = <&reg_5v_in>;
 				regulator-boot-on;
 				regulator-always-on;
 				regulator-ramp-delay = <3125>;
@@ -95,6 +104,7 @@
 				regulator-name = "BUCK2";
 				regulator-min-microvolt = <850000>;
 				regulator-max-microvolt = <1000000>;
+				vin-supply = <&reg_5v_in>;
 				regulator-boot-on;
 				regulator-always-on;
 				nxp,dvs-run-voltage = <950000>;
@@ -107,6 +117,7 @@
 				regulator-name = "BUCK4";
 				regulator-min-microvolt = <3300000>;
 				regulator-max-microvolt = <3300000>;
+				vin-supply = <&reg_5v_in>;
 				regulator-boot-on;
 				regulator-always-on;
 			};
@@ -116,6 +127,7 @@
 				regulator-name = "BUCK5";
 				regulator-min-microvolt = <1800000>;
 				regulator-max-microvolt = <1800000>;
+				vin-supply = <&reg_5v_in>;
 				regulator-boot-on;
 				regulator-always-on;
 			};
@@ -125,6 +137,7 @@
 				regulator-name = "BUCK6";
 				regulator-min-microvolt = <1100000>;
 				regulator-max-microvolt = <1100000>;
+				vin-supply = <&reg_5v_in>;
 				regulator-boot-on;
 				regulator-always-on;
 			};
@@ -134,6 +147,7 @@
 				regulator-name = "LDO1";
 				regulator-min-microvolt = <1800000>;
 				regulator-max-microvolt = <1800000>;
+				vin-supply = <&reg_5v_in>;
 				regulator-boot-on;
 				regulator-always-on;
 			};
@@ -143,6 +157,7 @@
 				regulator-name = "LDO3";
 				regulator-min-microvolt = <1800000>;
 				regulator-max-microvolt = <1800000>;
+				vin-supply = <&reg_5v_in>;
 				regulator-boot-on;
 				regulator-always-on;
 			};
@@ -152,6 +167,7 @@
 				regulator-name = "LDO4";
 				regulator-min-microvolt = <800000>;
 				regulator-max-microvolt = <3300000>;
+				vin-supply = <&reg_5v_in>;
 			};
 
 			/* VCC SD IO - switched using SD2 VSELECT */
@@ -159,6 +175,7 @@
 				regulator-name = "LDO5";
 				regulator-min-microvolt = <1800000>;
 				regulator-max-microvolt = <3300000>;
+				vin-supply = <&reg_5v_in>;
 			};
 		};
 	};
