@@ -20,6 +20,7 @@
 		serial0 = &wkup_uart0;
 		serial1 = &mcu_uart0;
 		serial2 = &main_uart0;
+		mmc0 = &sdhci0;
 		mmc1 = &sdhci1;
 		rtc0 = &wkup_rtc0;
 		ethernet0 = &cpsw_port1;
@@ -172,6 +173,24 @@
 			 <3300000 0x1>;
 		bootph-all;
 	};
+
+	codec_audio: sound {
+		compatible = "simple-audio-card";
+		simple-audio-card,name = "AM62D2-EVM";
+		simple-audio-card,format = "i2s";
+		simple-audio-card,bitclock-master = <&sound_master1>;
+		simple-audio-card,frame-master = <&sound_master1>;
+		simple-audio-card,bitclock-inversion;
+
+		sound_master1: simple-audio-card,cpu {
+			sound-dai = <&mcasp2>;
+			system-clock-direction-out;
+		};
+
+		simple-audio-card,codec {
+			sound-dai = <&tad5212>;
+		};
+	};
 };
 
 &mcu_pmx0 {
@@ -224,6 +243,22 @@
 			AM62DX_IOPAD(0x00b0, PIN_INPUT_PULLUP, 1) /* (M22) GPMC0_CSn2.I2C2_SCL */
 			AM62DX_IOPAD(0x00b4, PIN_INPUT_PULLUP, 1) /* (M20) GPMC0_CSn3.I2C2_SDA */
 		>;
+	};
+
+	main_mmc0_pins_default: main-mmc0-default-pins {
+		pinctrl-single,pins = <
+			AM62DX_IOPAD(0x0220, PIN_INPUT_PULLUP, 0) /* (Y6) MMC0_CMD */
+			AM62DX_IOPAD(0x0218, PIN_OUTPUT, 0) /* (AB7) MMC0_CLK */
+			AM62DX_IOPAD(0x0214, PIN_INPUT_PULLUP, 0) /* (AA6) MMC0_DAT0 */
+			AM62DX_IOPAD(0x0210, PIN_INPUT_PULLUP, 0) /* (AB6) MMC0_DAT1 */
+			AM62DX_IOPAD(0x020c, PIN_INPUT_PULLUP, 0) /* (Y7) MMC0_DAT2 */
+			AM62DX_IOPAD(0x0208, PIN_INPUT_PULLUP, 0) /* (AA7) MMC0_DAT3 */
+			AM62DX_IOPAD(0x0204, PIN_INPUT_PULLUP, 0) /* (Y8) MMC0_DAT4 */
+			AM62DX_IOPAD(0x0200, PIN_INPUT_PULLUP, 0) /* (W7) MMC0_DAT5 */
+			AM62DX_IOPAD(0x01fc, PIN_INPUT_PULLUP, 0) /* (W9) MMC0_DAT6 */
+			AM62DX_IOPAD(0x01f8, PIN_INPUT_PULLUP, 0) /* (AB8) MMC0_DAT7 */
+		>;
+		bootph-all;
 	};
 
 	main_mmc1_pins_default: main-mmc1-default-pins {
@@ -284,9 +319,26 @@
 		bootph-all;
 	};
 
+	main_mcasp2_pins_default: main-mcasp2-default-pins {
+		pinctrl-single,pins = <
+			AM62DX_IOPAD(0x0070, PIN_INPUT, 3) /* (R21) GPMC0_AD13.MCASP2_ACLKX */
+			AM62DX_IOPAD(0x006c, PIN_INPUT, 3) /* (T22) GPMC0_AD12.MCASP2_AFSX */
+			AM62DX_IOPAD(0x005C, PIN_INPUT, 3) /* (P22) GPMC0_AD8.MCASP2_AXR0 */
+			AM62DX_IOPAD(0x0060, PIN_INPUT, 3) /* (R19) GPMC0_AD9.MCASP2_AXR1 */
+			AM62DX_IOPAD(0x0068, PIN_INPUT, 3) /* (R22) GPMC0_AD11.MCASP2_AXR3 */
+			AM62DX_IOPAD(0x003c, PIN_INPUT, 3) /* (N21) GPMC0_AD0.MCASP2_AXR4 */
+		>;
+	};
+
 	main_gpio1_ioexp_intr_pins_default: main-gpio1-ioexp-intr-default-pins {
 		pinctrl-single,pins = <
 			AM62DX_IOPAD(0x01d4, PIN_INPUT, 7) /* (C15) UART0_RTSn.GPIO1_23 */
+		>;
+	};
+
+	main_usb1_pins_default: main-usb1-default-pins {
+			pinctrl-single,pins = <
+			AM62DX_IOPAD(0x0280, PIN_OUTPUT, 0) /* (D19) USB1_DRVVBUS */
 		>;
 	};
 
@@ -380,6 +432,13 @@
 			"", "",
 			"SoC_I2C0_SCL", "SoC_I2C0_SDA";
 	};
+
+	tad5212: dac@50 {
+		compatible = "ti,tad5212";
+		reg = <0x50>, <0x51>, <0x52>, <0x53>;
+		sound-name-prefix = "tad5212_04";
+		#sound-dai-cells = <0>;
+	};
 };
 
 &main_i2c1 {
@@ -394,6 +453,35 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&main_i2c2_pins_default>;
 	clock-frequency = <400000>;
+};
+
+&mcasp2 {
+	status = "okay";
+	#sound-dai-cells = <0>;
+
+	pinctrl-names = "default";
+	pinctrl-0 = <&main_mcasp2_pins_default>;
+
+	auxclk-fs-ratio = <2177>;
+	op-mode = <0>;          /* MCASP_IIS_MODE */
+	tdm-slots = <2>;
+	slot-width = <32>;
+	serial-dir = <
+	       1 1 0 1
+	       1 0 0 0
+	       0 0 0 0
+	       0 0 0 0
+	>;
+};
+
+&sdhci0 {
+	/* eMMC */
+	bootph-all;
+	status = "okay";
+	non-removable;
+	pinctrl-names = "default";
+	pinctrl-0 = <&main_mmc0_pins_default>;
+	disable-wp;
 };
 
 &sdhci1 {
@@ -428,6 +516,11 @@
 	bootph-all;
 };
 
+&usbss0 {
+	status = "okay";
+	ti,vbus-divider;
+};
+
 &usb0 {
 	usb-role-switch;
 
@@ -436,6 +529,16 @@
 			remote-endpoint = <&usb_con_hs>;
 		};
 	};
+};
+
+&usbss1 {
+	status = "okay";
+};
+
+&usb1 {
+	dr_mode = "host";
+	pinctrl-names = "default";
+	pinctrl-0 = <&main_usb1_pins_default>;
 };
 
 &mailbox0_cluster0 {
@@ -486,6 +589,7 @@
 	mboxes = <&mailbox0_cluster2 &mbox_mcu_r5_0>;
 	memory-region = <&mcu_r5fss0_core0_dma_memory_region>,
 			<&mcu_r5fss0_core0_memory_region>;
+	firmware-name = "am62d-mcu-r5f0_0-fw";
 };
 
 &c7x_0 {
@@ -494,6 +598,7 @@
 	mboxes = <&mailbox0_cluster1 &mbox_c7x_0>;
 	memory-region = <&c7x_0_dma_memory_region>,
 			<&c7x_0_memory_region>;
+	firmware-name = "am62d-c71_0-fw";
 };
 
 &cpsw3g {
