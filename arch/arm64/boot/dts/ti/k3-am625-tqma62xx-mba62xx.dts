@@ -116,6 +116,7 @@
 	};
 
 	reg_3v3_sd: regulator-3v3-sd {
+		bootph-all;
 		/* TPS22963CYZTP */
 		compatible = "regulator-fixed";
 		pinctrl-names = "default";
@@ -250,6 +251,7 @@
 };
 
 &main_gpio0 {
+	bootph-all;
 	pinctrl-names = "default";
 	pinctrl-0 = <&main_gpio0_pins &main_gpio0_pr0_pins>;
 	gpio-line-names =
@@ -275,6 +277,7 @@
 };
 
 &main_gpio1 {
+	bootph-all;
 	pinctrl-names = "default";
 	pinctrl-0 = <&main_gpio1_pins &main_gpio1_pr0_pins>;
 
@@ -396,6 +399,7 @@
 
 /* Main console */
 &main_uart0 {
+	bootph-all;
 	pinctrl-names = "default";
 	pinctrl-0 = <&main_uart0_pins>;
 	status = "okay";
@@ -447,6 +451,7 @@
 };
 
 &mcu_gpio0 {
+	bootph-all;
 	pinctrl-names = "default";
 	pinctrl-0 = <&mcu_gpio0_pins>;
 	gpio-line-names =
@@ -479,6 +484,7 @@
 };
 
 &reg_sd {
+	bootph-all;
 	pinctrl-names = "default";
 	pinctrl-0 = <&reg_sd_pins>;
 	gpios = <&main_gpio0 31 GPIO_ACTIVE_LOW>;
@@ -486,6 +492,7 @@
 };
 
 &sdhci1 {
+	bootph-all;
 	/* SD-card */
 	pinctrl-names = "default";
 	pinctrl-0 = <&main_mmc1_pins>;
@@ -516,6 +523,7 @@
 };
 
 &usbss0 {
+	bootph-all;
 	ti,vbus-divider;
 	status = "okay";
 };
@@ -526,6 +534,7 @@
 };
 
 &usb0 {
+	bootph-all;
 	pinctrl-names = "default";
 	pinctrl-0 = <&main_usb0_pins>;
 	dr_mode = "otg";
@@ -688,6 +697,7 @@
 	};
 
 	main_mmc1_pins: main-mmc1-pins {
+		bootph-all;
 		pinctrl-single,pins = <
 			AM62X_IOPAD(0x23c, PIN_INPUT, 0) /* (A21) MMC1_CMD */
 			AM62X_IOPAD(0x234, PIN_INPUT, 0) /* (B22) MMC1_CLK */
@@ -791,6 +801,7 @@
 	};
 
 	main_uart0_pins: main-uart0-pins {
+		bootph-all;
 		pinctrl-single,pins = <
 			AM62X_IOPAD(0x1c8, PIN_INPUT, 0) /* (D14) UART0_RXD */
 			AM62X_IOPAD(0x1cc, PIN_OUTPUT, 0) /* (E14) UART0_TXD */
@@ -844,6 +855,7 @@
 	};
 
 	reg_3v3_sd_pins: reg-3v3-sd-pins {
+		bootph-all;
 		pinctrl-single,pins = <
 			AM62X_IOPAD(0x198, PIN_OUTPUT, 7) /* (A19) MCASP0_AXR2.GPIO1_8 */
 		>;
@@ -862,6 +874,7 @@
 	};
 
 	reg_sd_pins: reg-sd-pins {
+		bootph-all;
 		pinctrl-single,pins = <
 			AM62X_IOPAD(0x07c, PIN_OUTPUT, 7) /* (P25) GPMC0_CLK.GPIO0_31 */
 		>;
