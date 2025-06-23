@@ -659,6 +659,10 @@
 	};
 };
 
+&usb0_phy_ctrl {
+	bootph-all;
+};
+
 &usbss1 {
 	ti,vbus-divider;
 	status = "okay";
