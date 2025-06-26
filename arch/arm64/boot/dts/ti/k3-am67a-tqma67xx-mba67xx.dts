@@ -563,6 +563,14 @@
 		      <J722S_SERDES1_LANE0_PCIE0_LANE0>;
 };
 
+&serdes_wiz0 {
+	status = "okay";
+};
+
+&serdes_wiz1 {
+	status = "okay";
+};
+
 &serdes0 {
 	status = "okay";
 
