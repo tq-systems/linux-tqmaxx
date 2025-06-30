@@ -384,7 +384,7 @@ static void wave5_vpu_dec_finish_decode(struct vpu_instance *inst)
 
 	ret = wave5_vpu_dec_get_output_info(inst, &dec_info);
 	if (ret) {
-		dev_warn(inst->dev->dev, "%s: could not get output info.", __func__);
+		dev_dbg(inst->dev->dev, "%s: could not get output info.", __func__);
 		v4l2_m2m_job_finish(inst->v4l2_m2m_dev, m2m_ctx);
 		return;
 	}
@@ -1908,8 +1908,8 @@ static void wave5_vpu_dec_device_run(void *priv)
 		}
 		break;
 	default:
-		WARN(1, "Execution of a job in state %s illegal.\n", state_to_str(inst->state));
-		break;
+		dev_dbg(inst->dev->dev, "Execution of a job in state %s illegal.\n",
+			state_to_str(inst->state));
 	}
 
 finish_job_and_return:
@@ -1965,7 +1965,8 @@ static int wave5_vpu_dec_job_ready(void *priv)
 				"No capture buffer ready to decode!\n");
 			break;
 		} else if (!wave5_is_draining_or_eos(inst) &&
-			   !(v4l2_m2m_num_src_bufs_ready(m2m_ctx) || inst->empty_queue)) {
+			   (!v4l2_m2m_num_src_bufs_ready(m2m_ctx) ||
+			    inst->empty_queue)) {
 			dev_dbg(inst->dev->dev,
 				"No bitstream data to decode!\n");
 			break;
