@@ -257,40 +257,6 @@
 		};
 	};
 
-	vsys_io_1v8: regulator-vsys-io-1v8 {
-		compatible = "regulator-fixed";
-		regulator-name = "vsys_io_1v8";
-		regulator-min-microvolt = <1800000>;
-		regulator-max-microvolt = <1800000>;
-		regulator-always-on;
-		regulator-boot-on;
-	};
-
-	vsys_io_1v2: regulator-vsys-io-1v2 {
-		compatible = "regulator-fixed";
-		regulator-name = "vsys_io_1v2";
-		regulator-min-microvolt = <1200000>;
-		regulator-max-microvolt = <1200000>;
-		regulator-always-on;
-		regulator-boot-on;
-	};
-
-	edp1_refclk: clock-edp1-refclk {
-		#clock-cells = <0>;
-		compatible = "fixed-clock";
-		clock-frequency = <19200000>;
-	};
-
-	dp1_pwr_3v3: regulator-dp1-prw {
-		compatible = "regulator-fixed";
-		regulator-name = "dp1-pwr";
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
-		gpio = <&exp4 1 GPIO_ACTIVE_HIGH>; /* P1 - DP1_PWR_SW_EN */
-		enable-active-high;
-		regulator-always-on;
-	};
-
 	transceiver0: can-phy0 {
 		compatible = "ti,tcan1042";
 		#phy-cells = <0>;
@@ -342,6 +308,52 @@
 			 <&k3_clks 157 34>, <&k3_clks 157 63>;
 		clock-names = "cpb-mcasp-auxclk", "cpb-mcasp-auxclk-48000",
 			      "cpb-codec-scki", "cpb-codec-scki-48000";
+	};
+
+	vsys_io_1v8: regulator-vsys-io-1v8 {
+		compatible = "regulator-fixed";
+		regulator-name = "vsys_io_1v8";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		regulator-always-on;
+		regulator-boot-on;
+	};
+
+	vsys_io_1v2: regulator-vsys-io-1v2 {
+		compatible = "regulator-fixed";
+		regulator-name = "vsys_io_1v2";
+		regulator-min-microvolt = <1200000>;
+		regulator-max-microvolt = <1200000>;
+		regulator-always-on;
+		regulator-boot-on;
+	};
+
+	edp1_refclk: clock-edp1-refclk {
+		#clock-cells = <0>;
+		compatible = "fixed-clock";
+		clock-frequency = <19200000>;
+	};
+
+	dp1_pwr_3v3: regulator-dp1-prw {
+		compatible = "regulator-fixed";
+		regulator-name = "dp1-pwr";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		gpio = <&exp4 1 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+	};
+
+	dp1: connector-dp1 {
+		compatible = "dp-connector";
+		label = "DP1";
+		type = "full-size";
+		dp-pwr-supply = <&dp1_pwr_3v3>;
+
+		port {
+			dp1_connector_in: endpoint {
+				remote-endpoint = <&dp1_out>;
+			};
+		};
 	};
 };
 
@@ -1468,14 +1480,6 @@
 	phy-names = "dpphy";
 };
 
-&dphy_tx0 {
-	status = "okay";
-};
-
-&dsi0 {
-	status = "okay";
-};
-
 &dss_ports {
 	#address-cells = <1>;
 	#size-cells = <0>;
@@ -1537,20 +1541,7 @@
 			port@1 {
 				reg = <1>;
 				dp1_out: endpoint {
-					remote-endpoint = <&dp1_panel_in>;
-				};
-			};
-		};
-
-		aux-bus {
-			panel {
-				compatible = "ti,panel-edp";
-				power-supply = <&dp1_pwr_3v3>;
-
-				port {
-					dp1_panel_in: endpoint {
-						remote-endpoint = <&dp1_out>;
-					};
+					remote-endpoint = <&dp1_connector_in>;
 				};
 			};
 		};
@@ -1571,6 +1562,14 @@
 			remote-endpoint = <&dpi2_out>;
 		};
 	};
+};
+
+&dphy_tx0 {
+	status = "okay";
+};
+
+&dsi0 {
+	status = "okay";
 };
 
 &dp0_ports {

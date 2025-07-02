@@ -146,10 +146,22 @@
 		regulator-name = "dp0-pwr";
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
-		pinctrl-names = "default";
 		gpio = <&exp2 2 GPIO_ACTIVE_HIGH>;     /*P0 - DP0_3V3 _EN */
 		enable-active-high;
 		regulator-always-on;
+	};
+
+	dp0: dp0-connector {
+		compatible = "dp-connector";
+		label = "DP0";
+		type = "full-size";
+		dp-pwr-supply = <&dp0_pwr_3v3>;
+
+		port {
+			dp0_connector_in: endpoint {
+				remote-endpoint = <&dp0_out>;
+			};
+		};
 	};
 
 	connector-hdmi {
@@ -636,19 +648,6 @@
 		vcca-supply = <&vsys_io_1v2>;
 		vcc-supply = <&vsys_io_1v2>;
 
-		aux-bus {
-			panel {
-				compatible = "ti,panel-edp";
-				power-supply = <&dp0_pwr_3v3>;
-
-				port {
-					dp0_panel_in: endpoint {
-						remote-endpoint = <&dp0_out>;
-					};
-				};
-			};
-		};
-
 		dsi_edp_bridge_ports: ports {
 			#address-cells = <1>;
 			#size-cells = <0>;
@@ -665,7 +664,7 @@
 				reg = <1>;
 
 				dp0_out: endpoint {
-					remote-endpoint = <&dp0_panel_in>;
+					remote-endpoint = <&dp0_connector_in>;
 				};
 			};
 		};
@@ -756,6 +755,7 @@
 &dss_ports {
 	#address-cells = <1>;
 	#size-cells = <0>;
+
 	/* HDMI */
 	port@1 {
 		reg = <1>;
