@@ -82,10 +82,12 @@
 		reg = <0x38>;
 		interrupt-parent = <&main_gpio0>;
 		interrupts = <48 IRQ_TYPE_EDGE_FALLING>;
+		reset-gpio = <&display_reg 1 GPIO_ACTIVE_LOW>;
 		touchscreen-inverted-x;
 		touchscreen-inverted-y;
 		touchscreen-size-x = <800>;
 		touchscreen-size-y = <480>;
+		vcc-supply = <&display_reg>;
 	};
 
 	display_reg: regulator@45 {
