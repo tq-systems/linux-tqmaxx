@@ -80,8 +80,6 @@
 	ft5406: touchscreen@38 {
 		compatible = "edt,edt-ft5506";
 		reg = <0x38>;
-		pinctrl-names = "default";
-		pinctrl-0 = <&ft5406_pins>;
 		interrupt-parent = <&main_gpio0>;
 		interrupts = <48 IRQ_TYPE_EDGE_FALLING>;
 		touchscreen-inverted-x;
@@ -177,13 +175,5 @@
 		dss1_dpi1_out: endpoint {
 			remote-endpoint = <&dsi0_in>;
 		};
-	};
-};
-
-&main_pmx0 {
-	ft5406_pins: ft5406-pins {
-		pinctrl-single,pins = <
-			J722S_IOPAD(0x00c4, PIN_INPUT, 7) /* (W23) VOUT0_DATA3.GPIO0_48 */
-		>;
 	};
 };
