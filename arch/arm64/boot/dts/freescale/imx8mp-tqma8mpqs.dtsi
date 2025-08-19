@@ -200,7 +200,7 @@
 
 &gpio4 {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_gpio4>, <&pinctrl_sdp>;
+	pinctrl-0 = <&pinctrl_gpio4>, <&pinctrl_sdp>, <&pinctrl_eepromwp>;
 
 	gpio-line-names = "", "GPIO8", "", "",
 			  "GPIO9", "ESPI_RST#", "", "",
@@ -210,6 +210,14 @@
 			  "", "", "", "",
 			  "", "GPIO0", "GPIO1", "",
 			  "GPIO2", "GPIO6", "", "";
+
+	/* EEPROM write control */
+	sw_en_hog: sw-en-hog {
+		gpio-hog;
+		gpios = <5 0>;
+		output-high;
+		line-name = "SW_EN";
+	};
 };
 
 &gpio5 {
@@ -662,6 +670,10 @@
 			   <MX8MP_IOMUXC_ECSPI1_SCLK__ECSPI1_SCLK	0x1c0>,
 			   <MX8MP_IOMUXC_ECSPI1_SS0__GPIO5_IO09		0x1c0>,
 			   <MX8MP_IOMUXC_ECSPI2_MISO__GPIO5_IO12	0x1c0>;
+	};
+
+	pinctrl_eepromwp: eepromwpgrp {
+		fsl,pins = <MX8MP_IOMUXC_SAI1_RXD3__GPIO4_IO05		0x00000144>;
 	};
 
 	pinctrl_eqos: eqosgrp {
