@@ -642,6 +642,7 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usb0>;
 	fsl,over-current-active-low;
+	maximum-speed = "high-speed";
 };
 
 &usb3_1 {
