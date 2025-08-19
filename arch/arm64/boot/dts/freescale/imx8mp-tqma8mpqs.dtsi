@@ -154,6 +154,13 @@
 			  "", "", "", "",
 			  "", "", "", "",
 			  "", "", "", "";
+
+	pmic_irq_hog: pmic-irq-hog {
+		gpio-hog;
+		gpios = <8 0>;
+		input;
+		line-name = "PMIC_IRQ#";
+	};
 };
 
 &gpio2 {
@@ -169,6 +176,20 @@
 			  "", "", "", "",
 			  "", "", "", "";
 
+	enet0-int-hog {
+		gpio-hog;
+		gpios = <0 0>;
+		input;
+		line-name = "ENET0_INT#";
+	};
+
+	enet1-int-hog {
+		gpio-hog;
+		gpios = <1 0>;
+		input;
+		line-name = "ENET_INT#";
+	};
+
 	perst-hog {
 		gpio-hog;
 		gpios = <10 0>;
@@ -181,6 +202,13 @@
 		gpios = <11 0>;
 		input;
 		line-name = "PEWAKE#";
+	};
+
+	rtc-int-hog {
+		gpio-hog;
+		gpios = <27 0>;
+		input;
+		line-name = "RTC_INT#";
 	};
 };
 
@@ -196,6 +224,13 @@
 			  "GPIO3", "", "", "",
 			  "", "", "", "",
 			  "TEMP_EVENT#", "", "", "";
+
+	temp-event--hog {
+		gpio-hog;
+		gpios = <28 0>;
+		input;
+		line-name = "TEMP_EVENT#";
+	};
 };
 
 &gpio4 {
@@ -232,6 +267,13 @@
 			  "", "", "", "",
 			  "", "", "", "",
 			  "", "", "", "";
+
+	dp-hpd-int-hog {
+		gpio-hog;
+		gpios = <21 0>;
+		input;
+		line-name = "DP_HPD_INT";
+	};
 };
 
 &hdmi_tx {
