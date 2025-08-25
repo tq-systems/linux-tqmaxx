@@ -298,6 +298,13 @@
 		iov-supply = <&reg_1v8>;
 		ldoin-supply = <&reg_3v3>;
 	};
+
+	eeprom2: eeprom@57 {
+		compatible = "atmel,24c32";
+		reg = <0x57>;
+		pagesize = <32>;
+		vcc-supply = <&reg_3v3>;
+	};
 };
 
 &ldb_lvds_ch0 {
