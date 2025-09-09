@@ -162,6 +162,10 @@ struct regulator *__must_check regulator_get_optional(struct device *dev,
 						      const char *id);
 struct regulator *__must_check devm_regulator_get_optional(struct device *dev,
 							   const char *id);
+struct regulator *__must_check regulator_get_exclusive_optional(struct device *dev,
+								const char *id);
+struct regulator *__must_check devm_regulator_get_exclusive_optional(struct device *dev,
+								     const char *id);
 int devm_regulator_get_enable(struct device *dev, const char *id);
 int devm_regulator_get_enable_optional(struct device *dev, const char *id);
 int devm_regulator_get_enable_read_voltage(struct device *dev, const char *id);
@@ -346,6 +350,18 @@ regulator_get_optional(struct device *dev, const char *id)
 
 static inline struct regulator *__must_check
 devm_regulator_get_optional(struct device *dev, const char *id)
+{
+	return ERR_PTR(-ENODEV);
+}
+
+static inline struct regulator *__must_check
+regulator_get_exclusive_optional(struct device *dev, const char *id)
+{
+	return ERR_PTR(-ENODEV);
+}
+
+static inline struct regulator *__must_check
+devm_regulator_get_exclusive_optional(struct device *dev, const char *id)
 {
 	return ERR_PTR(-ENODEV);
 }

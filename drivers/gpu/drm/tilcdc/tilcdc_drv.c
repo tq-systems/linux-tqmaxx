@@ -175,7 +175,10 @@ static void tilcdc_fini(struct drm_device *dev)
 		drm_dev_unregister(dev);
 
 	drm_kms_helper_poll_fini(dev);
-	drm_atomic_helper_shutdown(dev);
+
+	if (priv->is_registered)
+		drm_atomic_helper_shutdown(dev);
+
 	tilcdc_irq_uninstall(dev);
 	drm_mode_config_cleanup(dev);
 

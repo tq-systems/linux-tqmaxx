@@ -552,6 +552,7 @@ void __init am33xx_init_early(void)
 	omap3xxx_check_revision();
 	am33xx_check_features();
 	omap2_prcm_base_init();
+	am33xx_voltagedomains_init();
 	am33xx_powerdomains_init();
 	am33xx_clockdomains_init();
 	omap_clk_soc_init = am33xx_dt_clk_init;

@@ -33,8 +33,9 @@
 #define ADCFSM_STEPID		0x10
 #define SEQ_SETTLE		275
 #define MAX_12BIT		((1 << 12) - 1)
+#define COORDINATE_READOUTS_MAX	7
 
-#define TSC_IRQENB_MASK		(IRQENB_FIFO0THRES | IRQENB_EOS | IRQENB_HW_PEN)
+#define TSC_IRQENB_MASK		(IRQENB_FIFO0THRES | IRQENB_EOS | IRQENB_HW_PEN | IRQENB_PENUP)
 
 static const int config_pins[] = {
 	STEPCONFIG_XPP,
@@ -223,7 +224,7 @@ static int titsc_cmp_coord(const void *a, const void *b)
 static void titsc_read_coordinates(struct titsc *ts_dev,
 		u32 *x, u32 *y, u32 *z1, u32 *z2)
 {
-	unsigned int yvals[7], xvals[7];
+	unsigned int yvals[COORDINATE_READOUTS_MAX], xvals[COORDINATE_READOUTS_MAX];
 	unsigned int i, xsum = 0, ysum = 0;
 	unsigned int creads = ts_dev->coordinate_readouts;
 
@@ -276,28 +277,25 @@ static irqreturn_t titsc_irq(int irq, void *dev)
 {
 	struct titsc *ts_dev = dev;
 	struct input_dev *input_dev = ts_dev->input;
-	unsigned int fsm, status, irqclr = 0;
+	unsigned int status, irqclr = 0;
 	unsigned int x = 0, y = 0;
 	unsigned int z1, z2, z;
 
 	status = titsc_readl(ts_dev, REG_RAWIRQSTATUS);
 	if (status & IRQENB_HW_PEN) {
-		ts_dev->pen_down = true;
+		if (!(status & IRQENB_PENUP)) {
+			ts_dev->pen_down = true;
+			pm_stay_awake(ts_dev->dev);
+		}
 		irqclr |= IRQENB_HW_PEN;
-		pm_stay_awake(ts_dev->dev);
 	}
 
 	if (status & IRQENB_PENUP) {
-		fsm = titsc_readl(ts_dev, REG_ADCFSM);
-		if (fsm == ADCFSM_STEPID) {
-			ts_dev->pen_down = false;
-			input_report_key(input_dev, BTN_TOUCH, 0);
-			input_report_abs(input_dev, ABS_PRESSURE, 0);
-			input_sync(input_dev);
-			pm_relax(ts_dev->dev);
-		} else {
-			ts_dev->pen_down = true;
-		}
+		ts_dev->pen_down = false;
+		input_report_key(input_dev, BTN_TOUCH, 0);
+		input_report_abs(input_dev, ABS_PRESSURE, 0);
+		input_sync(input_dev);
+		pm_relax(ts_dev->dev);
 		irqclr |= IRQENB_PENUP;
 	}
 
@@ -385,7 +383,8 @@ static int titsc_parse_dt(struct platform_device *pdev,
 	if (err < 0)
 		return err;
 
-	if (ts_dev->coordinate_readouts <= 0) {
+	if (ts_dev->coordinate_readouts <= 0 ||
+	    ts_dev->coordinate_readouts > COORDINATE_READOUTS_MAX) {
 		dev_warn(&pdev->dev,
 			 "invalid co-ordinate readouts, resetting it to 5\n");
 		ts_dev->coordinate_readouts = 5;
@@ -451,8 +450,7 @@ static int titsc_probe(struct platform_device *pdev)
 		dev_err(&pdev->dev, "irq wake enable failed.\n");
 
 	titsc_writel(ts_dev, REG_IRQSTATUS, TSC_IRQENB_MASK);
-	titsc_writel(ts_dev, REG_IRQENABLE, IRQENB_FIFO0THRES);
-	titsc_writel(ts_dev, REG_IRQENABLE, IRQENB_EOS);
+	titsc_writel(ts_dev, REG_IRQENABLE, IRQENB_FIFO0THRES | IRQENB_EOS | IRQENB_PENUP);
 	err = titsc_config_wires(ts_dev);
 	if (err) {
 		dev_err(&pdev->dev, "wrong i/p wire configuration\n");

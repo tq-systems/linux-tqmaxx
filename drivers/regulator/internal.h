@@ -118,6 +118,7 @@ enum regulator_get_type {
 	NORMAL_GET,
 	EXCLUSIVE_GET,
 	OPTIONAL_GET,
+	EXCLUSIVE_OPTIONAL_GET,
 	MAX_GET_TYPE
 };
 
