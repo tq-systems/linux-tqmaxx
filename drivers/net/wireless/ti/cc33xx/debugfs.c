@@ -21,156 +21,10 @@
 	DEBUGFS_FWSTATS_FILE_ARRAY(a, b, c, cc33xx_acx_statistics)
 
 
-CC33XX_DEBUGFS_FWSTATS_FILE(error, error_frame_non_ctrl, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(error, error_frame_ctrl, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(error, error_frame_during_protection, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(error, null_frame_tx_start, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(error, null_frame_cts_start, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(error, bar_retry, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(error, num_frame_cts_nul_flid, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(error, tx_abort_failure, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(error, tx_resume_failure, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(error, rx_cmplt_db_overflow_cnt, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(error, elp_while_rx_exch, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(error, elp_while_tx_exch, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(error, elp_while_tx, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(error, elp_while_nvic_pending, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(error, rx_excessive_frame_len, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(error, burst_mismatch, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(error, tbc_exch_mismatch, "%u");
-
-CC33XX_DEBUGFS_FWSTATS_FILE(tx, tx_prepared_descs, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(tx, tx_cmplt, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(tx, tx_template_prepared, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(tx, tx_data_prepared, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(tx, tx_template_programmed, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(tx, tx_data_programmed, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(tx, tx_burst_programmed, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(tx, tx_starts, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(tx, tx_stop, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(tx, tx_start_templates, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(tx, tx_start_int_templates, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(tx, tx_start_fw_gen, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(tx, tx_start_data, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(tx, tx_start_null_frame, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(tx, tx_exch, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(tx, tx_retry_template, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(tx, tx_retry_data, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE_ARRAY(tx, tx_retry_per_rate,
-				  NUM_OF_RATES_INDEXES);
-CC33XX_DEBUGFS_FWSTATS_FILE(tx, tx_exch_pending, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(tx, tx_exch_expiry, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(tx, tx_done_template, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(tx, tx_done_data, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(tx, tx_done_int_template, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(tx, tx_cfe1, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(tx, tx_cfe2, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(tx, frag_called, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(tx, frag_mpdu_alloc_failed, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(tx, frag_init_called, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(tx, frag_in_process_called, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(tx, frag_tkip_called, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(tx, frag_key_not_found, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(tx, frag_need_fragmentation, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(tx, frag_bad_mblk_num, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(tx, frag_failed, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(tx, frag_cache_hit, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(tx, frag_cache_miss, "%u");
-
-CC33XX_DEBUGFS_FWSTATS_FILE(rx, rx_beacon_early_term, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(rx, rx_out_of_mpdu_nodes, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(rx, rx_hdr_overflow, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(rx, rx_dropped_frame, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(rx, rx_done, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(rx, rx_defrag, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(rx, rx_defrag_end, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(rx, rx_cmplt, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(rx, rx_pre_complt, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(rx, rx_cmplt_task, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(rx, rx_phy_hdr, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(rx, rx_timeout, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(rx, rx_rts_timeout, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(rx, rx_timeout_wa, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(rx, defrag_called, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(rx, defrag_init_called, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(rx, defrag_in_process_called, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(rx, defrag_tkip_called, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(rx, defrag_need_defrag, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(rx, defrag_decrypt_failed, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(rx, decrypt_key_not_found, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(rx, defrag_need_decrypt, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(rx, rx_tkip_replays, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(rx, rx_xfr, "%u");
-
-CC33XX_DEBUGFS_FWSTATS_FILE(isr, irqs, "%u");
-
-CC33XX_DEBUGFS_FWSTATS_FILE(pwr, missing_bcns_cnt, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(pwr, rcvd_bcns_cnt, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(pwr, connection_out_of_sync, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE_ARRAY(pwr, cont_miss_bcns_spread,
-				  PWR_STAT_MAX_CONT_MISSED_BCNS_SPREAD);
-CC33XX_DEBUGFS_FWSTATS_FILE(pwr, rcvd_awake_bcns_cnt, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(pwr, sleep_time_count, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(pwr, sleep_time_avg, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(pwr, sleep_cycle_avg, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(pwr, sleep_percent, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(pwr, ap_sleep_active_conf, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(pwr, ap_sleep_user_conf, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(pwr, ap_sleep_counter, "%u");
-
-CC33XX_DEBUGFS_FWSTATS_FILE(rx_filter, beacon_filter, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(rx_filter, arp_filter, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(rx_filter, mc_filter, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(rx_filter, dup_filter, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(rx_filter, data_filter, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(rx_filter, ibss_filter, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(rx_filter, protection_filter, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(rx_filter, accum_arp_pend_requests, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(rx_filter, max_arp_queue_dep, "%u");
-
-CC33XX_DEBUGFS_FWSTATS_FILE_ARRAY(rx_rate, rx_frames_per_rates, 50);
-
-CC33XX_DEBUGFS_FWSTATS_FILE_ARRAY(aggr_size, tx_agg_rate,
-				  AGGR_STATS_TX_AGG);
-CC33XX_DEBUGFS_FWSTATS_FILE_ARRAY(aggr_size, tx_agg_len,
-				  AGGR_STATS_TX_AGG);
-CC33XX_DEBUGFS_FWSTATS_FILE_ARRAY(aggr_size, rx_size,
-				  AGGR_STATS_RX_SIZE_LEN);
-
-CC33XX_DEBUGFS_FWSTATS_FILE(pipeline, hs_tx_stat_fifo_int, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(pipeline, enc_tx_stat_fifo_int, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(pipeline, enc_rx_stat_fifo_int, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(pipeline, rx_complete_stat_fifo_int, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(pipeline, pre_proc_swi, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(pipeline, post_proc_swi, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(pipeline, sec_frag_swi, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(pipeline, pre_to_defrag_swi, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(pipeline, defrag_to_rx_xfer_swi, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(pipeline, dec_packet_in, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(pipeline, dec_packet_in_fifo_full, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(pipeline, dec_packet_out, "%u");
-
-CC33XX_DEBUGFS_FWSTATS_FILE_ARRAY(pipeline, pipeline_fifo_full,
-				  PIPE_STATS_HW_FIFO);
-
-CC33XX_DEBUGFS_FWSTATS_FILE_ARRAY(diversity, num_of_packets_per_ant,
-				  DIVERSITY_STATS_NUM_OF_ANT);
-CC33XX_DEBUGFS_FWSTATS_FILE(diversity, total_num_of_toggles, "%u");
-
-CC33XX_DEBUGFS_FWSTATS_FILE(thermal, irq_thr_low, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(thermal, irq_thr_high, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(thermal, tx_stop, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(thermal, tx_resume, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(thermal, false_irq, "%u");
-CC33XX_DEBUGFS_FWSTATS_FILE(thermal, adc_source_unexpected, "%u");
-
-CC33XX_DEBUGFS_FWSTATS_FILE_ARRAY(calib, fail_count,
-				  CC33XX_NUM_OF_CALIBRATIONS_ERRORS);
-CC33XX_DEBUGFS_FWSTATS_FILE(calib, calib_count, "%u");
-
-CC33XX_DEBUGFS_FWSTATS_FILE(roaming, rssi_level, "%d");
-
-CC33XX_DEBUGFS_FWSTATS_FILE(dfs, num_of_radar_detections, "%d");
+CC33XX_DEBUGFS_FWSTATS_FILE(power, sleep_time_count, "%u");
+CC33XX_DEBUGFS_FWSTATS_FILE(power, sleep_time_avg, "%u");
+CC33XX_DEBUGFS_FWSTATS_FILE(power, sleep_cycle_avg, "%u");
+CC33XX_DEBUGFS_FWSTATS_FILE(power, sleep_percent, "%u");
 
 struct cc33xx_cmd_dfs_radar_debug {
 	struct cc33xx_cmd_header header;
@@ -181,8 +35,8 @@ struct cc33xx_cmd_dfs_radar_debug {
 
 /* ms */
 #define CC33XX_DEBUGFS_STATS_LIFETIME 1000
-#define MAX_VERSIONS_LEN	59
-#define MAX_VERSIONS_EXTENDED_LEN	86
+#define MAX_VERSIONS_LEN	128
+#define MAX_VERSIONS_EXTENDED_LEN	256
 
 static int cc33xx_cmd_radar_detection_debug(struct cc33xx *wl, u8 channel)
 {
@@ -225,8 +79,11 @@ static ssize_t conf_read(struct file *file, char __user *user_buf,
 		return -ENOMEM;
 
 	header.magic	= cpu_to_le32(CC33XX_CONF_MAGIC);
-	header.version	= cpu_to_le32(CC33XX_CONF_VERSION);
-	header.checksum	= 0;
+
+	header.fw_major_version = cpu_to_le32(CC33XX_CONF_FW_MAJOR_VERSION);
+	header.fw_minor_version = cpu_to_le32(CC33XX_CONF_FW_MINOR_VERSION);
+	header.fw_api_version = cpu_to_le32(CC33XX_CONF_FW_API_VERSION);
+	header.fw_build_version = cpu_to_le32(CC33XX_CONF_FW_BUILD_VERSION);
 
 	mutex_lock(&wl->mutex);
 
@@ -253,6 +110,14 @@ static ssize_t clear_fw_stats_write(struct file *file,
 				    const char __user *user_buf,
 				    size_t count, loff_t *ppos)
 {
+	struct cc33xx *wl = file->private_data;
+
+	mutex_lock(&wl->mutex);
+
+	cc33xx_acx_clear_statistics(wl);
+
+	mutex_unlock(&wl->mutex);
+
 	return count;
 }
 
@@ -410,15 +275,20 @@ int cc33xx_format_buffer(char __user *userbuf, size_t count,
 
 void cc33xx_debugfs_update_stats(struct cc33xx *wl)
 {
+	bool update_needed;
+
 	mutex_lock(&wl->mutex);
 
 	if (unlikely(wl->state != CC33XX_STATE_ON))
 		goto out;
 
+	update_needed = time_after(jiffies, wl->stats.fw_stats_next_update);
 
-	if (!wl->plt && time_after(jiffies, wl->stats.fw_stats_update +
-		msecs_to_jiffies(CC33XX_DEBUGFS_STATS_LIFETIME))) {
-		wl->stats.fw_stats_update = jiffies;
+	if (!wl->plt && update_needed) {
+		cc33xx_acx_statistics(wl, wl->stats.fw_stats);
+
+		wl->stats.fw_stats_next_update = 
+			jiffies + msecs_to_jiffies(CC33XX_DEBUGFS_STATS_LIFETIME);
 	}
 
 out:
@@ -1263,6 +1133,36 @@ static const struct file_operations ble_enable_ops = {
 	.llseek = default_llseek,
 };
 
+static ssize_t fw_crash_log_read(struct file *file, char __user *user_buf,
+			       	      size_t count, loff_t *ppos)
+{
+	struct cc33xx *cc = file->private_data;
+	size_t len;
+	int ret;
+
+	if(cc->fw_crash_logs == NULL)
+	{
+		return 0;
+	}
+
+	len = CC33XX_MAX_FW_LOGS_BUFFER_SIZE;
+
+	mutex_lock(&cc->mutex);
+
+	ret = simple_read_from_buffer(user_buf, count, ppos, cc->fw_crash_logs, len);
+
+	mutex_unlock(&cc->mutex);
+
+	return ret;
+}
+
+//crash_fw_log
+static const struct file_operations fw_crash_log_ops = {
+	.read = fw_crash_log_read,
+	.open = simple_open,
+	.llseek = default_llseek,
+};
+
 static ssize_t set_tsf_read(struct file *file, char __user *user_buf,
 			           size_t count, loff_t *ppos)
 {
@@ -2008,7 +1908,7 @@ static const struct file_operations antenna_diversity_select_default_antenna_ops
 };
 
 static int cc33xx_debugfs_add_files(struct cc33xx *wl,
-				    struct dentry *rootdir)
+			     struct dentry *rootdir)
 {
 	struct dentry *stats, *moddir;
 
@@ -2032,6 +1932,7 @@ static int cc33xx_debugfs_add_files(struct cc33xx *wl,
 	DEBUGFS_ADD(fw_stats_raw, rootdir);
 	DEBUGFS_ADD(sleep_auth, rootdir);
 	DEBUGFS_ADD(ble_enable, rootdir);
+	DEBUGFS_ADD(fw_crash_log, rootdir);
 	DEBUGFS_ADD(set_tsf, rootdir);
 	DEBUGFS_ADD(twt_action, rootdir);
 	DEBUGFS_ADD(fw_logger, rootdir);
@@ -2047,134 +1948,10 @@ static int cc33xx_debugfs_add_files(struct cc33xx *wl,
 
 	DEBUGFS_ADD_PREFIX(dev, mem, rootdir);
 
-	DEBUGFS_FWSTATS_ADD(error, error_frame_non_ctrl);
-	DEBUGFS_FWSTATS_ADD(error, error_frame_ctrl);
-	DEBUGFS_FWSTATS_ADD(error, error_frame_during_protection);
-	DEBUGFS_FWSTATS_ADD(error, null_frame_tx_start);
-	DEBUGFS_FWSTATS_ADD(error, null_frame_cts_start);
-	DEBUGFS_FWSTATS_ADD(error, bar_retry);
-	DEBUGFS_FWSTATS_ADD(error, num_frame_cts_nul_flid);
-	DEBUGFS_FWSTATS_ADD(error, tx_abort_failure);
-	DEBUGFS_FWSTATS_ADD(error, tx_resume_failure);
-	DEBUGFS_FWSTATS_ADD(error, rx_cmplt_db_overflow_cnt);
-	DEBUGFS_FWSTATS_ADD(error, elp_while_rx_exch);
-	DEBUGFS_FWSTATS_ADD(error, elp_while_tx_exch);
-	DEBUGFS_FWSTATS_ADD(error, elp_while_tx);
-	DEBUGFS_FWSTATS_ADD(error, elp_while_nvic_pending);
-	DEBUGFS_FWSTATS_ADD(error, rx_excessive_frame_len);
-	DEBUGFS_FWSTATS_ADD(error, burst_mismatch);
-	DEBUGFS_FWSTATS_ADD(error, tbc_exch_mismatch);
-	DEBUGFS_FWSTATS_ADD(tx, tx_prepared_descs);
-	DEBUGFS_FWSTATS_ADD(tx, tx_cmplt);
-	DEBUGFS_FWSTATS_ADD(tx, tx_template_prepared);
-	DEBUGFS_FWSTATS_ADD(tx, tx_data_prepared);
-	DEBUGFS_FWSTATS_ADD(tx, tx_template_programmed);
-	DEBUGFS_FWSTATS_ADD(tx, tx_data_programmed);
-	DEBUGFS_FWSTATS_ADD(tx, tx_burst_programmed);
-	DEBUGFS_FWSTATS_ADD(tx, tx_starts);
-	DEBUGFS_FWSTATS_ADD(tx, tx_stop);
-	DEBUGFS_FWSTATS_ADD(tx, tx_start_templates);
-	DEBUGFS_FWSTATS_ADD(tx, tx_start_int_templates);
-	DEBUGFS_FWSTATS_ADD(tx, tx_start_fw_gen);
-	DEBUGFS_FWSTATS_ADD(tx, tx_start_data);
-	DEBUGFS_FWSTATS_ADD(tx, tx_start_null_frame);
-	DEBUGFS_FWSTATS_ADD(tx, tx_exch);
-	DEBUGFS_FWSTATS_ADD(tx, tx_retry_template);
-	DEBUGFS_FWSTATS_ADD(tx, tx_retry_data);
-	DEBUGFS_FWSTATS_ADD(tx, tx_retry_per_rate);
-	DEBUGFS_FWSTATS_ADD(tx, tx_exch_pending);
-	DEBUGFS_FWSTATS_ADD(tx, tx_exch_expiry);
-	DEBUGFS_FWSTATS_ADD(tx, tx_done_template);
-	DEBUGFS_FWSTATS_ADD(tx, tx_done_data);
-	DEBUGFS_FWSTATS_ADD(tx, tx_done_int_template);
-	DEBUGFS_FWSTATS_ADD(tx, tx_cfe1);
-	DEBUGFS_FWSTATS_ADD(tx, tx_cfe2);
-	DEBUGFS_FWSTATS_ADD(tx, frag_called);
-	DEBUGFS_FWSTATS_ADD(tx, frag_mpdu_alloc_failed);
-	DEBUGFS_FWSTATS_ADD(tx, frag_init_called);
-	DEBUGFS_FWSTATS_ADD(tx, frag_in_process_called);
-	DEBUGFS_FWSTATS_ADD(tx, frag_tkip_called);
-	DEBUGFS_FWSTATS_ADD(tx, frag_key_not_found);
-	DEBUGFS_FWSTATS_ADD(tx, frag_need_fragmentation);
-	DEBUGFS_FWSTATS_ADD(tx, frag_bad_mblk_num);
-	DEBUGFS_FWSTATS_ADD(tx, frag_failed);
-	DEBUGFS_FWSTATS_ADD(tx, frag_cache_hit);
-	DEBUGFS_FWSTATS_ADD(tx, frag_cache_miss);
-	DEBUGFS_FWSTATS_ADD(rx, rx_beacon_early_term);
-	DEBUGFS_FWSTATS_ADD(rx, rx_out_of_mpdu_nodes);
-	DEBUGFS_FWSTATS_ADD(rx, rx_hdr_overflow);
-	DEBUGFS_FWSTATS_ADD(rx, rx_dropped_frame);
-	DEBUGFS_FWSTATS_ADD(rx, rx_done);
-	DEBUGFS_FWSTATS_ADD(rx, rx_defrag);
-	DEBUGFS_FWSTATS_ADD(rx, rx_defrag_end);
-	DEBUGFS_FWSTATS_ADD(rx, rx_cmplt);
-	DEBUGFS_FWSTATS_ADD(rx, rx_pre_complt);
-	DEBUGFS_FWSTATS_ADD(rx, rx_cmplt_task);
-	DEBUGFS_FWSTATS_ADD(rx, rx_phy_hdr);
-	DEBUGFS_FWSTATS_ADD(rx, rx_timeout);
-	DEBUGFS_FWSTATS_ADD(rx, rx_rts_timeout);
-	DEBUGFS_FWSTATS_ADD(rx, rx_timeout_wa);
-	DEBUGFS_FWSTATS_ADD(rx, defrag_called);
-	DEBUGFS_FWSTATS_ADD(rx, defrag_init_called);
-	DEBUGFS_FWSTATS_ADD(rx, defrag_in_process_called);
-	DEBUGFS_FWSTATS_ADD(rx, defrag_tkip_called);
-	DEBUGFS_FWSTATS_ADD(rx, defrag_need_defrag);
-	DEBUGFS_FWSTATS_ADD(rx, defrag_decrypt_failed);
-	DEBUGFS_FWSTATS_ADD(rx, decrypt_key_not_found);
-	DEBUGFS_FWSTATS_ADD(rx, defrag_need_decrypt);
-	DEBUGFS_FWSTATS_ADD(rx, rx_tkip_replays);
-	DEBUGFS_FWSTATS_ADD(rx, rx_xfr);
-	DEBUGFS_FWSTATS_ADD(isr, irqs);
-	DEBUGFS_FWSTATS_ADD(pwr, missing_bcns_cnt);
-	DEBUGFS_FWSTATS_ADD(pwr, rcvd_bcns_cnt);
-	DEBUGFS_FWSTATS_ADD(pwr, connection_out_of_sync);
-	DEBUGFS_FWSTATS_ADD(pwr, cont_miss_bcns_spread);
-	DEBUGFS_FWSTATS_ADD(pwr, rcvd_awake_bcns_cnt);
-	DEBUGFS_FWSTATS_ADD(pwr, sleep_time_count);
-	DEBUGFS_FWSTATS_ADD(pwr, sleep_time_avg);
-	DEBUGFS_FWSTATS_ADD(pwr, sleep_cycle_avg);
-	DEBUGFS_FWSTATS_ADD(pwr, sleep_percent);
-	DEBUGFS_FWSTATS_ADD(pwr, ap_sleep_active_conf);
-	DEBUGFS_FWSTATS_ADD(pwr, ap_sleep_user_conf);
-	DEBUGFS_FWSTATS_ADD(pwr, ap_sleep_counter);
-	DEBUGFS_FWSTATS_ADD(rx_filter, beacon_filter);
-	DEBUGFS_FWSTATS_ADD(rx_filter, arp_filter);
-	DEBUGFS_FWSTATS_ADD(rx_filter, mc_filter);
-	DEBUGFS_FWSTATS_ADD(rx_filter, dup_filter);
-	DEBUGFS_FWSTATS_ADD(rx_filter, data_filter);
-	DEBUGFS_FWSTATS_ADD(rx_filter, ibss_filter);
-	DEBUGFS_FWSTATS_ADD(rx_filter, protection_filter);
-	DEBUGFS_FWSTATS_ADD(rx_filter, accum_arp_pend_requests);
-	DEBUGFS_FWSTATS_ADD(rx_filter, max_arp_queue_dep);
-	DEBUGFS_FWSTATS_ADD(rx_rate, rx_frames_per_rates);
-	DEBUGFS_FWSTATS_ADD(aggr_size, tx_agg_rate);
-	DEBUGFS_FWSTATS_ADD(aggr_size, tx_agg_len);
-	DEBUGFS_FWSTATS_ADD(aggr_size, rx_size);
-	DEBUGFS_FWSTATS_ADD(pipeline, hs_tx_stat_fifo_int);
-	DEBUGFS_FWSTATS_ADD(pipeline, enc_tx_stat_fifo_int);
-	DEBUGFS_FWSTATS_ADD(pipeline, enc_rx_stat_fifo_int);
-	DEBUGFS_FWSTATS_ADD(pipeline, rx_complete_stat_fifo_int);
-	DEBUGFS_FWSTATS_ADD(pipeline, pre_proc_swi);
-	DEBUGFS_FWSTATS_ADD(pipeline, post_proc_swi);
-	DEBUGFS_FWSTATS_ADD(pipeline, sec_frag_swi);
-	DEBUGFS_FWSTATS_ADD(pipeline, pre_to_defrag_swi);
-	DEBUGFS_FWSTATS_ADD(pipeline, defrag_to_rx_xfer_swi);
-	DEBUGFS_FWSTATS_ADD(pipeline, dec_packet_in);
-	DEBUGFS_FWSTATS_ADD(pipeline, dec_packet_in_fifo_full);
-	DEBUGFS_FWSTATS_ADD(pipeline, dec_packet_out);
-	DEBUGFS_FWSTATS_ADD(pipeline, pipeline_fifo_full);
-	DEBUGFS_FWSTATS_ADD(diversity, num_of_packets_per_ant);
-	DEBUGFS_FWSTATS_ADD(diversity, total_num_of_toggles);
-	DEBUGFS_FWSTATS_ADD(thermal, irq_thr_low);
-	DEBUGFS_FWSTATS_ADD(thermal, irq_thr_high);
-	DEBUGFS_FWSTATS_ADD(thermal, tx_stop);
-	DEBUGFS_FWSTATS_ADD(thermal, tx_resume);
-	DEBUGFS_FWSTATS_ADD(thermal, false_irq);
-	DEBUGFS_FWSTATS_ADD(thermal, adc_source_unexpected);
-	DEBUGFS_FWSTATS_ADD(calib, fail_count);
-	DEBUGFS_FWSTATS_ADD(calib, calib_count);
-	DEBUGFS_FWSTATS_ADD(roaming, rssi_level);
-	DEBUGFS_FWSTATS_ADD(dfs, num_of_radar_detections);
+	DEBUGFS_FWSTATS_ADD(power, sleep_time_count);
+	DEBUGFS_FWSTATS_ADD(power, sleep_time_avg);
+	DEBUGFS_FWSTATS_ADD(power, sleep_cycle_avg);
+	DEBUGFS_FWSTATS_ADD(power, sleep_percent);
 
 	DEBUGFS_ADD(conf, moddir);
 	DEBUGFS_ADD(radar_detection, moddir);
@@ -2208,7 +1985,7 @@ int cc33xx_debugfs_init(struct cc33xx *wl)
 		goto out_remove;
 	}
 
-	wl->stats.fw_stats_update = jiffies;
+	wl->stats.fw_stats_next_update = jiffies;
 
 	ret = cc33xx_debugfs_add_files(wl, rootdir);
 	if (ret < 0)

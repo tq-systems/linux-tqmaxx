@@ -26,6 +26,11 @@ void cc33xx_disable_interrupts_nosync(struct cc33xx *cc)
 	cc->if_ops->disable_irq(cc->dev);
 }
 
+void cc33xx_sync_interrupts(struct cc33xx *cc)
+{
+	cc->if_ops->sync_irq(cc->dev);
+}
+
 void cc33xx_enable_interrupts(struct cc33xx *cc)
 {
 	cc->if_ops->enable_irq(cc->dev);

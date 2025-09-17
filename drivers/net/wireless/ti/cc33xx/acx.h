@@ -327,8 +327,9 @@ struct cc33xx_acx_fw_versions {
 	__le16 api_version;
 	__le16 build_version;
 
-	u8 phy_version[6];
-	u8 padding[2];
+	u8 phy_version[8];
+	u8 container_type;
+	u8 padding[3];
 } __packed;
 
 /* special capability bit (not employed by the 802.11n spec) */
@@ -469,6 +470,10 @@ enum cfg {
 	ANT_DIV_ENABLE				= 26,
 	ANT_DIV_SET_RSSI_THRESHOLD		= 27,
 	ANT_DIV_SELECT_DEFAULT_ANTENNA		= 28,
+	RESET_DECRYPT_PACKETS_COUNT	= 29,
+	ENABLE_CHANNEL_UTILIZATION_NEXT_SCAN = 30,
+	SET_SEED_CFG			= 31,
+	RESET_STATS			= 32,
 
 	LAST_CFG_VALUE,
 	MAX_DOT11_CFG = LAST_CFG_VALUE,
@@ -497,6 +502,7 @@ enum cmd_debug {
 	PWR_PARTIAL_MODES_CFG,
 	TRIGGER_FW_ASSERT,
 	BURST_MODE_CFG,
+	THERMAL_PROTECTION_CFG,
 
 	LAST_DEBUG_VALUE,
 
@@ -515,214 +521,17 @@ enum interrogate_opt {
 	GET_ANT_DIV_STATUS = 7,
 	GET_ANT_DIV_RSSI_THRESHOLD = 8,
 	GET_ANT_DIV_DEFAULT_ANTENNA = 9,
+	GET_LATEST_CHANNEL_UTILIZATION_SURVEY = 10,
+	GET_DECRYPT_PACKETS_COUNTS = 11,
+	GET_ROLE_CHANNEL_NUMBER = 12,
+	GET_STATISTICS = 13,
+	GET_SP_VERSIONS_INTR = 14,
+	GET_LINK_INACTIVITY = 15,
 	LAST_IE_VALUE,
 	MAX_DOT11_IE = LAST_IE_VALUE,
 
 	MAX_IE = 0xFFFF /*force enumeration to 16bits*/
 };
-
-struct cc33xx_acx_error_stats {
-	__le32 error_frame_non_ctrl;
-	__le32 error_frame_ctrl;
-	__le32 error_frame_during_protection;
-	__le32 null_frame_tx_start;
-	__le32 null_frame_cts_start;
-	__le32 bar_retry;
-	__le32 num_frame_cts_nul_flid;
-	__le32 tx_abort_failure;
-	__le32 tx_resume_failure;
-	__le32 rx_cmplt_db_overflow_cnt;
-	__le32 elp_while_rx_exch;
-	__le32 elp_while_tx_exch;
-	__le32 elp_while_tx;
-	__le32 elp_while_nvic_pending;
-	__le32 rx_excessive_frame_len;
-	__le32 burst_mismatch;
-	__le32 tbc_exch_mismatch;
-} __packed;
-
-#define NUM_OF_RATES_INDEXES 30
-struct cc33xx_acx_tx_stats {
-	__le32 tx_prepared_descs;
-	__le32 tx_cmplt;
-	__le32 tx_template_prepared;
-	__le32 tx_data_prepared;
-	__le32 tx_template_programmed;
-	__le32 tx_data_programmed;
-	__le32 tx_burst_programmed;
-	__le32 tx_starts;
-	__le32 tx_stop;
-	__le32 tx_start_templates;
-	__le32 tx_start_int_templates;
-	__le32 tx_start_fw_gen;
-	__le32 tx_start_data;
-	__le32 tx_start_null_frame;
-	__le32 tx_exch;
-	__le32 tx_retry_template;
-	__le32 tx_retry_data;
-	__le32 tx_retry_per_rate[NUM_OF_RATES_INDEXES];
-	__le32 tx_exch_pending;
-	__le32 tx_exch_expiry;
-	__le32 tx_done_template;
-	__le32 tx_done_data;
-	__le32 tx_done_int_template;
-	__le32 tx_cfe1;
-	__le32 tx_cfe2;
-	__le32 frag_called;
-	__le32 frag_mpdu_alloc_failed;
-	__le32 frag_init_called;
-	__le32 frag_in_process_called;
-	__le32 frag_tkip_called;
-	__le32 frag_key_not_found;
-	__le32 frag_need_fragmentation;
-	__le32 frag_bad_mblk_num;
-	__le32 frag_failed;
-	__le32 frag_cache_hit;
-	__le32 frag_cache_miss;
-} __packed;
-
-struct cc33xx_acx_rx_stats {
-	__le32 rx_beacon_early_term;
-	__le32 rx_out_of_mpdu_nodes;
-	__le32 rx_hdr_overflow;
-	__le32 rx_dropped_frame;
-	__le32 rx_done_stage;
-	__le32 rx_done;
-	__le32 rx_defrag;
-	__le32 rx_defrag_end;
-	__le32 rx_cmplt;
-	__le32 rx_pre_complt;
-	__le32 rx_cmplt_task;
-	__le32 rx_phy_hdr;
-	__le32 rx_timeout;
-	__le32 rx_rts_timeout;
-	__le32 rx_timeout_wa;
-	__le32 defrag_called;
-	__le32 defrag_init_called;
-	__le32 defrag_in_process_called;
-	__le32 defrag_tkip_called;
-	__le32 defrag_need_defrag;
-	__le32 defrag_decrypt_failed;
-	__le32 decrypt_key_not_found;
-	__le32 defrag_need_decrypt;
-	__le32 rx_tkip_replays;
-	__le32 rx_xfr;
-} __packed;
-
-struct cc33xx_acx_isr_stats {
-	__le32 irqs;
-} __packed;
-
-#define PWR_STAT_MAX_CONT_MISSED_BCNS_SPREAD 10
-
-struct cc33xx_acx_pwr_stats {
-	__le32 missing_bcns_cnt;
-	__le32 rcvd_bcns_cnt;
-	__le32 connection_out_of_sync;
-	__le32 cont_miss_bcns_spread[PWR_STAT_MAX_CONT_MISSED_BCNS_SPREAD];
-	__le32 rcvd_awake_bcns_cnt;
-	__le32 sleep_time_count;
-	__le32 sleep_time_avg;
-	__le32 sleep_cycle_avg;
-	__le32 sleep_percent;
-	__le32 ap_sleep_active_conf;
-	__le32 ap_sleep_user_conf;
-	__le32 ap_sleep_counter;
-} __packed;
-
-struct cc33xx_acx_rx_filter_stats {
-	__le32 beacon_filter;
-	__le32 arp_filter;
-	__le32 mc_filter;
-	__le32 dup_filter;
-	__le32 data_filter;
-	__le32 ibss_filter;
-	__le32 protection_filter;
-	__le32 accum_arp_pend_requests;
-	__le32 max_arp_queue_dep;
-} __packed;
-
-struct cc33xx_acx_rx_rate_stats {
-	__le32 rx_frames_per_rates[50];
-} __packed;
-
-#define AGGR_STATS_TX_AGG	16
-#define AGGR_STATS_RX_SIZE_LEN	16
-
-struct cc33xx_acx_aggr_stats {
-	__le32 tx_agg_rate[AGGR_STATS_TX_AGG];
-	__le32 tx_agg_len[AGGR_STATS_TX_AGG];
-	__le32 rx_size[AGGR_STATS_RX_SIZE_LEN];
-} __packed;
-
-#define PIPE_STATS_HW_FIFO	11
-
-struct cc33xx_acx_pipeline_stats {
-	__le32 hs_tx_stat_fifo_int;
-	__le32 hs_rx_stat_fifo_int;
-	__le32 enc_tx_stat_fifo_int;
-	__le32 enc_rx_stat_fifo_int;
-	__le32 rx_complete_stat_fifo_int;
-	__le32 pre_proc_swi;
-	__le32 post_proc_swi;
-	__le32 sec_frag_swi;
-	__le32 pre_to_defrag_swi;
-	__le32 defrag_to_rx_xfer_swi;
-	__le32 dec_packet_in;
-	__le32 dec_packet_in_fifo_full;
-	__le32 dec_packet_out;
-	__le16 pipeline_fifo_full[PIPE_STATS_HW_FIFO];
-	__le16 padding;
-} __packed;
-
-#define DIVERSITY_STATS_NUM_OF_ANT	2
-
-struct cc33xx_acx_diversity_stats {
-	__le32 num_of_packets_per_ant[DIVERSITY_STATS_NUM_OF_ANT];
-	__le32 total_num_of_toggles;
-} __packed;
-
-struct cc33xx_acx_thermal_stats {
-	__le16 irq_thr_low;
-	__le16 irq_thr_high;
-	__le16 tx_stop;
-	__le16 tx_resume;
-	__le16 false_irq;
-	__le16 adc_source_unexpected;
-} __packed;
-
-#define CC33XX_NUM_OF_CALIBRATIONS_ERRORS 18
-struct cc33xx_acx_calib_failure_stats {
-	__le16 fail_count[CC33XX_NUM_OF_CALIBRATIONS_ERRORS];
-	__le32 calib_count;
-} __packed;
-
-struct cc33xx_roaming_stats {
-	s32 rssi_level;
-} __packed;
-
-struct cc33xx_dfs_stats {
-	__le32 num_of_radar_detections;
-} __packed;
-
-struct cc33xx_acx_statistics {
-	struct acx_header header;
-
-	struct cc33xx_acx_error_stats		error;
-	struct cc33xx_acx_tx_stats		tx;
-	struct cc33xx_acx_rx_stats		rx;
-	struct cc33xx_acx_isr_stats		isr;
-	struct cc33xx_acx_pwr_stats		pwr;
-	struct cc33xx_acx_rx_filter_stats	rx_filter;
-	struct cc33xx_acx_rx_rate_stats		rx_rate;
-	struct cc33xx_acx_aggr_stats		aggr_size;
-	struct cc33xx_acx_pipeline_stats	pipeline;
-	struct cc33xx_acx_diversity_stats	diversity;
-	struct cc33xx_acx_thermal_stats		thermal;
-	struct cc33xx_acx_calib_failure_stats	calib;
-	struct cc33xx_roaming_stats		roaming;
-	struct cc33xx_dfs_stats			dfs;
-} __packed;
 
 /* ACX_PEER_CAP
  * this struct is very similar to cc33xx_acx_ht_capabilities, with the
@@ -880,6 +689,50 @@ struct acx_diversity_default_antenna {
 	u8 padding[3];
 } __packed;
 
+struct reset_decrypt_count_cfg {
+	u8 role_id;
+	u8 padding[3];
+} __packed;
+
+struct decrypt_packets_status_count {
+	__le32 roleid;
+
+	struct {
+		__le32 decrypted_ok_unicast_count;
+		__le32 decrypted_error_unicast_count;
+		__le32 decrypted_ok_multicast_count;
+		__le32 decrypted_error_multicast_count;
+		__le32 decrypted_ok_broadcast_count;
+		__le32 decrypted_error_broadcast_count;
+	} counters;
+} __packed;
+    
+struct channel_utilization_survey_results {
+	u8 channel_number;
+	u8 channel_load;
+	s8 noise_floor_avg;
+	u8 bss_count;
+} __packed;
+    
+struct role_current_channel_number {
+	u8 role_type;
+	u8 role_id;
+	__le16 channel_num;
+} __packed;
+
+struct cc33xx_acx_power_stats {
+	__le32 sleep_time_count;
+	__le32 sleep_time_avg;
+	__le32 sleep_cycle_avg;
+	__le32 sleep_percent;
+} __packed;
+
+struct cc33xx_acx_statistics {
+	struct acx_header header;
+
+	struct cc33xx_acx_power_stats power;
+} __packed;
+
 int cc33xx_acx_wake_up_conditions(struct cc33xx *cc, struct cc33xx_vif *wlvif,
 				  u8 wake_up_event, u8 listen_interval);
 int cc33xx_acx_sleep_auth(struct cc33xx *cc, u8 sleep_auth);
@@ -943,5 +796,7 @@ int cc33xx_acx_twt_setup(struct cc33xx *wl,
 int cc33xx_acx_twt_terminate(struct cc33xx *wl);
 int cc33xx_acx_twt_resume(struct cc33xx *wl);
 int cc33xx_acx_twt_suspend(struct cc33xx *wl);
+int cc33xx_acx_statistics(struct cc33xx *cc, void *stats);
+int cc33xx_acx_clear_statistics(struct cc33xx *cc);
 
 #endif /* __CC33XX_ACX_H__ */

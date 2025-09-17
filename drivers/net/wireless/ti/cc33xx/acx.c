@@ -1087,6 +1087,39 @@ out:
 	return ret;
 }
 
+int cc33xx_acx_statistics(struct cc33xx *cc, void *stats)
+{
+	int ret;
+
+	ret = cc33xx_cmd_interrogate(cc, GET_STATISTICS, stats,
+				     sizeof(struct acx_header),
+				     sizeof(struct cc33xx_acx_statistics));
+	if (ret < 0) {
+		cc33xx_warning("acx statistics failed: %d", ret);
+		return -ENOMEM;
+	}
+
+	return 0;
+}
+
+int cc33xx_acx_clear_statistics(struct cc33xx *cc)
+{
+	struct acx_header *acx;
+	int ret;
+
+	acx = kzalloc(sizeof(*acx), GFP_KERNEL);
+	if (!acx)
+		return -ENOMEM;
+
+	ret = cc33xx_cmd_configure(cc, RESET_STATS,
+				   acx, sizeof(*acx));
+	if (ret < 0)
+		cc33xx_warning("clear stats failed: %d", ret);
+
+	kfree(acx);
+	return ret;
+}
+
 int cc33xx_acx_twt_setup(struct cc33xx *cc, u32 min_wake_duration_usec,
 		       u32 min_wake_interval_mantissa, u32 min_wake_interval_exponent,
 			   u32 max_wake_interval_mantissa, u32 max_wake_interval_exponent,

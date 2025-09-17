@@ -13,6 +13,7 @@
 #include "io.h"
 
 #define CC33XX_BOOT_TIMEOUT 2000
+#define CC33XX_FW_HIF_INIT_DELAY 50
 
 struct hwinfo_bitmap {
 	u32 disable_5g			: 1u;
@@ -32,6 +33,7 @@ struct hwinfo_bitmap {
 	u32 fw_rollback_protection_1	: 32u;
 	u32 fw_rollback_protection_2	: 32u;
 	u32 fw_rollback_protection_3	: 32u;
+	u32 disable_wifi6               : 1u;
 	u32 reserved			: 13u;
 } /* Aligned with boot code, must not be __packed */;
 
@@ -131,7 +133,7 @@ static int wait_for_boot_irq(struct cc33xx *cc, u32 boot_irq_mask,
 	 * Work around this by explicitly triggering IRQ handler which will
 	 * check current device status after a safe delay.
 	 */
-	msleep(10);
+	msleep(CC33XX_FW_HIF_INIT_DELAY);
 	cc33xx_irq(cc);
 
 	ret = wait_for_completion_interruptible_timeout(&fw_download->wait_on_irq,
@@ -281,6 +283,30 @@ static int get_device_info(struct cc33xx *cc)
 	return 0;
 }
 
+static int get_device_info_ram_loader(struct cc33xx *cc)
+{
+	int ret; 
+	union hw_info hw_info;
+	u64 mac_address;
+
+	ret = cmd_get_device_info(cc, hw_info.bytes, sizeof hw_info.bytes);
+	if (ret < 0)
+		return ret;
+
+	mac_address = hw_info.bitmap.mac_address;
+
+	cc->efuse_mac_address[5] = (u8) (mac_address);
+	cc->efuse_mac_address[4] = (u8) (mac_address >> 8);
+	cc->efuse_mac_address[3] = (u8) (mac_address >> 16);
+	cc->efuse_mac_address[2] = (u8) (mac_address >> 24);
+	cc->efuse_mac_address[1] = (u8) (mac_address >> 32);
+	cc->efuse_mac_address[0] = (u8) (mac_address >> 40);
+
+	cc->disable_wifi6 = hw_info.bitmap.disable_wifi6;
+
+	return 0;
+}
+
 int cc33xx_init_fw(struct cc33xx *cc)
 {
 	int ret;
@@ -310,6 +336,10 @@ int cc33xx_init_fw(struct cc33xx *cc)
 
 	ret = container_download_and_wait(cc, SECOND_LOADER_NAME,
 					  HINT_SECOND_LOADER_INIT_COMPLETE);
+	if (ret < 0)
+		goto disable_irq;
+
+	ret = get_device_info_ram_loader(cc);
 	if (ret < 0)
 		goto disable_irq;
 

@@ -7,15 +7,24 @@
 #define __CONF_H__
 
 struct cc33xx_conf_header {
-	__le32 magic;
-	__le32 version;
-	__le32 checksum;
+	u32 magic;
+	u16 fw_major_version;
+	u16 fw_minor_version;
+	u16 fw_api_version;
+	u16 fw_build_version;
+	u32 checksum;
 } __packed;
 
-#define CC33XX_CONF_MAGIC	0x10e100ca
-#define CC33XX_CONF_VERSION	0x010700e1
-#define CC33XX_CONF_MASK	0x0000ffff
-#define CC33X_CONF_SIZE	(sizeof(struct cc33xx_conf_file))
+#define CC33XX_CONF_MAGIC				0x10e100ca
+
+#define CC33XX_CONF_FW_MAJOR_VERSION 	0x0001
+#define CC33XX_CONF_FW_MINOR_VERSION 	0x0007
+#define CC33XX_CONF_FW_API_VERSION   	0x0000
+#define CC33XX_CONF_FW_BUILD_VERSION 	0x013C
+
+
+#define CC33XX_CONF_MASK				0x0000ffff
+#define CC33X_CONF_SIZE					(sizeof(struct cc33xx_conf_file))
 
 #define CONF_HW_RXTX_RATE_UNSUPPORTED 0xff
 
@@ -515,47 +524,192 @@ enum cc33xx_ht_mode {
 	HT_MODE_SISO20 = 2,
 };
 
+struct coex_wifi_group_priorities {
+	/* 
+	 * WLAN activity groups priorities
+	 * 
+	 * Range: 0 - 15
+	 */
+	u8 coex_enabled;
+	u8 wlan_group_core_active_priority;
+	u8 wlan_group_traffic_priority;
+	u8 wlan_group_scan_priority;
+	u8 wlan_group_twt_traffic_priority;
+	u8 wlan_group_management_sequence_priority;
+	u8 wlan_group_scan_high_priority;
+	u8 wlan_group_broadcast_multicast_priority;
+	u8 wlan_group_beacon_priority;
+	u8 wlan_group_management_sequence_urgent_priority;
+	u8 wlan_group_beacon_urgent_priority;
+	u8 wlan_group_phy_command_priority;
+} __packed;
+
+struct coex_ble_group_priorities {
+	/* 
+	 * BLE command groups priorities
+	 * 
+	 * Range: 0 - 15
+	 */
+	u8 ble_group_test;
+    u8 ble_group_setup;
+    u8 ble_group_connected;
+    u8 ble_group_observer;
+    u8 ble_group_broadcaster;
+    u8 ble_group_initiator;
+    u8 ble_group_urgent_priority;
+} __packed;
+
+struct coex_external_soc_priorities {
+	/* 
+	 * External SoC low and high priorities
+	 * 
+	 * Range: 0 - 15
+	 */
+	u8 low_priority;
+	u8 high_priority;
+} __packed;
+
 struct conf_coex_configuration {
-	/* Work without Coex HW
+	/*
+	 * Work without Coex HW
 	 *
 	 * Range: 1 - YES, 0 - NO
 	 */
-	u8 disable_coex;
-	/* Yes/No Choose if External SoC entity is connected
-	 *
-	 * Range: 1 - YES, 0 - NO
+	u8 Disable_coex;
+
+	/*
+	 * Tie breaker configuration
+	 * 
+	 * Range: 0 - 3 for each tie breaker.
+	 * 
+	 * 0 is lowest and 3 is the highest.
 	 */
-	u8 is_ext_soc_enable;
-	/* External SoC grant polarity
-	 *
-	 * 0 - Active Low
-	 *
-	 * 1 - Active High (Default)
+	u8 tie_breaker_ble;
+	u8 tie_breaker_wifi;
+	u8 tie_breaker_ext_soc;
+
+	/*
+	 * Coex BLE configuration
 	 */
-	u8 ext_soc_grant_polarity;
-	/* External SoC priority polarity
+	u8 ble_enabled;
+	u8 ble_grant_polarity;
+	u8 ble_pta_signalling_mode;
+	u8 ble_tx_bypass_val;
+	u8 ble_rx_bypass_val;
+	
+	/*
+	 * Coex WiFi configuration
+	 */
+	u8 wifi_enabled;
+	u8 wifi_grant_polarity;
+	u8 wifi_alt_band_input_bypass;
+	u8 wifi_rx_only_input_bypass;
+	u8 wifi_alt_band_input_bypass_val;
+	u8 wifi_rx_only_input_bypass_val;
+
+	/*
+	 * External SoC entity enable
+	 *
+	 * 0 - NO
+	 * 1 - YES
+	 */
+	u8 is_Ext_soc_enable;
+	/*
+	 * External SoC PTA signalling mode
+	 * 
+	 * 00 - Reserved
+	 * 01 - 1-wire
+	 * 02 - 2-wires
+	 * 11 - 3-wires
+	 */
+	u8 ext_soc_pta_signalling_mode;
+	/* 
+	 * External SoC request polarity
+	 * 
+	 * 0 - Active Low (Default)
+	 *
+	 * 1 - Active High
+	 */
+	u8 ext_soc_request_polarity;
+	/* 
+	 * External SoC priority polarity
 	 *
 	 * 0 - Active Low (Default)
 	 *
 	 * 1 - Active High
 	 */
 	u8 ext_soc_priority_polarity;
-	/* External SoC request polarity
+	/* 
+	 * External SoC grant polarity
+	 * 
+	 * 0 - Active Low
 	 *
-	 * 0 - Active Low (Default)
-	 *
-	 * 1 - Active High
+	 * 1 - Active High (Default)
 	 */
-	u8 ext_soc_request_polarity;
+	u8 ext_soc_grant_polarity;
+	/* 
+	 * External SoC grant renew bypass
+	 * 
+	 * 0 - SOC needs to renew grant.
+	 *
+	 * 1 - Bypass SOC grant renew
+	 */
+	u8 ext_soc_grant_renew_bypass;
+	/*
+	 * External SoC request signal detection mechanism
+	 * 
+	 * 00 - Rise edge detection (L -> H)
+	 * 01 - Fall edge detection (H -> L)
+	 * 10 - Level detection (active high)
+	 * 11 - Level detection (active low)
+	 */
+	u8 ext_soc_request_signal_detection;
+
+	/*
+	 * External SoC GPIO pins
+	 */
+	u8 ext_soc_grant_pin;
+	u8 ext_soc_request_pin;
+	u8 ext_soc_priority_pin;
+
+	/*
+	 * Coex grant delays
+	 * 
+	 * Range: 0 - 200 usec
+	 */
+	u8 wifi_to_ble_grant_delay;
+	u8 wifi_to_ext_soc_grant_delay;
+	u8 ble_to_wifi_grant_delay;
+	u8 ble_to_ext_soc_grant_delay;
+	u8 ext_soc_to_wifi_grant_delay;
+	u8 ext_soc_to_ble_grant_delay;
+
+	/*
+	 * Coex grant times
+	 */	
+	u16 wifi_min_grant_time;
+	u16 ble_min_grant_time;
+	u16 ble_max_grant_time;
 	u16 ext_soc_min_grant_time;
 	u16 ext_soc_max_grant_time;
-	/* Range: 0 - 20 us
+	/* 
+	 * BLE T2 time
+	 *
+	 * Range: 0 - 50 us
+	 */
+	u8 ble_t2_time;
+	/* 
+	 * External SoC T2 time
+	 *
+	 * Range: 0 - 50 us
 	 */
 	u8 ext_soc_t2_time;
 
-	u8 ext_soc_to_wifi_grant_delay;
-	u8 ext_soc_to_ble_grant_delay;
-} __packed;
+	struct coex_wifi_group_priorities wifi_group_priorities;
+	struct coex_ble_group_priorities ble_group_priorities;
+	struct coex_external_soc_priorities external_soc_priorities;
+
+} __attribute__((__packed__));
 
 struct conf_iomux_configuration {
 	/* For any iomux pull value:
@@ -638,7 +792,75 @@ struct conf_ant_diversity {
 	/* The antenna to use when the diversity mechanism is not in charge.
 	 */
 	u8 default_antenna;
+
+	u8 rssi_low_limit;
+
+	u8 wifi_grant_override;
+	u8 wifi_grant_override_val;
+	u8 ext_soc_grant_override;
+	u8 ext_soc_grant_override_val;
+	u8 ble_grant_override;
+	u8 ble_grant_override_val;
+
+	u8 grant_override;
+
+	u8 external_mask;
+
+	u8 antenna_control_override;
+
+	u8 sw_enable_register;
+	
+	/*
+	 * SW index
+	 * Bit 0 - SW index value
+     * Bit 1 - SW index override
+	 */
+	u8 sw_index;
+
+	/*
+	 * GPIO antenna index (0-5)
+	 */
+	u8 gpio_antenna_index_0;
+	u8 gpio_antenna_index_1;
+	u8 gpio_antenna_index_2;
+	u8 gpio_antenna_index_3;
+	u8 gpio_antenna_index_4;
+	u8 gpio_antenna_index_5;
+
+	/*
+	 * Antenna selection bits
+	 */
+	u8 ant_sel_0;
+	u8 ant_sel_1;
+	u8 ant_sel_2;
+	u8 ant_sel_3;
 } __packed;
+
+struct conf_thermal_thresholds {
+	s16 high_threshold_24G;
+	s16 low_threshold_24G;
+	s16 high_threshold_5G;
+	s16 low_threshold_5G;
+	s16 high_sample_threshold;
+	u8 enable_value;
+} __attribute__((__packed__));
+
+struct conf_limit105c_params {
+	u8 enable_value;
+	u8 maxMCS;
+	u8 maxOFDM;
+} __attribute__((__packed__));
+
+struct conf_gpadc_params {
+    u8  overrideEn;
+    u8  disable_measuring;
+    u8  pmcioSlop;
+    u16 pmcioIntercept;
+    u8  rfcioSlop;
+    u16 rfcioIntercept;
+    u32 measurePeriodUsec;
+    u8  dcSlopExponent;
+} __attribute__((__packed__));
 
 struct cc33xx_core_conf {
 	u8 enable_5ghz;
@@ -647,6 +869,7 @@ struct cc33xx_core_conf {
 	u8 disable_beamforming_fftp;
 	u32 ble_uart_baudrate;
 	u8 enable_flow_ctrl;
+	s8 ble_default_tx_power;
 	u8 listen_interval;
 	u8 wake_up_event;
 	u8 suspend_listen_interval;
@@ -656,6 +879,7 @@ struct cc33xx_core_conf {
 	u32 internal_slowclk_open_window_longer;
 	u32 external_slowclk_wakeup_earlier;
 	u32 external_slowclk_open_window_longer;
+	u32 slowclk_sampled_cycles;
 	struct conf_coex_configuration coex_configuration;
 	/* Prevent HW recovery. FW will remain stuck. */
 	u8 no_recovery;
@@ -664,8 +888,12 @@ struct cc33xx_core_conf {
 	u8 sram_ldo_voltage_trimming;
 	u32 xtal_settling_time_usec;
 	u8 max_rx_ampdu_len;
+	u32 country_code;
 	struct conf_ant_diversity ant_diversity;
 	struct conf_iomux_configuration iomux_configuration;
+	struct conf_thermal_thresholds thermal_thresholds;
+	struct conf_limit105c_params limit105c_params;
+	struct conf_gpadc_params gpadc_params;
 } __packed;
 
 struct cc33xx_mac_conf {
@@ -675,6 +903,7 @@ struct cc33xx_mac_conf {
 	u8 ap_max_num_stations;
 	u8 fw_defrag;
 	u16 rx_memblks_override;
+	u8 rts_mode;
 } __packed;
 
 struct cc33xx_phy_conf {
@@ -693,7 +922,12 @@ struct cc33xx_phy_conf {
 	u16 calib_period;
 	u8 tx_psat_compensation_2_4GHz;
 	u8 tx_psat_compensation_5GHz;
-	u8 reserved_2;
+	u8 psat_reserved;
+	u8 Is85cDevice;
+	u16 product_type;
+	u32 gpio_data[4];
+	u16 xtalCorrAbove95C;
+	u8 reserved[6];
 } __packed;
 
 struct cc33xx_host_conf {
@@ -706,12 +940,17 @@ struct cc33xx_host_conf {
 
 } __packed;
 
+struct cc33xx_crc_conf {
+	u32 userChecksum;
+} __packed;
+
 struct cc33xx_conf_file {
 	struct cc33xx_conf_header header;
 	struct cc33xx_phy_conf phy;
 	struct cc33xx_mac_conf mac;
 	struct cc33xx_core_conf core;
 	struct cc33xx_host_conf host_conf;
+	struct cc33xx_crc_conf crc_conf;
 } __packed;
 
 #endif
