@@ -53,6 +53,16 @@
 		stdout-path = &lpuart1;
 	};
 
+	backlight_lvds: backlight-lvds {
+		compatible = "pwm-backlight";
+		pwms = <&tpm5 2 100000 0>;
+		brightness-levels = <0 4 8 16 32 64 128 255>;
+		default-brightness-level = <7>;
+		enable-gpios = <&expander2 6 GPIO_ACTIVE_HIGH>;
+		power-supply = <&reg_12v0>;
+		status = "disabled";
+	};
+
 	clk_xtal25: clk-xtal25 {
 		compatible = "fixed-clock";
 		#clock-cells = <0>;
@@ -89,6 +99,22 @@
 		};
 	};
 
+	panel_lvds: panel {
+		/*
+		 * Display is not fixed, so compatible has to be added from
+		 * DT
+		 */
+		backlight = <&backlight_lvds>;
+		power-supply = <&reg_lvds>;
+		status = "disabled";
+
+		port {
+			panel_in_lvds: endpoint {
+				remote-endpoint = <&lvds0_out>;
+			};
+		};
+	};
+
 	reg_v1v8_mb: regulator-v1v8-mb {
 		compatible = "regulator-fixed";
 		regulator-name = "V_1V8_MB";
@@ -119,6 +145,15 @@
 		regulator-min-microvolt = <12000000>;
 		regulator-max-microvolt = <12000000>;
 		gpio = <&expander1 15 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+	};
+
+	reg_lvds: regulator-lvds {
+		compatible = "regulator-fixed";
+		regulator-name = "LCD_PWR_EN";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		gpio = <&expander2 7 GPIO_ACTIVE_HIGH>;
 		enable-active-high;
 	};
 
@@ -180,6 +215,16 @@
 	pinctrl-0 = <&pinctrl_flexcan2>;
 	xceiver-supply = <&reg_v3v3_mb>;
 	status = "okay";
+};
+
+&ldb {
+	channel@0 {
+		port@1 {
+			lvds0_out: endpoint {
+				remote-endpoint = <&panel_in_lvds>;
+			};
+		};
+	};
 };
 
 &lpi2c2 {
