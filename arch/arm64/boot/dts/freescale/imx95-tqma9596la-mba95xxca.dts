@@ -124,6 +124,28 @@
 			      <&adc1 4>, <&adc1 5>, <&adc1 6>, <&adc1 7>;
 	};
 
+	panel_lvds: panel {
+		/*
+		 * Display is not fixed, so compatible has to be added from
+		 * DT
+		 */
+		backlight = <&backlight_lvds>;
+		power-supply = <&reg_lvds>;
+		status = "disabled";
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+				panel_in_lvds0: endpoint {
+					remote-endpoint = <&lvds0_out>;
+				};
+			};
+		};
+	};
+
 	reg_v1v8_mb: regulator-v1v8-mb {
 		compatible = "regulator-fixed";
 		regulator-name = "V_1V8_MB";
@@ -286,6 +308,16 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_flexcan2>;
 	status = "okay";
+};
+
+&ldb {
+	channel@0 {
+		port@1 {
+			lvds0_out: endpoint {
+				remote-endpoint = <&panel_in_lvds0>;
+			};
+		};
+	};
 };
 
 &lpi2c2 {
