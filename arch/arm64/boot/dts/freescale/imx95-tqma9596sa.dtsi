@@ -88,6 +88,22 @@
 	};
 };
 
+&display_pixel_link {
+	status = "okay";
+};
+
+&displaymix_irqsteer {
+	status = "okay";
+};
+
+&dpu {
+	assigned-clocks = <&scmi_clk IMX95_CLK_DISP1PIX>,
+			  <&scmi_clk IMX95_CLK_VIDEOPLL1_VCO>,
+			  <&scmi_clk IMX95_CLK_VIDEOPLL1>;
+	assigned-clock-parents = <&scmi_clk IMX95_CLK_VIDEOPLL1>;
+	assigned-clock-rates = <0>, <4008000000>, <445333334>;
+};
+
 &enetc_port0 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_enetc0>;
@@ -240,6 +256,20 @@
 				  "LCD1_VDD_EN", "ENET1_RESET#", "ENET2_RESET#", "GBE0_SDP_DIR",
 				  "GBE1_SDP_DIR", "PCIE1_RST#", "PCIE2_RST#", "DP_BRIDGE_EN",
 				  "HUB_RST#", "QSPI_RESET#", "PCIE1_CLK_EN", "PCIE2_CLK_EN";
+
+		pcie1-clk-en-hog {
+			gpio-hog;
+			gpios = <14 GPIO_ACTIVE_HIGH>;
+			output-high;
+			line-name = "PCIE1_CLK_EN";
+		};
+
+		pcie2-clk-en-hog {
+			gpio-hog;
+			gpios = <15 GPIO_ACTIVE_HIGH>;
+			output-high;
+			line-name = "PCIE2_CLK_EN";
+		};
 	};
 
 	/* D21 */
@@ -293,7 +323,7 @@
 				reg = <0>;
 
 				dp_dsi_in: endpoint {
-					/* TODO: DSI out */
+					remote-endpoint = <&dsi_out>;
 					data-lanes = <1 2 3 4>;
 				};
 			};
@@ -351,6 +381,16 @@
 &lpuart8 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpuart8>;
+};
+
+&mipi_dsi {
+	ports {
+		port@1 {
+			dsi_out: endpoint {
+				remote-endpoint = <&dp_dsi_in>;
+			};
+		};
+	};
 };
 
 &netc_blk_ctrl {
@@ -419,6 +459,14 @@
 		 <&pcieclk 0>;
 	clock-names = "pcie", "pcie_bus", "pcie_phy", "pcie_aux", "ref";
 	reset-gpios = <&expander2 10 GPIO_ACTIVE_LOW>;
+};
+
+&pixel_interleaver {
+	status = "okay";
+
+	channel@0 {
+		status = "okay";
+	};
 };
 
 &sai3 {
@@ -525,6 +573,11 @@
 	no-1-8-v;
 	disable-wp;
 	bus-width = <4>;
+};
+
+&vpuctrl {
+	boot = <&vpu_boot>;
+	sram = <&sram1>;
 };
 
 &wdog3 {
