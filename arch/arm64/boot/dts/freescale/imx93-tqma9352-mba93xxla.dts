@@ -4,6 +4,7 @@
  * D-82229 Seefeld, Germany.
  * Author: Markus Niebel
  * Author: Alexander Stein
+ * Author: Martin Schmiedel
  */
 /dts-v1/;
 
@@ -40,6 +41,23 @@
 		power-supply = <&reg_12v0>;
 		enable-gpios = <&expander2 2 GPIO_ACTIVE_HIGH>;
 		status = "disabled";
+	};
+
+	display: display {
+		/*
+		 * Display is not fixed, so compatible has to be added from
+		 * DT overlay
+		 */
+		power-supply = <&reg_3v3>;
+		enable-gpios = <&gpio2 7 GPIO_ACTIVE_HIGH>;
+		backlight = <&backlight_lvds>;
+		status = "disabled";
+
+		port {
+			panel_in_lvds0: endpoint {
+				remote-endpoint = <&ldb_lvds>;
+			};
+		};
 	};
 
 	clk_dp: clk-dp {
@@ -470,6 +488,16 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart8>;
 	status = "okay";
+};
+
+&lvds_bridge {
+	ports {
+		port@1 {
+			ldb_lvds: endpoint {
+				remote-endpoint = <&panel_in_lvds0>;
+			};
+		};
+	};
 };
 
 &pcf85063 {
