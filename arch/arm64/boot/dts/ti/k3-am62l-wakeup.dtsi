@@ -18,8 +18,8 @@
 	};
 
 	pmx0: pinctrl@4084000 {
-		compatible = "pinctrl-single";
-		reg = <0x00 0x4084000 0x00 0x8000>;
+		compatible = "ti,am62l-padconf", "pinctrl-single";
+		reg = <0x00 0x4084000 0x00 0x24c>;
 		pinctrl-single,register-width = <32>;
 		pinctrl-single,function-mask = <0xffffffff>;
 		#pinctrl-cells = <1>;
@@ -41,7 +41,7 @@
 		ti,ngpio = <7>;
 		ti,davinci-gpio-unbanked = <0>;
 		power-domains = <&scmi_pds 36>;
-		clocks = <&scmi_clk 142>;
+		clocks = <&scmi_clk 146>;
 		clock-names = "gpio";
 		status = "disabled";
 	};
@@ -50,7 +50,7 @@
 		compatible = "ti,am654-timer";
 		reg = <0x00 0x2b100000 0x00 0x400>;
 		interrupts = <GIC_SPI 190 IRQ_TYPE_LEVEL_HIGH>;
-		clocks = <&scmi_clk 85>;
+		clocks = <&scmi_clk 93>;
 		clock-names = "fck";
 		power-domains = <&scmi_pds 19>;
 		ti,timer-pwm;
@@ -60,7 +60,7 @@
 		compatible = "ti,am654-timer";
 		reg = <0x00 0x2b110000 0x00 0x400>;
 		interrupts = <GIC_SPI 191 IRQ_TYPE_LEVEL_HIGH>;
-		clocks = <&scmi_clk 96>;
+		clocks = <&scmi_clk 98>;
 		clock-names = "fck";
 		power-domains = <&scmi_pds 20>;
 		ti,timer-pwm;
@@ -110,6 +110,18 @@
 			clock-names = "fck";
 			status = "disabled";
 		};
+	};
+
+	wkup_rtc0: rtc@2b1f0000 {
+		compatible = "ti,am62l-rtc";
+		reg = <0x00 0x2b1f0000 0x00 0x100>;
+		interrupts = <GIC_SPI 28 IRQ_TYPE_LEVEL_HIGH>;
+		clocks = <&scmi_clk 271> , <&scmi_clk 268>;
+		clock-names = "vbus", "osc32k";
+		assigned-clocks = <&scmi_clk 488>;
+		assigned-clock-parents = <&scmi_clk 487>;
+		power-domains = <&scmi_pds 59>;
+		wakeup-source;
 	};
 
 	wkup_conf: bus@43000000 {

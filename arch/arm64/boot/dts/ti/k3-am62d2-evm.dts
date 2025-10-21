@@ -10,7 +10,7 @@
 #include <dt-bindings/leds/common.h>
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/net/ti-dp83867.h>
-#include "k3-am62a7.dtsi"
+#include "k3-am62d2.dtsi"
 
 / {
 	compatible = "ti,am62d2-evm", "ti,am62d2";
@@ -25,6 +25,7 @@
 		rtc0 = &wkup_rtc0;
 		ethernet0 = &cpsw_port1;
 		ethernet1 = &cpsw_port2;
+		spi0 = &ospi0;
 	};
 
 	chosen {
@@ -119,7 +120,7 @@
 		};
 	};
 
-	vout_pd: regulator-1 {
+	vout_pd: regulator-0 {
 		/* TPS65988 PD CONTROLLER OUTPUT */
 		compatible = "regulator-fixed";
 		regulator-name = "vout_pd";
@@ -130,7 +131,7 @@
 		bootph-all;
 	};
 
-	vmain_pd: load-switch {
+	vmain_pd: regulator-1 {
 		/* Output of TPS22811 */
 		compatible = "regulator-fixed";
 		regulator-name = "vmain_pd";
@@ -154,7 +155,19 @@
 		bootph-all;
 	};
 
-	vdd_mmc1: regulator-3 {
+	vcc_3v3_main: regulator-3 {
+		/* output of LM5141-Q1 */
+		compatible = "regulator-fixed";
+		regulator-name = "vcc_3v3_main";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		vin-supply = <&vmain_pd>;
+		regulator-always-on;
+		regulator-boot-on;
+		bootph-all;
+	};
+
+	vdd_mmc1: regulator-4 {
 		/* TPS22918DBVR */
 		compatible = "regulator-fixed";
 		regulator-name = "vdd_mmc1";
@@ -166,7 +179,19 @@
 		bootph-all;
 	};
 
-	vddshv_sdio: regulator-4 {
+	vcc_3v3_sys: regulator-5 {
+		/* output of TPS222965DSGT */
+		compatible = "regulator-fixed";
+		regulator-name = "vcc_3v3_sys";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		vin-supply = <&vcc_3v3_main>;
+		regulator-always-on;
+		regulator-boot-on;
+		bootph-all;
+	};
+
+	vddshv_sdio: regulator-6 {
 		compatible = "regulator-gpio";
 		regulator-name = "vddshv_sdio";
 		pinctrl-names = "default";
@@ -183,18 +208,69 @@
 	codec_audio: sound {
 		compatible = "simple-audio-card";
 		simple-audio-card,name = "AM62D2-EVM";
-		simple-audio-card,format = "i2s";
-		simple-audio-card,bitclock-master = <&sound_master1>;
-		simple-audio-card,frame-master = <&sound_master1>;
-		simple-audio-card,bitclock-inversion;
 
-		sound_master1: simple-audio-card,cpu {
-			sound-dai = <&mcasp2>;
-			system-clock-direction-out;
+		simple-audio-card,dai-link@0 {
+			format = "dsp_b";
+			bitclock-master = <&master0>;
+			frame-master = <&master0>;
+
+			master0: cpu {
+				sound-dai = <&mcasp2>;
+				system-clock-direction-out;
+			};
+
+			codec@0 {
+				sound-dai = <&tad5x1x_50>;
+				playback-only;
+			};
 		};
 
-		simple-audio-card,codec {
-			sound-dai = <&tad5212>;
+		simple-audio-card,dai-link@1 {
+			format = "dsp_b";
+			bitclock-master = <&master1>;
+			frame-master = <&master1>;
+
+			master1: cpu {
+				sound-dai = <&mcasp2>;
+				system-clock-direction-out;
+			};
+
+			codec@1 {
+				sound-dai = <&tad5x1x_51>;
+				playback-only;
+			};
+		};
+
+		simple-audio-card,dai-link@2 {
+			format = "dsp_b";
+			bitclock-master = <&master2>;
+			frame-master = <&master2>;
+
+			master2: cpu {
+			sound-dai = <&mcasp2>;
+				system-clock-direction-out;
+			};
+
+			codec@2 {
+				sound-dai = <&tad5x1x_52>;
+				playback-only;
+			};
+		};
+
+		simple-audio-card,dai-link@3 {
+			format = "dsp_b";
+			bitclock-master = <&master3>;
+			frame-master = <&master3>;
+
+			master3: cpu {
+				sound-dai = <&mcasp2>;
+				system-clock-direction-out;
+			};
+
+			codec@3 {
+				sound-dai = <&tad5x1x_53>;
+				playback-only;
+			};
 		};
 	};
 
@@ -229,8 +305,8 @@
 &wkup_uart0 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&wkup_uart0_pins_default>;
-	status = "reserved";
 	bootph-all;
+	status = "reserved";
 };
 
 &main_pmx0 {
@@ -286,9 +362,9 @@
 			AM62DX_IOPAD(0x023c, PIN_INPUT, 0) /* (C21) MMC1_CMD */
 			AM62DX_IOPAD(0x0234, PIN_OUTPUT, 0) /* (E22) MMC1_CLK */
 			AM62DX_IOPAD(0x0230, PIN_INPUT, 0) /* (B22) MMC1_DAT0 */
-			AM62DX_IOPAD(0x022c, PIN_INPUT_PULLUP, 0) /* (D21) MMC1_DAT1 */
-			AM62DX_IOPAD(0x0228, PIN_INPUT_PULLUP, 0) /* (C22) MMC1_DAT2 */
-			AM62DX_IOPAD(0x0224, PIN_INPUT_PULLUP, 0) /* (D22) MMC1_DAT3 */
+			AM62DX_IOPAD(0x022c, PIN_INPUT, 0) /* (D21) MMC1_DAT1 */
+			AM62DX_IOPAD(0x0228, PIN_INPUT, 0) /* (C22) MMC1_DAT2 */
+			AM62DX_IOPAD(0x0224, PIN_INPUT, 0) /* (D22) MMC1_DAT3 */
 			AM62DX_IOPAD(0x0240, PIN_INPUT, 0) /* (E18) MMC1_SDCD */
 		>;
 		bootph-all;
@@ -357,13 +433,13 @@
 
 	main_usb1_pins_default: main-usb1-default-pins {
 			pinctrl-single,pins = <
-			AM62DX_IOPAD(0x0280, PIN_OUTPUT, 0) /* (D19) USB1_DRVVBUS */
+			AM62DX_IOPAD(0x0258, PIN_OUTPUT, 0) /* (D19) USB1_DRVVBUS */
 		>;
 	};
 
 	vddshv_sdio_pins_default: vddshv-sdio-default-pins {
 		pinctrl-single,pins = <
-			AM62DX_IOPAD(0x1F4, PIN_OUTPUT, 7) /* (M19) GPMC0_CLK.GPIO1_31 */
+			AM62DX_IOPAD(0x1f4, PIN_OUTPUT, 7) /* (M19) GPMC0_CLK.GPIO1_31 */
 		>;
 		bootph-all;
 	};
@@ -372,6 +448,26 @@
 		pinctrl-single,pins = <
 			AM62DX_IOPAD(0x0244, PIN_INPUT, 7) /* (D18) MMC1_SDWP.GPIO1_49 */
 		>;
+	};
+
+	ospi0_pins_default: ospi0-default-pins {
+		pinctrl-single,pins = <
+			AM62DX_IOPAD(0x0000, PIN_OUTPUT, 0) /* (L22) OSPI0_CLK */
+			AM62DX_IOPAD(0x002c, PIN_OUTPUT, 0) /* (H21) OSPI0_CSn0 */
+			AM62DX_IOPAD(0x0030, PIN_OUTPUT, 0) /* (G19) OSPI0_CSn1 */
+			AM62DX_IOPAD(0x0034, PIN_OUTPUT, 0) /* (K20) OSPI0_CSn2 */
+			AM62DX_IOPAD(0x0038, PIN_OUTPUT, 0) /* (G20) OSPI0_CSn3 */
+			AM62DX_IOPAD(0x000c, PIN_INPUT, 0) /* (J21) OSPI0_D0 */
+			AM62DX_IOPAD(0x0010, PIN_INPUT, 0) /* (J18) OSPI0_D1 */
+			AM62DX_IOPAD(0x0014, PIN_INPUT, 0) /* (J19) OSPI0_D2 */
+			AM62DX_IOPAD(0x0018, PIN_INPUT, 0) /* (H18) OSPI0_D3 */
+			AM62DX_IOPAD(0x001c, PIN_INPUT, 0) /* (K21) OSPI0_D4 */
+			AM62DX_IOPAD(0x0020, PIN_INPUT, 0) /* (H19) OSPI0_D5 */
+			AM62DX_IOPAD(0x0024, PIN_INPUT, 0) /* (J20) OSPI0_D6 */
+			AM62DX_IOPAD(0x0028, PIN_INPUT, 0) /* (J22) OSPI0_D7 */
+			AM62DX_IOPAD(0x0008, PIN_INPUT, 0) /* (L21) OSPI0_DQS */
+		>;
+		bootph-all;
 	};
 };
 
@@ -390,11 +486,11 @@
 };
 
 &main_i2c0 {
-	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&main_i2c0_pins_default>;
 	clock-frequency = <400000>;
 	bootph-all;
+	status = "okay";
 
 	typec_pd0: usb-power-controller@3f {
 		compatible = "ti,tps6598x";
@@ -428,16 +524,17 @@
 		bootph-all;
 
 		gpio-line-names = "GPIO_CPSW2_RST", "GPIO_CPSW1_RST",
-			"MMC1_SD_EN", "VPP_EN",
-			"GPIO_DIX_RST", "IO_EXP_OPT_EN",
-			"DIX_INT", "GPIO_eMMC_RSTn",
-			"CPLD2_DONE", "CPLD2_INTN",
-			"CPLD1_DONE", "CPLD1_INTN",
-			"USB_TYPEA_OC_INDICATION", "PCM1_INT",
-			"PCM2_INT", "GPIO_PCM1_RST",
-			"TEST_GPIO2", "GPIO_PCM2_RST",
-			"IO_MCAN0_STB", "IO_MCAN1_STB",
-			"PD_I2C_IRQ", "IO_EXP_TEST_LED";
+				  "","MMC1_SD_EN",
+				  "VPP_EN", "GPIO_DIX_RST",
+				  "IO_EXP_OPT_EN", "DIX_INT",
+				  "GPIO_eMMC_RSTn", "CPLD2_DONE",
+				  "CPLD2_INTN", "CPLD1_DONE",
+				  "CPLD1_INTN", "USB_TYPEA_OC_INDICATION",
+				  "PCM1_INT", "PCM2_INT",
+				  "GPIO_PCM1_RST", "TEST_GPIO2",
+				  "GPIO_PCM2_RST", "",
+				  "IO_MCAN0_STB", "IO_MCAN1_STB",
+				  "PD_I2C_IRQ", "IO_EXP_TEST_LED";
 	};
 
 	exp2: gpio@20 {
@@ -446,38 +543,67 @@
 		gpio-controller;
 		#gpio-cells = <2>;
 
-		gpio-line-names = "", "DAC_LAT_CTRL",
-			"CPLD1_JTAGENB", "CPLD1_PROGRAMN",
-			"CPLD2_JTAGENB", "CPLD2_PROGRAMN",
-			"", "",
-			"", "",
-			"", "",
-			"", "",
-			"", "",
-			"", "",
-			"SoC_I2C0_SCL", "SoC_I2C0_SDA";
+		gpio-line-names = "PCM6240_BUF_IO_EN", "",
+				  "CPLD1_JTAGENB", "CPLD1_PROGRAMN",
+				  "CPLD2_JTAGENB", "CPLD2_PROGRAMN",
+				  "", "",
+				  "", "CPLD1_TCK",
+				  "CPLD1_TMS", "CPLD1_TDI",
+				  "CPLD1_TDO", "CPLD2_TCK",
+				  "CPLD2_TMS", "CPLD2_TDI",
+				  "CPLD2_TDO", "ADDR1_IO_EXP",
+				  "SoC_I2C0_SCL", "SoC_I2C0_SDA";
 	};
 
-	tad5212: dac@50 {
+	tad5x1x_50: tad5x1x@50 {
 		compatible = "ti,tad5212";
-		reg = <0x50>, <0x51>, <0x52>, <0x53>;
-		sound-name-prefix = "tad5212_04";
+		reg = <0x50>;
 		#sound-dai-cells = <0>;
+		ti,vref = <0>;
+		ti,micbias-vg = <3>;
+		sound-name-prefix = "J3A";
+	};
+
+	tad5x1x_51: tad5x1x@51 {
+		compatible = "ti,tad5212";
+		reg = <0x51>;
+		#sound-dai-cells = <0>;
+		ti,vref = <0>;
+		ti,micbias-vg = <3>;
+		sound-name-prefix = "J3B";
+	};
+
+	tad5x1x_52: tad5x1x@52 {
+		compatible = "ti,tad5212";
+		reg = <0x52>;
+		#sound-dai-cells = <0>;
+		ti,vref = <0>;
+		ti,micbias-vg = <3>;
+		sound-name-prefix = "J4A";
+	};
+
+	tad5x1x_53: tad5x1x@53 {
+		compatible = "ti,tad5212";
+		reg = <0x53>;
+		#sound-dai-cells = <0>;
+		ti,vref = <0>;
+		ti,micbias-vg = <3>;
+		sound-name-prefix = "J4B";
 	};
 };
 
 &main_i2c1 {
-	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&main_i2c1_pins_default>;
 	clock-frequency = <100000>;
+	status = "okay";
 };
 
 &main_i2c2 {
-	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&main_i2c2_pins_default>;
 	clock-frequency = <400000>;
+	status = "okay";
 };
 
 &mcasp2 {
@@ -501,23 +627,23 @@
 
 &sdhci0 {
 	/* eMMC */
-	bootph-all;
-	status = "okay";
 	non-removable;
 	pinctrl-names = "default";
 	pinctrl-0 = <&main_mmc0_pins_default>;
 	disable-wp;
+	bootph-all;
+	status = "okay";
 };
 
 &sdhci1 {
 	/* SD/MMC */
-	status = "okay";
 	vmmc-supply = <&vdd_mmc1>;
 	vqmmc-supply = <&vddshv_sdio>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&main_mmc1_pins_default>;
 	disable-wp;
 	bootph-all;
+	status = "okay";
 };
 
 &main_gpio0 {
@@ -535,10 +661,10 @@
 };
 
 &main_uart0 {
-	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&main_uart0_pins_default>;
 	bootph-all;
+	status = "okay";
 };
 
 &usbss0 {
@@ -627,9 +753,10 @@
 };
 
 &cpsw3g {
-	status = "okay";
 	pinctrl-names = "default";
-	pinctrl-0 = <&main_rgmii1_pins_default &main_rgmii2_pins_default>;
+	pinctrl-0 = <&main_rgmii1_pins_default>,
+		    <&main_rgmii2_pins_default>;
+	status = "okay";
 
 	cpts@3d000 {
 		/* MAP HW3_TS_PUSH to GENF1 */
@@ -638,23 +765,23 @@
 };
 
 &cpsw_port1 {
-	status = "okay";
 	phy-mode = "rgmii-rxid";
 	phy-handle = <&cpsw3g_phy0>;
+	status = "okay";
 };
 
 &cpsw_port2 {
-	status = "okay";
 	phy-mode = "rgmii-rxid";
 	phy-handle = <&cpsw3g_phy1>;
+	status = "okay";
 };
 
 &cpsw3g_mdio {
-	status = "okay";
 	#address-cells = <1>;
 	#size-cells = <0>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&main_mdio0_pins_default>;
+	status = "okay";
 
 	cpsw3g_phy0: ethernet-phy@0 {
 		reg = <0>;
@@ -681,14 +808,68 @@
 	status = "reserved";
 };
 
-&vpu {
-	status = "disabled";
+&fss {
+	status = "okay";
 };
 
-&e5010 {
-	status = "disabled";
-};
+&ospi0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&ospi0_pins_default>;
+	status = "okay";
 
-&wkup_uart_conf{
-	status = "disabled";
+	flash@0{
+		compatible = "jedec,spi-nor";
+		reg = <0x0>;
+		spi-tx-bus-width = <8>;
+		spi-rx-bus-width = <8>;
+		spi-max-frequency = <25000000>;
+		cdns,tshsl-ns = <60>;
+		cdns,tsd2d-ns = <60>;
+		cdns,tchsh-ns = <60>;
+		cdns,tslch-ns = <60>;
+		cdns,read-delay = <4>;
+		cdns,phy-mode;
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			partition@0 {
+				label = "ospi.tiboot3";
+				reg = <0x0 0x80000>;
+			};
+
+			partition@80000 {
+				label = "ospi.tispl";
+				reg = <0x80000 0x200000>;
+			};
+
+			partition@280000 {
+				label = "ospi.u-boot";
+				reg = <0x280000 0x400000>;
+			};
+
+			partition@680000 {
+				label = "ospi.env";
+				reg = <0x680000 0x40000>;
+			};
+
+			partition@6c0000 {
+				label = "ospi.env.backup";
+				reg = <0x6c0000 0x40000>;
+			};
+
+			partition@800000 {
+				label = "ospi.rootfs";
+				reg = <0x800000 0x37c0000>;
+			};
+
+			partition@3fc0000 {
+				label = "ospi.phypattern";
+				reg = <0x3fc0000 0x40000>;
+				bootph-all;
+			};
+		};
+	};
 };

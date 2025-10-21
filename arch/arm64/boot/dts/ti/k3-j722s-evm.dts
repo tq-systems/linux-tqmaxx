@@ -12,6 +12,7 @@
 #include <dt-bindings/phy/phy.h>
 #include "k3-j722s.dtsi"
 #include "k3-serdes.h"
+#include "k3-timesync-router.h"
 
 / {
 	compatible = "ti,j722s-evm", "ti,j722s";
@@ -296,6 +297,7 @@
 
 &main_pmx0 {
 
+	/delete-property/ interrupts;
 	main_mcan0_pins_default: main-mcan0-default-pins {
 		pinctrl-single,pins = <
 			J722S_IOPAD(0x1dc, PIN_INPUT, 0) /* (C22) MCAN0_RX */
@@ -476,6 +478,11 @@
 	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&rgmii1_pins_default>;
+
+	cpts@3d000 {
+		/* MAP HW3_TS_PUSH to GENF1 */
+		ti,pps = <2 1>;
+	};
 };
 
 &cpsw3g_mdio {
@@ -697,7 +704,7 @@
 			/* P05 - USB2.0_MUX_SEL */
 			gpio-hog;
 			gpios = <5 GPIO_ACTIVE_LOW>;
-			output-high;
+			output-low;
 		};
 
 		p01_hog: p01-hog {
@@ -1172,6 +1179,10 @@
 	usb-role-switch;
 };
 
+&usb0_phy_ctrl {
+	bootph-all;
+};
+
 &usbss1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&main_usb1_pins_default>;
@@ -1318,4 +1329,11 @@
 
 &main_rti3 {
 	assigned-clock-parents = <&k3_clks 128 4>;
+};
+
+&timesync_router {
+	mux-reg-masks-state = <
+		K3_TS_OFFSET(12, 0x0001ffff, 17)
+		>;
+	status = "okay";
 };
