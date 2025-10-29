@@ -288,14 +288,14 @@
 	status = "okay";
 };
 
-/* No support for XFI yet */
 &enetc_port2 {
 	sfp = <&sfp_xfi>;
 	phy-mode = "10gbase-r";
 	clocks = <&clk_eth>;
 	clock-names = "enet_ref_clk";
 	managed = "in-band-status";
-	status = "disabled";
+	serdes-supply = <&reg_3v3a_10g>;
+	status = "okay";
 };
 
 &flexcan1 {
@@ -541,7 +541,18 @@
 	sda-gpios = <&gpio2 6 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
 	status = "okay";
 
-	/* TODO: 0x19: retimer */
+	/*
+	 * driver is in downstream NXP kernel only
+	 * should be attached as RX / TX PHY to allow loading optimized values
+	 * base on speed configuration
+	 */
+	retimer: phy@19 {
+		compatible = "ti,ds110df111";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_retimer>;
+		reg = <0x19>;
+		phy-supply = <&reg_3v3a_10g>;
+	};
 
 	/* 0x50 / 0x51: SFP EEPROM */
 };
