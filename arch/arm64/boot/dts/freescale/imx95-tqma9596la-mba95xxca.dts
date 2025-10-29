@@ -63,6 +63,24 @@
 		status = "disabled";
 	};
 
+	clk_eth: clk-eth {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <156250000>;
+	};
+
+	/*
+	 * TODO: gate is disabled for now and GPIO are hogged
+	 * ENETC driver switches the clock far too late for ENETC2 + SFP
+	 */
+	clk_eth_gate: clk-eth-gate {
+		compatible = "gpio-gate-clock";
+		enable-gpios = <&expander2 0 GPIO_ACTIVE_HIGH>;
+		clocks = <&clk_eth>;
+		#clock-cells = <0>;
+		status = "disabled";
+	};
+
 	clk_xtal25: clk-xtal25 {
 		compatible = "fixed-clock";
 		#clock-cells = <0>;
@@ -137,6 +155,17 @@
 		regulator-always-on;
 	};
 
+	reg_3v3a_10g: regulator-3v3a-10g {
+		compatible = "regulator-fixed";
+		regulator-name = "3V3A_10G";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		gpio = <&expander2 15 GPIO_ACTIVE_HIGH>;
+		startup-delay-us = <2000>;
+		enable-active-high;
+		vin-supply = <&reg_5v0>;
+	};
+
 	reg_5v0: regulator-5v0 {
 		compatible = "regulator-fixed";
 		regulator-name = "5V0";
@@ -174,6 +203,18 @@
 		vin-supply = <&reg_5v0>;
 	};
 
+	sfp_xfi: sfp-xfi {
+		compatible = "sff,sfp";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_sfp>;
+		i2c-bus = <&lpi2c7>;
+		maximum-power-milliwatt = <2000>;
+		mod-def0-gpios = <&expander1 3 GPIO_ACTIVE_LOW>;
+		tx-fault-gpios = <&gpio2 30 GPIO_ACTIVE_HIGH>;
+		los-gpios = <&gpio2 31 GPIO_ACTIVE_HIGH>;
+		tx-disable-gpios = <&expander2 2 GPIO_ACTIVE_HIGH>;
+	};
+
 	sound {
 		compatible = "fsl,imx-audio-tlv320aic32x4";
 		model = "tqm-tlv320aic32";
@@ -208,6 +249,16 @@
 	pinctrl-0 = <&pinctrl_enetc1>;
 	phy-handle = <&ethphy1>;
 	phy-mode = "rgmii-id";
+	status = "okay";
+};
+
+&enetc_port2 {
+	sfp = <&sfp_xfi>;
+	phy-mode = "10gbase-r";
+	serdes-supply = <&reg_3v3a_10g>;
+	clocks = <&clk_eth>;
+	clock-names = "enet_ref_clk";
+	managed = "in-band-status";
 	status = "okay";
 };
 
@@ -441,6 +492,21 @@
 	scl-gpios = <&gpio2 7 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
 	sda-gpios = <&gpio2 6 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
 	status = "okay";
+
+	/*
+	 * driver is in downstream NXP kernel only
+	 * should be attached as RX / TX PHY to allow loading optimized values
+	 * base on speed configuration
+	 */
+	retimer: phy@19 {
+		compatible = "ti,ds110df111";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_retimer>;
+		reg = <0x19>;
+		phy-supply = <&reg_3v3a_10g>;
+	};
+
+	/* 0x50 / 0x51: SFP EEPROM */
 };
 
 /* X4 */
@@ -845,6 +911,15 @@
 			   <IMX95_PAD_GPIO_IO20__SAI3_RX_DATA_BIT0		0x1300>,
 			   <IMX95_PAD_GPIO_IO21__SAI3_TX_DATA_BIT0		0x51e>,
 			   <IMX95_PAD_GPIO_IO26__SAI3_TX_SYNC			0x51e>;
+	};
+
+	pinctrl_retimer: retirmergrp {
+		fsl,pins = <IMX95_PAD_GPIO_IO29__GPIO2_IO_BIT29			0x1100>;
+	};
+
+	pinctrl_sfp: sfpgrp {
+		fsl,pins = <IMX95_PAD_GPIO_IO30__GPIO2_IO_BIT30			0x1100>,
+			   <IMX95_PAD_GPIO_IO31__GPIO2_IO_BIT31			0x1100>;
 	};
 
 	pinctrl_tpm3: tpm3grp {
