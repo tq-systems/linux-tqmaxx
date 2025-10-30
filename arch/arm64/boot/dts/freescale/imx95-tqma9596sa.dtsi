@@ -446,7 +446,6 @@
 		 <&scmi_clk IMX95_CLK_HSIOPCIEAUX>,
 		 <&pcieclk 1>;
 	clock-names = "pcie", "pcie_bus", "pcie_phy", "pcie_aux", "ref";
-	fsl,refclk-pad-mode = <IMX8_PCIE_REFCLK_PAD_INPUT>;
 	reset-gpios = <&expander2 9 GPIO_ACTIVE_LOW>;
 };
 
@@ -459,7 +458,6 @@
 		 <&scmi_clk IMX95_CLK_HSIOPCIEAUX>,
 		 <&pcieclk 0>;
 	clock-names = "pcie", "pcie_bus", "pcie_phy", "pcie_aux", "ref";
-	fsl,refclk-pad-mode = <IMX8_PCIE_REFCLK_PAD_INPUT>;
 	reset-gpios = <&expander2 10 GPIO_ACTIVE_LOW>;
 };
 
