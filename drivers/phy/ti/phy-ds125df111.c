@@ -181,6 +181,7 @@ static int ds125df111_probe(struct i2c_client *client)
 }
 
 static const struct of_device_id ds125df111_dt_ids[] = {
+	{ .compatible = "ti,ds110df111", },
 	{ .compatible = "ti,ds125df111", },
 	{},
 };
