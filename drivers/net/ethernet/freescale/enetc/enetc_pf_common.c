@@ -497,7 +497,7 @@ static int enetc_imdio_create(struct enetc_pf *pf)
 	err = mdiobus_register(bus);
 	if (err) {
 		dev_err(dev, "cannot register internal MDIO bus (%d)\n", err);
-		goto free_mdio_bus;
+		goto serdes_regulator_disable;
 	}
 
 	if (is_enetc_rev1(pf->si)) {
@@ -533,6 +533,9 @@ static int enetc_imdio_create(struct enetc_pf *pf)
 
 unregister_mdiobus:
 	mdiobus_unregister(bus);
+serdes_regulator_disable:
+	if (mdio_priv->regulator)
+		regulator_disable(mdio_priv->regulator);
 free_mdio_bus:
 	mdiobus_free(bus);
 	return err;
