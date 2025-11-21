@@ -85,18 +85,20 @@ config NVMEM_IMX_OCOTP
 	  will be called nvmem-imx-ocotp.
 
 config NVMEM_IMX_OCOTP_ELE
-	tristate "i.MX On-Chip OTP Controller support"
+	tristate "i.MX On-Chip OTP Controller support (linux mainline)"
 	depends on ARCH_MXC || COMPILE_TEST
 	depends on HAS_IOMEM
 	depends on OF
+	depends on !NVMEM_IMX_OCOTP_FSB_S400
 	help
 	  This is a driver for the On-Chip OTP Controller (OCOTP)
-	  available on i.MX SoCs which has ELE.
+	  available on i.MX SoCs which has ELE. Note that this is
+	  the upstream version. If donwstream is needed, select
+	  NVMEM_IMX_OCOTP_FSB_S400 instead.
 
 config NVMEM_IMX_OCOTP_FSB_S400
-	tristate "i.MX FSB/S400-API ocotp fuse box support"
+	tristate "i.MX FSB/S400-API ocotp fuse box support (NXP downstream)"
 	depends on IMX_SEC_ENCLAVE
-	default y
 	help
 	  This is a driver for the ocotp fuse box which can be accessed by
 	  FSB and S400-API.
