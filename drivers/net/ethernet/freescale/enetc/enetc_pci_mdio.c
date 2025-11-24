@@ -120,6 +120,8 @@ err_mdiobus_reg:
 err_pci_mem_reg:
 	pci_disable_device(pdev);
 err_pci_enable:
+	if (mdio_priv->regulator)
+		err = regulator_disable(mdio_priv->regulator);
 err_en_regulator:
 err_get_regulator:
 err_mdiobus_alloc:
