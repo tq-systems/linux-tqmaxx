@@ -273,12 +273,14 @@
 };
 
 &epwm0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&epwm0_ext_pins>;
 	status = "okay";
 };
 
 &epwm1 {
 	pinctrl-names = "default";
-	pinctrl-0 = <&epwm1_pins>;
+	pinctrl-0 = <&epwm1_ext_pins>;
 	status = "okay";
 };
 
@@ -733,9 +735,15 @@
 	};
 
 	/* On extension header */
-	epwm1_pins: epwm1-pins {
+	epwm0_ext_pins: epwm0-ext-pins {
 		pinctrl-single,pins = <
-			J722S_IOPAD(0x019c, PIN_OUTPUT, 6) /* (B25) MCASP0_AXR1.EHRPWM1_A */
+			J722S_IOPAD(0x1b8, PIN_OUTPUT, 2) /* (C20) SPI0_CS1.EHRPWM0_B */
+		>;
+	};
+
+	/* On extension header */
+	epwm1_ext_pins: epwm1-ext-pins {
+		pinctrl-single,pins = <
 			J722S_IOPAD(0x01a0, PIN_OUTPUT, 6) /* (F23) MCASP0_AXR0.EHRPWM1_B */
 		>;
 	};
