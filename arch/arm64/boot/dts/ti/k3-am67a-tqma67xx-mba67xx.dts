@@ -11,6 +11,7 @@
 #include <dt-bindings/leds/common.h>
 #include <dt-bindings/net/ti-dp83867.h>
 #include <dt-bindings/phy/phy.h>
+#include <dt-bindings/pwm/pwm.h>
 #include "k3-am67a-tqma67xx.dtsi"
 #include "k3-serdes.h"
 
@@ -81,6 +82,21 @@
 		pinctrl-0 = <&lvds_panel_pins>;
 		enable-gpios = <&main_gpio0 25 GPIO_ACTIVE_HIGH>;
 		reset-gpios = <&main_gpio0 21 GPIO_ACTIVE_LOW>;
+		status = "disabled";
+	};
+
+	fan0: pwm-fan {
+		compatible = "pwm-fan";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pwm_fan_pins>, <&pwm_fan_mcu_pins>;
+		#cooling-cells = <2>;
+		/* typical 16 kHz -> 62.500 nsec */
+		cooling-levels = <0 32 64 128 196 240>;
+		fan-supply = <&reg_pwm_fan>;
+		interrupt-parent = <&mcu_gpio0>;
+		interrupts = <18 IRQ_TYPE_EDGE_FALLING>;
+		pulses-per-revolution = <2>;
+		pwms = <&epwm1 0 62500 PWM_POLARITY_INVERTED>;
 		status = "disabled";
 	};
 
@@ -162,6 +178,17 @@
 		regulator-min-microvolt = <5000000>;
 		regulator-max-microvolt = <5000000>;
 		regulator-name = "V_5V0_MBA";
+	};
+
+	reg_pwm_fan: regulator-pwm-fan {
+		compatible = "regulator-fixed";
+		pinctrl-names = "default";
+		pinctrl-0 = <&reg_pwm_fan_pins>;
+		enable-active-high;
+		gpio = <&mcu_gpio0 17 GPIO_ACTIVE_HIGH>;
+		regulator-name = "FAN_PWR";
+		regulator-min-microvolt = <12000000>;
+		regulator-max-microvolt = <12000000>;
 	};
 
 	reg_wifi_bt: regulator-wifi-bt {
@@ -878,6 +905,13 @@
 		>;
 	};
 
+	pwm_fan_pins: pwm-fan-pins {
+		pinctrl-single,pins = <
+			/* (B25) MCASP0_AXR1.EHRPWM1_A - FAN_PWM */
+			J722S_IOPAD(0x019c, PIN_OUTPUT, 6)
+		>;
+	};
+
 	reg_3v3_sd_pins: reg-3v3-sd-pins {
 		pinctrl-single,pins = <
 			J722S_IOPAD(0x0258, PIN_OUTPUT, 7) /* (B27) USB1_DRVVBUS.GPIO1_51 */
@@ -1016,6 +1050,20 @@
 			J722S_MCU_IOPAD(0x0020, PIN_OUTPUT, 0)	/* (C5) MCU_UART0_RTSn */
 			J722S_MCU_IOPAD(0x0014, PIN_INPUT, 0)	/* (B8) MCU_UART0_RXD */
 			J722S_MCU_IOPAD(0x0018, PIN_OUTPUT, 0)	/* (B4) MCU_UART0_TXD */
+		>;
+	};
+
+	pwm_fan_mcu_pins: pwm-fan-mcu-pins {
+		pinctrl-single,pins = <
+			/* (E11) MCU_I2C0_SDA.MCU_GPIO0_18 - FAN_RPM */
+			J722S_MCU_IOPAD(0x0048, PIN_INPUT, 7)
+		>;
+	};
+
+	reg_pwm_fan_pins: reg-pwm-fan-pins {
+		pinctrl-single,pins = <
+			/* (B13) MCU_I2C0_SCL.MCU_GPIO0_17 - FAN_PWR */
+			J722S_MCU_IOPAD(0x0044, PIN_OUTPUT, 7)
 		>;
 	};
 
