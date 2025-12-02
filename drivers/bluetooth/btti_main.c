@@ -43,7 +43,7 @@ void btti_hci_irq_handler(struct btti_private *private_data)
 
 	spin_lock_irqsave(&private_data->irq_cnt_lock, flags);
 	private_data->hci_adapter->num_of_interrupt++;
-    spin_unlock_irqrestore(&private_data->irq_cnt_lock, flags);
+	spin_unlock_irqrestore(&private_data->irq_cnt_lock, flags);
 
     //  wakeup to btti_service_work_thread
 	wake_up_interruptible(&private_data->work_thread.wait_queue);
@@ -55,15 +55,16 @@ int btti_debugfs_if_prepare_command(u8 cmd_type,
 				    struct btti_private *private_data)
 {
 	int ret = 0;
-	switch(cmd_type){
-		case CMD_TYPE_BLE_ENABLE:
-			BT_DBG("[bt sdio hci] "\
-					"btti_debugfs_if_prepare_command "\
-					" CMD_TYPE_BLE_ENABLE ");
-			ret = btti_hci_is_ble_enabled(private_data);
+
+	switch (cmd_type) {
+	case CMD_TYPE_BLE_ENABLE:
+		BT_DBG("[bt sdio hci] "\
+				"btti_debugfs_if_prepare_command "\
+				" CMD_TYPE_BLE_ENABLE ");
+		ret = btti_hci_is_ble_enabled(private_data);
+	break;
+	default:
 		break;
-		default:
-			break;
 	}
 	return ret;
 }
@@ -77,8 +78,7 @@ static int btti_hci_tx_pkt(struct btti_private *private_data,\
 	if (!skb || !skb->data)
 		return -EINVAL;
 
-	if (!skb->len || ((skb->len + BT_SDIO_HEADER_LEN) > BT_SDIO_UPLD_SIZE))
-	{
+	if (!skb->len || ((skb->len + BT_SDIO_HEADER_LEN) > BT_SDIO_UPLD_SIZE)) {
 		BT_ERR("[bt sdio hci] TX Error: Bad skb length %d : %d",
 						skb->len, BT_SDIO_UPLD_SIZE);
 		return -EINVAL;
@@ -129,8 +129,8 @@ static void btti_hci_free_hci_adapter(struct btti_private *private_data)
 //worse case card_ble_verify_if_ble_enable_funcp will be called more than once
 static int btti_hci_is_ble_enabled(struct btti_private *private_data)
 {
-        //if ble_enabled -- return 0
-	return( private_data->hci_adapter->ble_enable);
+	//if ble_enabled -- return 0
+	return private_data->hci_adapter->ble_enable;
 }
 
 
@@ -168,7 +168,7 @@ static int btti_hci_if_tx_frame(struct hci_dev *hdev, struct sk_buff *skb)
 	BT_DBG("[bt sdio hci] TX from HCI received ,type=%d,"\
 			" opcode: 0x%x len=%d ble_enable=%d",
 			hci_skb_pkt_type(skb), hci_skb_opcode(skb),\
-			skb->len,private_data->hci_adapter->ble_enable);
+			skb->len, private_data->hci_adapter->ble_enable);
 
 	if (private_data->hci_adapter->is_suspending\
 			|| private_data->hci_adapter->is_suspended) {
@@ -178,7 +178,7 @@ static int btti_hci_if_tx_frame(struct hci_dev *hdev, struct sk_buff *skb)
 	}
 
 	//check of ble is enabled
-	if(!btti_hci_is_ble_enabled(private_data)){
+	if (!btti_hci_is_ble_enabled(private_data)) {
 		BT_INFO("[bt sdio hci] ble is not enabled");
 		goto fail;
 	}
@@ -186,22 +186,19 @@ static int btti_hci_if_tx_frame(struct hci_dev *hdev, struct sk_buff *skb)
 
 	switch (hci_skb_pkt_type(skb)) {
 	case HCI_COMMAND_PKT:
-		if(hdev){
+		if (hdev)
 			hdev->stat.cmd_tx++;
-		}
 		break;
 
 	case HCI_ACLDATA_PKT:
-		if(hdev){
+		if (hdev)
 			hdev->stat.acl_tx++;
-		}
 		break;
 
 	case HCI_SCODATA_PKT:
 		BT_WARN("[bt sdio hci] HCI_SCODATA_PKT not supported");
-		if(hdev){
+		if (hdev)
 			hdev->stat.sco_tx++;
-		}
 		break;
 
 	default:
@@ -214,9 +211,9 @@ static int btti_hci_if_tx_frame(struct hci_dev *hdev, struct sk_buff *skb)
 
 	skb_queue_tail(&private_data->hci_adapter->tx_queue, skb);
 
-	if (!private_data->hci_adapter->is_suspended){
+	if (!private_data->hci_adapter->is_suspended)
 		wake_up_interruptible(&private_data->work_thread.wait_queue);
-	}else{
+	else {
 		skb_dequeue_tail(&private_data->hci_adapter->tx_queue);
 		BT_INFO("[bt sdio hci] Device is suspending");
 		goto fail;
@@ -314,7 +311,7 @@ static int btti_service_work_thread(void *data)
 			hci_adapter->num_of_interrupt = 0;
 			spin_unlock_irqrestore(&private_data->irq_cnt_lock,\
 					flags);
-			if(private_data->card_process_rx_funcp){
+			if (private_data->card_process_rx_funcp) {
 				private_data->card_process_rx_funcp\
 				(private_data);//call to btti_sdio_process_rx
 			}
@@ -323,17 +320,15 @@ static int btti_service_work_thread(void *data)
 					flags);
 		}
 
-		if (private_data->hci_adapter->is_suspended)
-		{
+		if (private_data->hci_adapter->is_suspended) {
 			BT_INFO("[bt sdio hci] work thread not available,"\
-					" is_suspended:%d",
-					private_data->hci_adapter->is_suspended);
+			" is_suspended:%d", private_data->hci_adapter->is_suspended);
 			continue;
 		}
 		//handle the TX
 		skb = skb_dequeue(&hci_adapter->tx_queue);
 		if (skb) {
-			if (btti_hci_tx_pkt(private_data, skb)){
+			if (btti_hci_tx_pkt(private_data, skb)) {
 				//handle tx packet
 				BT_ERR("[bt sdio hci] TX , error send packet");
 			}
@@ -349,6 +344,7 @@ int btti_hci_register_hdev(struct btti_private *private_data)
 	struct hci_dev *hdev = NULL;
 	struct btti_sdio_dev *sdiodev = private_data->btti_dev.sdiodev;
 	int ret;
+
 	BT_DBG("[bt sdio hci] btti_hci_register_hdev");
 
 	hdev = hci_alloc_dev();
@@ -399,8 +395,8 @@ EXPORT_SYMBOL_GPL(btti_hci_register_hdev);
 struct btti_private *btti_hci_add_sdio_dev(void *sdiodev)
 {
 	struct btti_private *private_data;
-	BT_DBG("[bt sdio hci] btti_hci_add_sdio_dev");
 
+	BT_DBG("[bt sdio hci] btti_hci_add_sdio_dev");
 
 	private_data = kzalloc(sizeof(*private_data), GFP_KERNEL);
 	if (!private_data) {
@@ -451,12 +447,11 @@ int btti_hci_remove_sdio_dev(struct btti_private *private_data)
 
 	hdev = private_data->btti_dev.hcidev;
 
-	if(private_data->work_thread.task)
+	if (private_data->work_thread.task)
 		kthread_stop(private_data->work_thread.task);
 
 
-	if(hdev)
-	{
+	if (hdev) {
 		BT_DBG("[bt sdio hci] unregister hci");
 #ifdef CONFIG_DEBUG_FS
 		btti_debugfs_remove(hdev);

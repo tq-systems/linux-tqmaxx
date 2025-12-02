@@ -62,7 +62,7 @@ struct btti_private {
 	struct btti_hci_adapter *hci_adapter;
 	struct btti_worker_thread work_thread;
 	int (*card_tx_packet_funcp)\
-			(struct btti_private *private_data,struct sk_buff *skb);
+			(struct btti_private *private_data, struct sk_buff *skb);
 	int (*card_power_up_firmware_funcp)(struct btti_private *private_data);
 	int (*card_power_dn_firmware_funcp)(struct btti_private *private_data);
 	int (*card_process_rx_funcp)(struct btti_private *private_data);

@@ -44,7 +44,7 @@ static int btti_sdio_tx_packet(struct btti_private *private_data,
 static void btti_sdio_irq_handler(struct sdio_func *func);
 static int btti_sdio_power_up_fw(struct btti_private *private_data);
 static int btti_handle_rx_vendor_event(struct btti_private *private_data,
-		struct sk_buff *skb );
+		struct sk_buff *skb);
 static void btti_acknldg_packet(struct btti_sdio_dev *sdiodev, u8 Ack);
 
 
@@ -70,17 +70,19 @@ static int btti_sdio_if_probe_of(struct device *dev)
 static const struct btti_sdio_dev_reg_map btti_reg_map_cc33xx = {
 	/* fun0 ,ELP Wakeup Reg address, func0 not used*/
 	.sdio_wup_ble = 0x40,
-	/*fun1, set 0x1, to enable interrupts, 0 to disable */
+	/* fun1, set 0x1, to enable interrupts, 0 to disable */
 	.sdio_enable_int = 0x14,
 	/* fun1,read and write to the card are at 0x0 address */
 	.sdio_rt_data = 0x0,
-	/*  fun1,write 1 to clear rx interrupt after reception*/
+	/* fun1,write 1 to clear rx interrupt after reception */
 	.sdio_cl_int = 0x13,
-	 /*fun1, bt mode status, bit 1 means ack mode,
-	  *  currently the code just read it */
+	/* fun1, bt mode status, bit 1 means ack mode,
+	 * currently the code just read it
+	 */
 	.bt_mode_status = 0x20,
 	/* fun1 read packet control, write 1 is set ack for RX,
-	 *  write 0 for nack */
+	 *  write 0 for nack
+	 */
 	.sdio_pc_rrt = 0x10,
 };
 
@@ -89,8 +91,8 @@ static const struct btti_sdio_device btti_sdio_cc33xx_bt = {
 };
 
 static const struct sdio_device_id btti_sdio_ids[] = {
-    { SDIO_DEVICE(SDIO_VENDOR_ID_TI, SDIO_DEVICE_ID_TI_CC33XX) ,.driver_data\
-		    = (unsigned long)&btti_sdio_cc33xx_bt },
+	{SDIO_DEVICE(SDIO_VENDOR_ID_TI, SDIO_DEVICE_ID_TI_CC33XX), .driver_data\
+		    = (unsigned long)&btti_sdio_cc33xx_bt},
 	{ }	/* Terminating entry */
 };
 
@@ -150,12 +152,9 @@ static int btti_sdio_process_rx(struct btti_private *private_data)
 
 	sdio_claim_host(sdiodev->func);
 	if (intrpt_occur)
-	{
 		btti_sdio_rx_packet(private_data);//read Rx,
-	}
-	else{
-		btti_acknldg_packet(sdiodev,1);//nack
-	}
+	else
+		btti_acknldg_packet(sdiodev, 1);//nack
 
 	sdio_release_host(sdiodev->func);
 
@@ -168,7 +167,7 @@ static int btti_sdio_clr_irq(struct btti_sdio_dev *sdiodev)
 
 	BT_DBG("[bt sdio] clear int_status");
 
-	sdio_writeb(sdiodev->func, 1 ,sdiodev->reg_map->sdio_cl_int, &ret);
+	sdio_writeb(sdiodev->func, 1, sdiodev->reg_map->sdio_cl_int, &ret);
 	if (ret) {
 		BT_ERR("[bt sdio] clear int status failed: %d", ret);
 		return ret;
@@ -201,10 +200,9 @@ static int btti_sdio_register_dev(struct btti_sdio_dev *sdiodev)
 		//this is ok, since the ble is not up yet so SDIO_CCCR_IOEx
 		//is not set on this sage
 		BT_DBG("[bt sdio] sdio_enable_func: %d failed: ret=%d",\
-				func->num, ret );
-	}
-	else{
-		BT_DBG("[bt sdio] sdio_enable_func: %d success", func->num );
+				func->num, ret);
+	} else {
+		BT_DBG("[bt sdio] sdio_enable_func: %d success", func->num);
 	}
 
 	//set block size
@@ -353,14 +351,13 @@ static void btti_sdio_coredump(struct device *dev)
 	struct btti_private *private_data;
 
 	sdiodev = sdio_get_drvdata(func);
-	if(sdiodev)
-	{
+	if (sdiodev) {
 		private_data = sdiodev->private_data;
-		if(!private_data){
+		if (!private_data) {
 			BT_ERR("[bt sdio] private_data is not allocated");
 			return;
 		}
-	}else {
+	} else {
 		BT_ERR("[bt sdio] no sdiodev");
 		return;
 	}
@@ -457,7 +454,7 @@ static void btti_sdio_irq_handler(struct sdio_func *func)
 
 	sdio_release_host(func);
 
-	if (ret){
+	if (ret) {
 		BT_ERR("[bt sdio] RX btti_sdio_irq_handler:failed to clear");
 		return;
 	}
@@ -504,7 +501,7 @@ static int btti_sdio_rx_packet(struct btti_private *private_data)
 	packet_type = sdio_header[3];
 
 	BT_DBG("[bt sdio] RX packet_len:%d packet_type:%d "\
-			"packet header hex: %*ph", packet_len,packet_type,\
+			"packet header hex: %*ph", packet_len, packet_type,\
 			SDIO_HEADER_LEN, sdio_header);
 
 	if ((packet_len <= SDIO_HEADER_LEN)\
@@ -553,48 +550,45 @@ static int btti_sdio_rx_packet(struct btti_private *private_data)
 	case HCI_ACLDATA_PKT:
 	case HCI_SCODATA_PKT:
 	case HCI_EVENT_PKT:
-		if(hdev != NULL){
+		if (hdev != NULL) {
 			btti_acknldg_packet(sdiodev, 0);//ack
 			hdev->stat.byte_rx += data_read_size;
 			hci_skb_pkt_type(skb) = packet_type;
 
-			ret= hci_recv_frame(hdev, skb);
-			if (ret < 0){
+			ret = hci_recv_frame(hdev, skb);
+			if (ret < 0) {
 				BT_ERR("[bt sdio] RX hci_recv_frame"
 						" failed :%d ", ret);
 			}
-			ret=0;
-		}else
-		{
+			ret = 0;
+		} else
 			ret = -EPERM;
-		}
+
 		//no need to free the skb in here, it is freed at hci_recv_frame
 		break;
 
 	case HCI_VENDOR_PKT:
 		BT_DBG("[bt sdio] vendor packet received");
-		if (!(ret=btti_handle_rx_vendor_event(private_data, skb)))
-		{
+		ret = btti_handle_rx_vendor_event(private_data, skb);
+		if (!ret) {
 			//if hdev was just created read it
 			hdev = private_data->btti_dev.hcidev;
-			if(hdev != NULL)
-			{
+			if (hdev != NULL) {
 				btti_acknldg_packet(sdiodev, 0);//ack
 				BT_DBG("[bt sdio] Hdev was created");
 				hdev->stat.byte_rx += data_read_size;
 				hci_skb_pkt_type(skb) = HCI_EVENT_PKT;
-				ret= hci_recv_frame(hdev, skb);
-				if (ret < 0){
+				ret = hci_recv_frame(hdev, skb);
+				if (ret < 0) {
 					BT_ERR("[bt sdio] vendor RX "
 							"hci_recv_frame "
 							"failed :%d ", ret);
 				}
 				//no need to free the skb in here,
 				//it is freed at hci_recv_frame
-				ret=0;
-			}else{
-				ret=-EPERM;
-			}
+				ret = 0;
+			} else
+				ret = -EPERM;
 		}
 		break;
 
@@ -609,9 +603,8 @@ static int btti_sdio_rx_packet(struct btti_private *private_data)
 exit:
     //send nack
 	if (ret) {
-		if(hdev){
+		if (hdev)
 			hdev->stat.err_rx++;
-		}
 		kfree_skb(skb);
 		skb = NULL;
 		btti_acknldg_packet(sdiodev, 1);//nack
@@ -627,11 +620,11 @@ static void btti_acknldg_packet(struct btti_sdio_dev *sdiodev, u8 Ack)
 	BT_DBG("[bt sdio] RX sdio_writesb: send ACK ");
 	sdio_writeb(sdiodev->func, Ack,\
 			sdiodev->reg_map->sdio_pc_rrt, &retACK);
-	if (retACK && (Ack==0)) {
+	if (retACK && (Ack == 0)) {
 		BT_ERR("[bt sdio] RX sdio_writesb:"\
 				" send ACK failed: %d", retACK);
 	}
-	if (retACK && (Ack==1)) {
+	if (retACK && (Ack == 1)) {
 		BT_ERR("[bt sdio] RX sdio_writesb:"\
 				" send NACK failed: %d", retACK);
 	}
@@ -640,27 +633,27 @@ static void btti_acknldg_packet(struct btti_sdio_dev *sdiodev, u8 Ack)
 
 
 static int btti_handle_rx_vendor_event(struct btti_private *private_data,
-		struct sk_buff *skb )
+		struct sk_buff *skb)
 {
 	int ret = 0;
-	struct btti_vendor_event* vendor_event;
-	vendor_event = (struct btti_vendor_event *) skb->data;
+	struct btti_vendor_event *vendor_event;
+	vendor_event = (struct btti_vendor_event *)skb->data;
 	switch (vendor_event->event_opcode) {
-		case BTTI_BLE_FIRMWARE_UP:
-			BT_DBG("[bt sdio] vendor packet- ble is up");
-			private_data->hci_adapter->ble_enable = 1;
-			if (btti_hci_register_hdev(private_data)) {
-				BT_ERR("[bt sdio] Register hdev failed!");
-				ret = -ENODEV;
-			}
-			BT_INFO("[bt sdio] registered to HCI");
+	case BTTI_BLE_FIRMWARE_UP:
+		BT_DBG("[bt sdio] vendor packet- ble is up");
+		private_data->hci_adapter->ble_enable = 1;
+		if (btti_hci_register_hdev(private_data)) {
+			BT_ERR("[bt sdio] Register hdev failed!");
+			ret = -ENODEV;
+		}
+		BT_INFO("[bt sdio] registered to HCI");
 
-			break;
-		default:
-			BT_ERR("[bt sdio] unsupported rx vendor event code:"\
-					" %d", vendor_event->event_code);
-			ret = -EINVAL;
-			break;
+		break;
+	default:
+		BT_ERR("[bt sdio] unsupported rx vendor event code:"\
+				" %d", vendor_event->event_code);
+		ret = -EINVAL;
+		break;
 	}
 
 	return ret;
@@ -677,7 +670,7 @@ static int btti_sdio_tx_packet(struct btti_private *private_data,
 	void *tmpbuf = NULL;
 	u32 data_send_size = 0;
 	u32 packet_len;
-	char* payload;
+	char *payload;
 	bool alignment_required;
 
 
@@ -693,17 +686,14 @@ static int btti_sdio_tx_packet(struct btti_private *private_data,
 	data_send_size = roundup(packet_len, BTSDIO_TX_ALIGN);
 	alignment_required = (data_send_size != packet_len);
 
-	if(alignment_required) 
-	{
+	if (alignment_required) {
 		tmpbuf = kzalloc(data_send_size, GFP_KERNEL);
-		if (!tmpbuf){
+		if (!tmpbuf) {
 			BT_ERR("[bt sdio] TX allocation failed");
 			return -ENOMEM;
 		}
 		memcpy(tmpbuf, payload, data_send_size);
-	}
-	else
-	{
+	} else {
 		tmpbuf = payload;
 	}
 
@@ -719,7 +709,7 @@ static int btti_sdio_tx_packet(struct btti_private *private_data,
 			i++;
 			BT_ERR("[bt sdio] TX  i=%d writesb failed: %d", i, ret);
 			BT_ERR("[bt sdio] TX data_send_size: %d hex: %*ph",\
-					data_send_size, data_send_size,tmpbuf);
+					data_send_size, data_send_size, tmpbuf);
 			ret = -EIO;
 			if (i > MAX_SDIO_TX_RETRY)
 				goto exit;
@@ -732,17 +722,15 @@ static int btti_sdio_tx_packet(struct btti_private *private_data,
 exit:
 	sdio_release_host(sdiodev->func);
 
-	if(alignment_required){
+	if (alignment_required)
 		kfree(tmpbuf);
-	}
 
 	pm_runtime_mark_last_busy(&sdiodev->func->dev);
 	pm_runtime_put_autosuspend(&sdiodev->func->dev);
 
-	if(ret){
+	if (ret) {
 		private_data->btti_dev.hcidev->stat.err_tx++;
-	}
-	else{
+	} else {
 		private_data->btti_dev.hcidev->stat.byte_tx\
 			+= data_send_size;
 	}
@@ -761,24 +749,23 @@ static int btti_sdio_if_probe(struct sdio_func *func,
 	BT_INFO("[bt sdio] PROBE vendor=0x%x, device=0x%x,"\
 			" class=%d, fn=%d 0x%lx",
 			id->vendor, id->device, id->class, func->num,\
-			( unsigned long)func);
+			(unsigned long)func);
 
 	/* We are only able to handle the wlan function */
-	if (func->num != 0x01)
-	{
+	if (func->num != 0x01) {
 		BT_DBG("[bt sdio] PROBE incorrect function number!");
 		ret = -ENODEV;
 		return ret;
 	}
 
 	/* Device tree node parsing */
-	if(btti_sdio_if_probe_of(&func->dev)){
+	if (btti_sdio_if_probe_of(&func->dev)) {
 		ret = -ENODEV;
 		return ret;
 	}
 
 	sdiodev = devm_kzalloc(&func->dev, sizeof(*sdiodev), GFP_KERNEL);
-	if (!sdiodev){
+	if (!sdiodev) {
 		ret = -ENODEV;
 		return ret;
 	}
@@ -868,11 +855,10 @@ static void btti_sdio_if_remove(struct sdio_func *func)
 		if (sdiodev != NULL) {
 			BT_INFO("[bt sdio] disable interrupt");
 			btti_sdio_disable_int(sdiodev);
-			if(sdiodev->private_data != NULL){
+			if (sdiodev->private_data != NULL) {
 				sdiodev->private_data->sdio_dev_removed = true;
 				btti_hci_remove_sdio_dev(sdiodev->private_data);
-			}
-			else {
+			} else {
 				BT_ERR("[bt sdio] private_data was "\
 						"not allocated");
 			}
@@ -959,8 +945,7 @@ static int btti_sdio_if_resume(struct device *dev)
 		return 0;
 	}
 	private_data = sdiodev->private_data;
-	if(!private_data)
-	{
+	if (!private_data) {
 		BT_ERR("[bt sdio] private_data is not allocated");
 		return 0;
 	}

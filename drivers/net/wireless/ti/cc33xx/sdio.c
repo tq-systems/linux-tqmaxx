@@ -136,7 +136,7 @@ static bool mmc_inband_polling_host(struct sdio_func *func)
 	struct mmc_host *host = func->card->host;
 
 	/* Indicates the MMC host uses a dedicated thread to poll
-	   for SDIO in-band IRQs and run the IRQ handlers */
+	for SDIO in-band IRQs and run the IRQ handlers */
 
 	return !(host->caps2 & MMC_CAP2_SDIO_IRQ_NOTHREAD);
 }
@@ -170,7 +170,7 @@ static void inband_irq_work(struct work_struct *work)
 	struct cc33xx_sdio_glue *glue = container_of(work, struct cc33xx_sdio_glue, inband_irq_work);
 	struct platform_device *pdev = glue->core;
 	struct cc33xx_platdev_data *pdev_data = dev_get_platdata(&pdev->dev);
-	
+
 	pdev_data->irq_handler(pdev);
 }
 

@@ -312,7 +312,7 @@ int cc33xx_set_link(struct cc33xx *cc, struct cc33xx_vif *wlvif, u8 link)
 	return 0;
 }
 
-static u8 cc33xx_check_is_dfs_channel(struct cc33xx *cc, 
+static u8 cc33xx_check_is_dfs_channel(struct cc33xx *cc,
 						enum nl80211_band rate_band, u8 channel)
 {
 	struct ieee80211_supported_band *band;
@@ -379,7 +379,7 @@ static u8 cc33xx_get_sub_channel_type(u8 band, u8 channel, u8 band_width)
 		switch (channel) {
 		case 9:
 		case 5:
-			return 0; 
+			return 0;
 		case 1:
 			return 0;
 		case 13:
@@ -690,7 +690,7 @@ int cc33xx_cmd_role_start_sta(struct cc33xx *cc, struct cc33xx_vif *wlvif)
 	if (wlvif->p2p)
 		supported_rates &= ~CONF_TX_CCK_RATES;
 
-	cmd->sta.local_rates = cpu_to_le32(supported_rates); 
+	cmd->sta.local_rates = cpu_to_le32(supported_rates);
 	cmd->channel_type = cc33xx_get_sub_channel_type(cmd->band, cmd->channel, 0);
 
 	/* We don't have the correct remote rates in this stage.  The

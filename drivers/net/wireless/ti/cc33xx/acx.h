@@ -599,7 +599,7 @@ struct acx_twt_setup {
 	__le32 max_wake_interval_mantissa;
 	__le32 max_wake_interval_exponent;
 	u8 valid_params;
-	u8 padding [3];
+	u8 padding[3];
 } __packed;
 
 #define MIN_WAKE_DURATION_VALID				BIT(0)
@@ -619,9 +619,8 @@ struct acx_preamble_and_tx_rate {
 	u8 role_id;
 } __packed;
 
-static const u16 cc33xx_idx_to_rate_100Kbps[] =
-{
-    10, 20, 55, 110, 60, 90, 120, 180, 240, 360, 480, 540
+static const u16 cc33xx_idx_to_rate_100Kbps[] = {
+	10, 20, 55, 110, 60, 90, 120, 180, 240, 360, 480, 540
 };
 
 struct cc33xx_coex_statistics {
@@ -706,14 +705,14 @@ struct decrypt_packets_status_count {
 		__le32 decrypted_error_broadcast_count;
 	} counters;
 } __packed;
-    
+
 struct channel_utilization_survey_results {
 	u8 channel_number;
 	u8 channel_load;
 	s8 noise_floor_avg;
 	u8 bss_count;
 } __packed;
-    
+
 struct role_current_channel_number {
 	u8 role_type;
 	u8 role_id;

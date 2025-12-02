@@ -100,5 +100,4 @@ static const struct file_operations sub## _ ##name## _ops = {		\
 #define DEBUGFS_FWSTATS_ADD(sub, name)					\
 	DEBUGFS_ADD(sub## _ ##name, stats)
 
-
 #endif /* CC33XX_DEBUGFS_H */

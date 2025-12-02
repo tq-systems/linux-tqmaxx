@@ -267,24 +267,11 @@
 	};
 
 	main_pmx0: pinctrl@f4000 {
-		compatible = "ti,am654-padconf", "pinctrl-single";
+		compatible = "pinctrl-single";
 		reg = <0x00 0xf4000 0x00 0x2b0>;
 		#pinctrl-cells = <1>;
 		pinctrl-single,register-width = <32>;
 		pinctrl-single,function-mask = <0xffffffff>;
-		/*
-		 * pinctrl IP DOES NOT give any functional IRQs when a
-		 * system is in active state. This IRQ is only a dummy IRQ
-		 * that is being used to trick Linux into thinking that
-		 * GIC can potentially recieve an interrupt from this IP.
-		 * This helps us setup the IO daisychain wakeups for deep
-		 * sleep via chained wake IRQs.
-		 * Please feel free to assign a different number here as
-		 * long as it is unused if 98 conflicts with another use case.
-		 */
-		interrupts = <GIC_SPI 98 IRQ_TYPE_LEVEL_HIGH>;
-		interrupt-controller;
-		#interrupt-cells = <1>;
 		bootph-all;
 	};
 
@@ -1230,7 +1217,7 @@
 			#size-cells = <0>;
 
 			oldi1_dss1: oldi@1 {
-				reg = <0>;
+				reg = <1>;
 				clocks = <&k3_clks 232 0>;
 				clock-names = "serial";
 				ti,oldi-io-ctrl = <&dss_oldi_io_ctrl>;
@@ -1302,6 +1289,26 @@
 			opp-500000000 {
 				opp-hz = /bits/ 64 <500000000>;
 			};
+		};
+	};
+
+	memorycontroller: memory-controller@f300000 {
+		compatible = "ti,am62a-ddrss";
+		reg = <0x00 0x0f300000 0x00 0x200>;
+		reg-names = "ss_cfg";
+		ranges = <0x00 0x00 0x00 0x0f308000 0x00 0x5e10>;
+		interrupts = <GIC_SPI 119 IRQ_TYPE_LEVEL_HIGH>;
+		power-domains = <&k3_pds 170 TI_SCI_PD_EXCLUSIVE>;
+		clocks = <&k3_clks 170 0>;
+		#address-cells = <2>;
+		#size-cells = <2>;
+
+		ddr: ddr@0 {
+			compatible = "cdns,j7-ddr";
+			reg = <0x00 0x0000 0x00 0x6cc>,
+				<0x00 0x2000 0x00 0x6a0>,
+				<0x00 0x4000 0x00 0x1e10>;
+			reg-names = "ctl_cfg", "ctl_cfg_pi", "ctl_cfg_phy";
 		};
 	};
 };

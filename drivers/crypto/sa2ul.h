@@ -119,7 +119,13 @@ struct sa_tfm_ctx;
  */
 #define SA_CTX_SCCTL_OWNER_OFFSET 0
 
-#define SA_SCCTL_FE_AUTH_ENC	0x6D
+/*
+ * SCCTL Fetch/Evict control values
+ * Based on bit encoding: [7:6]=evict PHP, [5:4]=fetch auth, [3:2]=fetch enc, [1:0]=fetch PHP
+ */
+#define SA_SCCTL_FE_AUTH_ENC	0x6D  /* Dual-engine: PHP + Enc + Auth (authenc) */
+#define SA_SCCTL_FE_ENC		0x8D  /* Single-engine Enc: PHP + Enc + evict (CMAC, GCM, CBC) */
+#define SA_SCCTL_FE_AUTH	0x4D  /* Single-engine Auth: PHP + Auth (SHA, HMAC) */
 
 #define SA_ALIGN_MASK		(sizeof(u32) - 1)
 #define SA_ALIGNED		__aligned(32)
@@ -144,6 +150,18 @@ struct sa_tfm_ctx;
 #define SA_UNSAFE_DATA_SZ_MAX	255
 
 struct sa_match_data;
+
+/**
+ * struct sa_hw_state - Hardware-level lock state
+ * @lock: Spinlock to protect busy flag
+ * @wq: Wait queue for hardware availability
+ * @busy: Hardware busy flag
+ */
+struct sa_hw_state {
+	spinlock_t lock;
+	wait_queue_head_t wq;
+	bool busy;
+};
 
 /**
  * struct sa_crypto_data - Crypto driver instance data
@@ -179,6 +197,7 @@ struct sa_crypto_data {
 	struct dma_chan		*dma_rx1;
 	struct dma_chan		*dma_rx2;
 	struct dma_chan		*dma_tx;
+	struct sa_hw_state	hw;
 };
 
 /**
@@ -254,6 +273,18 @@ struct sa_ctx_info {
 	struct sa_cmdl_upd_info cmdl_upd_info;
 	/* Store Auxiliary data such as K2/K3 subkeys in AES-XCBC */
 	u32		epib[SA_DMA_NUM_EPIB_WORDS];
+};
+
+/**
+ * struct sa_req_ctx_data - Per-request snapshot of command label metadata
+ * @cmdl_size: template command label size in bytes
+ * @cmdl: mutable command label buffer for the request
+ * @cmdl_upd_info: request-local copy of update metadata
+ */
+struct sa_req_ctx_data {
+	u16 cmdl_size;
+	u32 cmdl[SA_MAX_CMDL_WORDS];
+	struct sa_cmdl_upd_info cmdl_upd_info;
 };
 
 /**

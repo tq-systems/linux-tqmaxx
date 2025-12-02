@@ -14,12 +14,10 @@
 #include "tx.h"
 #include "../net/mac80211/ieee80211_i.h"
 
-
 #define CC33XX_DEBUGFS_FWSTATS_FILE(a, b, c) \
 	DEBUGFS_FWSTATS_FILE(a, b, c, cc33xx_acx_statistics)
 #define CC33XX_DEBUGFS_FWSTATS_FILE_ARRAY(a, b, c) \
 	DEBUGFS_FWSTATS_FILE_ARRAY(a, b, c, cc33xx_acx_statistics)
-
 
 CC33XX_DEBUGFS_FWSTATS_FILE(power, sleep_time_count, "%u");
 CC33XX_DEBUGFS_FWSTATS_FILE(power, sleep_time_avg, "%u");
@@ -181,6 +179,7 @@ static ssize_t dynamic_fw_traces_read(struct file *file, char __user *userbuf,
 				      size_t count, loff_t *ppos)
 {
 	struct cc33xx *wl = file->private_data;
+
 	return cc33xx_format_buffer(userbuf, count, ppos,
 				    "%d\n", wl->dynamic_fw_traces);
 }
@@ -287,7 +286,7 @@ void cc33xx_debugfs_update_stats(struct cc33xx *wl)
 	if (!wl->plt && update_needed) {
 		cc33xx_acx_statistics(wl, wl->stats.fw_stats);
 
-		wl->stats.fw_stats_next_update = 
+		wl->stats.fw_stats_next_update =
 			jiffies + msecs_to_jiffies(CC33XX_DEBUGFS_STATS_LIFETIME);
 	}
 
@@ -435,6 +434,7 @@ static ssize_t dynamic_ps_timeout_read(struct file *file,
 					      size_t count, loff_t *ppos)
 {
 	struct cc33xx *wl = file->private_data;
+
 	return cc33xx_format_buffer(user_buf, count, ppos, "%d\n",
 				    wl->conf.host_conf.conn.dynamic_ps_timeout);
 }
@@ -490,6 +490,7 @@ static ssize_t ps_mode_read(struct file *file, char __user *user_buf,
 				     size_t count, loff_t *ppos)
 {
 	struct cc33xx *wl = file->private_data;
+
 	return cc33xx_format_buffer(user_buf, count, ppos, "%d\n",
 				    wl->conf.mac.ps_mode);
 }
@@ -839,8 +840,7 @@ static ssize_t dtim_interval_write(struct file *file,
 		wl->conf.core.wake_up_event = CONF_WAKE_UP_EVENT_N_DTIM;
 
 	cc33xx_for_each_wlvif_sta(wl, wlvif) {
-		if (!cc33xx_is_p2p_mgmt(wlvif))
-		{
+		if (!cc33xx_is_p2p_mgmt(wlvif)) {
 			vif = cc33xx_wlvif_to_vif(wlvif);
 			sdata = vif_to_sdata(vif);
 			cc33xx_debug(DEBUG_CMD, "Setting LSI on interface %s",
@@ -852,7 +852,7 @@ static ssize_t dtim_interval_write(struct file *file,
 				vif = cc33xx_wlvif_to_vif(wlvif);
 				sdata = vif_to_sdata(vif);
 				cc33xx_warning("Failed to set LSI on "
-					       "interface %s", sdata->name);
+					"interface %s", sdata->name);
 				return ret;
 			}
 		}
@@ -1087,7 +1087,7 @@ static ssize_t ble_enable_read(struct file *file, char __user *user_buf,
 {
 	struct cc33xx *wl = file->private_data;
 	return cc33xx_format_buffer(user_buf, count, ppos, "%d\n",
-				    wl->ble_enable);
+				wl->ble_enable);
 }
 
 static ssize_t ble_enable_write(struct file *file, const char __user *user_buf,
@@ -1100,13 +1100,13 @@ static ssize_t ble_enable_write(struct file *file, const char __user *user_buf,
 	ret = kstrtoul_from_user(user_buf, count, 0, &value);
 
 	if (value == wl->ble_enable) {
-		cc33xx_warning("ble_enable is already %d",wl->ble_enable);
+		cc33xx_warning("ble_enable is already %d", wl->ble_enable);
 		return -EINVAL;
 	}
 
 	if (value != 1) {
-		cc33xx_warning("illegal value in ble_enable (only value allowed is is 1)");
-		cc33xx_warning("ble_enable cant be disabled after being enabled.");
+		cc33xx_warning("illegal value in ble_enable (only value allowed is 1)");
+		cc33xx_warning("ble_enable can't be disabled after being enabled.");
 		return -EINVAL;
 	}
 
@@ -1134,16 +1134,14 @@ static const struct file_operations ble_enable_ops = {
 };
 
 static ssize_t fw_crash_log_read(struct file *file, char __user *user_buf,
-			       	      size_t count, loff_t *ppos)
+			size_t count, loff_t *ppos)
 {
 	struct cc33xx *cc = file->private_data;
 	size_t len;
 	int ret;
 
-	if(cc->fw_crash_logs == NULL)
-	{
+	if (cc->fw_crash_logs == NULL)
 		return 0;
-	}
 
 	len = CC33XX_MAX_FW_LOGS_BUFFER_SIZE;
 
@@ -1164,7 +1162,7 @@ static const struct file_operations fw_crash_log_ops = {
 };
 
 static ssize_t set_tsf_read(struct file *file, char __user *user_buf,
-			           size_t count, loff_t *ppos)
+			size_t count, loff_t *ppos)
 {
 	return cc33xx_format_buffer(user_buf, count, ppos, "%llx\n", 0LL);
 }
@@ -1229,7 +1227,7 @@ static ssize_t twt_action_write(struct file *file,
 	u8 valid_params;
 	int ret;
 	int arg_count;
-	char* buffer;
+	char *buffer;
 
 	buffer = kzalloc(count, GFP_KERNEL);
 	if (!buffer) {
@@ -1239,7 +1237,7 @@ static ssize_t twt_action_write(struct file *file,
 	}
 
 	ret = strncpy_from_user(buffer, user_buf, count);
-	if(-EFAULT == ret){
+	if (-EFAULT == ret) {
 		cc33xx_warning("error in twt_action: %d", ret);
 		kfree(buffer);
 		return ret;
@@ -1251,27 +1249,23 @@ static ssize_t twt_action_write(struct file *file,
 
 	kfree(buffer);
 
-#define TWT_ACTION_SETUP 		(1)
-#define TWT_ACTION_SUSPEND 		(2)
-#define TWT_ACTION_RESUME 		(3)
-#define TWT_ACTION_TERMINATE 	(4)
+#define TWT_ACTION_SETUP		(1)
+#define TWT_ACTION_SUSPEND		(2)
+#define TWT_ACTION_RESUME		(3)
+#define TWT_ACTION_TERMINATE	(4)
 
 	valid_params = 0;
-	if( (twt_action_type == TWT_ACTION_SETUP) && (arg_count > 1) )
-	{
-		if( min_wake_duration_usec < 256)
-		{
+	if ((twt_action_type == TWT_ACTION_SETUP) && (arg_count > 1)) {
+		if (min_wake_duration_usec < 256) {
 			cc33xx_warning("error in twt_action: duration cannot be under 256 ");
 			return count;
 		}
 
-		if(min_wake_interval_mantissa <= 0)
-		{
+		if (min_wake_interval_mantissa <= 0) {
 			cc33xx_warning("error in twt_action: interval mantissa must be over 0 ");
 			return count;
 		}
-		if((min_wake_interval_exponent < 0) || (max_wake_interval_mantissa < 0 ) || (max_wake_interval_exponent < 0 ))
-		{
+		if (min_wake_interval_exponent < 0 || max_wake_interval_mantissa < 0 || max_wake_interval_exponent < 0) {
 			cc33xx_warning("error in twt_action: negative value not allowed ");
 			return count;
 		}
@@ -1279,38 +1273,28 @@ static ssize_t twt_action_write(struct file *file,
 
 	mutex_lock(&wl->mutex);
 
-	if (unlikely(wl->state != CC33XX_STATE_ON)) {
+	if (unlikely(wl->state != CC33XX_STATE_ON))
 		goto out;
-	}
+
 
 	// valid input is twt_action [min_wake_duration_usec min_wake_interval_mantissa
-	//			min_wake_interval_exponent [max_wake_interval_mantissa max_wake_interval_exponent]]
-	if(twt_action_type != TWT_ACTION_SETUP && arg_count != 1)
-	{
+	// min_wake_interval_exponent [max_wake_interval_mantissa max_wake_interval_exponent]]
+	if (twt_action_type != TWT_ACTION_SETUP && arg_count != 1) {
 		cc33xx_warning("illegal arguments in twt_action");
-		cc33xx_warning("twt_action_type: %d",twt_action_type);
+		cc33xx_warning("twt_action_type: %d", twt_action_type);
 		goto out;
 	}
-	switch (twt_action_type) 
-	{
-		case TWT_ACTION_SETUP:{
-			if(arg_count == 1)
-			{
-
-			}
-			else if(arg_count == 4)
-			{
-				valid_params |= (MIN_WAKE_DURATION_VALID | MIN_WAKE_INTERVAL_MANTISSA_VALID | 
+	switch (twt_action_type)  {
+		case TWT_ACTION_SETUP: {
+			if (arg_count == 1) {
+			} else if (arg_count == 4) {
+				valid_params |= (MIN_WAKE_DURATION_VALID | MIN_WAKE_INTERVAL_MANTISSA_VALID |
 						MIN_WAKE_INTERVAL_EXPONENT_VALID);
-			}
-			else if(arg_count == 6)
-			{
+			} else if (arg_count == 6) {
 				valid_params |= (MIN_WAKE_DURATION_VALID | MIN_WAKE_INTERVAL_MANTISSA_VALID |
 					MIN_WAKE_INTERVAL_EXPONENT_VALID | MAX_WAKE_INTERVAL_MANTISSA_VALID |
-					MAX_WAKE_INTERVAL_EXPONENT_VALID);	
-			}
-			else
-			{
+					MAX_WAKE_INTERVAL_EXPONENT_VALID);
+			} else {
 				cc33xx_warning("illegal number of params for twt action setup");
 				goto out;
 			}
@@ -1340,7 +1324,7 @@ static ssize_t twt_action_write(struct file *file,
 			break;
 		}
 
-		default : {
+		default: {
 			cc33xx_warning("illegal twt command");
 			goto out;
 		}
@@ -1393,6 +1377,7 @@ static ssize_t fw_logger_read(struct file *file, char __user *user_buf,
 				     size_t count, loff_t *ppos)
 {
 	struct cc33xx *wl = file->private_data;
+
 	return cc33xx_format_buffer(user_buf, count, ppos, "%d\n",
 				    wl->conf.host_conf.fwlog.output);
 }
@@ -1410,7 +1395,7 @@ static ssize_t fw_logger_write(struct file *file, const char __user *user_buf,
 		return -EINVAL;
 	}
 
-	if ((value > 2) || (value == 0)) {
+	if (value > 2 || value == 0) {
 		cc33xx_warning("fw_logger value must be 1-UART 2-SDIO");
 		return -ERANGE;
 	}
@@ -1468,14 +1453,12 @@ static ssize_t antenna_select_write(struct file *file,
 
 	mutex_lock(&wl->mutex);
 
-	if (unlikely(wl->state != CC33XX_STATE_ON)) {
+	if (unlikely(wl->state != CC33XX_STATE_ON))
 		goto out;
-	}
 
 	ret = cc33xx_acx_set_antenna_select(wl, selection);
-	if (ret == 0) {
+	if (ret == 0)
 		wl->antenna_selection = selection;
-	}
 
 out:
 	mutex_unlock(&wl->mutex);
@@ -1495,7 +1478,7 @@ static ssize_t get_versions_read(struct file *file, char __user *user_buf,
 	struct cc33xx *wl = file->private_data;
 	struct cc33xx_acx_fw_versions *fw_ver = wl->fw_ver;
 
-	char all_versions_str [MAX_VERSIONS_LEN];
+	char all_versions_str[MAX_VERSIONS_LEN];
 
 	sprintf(all_versions_str,
 		"Firmware Version: %u.%u.%u",
@@ -1518,11 +1501,10 @@ static ssize_t trigger_fw_assert_write(struct file *file,
 	struct cc33xx *wl = file->private_data;
 
 	mutex_lock(&wl->mutex);
-	
-	if (unlikely(wl->state != CC33XX_STATE_ON)) {
+
+	if (unlikely(wl->state != CC33XX_STATE_ON))
 		goto out;
-	}
-	
+
 	cc33xx_acx_trigger_fw_assert(wl);
 
 out:
@@ -1565,14 +1547,12 @@ static ssize_t burst_mode_write(struct file *file, const char __user *user_buf,
 
 	mutex_lock(&wl->mutex);
 
-	if (unlikely(wl->state != CC33XX_STATE_ON)) {
+	if (unlikely(wl->state != CC33XX_STATE_ON))
 		goto out;
-	}
 
 	ret = cc33xx_acx_burst_mode_cfg(wl, burst_disable);
-	if (ret == 0) {
+	if (ret == 0)
 		wl->burst_disable = burst_disable;
-	}
 
 out:
 	mutex_unlock(&wl->mutex);
@@ -1801,7 +1781,7 @@ static const struct file_operations antenna_diversity_enable_ops = {
 };
 
 static ssize_t antenna_diversity_set_rssi_threshold_read(struct file *file, char __user *user_buf,
-			       	size_t count, loff_t *ppos)
+			    size_t count, loff_t *ppos)
 {
 	struct cc33xx *wl = file->private_data;
 	int ret;
@@ -1816,7 +1796,7 @@ static ssize_t antenna_diversity_set_rssi_threshold_read(struct file *file, char
 	return cc33xx_format_buffer(user_buf, count, ppos, "%d\n", threshold);
 }
 
-static ssize_t antenna_diversity_set_rssi_threshold_write(struct file *file, 
+static ssize_t antenna_diversity_set_rssi_threshold_write(struct file *file,
 				const char __user *user_buf, size_t count, loff_t *ppos)
 {
 	struct cc33xx *wl = file->private_data;
@@ -1830,7 +1810,7 @@ static ssize_t antenna_diversity_set_rssi_threshold_write(struct file *file,
 	}
 
 	mutex_lock(&wl->mutex);
-	
+
 	if (unlikely(wl->state != CC33XX_STATE_ON)) {
 		goto out;
 	}

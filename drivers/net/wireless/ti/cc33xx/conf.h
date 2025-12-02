@@ -22,7 +22,6 @@ struct cc33xx_conf_header {
 #define CC33XX_CONF_FW_API_VERSION   	0x0000
 #define CC33XX_CONF_FW_BUILD_VERSION 	0x013C
 
-
 #define CC33XX_CONF_MASK				0x0000ffff
 #define CC33X_CONF_SIZE					(sizeof(struct cc33xx_conf_file))
 
@@ -525,9 +524,9 @@ enum cc33xx_ht_mode {
 };
 
 struct coex_wifi_group_priorities {
-	/* 
+	/*
 	 * WLAN activity groups priorities
-	 * 
+	 *
 	 * Range: 0 - 15
 	 */
 	u8 coex_enabled;
@@ -545,24 +544,24 @@ struct coex_wifi_group_priorities {
 } __packed;
 
 struct coex_ble_group_priorities {
-	/* 
+	/*
 	 * BLE command groups priorities
-	 * 
+	 *
 	 * Range: 0 - 15
 	 */
 	u8 ble_group_test;
-    u8 ble_group_setup;
-    u8 ble_group_connected;
-    u8 ble_group_observer;
-    u8 ble_group_broadcaster;
-    u8 ble_group_initiator;
-    u8 ble_group_urgent_priority;
+	u8 ble_group_setup;
+	u8 ble_group_connected;
+	u8 ble_group_observer;
+	u8 ble_group_broadcaster;
+	u8 ble_group_initiator;
+	u8 ble_group_urgent_priority;
 } __packed;
 
 struct coex_external_soc_priorities {
-	/* 
+	/*
 	 * External SoC low and high priorities
-	 * 
+	 *
 	 * Range: 0 - 15
 	 */
 	u8 low_priority;
@@ -579,9 +578,9 @@ struct conf_coex_configuration {
 
 	/*
 	 * Tie breaker configuration
-	 * 
+	 *
 	 * Range: 0 - 3 for each tie breaker.
-	 * 
+	 *
 	 * 0 is lowest and 3 is the highest.
 	 */
 	u8 tie_breaker_ble;
@@ -596,7 +595,7 @@ struct conf_coex_configuration {
 	u8 ble_pta_signalling_mode;
 	u8 ble_tx_bypass_val;
 	u8 ble_rx_bypass_val;
-	
+
 	/*
 	 * Coex WiFi configuration
 	 */
@@ -616,22 +615,22 @@ struct conf_coex_configuration {
 	u8 is_Ext_soc_enable;
 	/*
 	 * External SoC PTA signalling mode
-	 * 
+	 *
 	 * 00 - Reserved
 	 * 01 - 1-wire
 	 * 02 - 2-wires
 	 * 11 - 3-wires
 	 */
 	u8 ext_soc_pta_signalling_mode;
-	/* 
+	/*
 	 * External SoC request polarity
-	 * 
+	 *
 	 * 0 - Active Low (Default)
 	 *
 	 * 1 - Active High
 	 */
 	u8 ext_soc_request_polarity;
-	/* 
+	/*
 	 * External SoC priority polarity
 	 *
 	 * 0 - Active Low (Default)
@@ -639,17 +638,17 @@ struct conf_coex_configuration {
 	 * 1 - Active High
 	 */
 	u8 ext_soc_priority_polarity;
-	/* 
+	/*
 	 * External SoC grant polarity
-	 * 
+	 *
 	 * 0 - Active Low
 	 *
 	 * 1 - Active High (Default)
 	 */
 	u8 ext_soc_grant_polarity;
-	/* 
+	/*
 	 * External SoC grant renew bypass
-	 * 
+	 *
 	 * 0 - SOC needs to renew grant.
 	 *
 	 * 1 - Bypass SOC grant renew
@@ -657,7 +656,7 @@ struct conf_coex_configuration {
 	u8 ext_soc_grant_renew_bypass;
 	/*
 	 * External SoC request signal detection mechanism
-	 * 
+	 *
 	 * 00 - Rise edge detection (L -> H)
 	 * 01 - Fall edge detection (H -> L)
 	 * 10 - Level detection (active high)
@@ -674,7 +673,7 @@ struct conf_coex_configuration {
 
 	/*
 	 * Coex grant delays
-	 * 
+	 *
 	 * Range: 0 - 200 usec
 	 */
 	u8 wifi_to_ble_grant_delay;
@@ -686,19 +685,19 @@ struct conf_coex_configuration {
 
 	/*
 	 * Coex grant times
-	 */	
+	 */
 	u16 wifi_min_grant_time;
 	u16 ble_min_grant_time;
 	u16 ble_max_grant_time;
 	u16 ext_soc_min_grant_time;
 	u16 ext_soc_max_grant_time;
-	/* 
+	/*
 	 * BLE T2 time
 	 *
 	 * Range: 0 - 50 us
 	 */
 	u8 ble_t2_time;
-	/* 
+	/*
 	 * External SoC T2 time
 	 *
 	 * Range: 0 - 50 us
@@ -809,11 +808,11 @@ struct conf_ant_diversity {
 	u8 antenna_control_override;
 
 	u8 sw_enable_register;
-	
+
 	/*
 	 * SW index
 	 * Bit 0 - SW index value
-     * Bit 1 - SW index override
+	 * Bit 1 - SW index override
 	 */
 	u8 sw_index;
 
@@ -852,14 +851,14 @@ struct conf_limit105c_params {
 } __attribute__((__packed__));
 
 struct conf_gpadc_params {
-    u8  overrideEn;
-    u8  disable_measuring;
-    u8  pmcioSlop;
-    u16 pmcioIntercept;
-    u8  rfcioSlop;
-    u16 rfcioIntercept;
-    u32 measurePeriodUsec;
-    u8  dcSlopExponent;
+	u8  overrideEn;
+	u8  disable_measuring;
+	u8 pmcioSlop;
+	u16 pmcioIntercept;
+	u8 rfcioSlop;
+	u16 rfcioIntercept;
+	u32 measurePeriodUsec;
+	u8 dcSlopExponent;
 } __attribute__((__packed__));
 
 struct cc33xx_core_conf {

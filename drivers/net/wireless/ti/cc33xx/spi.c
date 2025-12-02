@@ -15,7 +15,6 @@
 #include "cc33xx.h"
 #include "io.h"
 
-
 enum {
 	WSPI_CMD_READ				= 0x40000000,
 	WSPI_CMD_WRITE				= 0x00000000,
@@ -44,7 +43,7 @@ enum {
 
 #define HW_ACCESS_WSPI_FIXED_BUSY_LEN \
 		((CC33XX_BUSY_WORD_LEN - 4) / sizeof(u32))
-#define HW_ACCESS_WSPI_INIT_CMD_MASK  	0
+#define HW_ACCESS_WSPI_INIT_CMD_MASK	0
 
 /* HW limitation: maximum possible chunk size is 4095 bytes */
 /* Actual size will have to be 32 bit aligned */
@@ -72,8 +71,7 @@ struct spi_transaction_buffers {
 
 static void __cc33xx_spi_lock(struct cc33xx_spi_glue *glue)
 {
-	if (glue->locking_pid != current->pid)
-	{
+	if (glue->locking_pid != current->pid) {
 		spi_bus_lock(to_spi_device(glue->dev)->controller);
 		glue->locking_pid = current->pid;
 		glue->lock_count = 1;
@@ -88,7 +86,7 @@ static void __cc33xx_spi_unlock(struct cc33xx_spi_glue *glue)
 	BUG_ON(!glue->lock_count);
 
 	glue->lock_count--;
-	if (!glue->lock_count){
+	if (!glue->lock_count) {
 		glue->locking_pid = 0;
 		spi_bus_unlock(to_spi_device(glue->dev)->controller);
 	}
@@ -160,14 +158,14 @@ static void cc33xx_spi_init(struct device *child)
 	else
 		cmd[6] |= WSPI_INIT_CMD_EN_FIXEDBUSY;
 
-	cmd[7] = crc7_be(0, cmd+2, WSPI_INIT_CMD_CRC_LEN) | WSPI_INIT_CMD_END;
+	cmd[7] = crc7_be(0, cmd + 2, WSPI_INIT_CMD_CRC_LEN) | WSPI_INIT_CMD_END;
 
 	/*
 	 * The above is the logical order; it must actually be stored
 	 * in the buffer byte-swapped.
 	 */
 	__swab32s((u32 *)cmd);
-	__swab32s((u32 *)cmd+1);
+	__swab32s((u32 *)cmd + 1);
 
 	t.tx_buf = cmd;
 	t.len = WSPI_INIT_CMD_LEN;
@@ -194,7 +192,7 @@ static void cc33xx_spi_init(struct device *child)
 
 	spi_sync(to_spi_device(glue->dev), &m);
 
-	/* Restore chip select configration to normal */
+	/* Restore chip select configuration to normal */
 	spi->mode ^= SPI_CS_HIGH;
 	kfree(cmd);
 }
@@ -237,19 +235,19 @@ static int __must_check cc33xx_spi_raw_read(struct device *child, int addr,
 					    void *buf, size_t len, bool fixed)
 {
 	struct cc33xx_spi_glue *glue = dev_get_drvdata(child->parent);
-	struct spi_transaction_buffers* txn_buffers; 
+	struct spi_transaction_buffers *txn_buffers;
 	struct spi_transfer t[2];
 	struct spi_message m;
 	int ret;
 	u32 *busy_buf;
 	u32 *cmd;
 
-	if (unlikely(len > WSPI_MAX_CHUNK_SIZE)){
+	if (unlikely(len > WSPI_MAX_CHUNK_SIZE)) {
 		WARN_ON(1);
 		return -EFAULT;
 	}
 
-	txn_buffers = kzalloc(sizeof (*txn_buffers), GFP_KERNEL);
+	txn_buffers = kzalloc(sizeof(*txn_buffers), GFP_KERNEL);
 	if (!txn_buffers)
 		return -ENOMEM;
 
@@ -283,8 +281,8 @@ static int __must_check cc33xx_spi_raw_read(struct device *child, int addr,
 
 	spi_sync_locked(to_spi_device(glue->dev), &m);
 
-	if (unlikely((*busy_buf & 0x1) == 0)){			
-		if( cc33xx_spi_read_busy(child, busy_buf) != 0){
+	if (unlikely((*busy_buf & 0x1) == 0)) {
+		if (cc33xx_spi_read_busy(child, busy_buf) != 0) {
 			memset(buf, 0, len);
 			ret = -EIO;
 			goto out;
@@ -301,7 +299,7 @@ static int __must_check cc33xx_spi_raw_read(struct device *child, int addr,
 
 	spi_sync_locked(to_spi_device(glue->dev), &m);
 
-	ret=0;
+	ret = 0;
 
 out:
 	__cc33xx_spi_unlock(glue);
@@ -314,14 +312,14 @@ static int __cc33xx_spi_raw_write(struct device *child, int addr,
 {
 	struct cc33xx_spi_glue *glue = dev_get_drvdata(child->parent);
 	struct spi_transfer t[2];
-	struct spi_transaction_buffers* txn_buffers; 
+	struct spi_transaction_buffers *txn_buffers;
 	struct spi_message m;
 	u32 *cmd;
 	u32 *busy_buf;
 	u32 chunk_len;
 	int ret;
 
-	txn_buffers = kzalloc(sizeof (*txn_buffers), GFP_KERNEL);
+	txn_buffers = kzalloc(sizeof(*txn_buffers), GFP_KERNEL);
 	if (!txn_buffers)
 		return -ENOMEM;
 
@@ -354,12 +352,12 @@ static int __cc33xx_spi_raw_write(struct device *child, int addr,
 		t[1].rx_buf = busy_buf;
 		t[1].len = CC33XX_BUSY_WORD_LEN;
 		t[1].cs_change = false;
-		spi_message_add_tail(&t[1], &m);	
+		spi_message_add_tail(&t[1], &m);
 
-		spi_sync_locked(to_spi_device(glue->dev), &m);	
+		spi_sync_locked(to_spi_device(glue->dev), &m);
 
-		if (unlikely((*busy_buf & 0x1) == 0)){			
-			if( cc33xx_spi_read_busy(child, busy_buf) != 0){
+		if (unlikely((*busy_buf & 0x1) == 0)) {
+			if (cc33xx_spi_read_busy(child, busy_buf) != 0) {
 				memset(buf, 0, chunk_len);
 				ret = -EIO;
 				goto out;
@@ -382,7 +380,7 @@ static int __cc33xx_spi_raw_write(struct device *child, int addr,
 		len -= chunk_len;
 	}
 
-	ret=0;
+	ret = 0;
 
 out:
 	__cc33xx_spi_unlock(glue);
@@ -442,7 +440,7 @@ static size_t cc33xx_spi_get_max_transfer_len(struct device *child)
 	return WSPI_MAX_CHUNK_SIZE;
 }
 
-static void cc33xx_spi_set_irq_handler(struct device *child, void* irq_handler)
+static void cc33xx_spi_set_irq_handler(struct device *child, void *irq_handler)
 {
 	struct cc33xx_spi_glue *glue = dev_get_drvdata(child->parent);
 	struct platform_device *pdev = glue->core;
@@ -451,7 +449,7 @@ static void cc33xx_spi_set_irq_handler(struct device *child, void* irq_handler)
 	pdev_data->irq_handler = irq_handler;
 }
 
-static void cc33xx_spi_enable_irq (struct device *child)
+static void cc33xx_spi_enable_irq(struct device *child)
 {
 	struct cc33xx_spi_glue *glue = dev_get_drvdata(child->parent);
 	struct platform_device *pdev = glue->core;
@@ -460,7 +458,7 @@ static void cc33xx_spi_enable_irq (struct device *child)
 	enable_irq(pdev_data->gpio_irq_num);
 }
 
-static void cc33xx_spi_disable_irq (struct device *child)
+static void cc33xx_spi_disable_irq(struct device *child)
 {
 	struct cc33xx_spi_glue *glue = dev_get_drvdata(child->parent);
 	struct platform_device *pdev = glue->core;
@@ -469,7 +467,7 @@ static void cc33xx_spi_disable_irq (struct device *child)
 	disable_irq_nosync(pdev_data->gpio_irq_num);
 }
 
-static void cc33xx_spi_sync_irq (struct device *child)
+static void cc33xx_spi_sync_irq(struct device *child)
 {
 	struct cc33xx_spi_glue *glue = dev_get_drvdata(child->parent);
 	struct platform_device *pdev = glue->core;
@@ -516,7 +514,7 @@ static struct cc33xx_if_operations spi_ops = {
 	.reset				= cc33xx_spi_reset,
 	.init				= cc33xx_spi_init,
 	.power				= cc33xx_spi_set_power,
-	.set_block_size 		= cc33xx_spi_set_block_size,
+	.set_block_size		= cc33xx_spi_set_block_size,
 	.get_max_transaction_len	= cc33xx_spi_get_max_transfer_len,
 	.set_irq_handler		= cc33xx_spi_set_irq_handler,
 	.enable_irq			= cc33xx_spi_enable_irq,
@@ -554,7 +552,7 @@ static int wlcore_probe_of(struct spi_device *spi, struct cc33xx_spi_glue *glue,
 		 pdev_data->family->name);
 
 	*irq = irq_of_parse_and_map(dt_node, 0);
-	if (0 == *irq){
+	if (*irq == 0) {
 		dev_err(&spi->dev, "Could not parse IRQ property");
 		return -ENODEV;
 	}
@@ -579,17 +577,16 @@ static int spi_cc33xx_probe(struct spi_device *spi)
 	pdev_data->if_ops = &spi_ops;
 
 	glue = devm_kzalloc(&spi->dev, sizeof(*glue), GFP_KERNEL);
-	if (!glue) {
-		dev_err(&spi->dev, "can't allocate glue\n");
+	if (!glue)
 		return -ENOMEM;
-	}
 
 	glue->dev = &spi->dev;
 
 	spi_set_drvdata(spi, glue);
 
 	/* This is the only SPI value that we need to set here, the rest
-	 * comes from the board-peripherals file */
+	 * comes from the board-peripherals file
+	 */
 	spi->bits_per_word = 32;
 
 	glue->reg = devm_regulator_get(&spi->dev, "vwlan");
@@ -668,8 +665,6 @@ static void cc33xx_remove(struct spi_device *spi)
 	platform_device_unregister(glue->core);
 
 	free_irq(pdev_data->gpio_irq_num, spi);
-
-	return;
 }
 
 static const struct spi_device_id cc33xx_spi_ids[] = {

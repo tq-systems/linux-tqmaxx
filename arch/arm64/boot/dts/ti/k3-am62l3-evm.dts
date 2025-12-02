@@ -22,6 +22,7 @@
 	aliases {
 		mmc0 = &sdhci0;
 		mmc1 = &sdhci1;
+		serial3 = &main_uart1;
 	};
 
 	chosen {
@@ -56,6 +57,9 @@
 			label = "User Key";
 			linux,code = <BTN_0>;
 			gpios = <&main_gpio0 90 GPIO_ACTIVE_LOW>;
+			interrupts-extended = <&main_gpio0 90 IRQ_TYPE_EDGE_RISING>,
+				<&pmx0 0x01ac>;
+			interrupt-names = "irq", "wakeup";
 		};
 	};
 
@@ -311,20 +315,6 @@
 		bootph-all;
 	};
 
-	main_mcan0_pins_default: main-mcan0-default-pins {
-		pinctrl-single,pins = <
-			AM62LX_IOPAD(0x01c8, PIN_INPUT, 0) /* (B15) MCAN0_RX */
-			AM62LX_IOPAD(0x01c4, PIN_OUTPUT, 0) /* (B16) MCAN0_TX */
-		>;
-	};
-
-	main_mcan2_pins_default: main-mcan2-default-pins {
-		pinctrl-single,pins = <
-			AM62LX_IOPAD(0x01bc, PIN_INPUT, 6) /* (B14) UART0_CTSn.MCAN2_RX */
-			AM62LX_IOPAD(0x01c0, PIN_OUTPUT, 6) /* (B13) UART0_RTSn.MCAN2_TX */
-		>;
-	};
-
 	gpmc0_pins_default: gpmc0-default-pins {
 		pinctrl-single,pins = <
 			AM62LX_IOPAD(0x0078, PIN_INPUT, 0) /* (L22) GPMC0_AD0 */
@@ -478,6 +468,13 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&main_gpio0_ioexp_intr_pins_default>;
 		bootph-all;
+
+		uart1_fet_buf_en {
+			gpio-hog;
+			gpios = <6 GPIO_ACTIVE_HIGH>;
+			output-low;
+			line-name = "UART1_FET_BUF_EN";
+		};
 	};
 
 	exp2: gpio@23 {
@@ -507,6 +504,8 @@
 		interrupts = <16 IRQ_TYPE_EDGE_FALLING>;
 		#sound-dai-cells = <0>;
 		sil,i2s-data-lanes = < 0 >;
+		pinctrl-names = "default";
+		pinctrl-0 = <&main_dpi_pins_default>;
 		bootph-all;
 
 		ports {
@@ -788,8 +787,6 @@
 
 &dss {
 	status = "okay";
-	pinctrl-names = "default";
-	pinctrl-0 = <&main_dpi_pins_default>;
 	bootph-all;
 };
 
@@ -802,18 +799,6 @@
 			remote-endpoint = <&sii9022_in>;
 		};
 	};
-};
-
-&main_mcan0 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&main_mcan0_pins_default>;
-	status = "okay";
-};
-
-&main_mcan2 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&main_mcan2_pins_default>;
-	status = "okay";
 };
 
 &tscadc0 {
@@ -997,4 +982,8 @@
 	       0 0 0 0
 	       0 0 0 0
 	>;
+};
+
+&wkup_uart0_interconnect {
+	status = "okay";
 };

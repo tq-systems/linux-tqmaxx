@@ -285,7 +285,7 @@ static int get_device_info(struct cc33xx *cc)
 
 static int get_device_info_ram_loader(struct cc33xx *cc)
 {
-	int ret; 
+	int ret;
 	union hw_info hw_info;
 	u64 mac_address;
 
@@ -295,12 +295,12 @@ static int get_device_info_ram_loader(struct cc33xx *cc)
 
 	mac_address = hw_info.bitmap.mac_address;
 
-	cc->efuse_mac_address[5] = (u8) (mac_address);
-	cc->efuse_mac_address[4] = (u8) (mac_address >> 8);
-	cc->efuse_mac_address[3] = (u8) (mac_address >> 16);
-	cc->efuse_mac_address[2] = (u8) (mac_address >> 24);
-	cc->efuse_mac_address[1] = (u8) (mac_address >> 32);
-	cc->efuse_mac_address[0] = (u8) (mac_address >> 40);
+	cc->efuse_mac_address[5] = (u8)(mac_address);
+	cc->efuse_mac_address[4] = (u8)(mac_address >> 8);
+	cc->efuse_mac_address[3] = (u8)(mac_address >> 16);
+	cc->efuse_mac_address[2] = (u8)(mac_address >> 24);
+	cc->efuse_mac_address[1] = (u8)(mac_address >> 32);
+	cc->efuse_mac_address[0] = (u8)(mac_address >> 40);
 
 	cc->disable_wifi6 = hw_info.bitmap.disable_wifi6;
 

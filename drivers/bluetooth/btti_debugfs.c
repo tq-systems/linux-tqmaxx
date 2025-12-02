@@ -50,6 +50,7 @@ static ssize_t ble_enable_read(struct file *file, char __user *userbuf,
 	struct btti_private *private_data = file->private_data;
 	char buf[16];
 	int ret;
+
 	BT_INFO("[bt sdio] ble enable read");
 
 	ret = snprintf(buf, sizeof(buf) - 1, "%d\n", \
@@ -70,9 +71,9 @@ static ssize_t ble_enable_write(struct file *file,
 	ret = kstrtoul_from_user(user_buf, count, 0, &value);
 	BT_INFO("[bt sdio] ble enable write: %ld", value);
 
-	if(!private_data || !private_data->hci_adapter){
+	if (!private_data || !private_data->hci_adapter)
 		BT_ERR("[bt sdio] driver is not ready");
-	}
+
 
 	if (private_data->hci_adapter->ble_enable) {
 		BT_WARN("[bt sdio] ble_enable is already %d",\
@@ -83,7 +84,7 @@ static ssize_t ble_enable_write(struct file *file,
 	if (value != 1) {
 		BT_WARN("illegal value in ble_enable "\
 				"(only value allowed is is 1)");
-		BT_WARN("ble_enable cant be disabled after being enabled.");
+		BT_WARN("ble_enable can't be disabled after being enabled.");
 		return -EINVAL;
 	}
 
@@ -139,14 +140,11 @@ void btti_debugfs_remove(struct hci_dev *hdev)
 	if (!dbgfs)
 		return;
 
-	if(dbgfs->config_dir)
-	{
+	if (dbgfs->config_dir)
 		debugfs_remove_recursive(dbgfs->config_dir);
-	}
-	if(dbgfs->status_dir)
-	{
+
+	if (dbgfs->status_dir)
 		debugfs_remove_recursive(dbgfs->status_dir);
-	}
 
 	kfree(dbgfs);
 }

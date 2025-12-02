@@ -23,7 +23,7 @@
 #include "debugfs.h"
 
 #define CC33XX_FW_RX_PACKET_RAM (9 * 1024)
-#define CC33XX_GENERAL_ERROR_READ_TIMEOUT_MSEC 	(3000)
+#define CC33XX_GENERAL_ERROR_READ_TIMEOUT_MSEC	(3000)
 
 static int no_recovery     = -1;
 
@@ -475,7 +475,7 @@ static const struct ieee80211_sband_iftype_data iftype_data_5ghz[] = {{
 			IEEE80211_HE_PHY_CAP9_NON_TRIGGERED_CQI_FEEDBACK |
 			IEEE80211_HE_PHY_CAP9_RX_FULL_BW_SU_USING_MU_WITH_COMP_SIGB |
 			IEEE80211_HE_PHY_CAP9_RX_FULL_BW_SU_USING_MU_WITH_NON_COMP_SIGB |
-			(IEEE80211_HE_PHY_CAP9_NOMINAL_PKT_PADDING_16US << 
+			(IEEE80211_HE_PHY_CAP9_NOMINAL_PKT_PADDING_16US <<
 				IEEE80211_HE_PHY_CAP9_NOMINAL_PKT_PADDING_POS),
 		},
 		/* Set default Tx/Rx HE MCS NSS Support field.
@@ -836,68 +836,58 @@ static int read_control_message(struct cc33xx *cc, u8 *read_buffer,
 	return le16_to_cpu(nab_header->len);
 }
 
-static int general_error_event_get_log(struct cc33xx *cc, 
-					struct core_status *core_status)
+static int general_error_event_get_log(struct cc33xx *cc,
+			struct core_status *core_status)
 {
-	int ret = 0; 
+	int ret = 0;
 	u8 *read_buffer;
 	const size_t buffer_size = 5000;
 	unsigned long end_time = jiffies + msecs_to_jiffies(CC33XX_GENERAL_ERROR_READ_TIMEOUT_MSEC);
 	u8 isGeneralError = 0;
 	u32 isTimeout = 0;
-	void* pFwCrashLogs;
+	void *pFwCrashLogs;
 
 
 	read_buffer = kmalloc(buffer_size, GFP_KERNEL);
 	if (!read_buffer)
-		return -ENOMEM;	
+		return -ENOMEM;
 
 
 	cc33xx_debug(DEBUG_CMD, "Attempting to Get FW Crash Logs Before Starting Recovery Work");
-	while((isGeneralError != true) && (isTimeout != true))
-	{
+	while ((isGeneralError != true) && (isTimeout != true)) {
 		ret = read_control_message(cc, read_buffer, buffer_size);
-		if(ret > 0)
-		{
-			struct NAB_header *nab_header = (struct NAB_header*) read_buffer;
-			if(nab_header->opcode == NAB_GENERAL_ERROR_FW_LOGS_OPCODE)
-			{
-				cc33xx_debug(DEBUG_CMD,"successfully received GENERAL ERROR CRASH FW_LOGS");
+		if (ret > 0) {
+			struct NAB_header *nab_header = (struct NAB_header *)read_buffer;
+			if (nab_header->opcode == NAB_GENERAL_ERROR_FW_LOGS_OPCODE) {
+				cc33xx_debug(DEBUG_CMD, "successfully received GENERAL ERROR CRASH FW_LOGS");
 				isGeneralError = 1;
 				break;
 			}
 		}
-		//should sleep here for 100ms if reading is zero 
-		if(isGeneralError != true)
-		{
+		//should sleep here for 100ms if reading is zero
+		if (isGeneralError != true) {
 			msleep(100);
 			isTimeout = time_is_before_eq_jiffies(end_time);
 		}
 
 	}
 
-	if(isTimeout)
-	{
-		cc33xx_debug(DEBUG_CMD,"Timed Out Attempting to read  CRASH FW Logs");
+	if (isTimeout) {
+		cc33xx_debug(DEBUG_CMD, "Timed Out Attempting to read  CRASH FW Logs");
 		goto out;
 	}
-
-
 
 	pFwCrashLogs = read_buffer;
 	pFwCrashLogs += sizeof(struct NAB_header);
 
-	if(cc->fw_crash_logs == NULL)
-	{
+	if (cc->fw_crash_logs == NULL) {
 		cc->fw_crash_logs = kzalloc(CC33XX_MAX_FW_LOGS_BUFFER_SIZE, GFP_KERNEL);
 		if (!cc->fw_crash_logs) {
 			ret = -ENOMEM;
 			goto err_crashfwlog;
 		}
-	}
-	else
-	{
-		memset(cc->fw_crash_logs, 0 , CC33XX_MAX_FW_LOGS_BUFFER_SIZE);
+	} else {
+		memset(cc->fw_crash_logs, 0, CC33XX_MAX_FW_LOGS_BUFFER_SIZE);
 	}
 
 	//store crash logs into WL
@@ -911,7 +901,7 @@ err_crashfwlog:
 
 out:
 	kfree(read_buffer);
-	return ret; 
+	return ret;
 }
 
 static int process_event_and_cmd_result(struct cc33xx *cc,
@@ -1157,7 +1147,7 @@ static void cc33xx_recovery_work(struct work_struct *work)
 		mutex_lock(&cc->mutex);
 
 		general_error_event_get_log(cc, cc->core_status);
-		
+
 		mutex_unlock(&cc->mutex);
 		return;
 	}
@@ -3862,7 +3852,7 @@ static void cc33xx_bss_info_changed_sta(struct cc33xx *cc,
 		ret = 0;
 
 		if (cc->conf.mac.ps_mode == STATION_AUTO_PS_MODE) {
-			if ((vif->cfg.ps) && test_bit(WLVIF_FLAG_STA_ASSOCIATED, &wlvif->flags)) {
+			if (vif->cfg.ps && test_bit(WLVIF_FLAG_STA_ASSOCIATED, &wlvif->flags)) {
 				ret = cc33xx_ps_set_mode(cc, wlvif, STATION_AUTO_PS_MODE);
 			} else if (!vif->cfg.ps) {
 				ret = cc33xx_ps_set_mode(cc, wlvif, STATION_ACTIVE_MODE);
@@ -5242,8 +5232,7 @@ static int cc33xx_init_ieee80211(struct cc33xx *cc)
 		cc->hw->wiphy->iftype_ext_capab = he_iftypes_ext_capa;
 		cc->hw->wiphy->num_iftype_ext_capab =
 			ARRAY_SIZE(he_iftypes_ext_capa);
-	}
-	else {
+	} else {
 		cc33xx_band_2ghz.iftype_data = NULL;
 		cc33xx_band_2ghz.n_iftype_data = 0;
 
@@ -5254,7 +5243,7 @@ static int cc33xx_init_ieee80211(struct cc33xx *cc)
 	/* We keep local copies of the band structs because we need to
 	 * modify them on a per-device basis.
 	 */
-	if((!cc->disable_wifi6) && (cc->conf.mac.he_enable)) {
+	if (!cc->disable_wifi6 && (cc->conf.mac.he_enable)) {
 		memcpy(&cc->bands[NL80211_BAND_2GHZ], &cc33xx_band_2ghz,
 			sizeof(cc33xx_band_2ghz));
 		memcpy(&cc->bands[NL80211_BAND_2GHZ].ht_cap,
@@ -5334,7 +5323,7 @@ static int cc33xx_init_ieee80211(struct cc33xx *cc)
 static struct ieee80211_hw *cc33xx_alloc_hw(u32 aggr_buf_size)
 {
 	struct ieee80211_hw *hw;
-	struct cc33xx *cc;
+	struct cc33xx *cc = NULL;
 	int i, j;
 	unsigned int order;
 
@@ -5693,7 +5682,6 @@ static int cc33xx_setup(struct cc33xx *cc)
 		cc33xx_siso40_ht_cap_5ghz.ampdu_factor = IEEE80211_HT_MAX_AMPDU_16K;
 		cc33xx_siso20_ht_cap.ampdu_factor = IEEE80211_HT_MAX_AMPDU_16K;
 	}
-
 
 	if (cc->conf.host_conf.ht.mode == HT_MODE_DEFAULT) {
 		cc33xx_set_ht_cap(cc, NL80211_BAND_2GHZ,

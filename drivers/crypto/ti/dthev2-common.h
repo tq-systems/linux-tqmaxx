@@ -35,6 +35,7 @@
  * This is currently the keysize of HMAC-SHA512
  */
 #define DTHE_MAX_KEYSIZE	(SHA512_BLOCK_SIZE)
+#define DTHE_MAX_PADSIZE	(AES_BLOCK_SIZE * 3)
 
 enum dthe_hash_alg_sel {
 	DTHE_HASH_MD5		= 0,
@@ -48,7 +49,10 @@ enum dthe_hash_alg_sel {
 enum dthe_aes_mode {
 	DTHE_AES_ECB = 0,
 	DTHE_AES_CBC,
+	DTHE_AES_CTR,
+	DTHE_AES_XTS,
 	DTHE_AES_GCM,
+	DTHE_AES_CCM,
 };
 
 /* Driver specific struct definitions */
@@ -98,8 +102,9 @@ struct dthe_list {
  * @block_size: block size of hash algorithm selected
  * @digest_size: digest size of hash algorithm selected
  * @phash_size: partial hash size of the hash algorithm selected
- * @fallback: Fallback crypto aead instance for GCM mode
+ * @fallback: Fallback crypto aead handle
  * @ahash_fb: Fallback crypto ahash instance for hashing algorithms
+ * @skcipher_fb: Fallback crypto skcipher handle for AES-XTS mode
  */
 struct dthe_tfm_ctx {
 	struct dthe_data *dev_data;
@@ -114,21 +119,22 @@ struct dthe_tfm_ctx {
 	u32 digest_size;
 	u32 phash_size;
 	union {
-		struct crypto_aead *aead_fb;
+		struct crypto_sync_aead *aead_fb;
 		struct crypto_ahash *ahash_fb;
+		struct crypto_sync_skcipher *skcipher_fb;
 	};
 };
 
 /**
  * struct dthe_aes_req_ctx - AES engine req ctx struct
  * @enc: flag indicating encryption or decryption operation
+ * @padding: padding buffer for handling unaligned data
  * @aes_compl: Completion variable for use in manual completion in case of DMA callback failure
- * @fb_req: Fallback aead_request structure for GCM mode
  */
 struct dthe_aes_req_ctx {
 	int enc;
+	u8 padding[DTHE_MAX_PADSIZE];
 	struct completion aes_compl;
-	struct aead_request fb_req;
 };
 
 /**
@@ -136,6 +142,7 @@ struct dthe_aes_req_ctx {
  * @phash: buffer to store a partial hash/inner digest from a previous operation
  * @odigest: buffer to store the outer digest from a previous operation
  * @data_buf: buffer to store part of input data to be carried over to next operation
+ * @padding: padding buffer for handling unaligned data
  * @digestcnt: stores the digest count from a previous operation
  * @phash_available: flag indicating if a partial hash from a previous operation is available
  * @buflen: length of input data stored in data_buf
@@ -146,6 +153,7 @@ struct dthe_hash_req_ctx {
 	u32 phash[SHA512_DIGEST_SIZE / sizeof(u32)];
 	u32 odigest[SHA512_DIGEST_SIZE / sizeof(u32)];
 	u8 data_buf[SHA512_BLOCK_SIZE];
+	u8 padding[SHA512_BLOCK_SIZE];
 	u32 digestcnt;
 	u8 phash_available;
 	u8 buflen;
