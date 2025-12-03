@@ -733,7 +733,7 @@ int mxc_isi_m2m_resume(struct mxc_isi_pipe *pipe)
 	mxc_isi_channel_get(pipe);
 
 	if (ctx->chained)
-		mxc_isi_channel_chain(pipe, false);
+		mxc_isi_channel_chain(pipe);
 
 	m2m->last_ctx = NULL;
 	v4l2_m2m_resume(m2m->m2m_dev);
