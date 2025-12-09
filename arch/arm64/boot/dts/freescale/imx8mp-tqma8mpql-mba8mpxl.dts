@@ -418,7 +418,7 @@
 			reset-deassert-us = <50000>;
 			enet-phy-lane-no-swap;
 			interrupt-parent = <&gpio4>;
-			interrupts = <3 IRQ_TYPE_EDGE_FALLING>;
+			interrupts = <3 IRQ_TYPE_LEVEL_LOW>;
 			/* LED0: Link, LED2: activity */
 			ti,led-function = <0x0100>;
 			/* LED0/2: active High, driven by phy function */
@@ -452,7 +452,7 @@
 			reset-deassert-us = <50000>;
 			enet-phy-lane-no-swap;
 			interrupt-parent = <&gpio4>;
-			interrupts = <1 IRQ_TYPE_EDGE_FALLING>;
+			interrupts = <1 IRQ_TYPE_LEVEL_LOW>;
 			/* LED0: Link, LED2: activity */
 			ti,led-function = <0x0100>;
 			/* LED0/2: active High, driven by phy function */
