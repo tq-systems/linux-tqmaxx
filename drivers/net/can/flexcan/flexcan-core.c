@@ -2332,9 +2332,6 @@ static int __maybe_unused flexcan_resume(struct device *device)
 			err = pinctrl_pm_select_default_state(device);
 			if (err)
 				return err;
-			err = flexcan_transceiver_enable(priv);
-			if (err)
-				return err;
 
 			err = flexcan_transceiver_enable(priv);
 			if (err)
