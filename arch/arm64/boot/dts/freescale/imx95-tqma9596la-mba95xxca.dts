@@ -552,6 +552,18 @@
 	pinctrl-0 = <&pinctrl_lpspi4>;
 	cs-gpios = <&gpio5 14 GPIO_ACTIVE_LOW>, <&gpio5 13 GPIO_ACTIVE_LOW>;
 	status = "okay";
+
+	spidev0: spi@0 {
+		reg = <0>;
+		compatible = "tq,testdev";
+		spi-max-frequency = <1000000>;
+	};
+
+	spidev1: spi@1 {
+		reg = <1>;
+		compatible = "tq,testdev";
+		spi-max-frequency = <1000000>;
+	};
 };
 
 &lpuart1 {
