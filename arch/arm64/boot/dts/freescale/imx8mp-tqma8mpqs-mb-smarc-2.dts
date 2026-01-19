@@ -350,7 +350,7 @@
 
 &reg_sdvmmc {
 	startup-delay-us = <100>;
-	off-on-delay-us = <12000>;
+	off-on-delay-us = <200000>;
 	status = "okay";
 };
 
