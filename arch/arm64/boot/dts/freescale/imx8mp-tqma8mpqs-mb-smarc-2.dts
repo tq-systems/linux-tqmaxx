@@ -203,6 +203,18 @@
 
 &ecspi1 {
 	status = "okay";
+
+	spidev0_0: spidev0@0 {
+		compatible = "tq,testdev";
+		reg = <0>;
+		spi-max-frequency = <5000000>;
+	};
+
+	spidev0_1: spidev0@1 {
+		compatible = "tq,testdev";
+		reg = <1>;
+		spi-max-frequency = <5000000>;
+	};
 };
 
 &eqos {
@@ -298,6 +310,13 @@
 		iov-supply = <&reg_1v8>;
 		ldoin-supply = <&reg_3v3>;
 	};
+
+	eeprom2: eeprom@57 {
+		compatible = "atmel,24c32";
+		reg = <0x57>;
+		pagesize = <32>;
+		vcc-supply = <&reg_3v3>;
+	};
 };
 
 &ldb_lvds_ch0 {
@@ -331,7 +350,7 @@
 
 &reg_sdvmmc {
 	startup-delay-us = <100>;
-	off-on-delay-us = <12000>;
+	off-on-delay-us = <200000>;
 	status = "okay";
 };
 
@@ -374,15 +393,10 @@
 };
 
 &usdhc2 {
-	pinctrl-names = "default", "state_100mhz", "state_200mhz";
-	pinctrl-0 = <&pinctrl_usdhc2>, <&pinctrl_usdhc2_gpio>;
-	pinctrl-1 = <&pinctrl_usdhc2_100mhz>, <&pinctrl_usdhc2_gpio>;
-	pinctrl-2 = <&pinctrl_usdhc2_200mhz>, <&pinctrl_usdhc2_gpio>;
 	cd-gpios = <&gpio2 12 GPIO_ACTIVE_LOW>;
 	wp-gpios = <&gpio2 20 GPIO_ACTIVE_HIGH>;
 	vmmc-supply = <&reg_sdvmmc>;
 	no-mmc;
 	no-sdio;
-	bus-width = <4>;
 	status = "okay";
 };
