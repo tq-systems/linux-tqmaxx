@@ -586,6 +586,8 @@ dtb-$(CONFIG_ARCH_MXC) += imx95-tqma9596sa-mb-smarc-2.dtb
 
 imx95-tqma9596la-mba95xxca-lvds-tm070jvhg33-dtbs := imx95-tqma9596la-mba95xxca.dtb imx95-tqma9596la-mba95xxca-lvds-tm070jvhg33.dtbo
 dtb-$(CONFIG_ARCH_MXC) += imx95-tqma9596la-mba95xxca-lvds-tm070jvhg33.dtb
+imx95-tqma9596la-mba95xxca-lvds-g133han01-dtbs := imx95-tqma9596la-mba95xxca.dtb imx95-tqma9596la-mba95xxca-lvds-g133han01.dtbo
+dtb-$(CONFIG_ARCH_MXC) += imx95-tqma9596la-mba95xxca-lvds-g133han01.dtb
 
 imx95-tqma9596sa-mb-smarc-2-lvds-tm070jvhg33-dtbs := imx95-tqma9596sa-mb-smarc-2.dtb imx95-tqma9596sa-mb-smarc-2-lvds-tm070jvhg33.dtbo
 dtb-$(CONFIG_ARCH_MXC) += imx95-tqma9596sa-mb-smarc-2-lvds-tm070jvhg33.dtb
