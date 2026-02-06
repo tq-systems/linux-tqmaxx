@@ -439,7 +439,7 @@
 	pinctrl-0 = <&pinctrl_lpi2c7>;
 	pinctrl-1 = <&pinctrl_lpi2c7_recovery>;
 	scl-gpios = <&gpio2 7 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
-	sda-gpios = <&gpio2 8 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
+	sda-gpios = <&gpio2 6 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
 	status = "okay";
 };
 
@@ -773,13 +773,13 @@
 	};
 
 	pinctrl_lpi2c7: lpi2c7grp {
-		fsl,pins = <IMX95_PAD_GPIO_IO07__LPI2C7_SCL	0x4000191e>,
-			   <IMX95_PAD_GPIO_IO08__LPI2C7_SDA	0x4000191e>;
+		fsl,pins = <IMX95_PAD_GPIO_IO07__LPI2C7_SCL	0x40001b1e>,
+			   <IMX95_PAD_GPIO_IO06__LPI2C7_SDA	0x40001b1e>;
 	};
 
 	pinctrl_lpi2c7_recovery: lpi2c7recoverygrp {
-		fsl,pins = <IMX95_PAD_GPIO_IO07__GPIO2_IO_BIT7	0x4000191e>,
-			   <IMX95_PAD_GPIO_IO08__GPIO2_IO_BIT8	0x4000191e>;
+		fsl,pins = <IMX95_PAD_GPIO_IO07__GPIO2_IO_BIT7	0x40001b1e>,
+			   <IMX95_PAD_GPIO_IO06__GPIO2_IO_BIT6	0x40001b1e>;
 	};
 
 	pinctrl_lpspi4: lpspi4grp {
