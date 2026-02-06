@@ -182,6 +182,8 @@
 		audio-routing =
 			"IN3_L", "Mic Jack",
 			"Mic Jack", "Mic Bias",
+			"Headphone Jack", "HPL",
+			"Headphone Jack", "HPR",
 			"IN1_L", "Line In Jack",
 			"IN1_R", "Line In Jack",
 			"Line Out Jack", "LOL",
