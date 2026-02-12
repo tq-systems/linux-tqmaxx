@@ -12,6 +12,7 @@ maintainers:
 properties:
   compatible:
     enum:
+      - ti,ds110df111
       - ti,ds125df111
 
   reg:
