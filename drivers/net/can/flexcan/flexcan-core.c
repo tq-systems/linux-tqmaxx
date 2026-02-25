@@ -2297,6 +2297,7 @@ static int __maybe_unused flexcan_suspend(struct device *device)
 				return err;
 
 			flexcan_chip_interrupts_disable(dev);
+
 			err = flexcan_transceiver_disable(priv);
 			if (err)
 				return err;

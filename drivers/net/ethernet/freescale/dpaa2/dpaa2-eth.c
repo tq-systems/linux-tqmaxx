@@ -1110,8 +1110,7 @@ static int dpaa2_eth_build_single_fd(struct dpaa2_eth_priv *priv,
 	dma_addr_t addr;
 
 	buffer_start = skb->data - dpaa2_eth_needed_headroom(skb);
-	aligned_start = PTR_ALIGN(buffer_start - DPAA2_ETH_TX_BUF_ALIGN,
-				  DPAA2_ETH_TX_BUF_ALIGN);
+	aligned_start = PTR_ALIGN(buffer_start, DPAA2_ETH_TX_BUF_ALIGN);
 	if (aligned_start >= skb->head)
 		buffer_start = aligned_start;
 	else
@@ -4756,15 +4755,16 @@ static int dpaa2_eth_connect_mac(struct dpaa2_eth_priv *priv)
 	if (IS_ERR(dpmac_dev))
 		return 0;
 
+	if (dpmac_dev->dev.type != &fsl_mc_bus_dpmac_type) {
+		err = 0;
+		goto out_put_device;
+	}
+
 #if IS_ENABLED(CONFIG_MACSEC)
 	dpaa2_eth_macsec_init(priv);
 #endif
 
 	dpaa2_mac_driver_detach(dpmac_dev);
-	if (dpmac_dev->dev.type != &fsl_mc_bus_dpmac_type) {
-		err = 0;
-		goto out_put_device;
-	}
 
 	mac = kzalloc(sizeof(struct dpaa2_mac), GFP_KERNEL);
 	if (!mac) {

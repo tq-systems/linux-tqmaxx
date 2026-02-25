@@ -40,6 +40,7 @@
 #include <linux/delay.h>
 #include <linux/version.h>
 #include "vsi-v4l2-priv.h"
+#include "vsi-v4l2-trace.h"
 
 static int vsi_enc_querycap(
 	struct file *file,
@@ -249,10 +250,10 @@ static int vsi_enc_trystartenc(struct vsi_v4l2_ctx *ctx)
 			ctx->output_que.queued_count >= ctx->output_que.min_queued_buffers) {
 			ret = vsiv4l2_execcmd(ctx, V4L2_DAEMON_VIDIOC_STREAMON, NULL);
 			if (ret == 0) {
-				ctx->status = ENC_STATUS_ENCODING;
+				vsi_v4l2_set_ctx_status(ctx, ENC_STATUS_ENCODING);
 				if (test_and_clear_bit(CTX_FLAG_PRE_DRAINING_BIT, &ctx->flag)) {
 					ret |= vsiv4l2_execcmd(ctx, V4L2_DAEMON_VIDIOC_CMD_STOP, NULL);
-					ctx->status = ENC_STATUS_DRAINING;
+					vsi_v4l2_set_ctx_status(ctx, ENC_STATUS_DRAINING);
 				}
 			}
 		}
@@ -281,6 +282,9 @@ static int vsi_enc_qbuf(struct file *filp, void *priv, struct v4l2_buffer *buf)
 		if (test_and_clear_bit(CTX_FLAG_FORCEIDR_BIT, &ctx->flag))
 			ctx->srcvbufflag[buf->index] |= FORCE_IDR;
 
+		if (test_and_clear_bit(CTX_FLAG_RECTROIUPDATE, &ctx->flag))
+			ctx->srcvbufflag[buf->index] |= RECT_ROI_UPDATE;
+
 		ret = vb2_qbuf(&ctx->input_que, vdev->v4l2_dev->mdev, buf);
 	}
 	v4l2_klog(LOGLVL_FLOW, "%llx:%s:%d:%d:%d, %d:%d, %d:%d",
@@ -308,6 +312,11 @@ static int vsi_enc_streamon(struct file *filp, void *priv, enum v4l2_buf_type ty
 
 	if (mutex_lock_interruptible(&ctx->ctxlock))
 		return -EBUSY;
+
+	trace_vsiv4l2_stream_on(ctx, type);
+	dev_dbg(ctx->dev->dev, "[%llx] enc %s streamon\n",
+		ctx->ctxid, V4L2_TYPE_IS_OUTPUT(type) ? "output" : "capture");
+
 	if (!binputqueue(type)) {
 		ret = vb2_streamon(&ctx->output_que, type);
 		printbufinfo(&ctx->output_que);
@@ -319,7 +328,7 @@ static int vsi_enc_streamon(struct file *filp, void *priv, enum v4l2_buf_type ty
 	if (ret == 0) {
 		if (ctx->status == ENC_STATUS_EOS) {
 			//to avoid no queued buf when streamon
-			ctx->status = ENC_STATUS_STOPPED;
+			vsi_v4l2_set_ctx_status(ctx, ENC_STATUS_STOPPED);
 		}
 		ret = vsi_enc_trystartenc(ctx);
 	}
@@ -346,6 +355,10 @@ static int vsi_enc_streamoff(
 	if (ctx->status == VSI_STATUS_INIT)
 		return 0;
 
+	trace_vsiv4l2_stream_off(ctx, type);
+	dev_dbg(ctx->dev->dev, "[%llx] enc %s streamoff\n",
+		ctx->ctxid, V4L2_TYPE_IS_OUTPUT(type) ? "output" : "capture");
+
 	if (binput)
 		q = &ctx->input_que;
 	else
@@ -369,9 +382,10 @@ static int vsi_enc_streamoff(
 
 	if (mutex_lock_interruptible(&ctx->ctxlock))
 		return -EBUSY;
-	ctx->status = ENC_STATUS_STOPPED;
+	vsi_v4l2_set_ctx_status(ctx, ENC_STATUS_STOPPED);
 	if (binput) {
 		clear_bit(CTX_FLAG_FORCEIDR_BIT, &ctx->flag);
+		clear_bit(CTX_FLAG_RECTROIUPDATE, &ctx->flag);
 		for (i = 0; i < VIDEO_MAX_FRAME; i++)
 			ctx->srcvbufflag[i] = 0;
 	}
@@ -427,7 +441,7 @@ static int vsi_enc_dqbuf(struct file *file, void *priv, struct v4l2_buffer *p)
 			if (ctx->vbufflag[p->index] & LAST_BUFFER_FLAG) {
 				vsi_v4l2_sendeos(ctx);
 				if (ctx->status == ENC_STATUS_DRAINING)
-					ctx->status = ENC_STATUS_EOS;
+					vsi_v4l2_set_ctx_status(ctx, ENC_STATUS_EOS);
 				v4l2_klog(LOGLVL_BRIEF, "dqbuf get eos flag");
 			}
 		}
@@ -615,6 +629,11 @@ static int vsi_enc_set_selection(struct file *file, void *prv, struct v4l2_selec
 		}
 	}
 
+	if (mutex_lock_interruptible(&ctx->ctxlock))
+		return -EBUSY;
+	vsi_enc_set_roi_info(ctx);
+	mutex_unlock(&ctx->ctxlock);
+
 	v4l2_klog(LOGLVL_CONFIG, "%llx:%s:%d,%d,%d,%d",
 		ctx->ctxid, __func__, s->r.left, s->r.top, s->r.width, s->r.height);
 
@@ -703,16 +722,21 @@ static int vsi_enc_encoder_cmd(struct file *file, void *fh, struct v4l2_encoder_
 	v4l2_klog(LOGLVL_BRIEF, "%s:%d:%d", __func__, ctx->status, cmd->cmd);
 	switch (cmd->cmd) {
 	case V4L2_ENC_CMD_STOP:
+		trace_vsiv4l2_cmd_drain(ctx, 0);
+		dev_dbg(ctx->dev->dev, "[%llx] enc drain\n", ctx->ctxid);
 		set_bit(CTX_FLAG_PRE_DRAINING_BIT, &ctx->flag);
 		if (ctx->status == ENC_STATUS_ENCODING) {
 			ret = vsiv4l2_execcmd(ctx, V4L2_DAEMON_VIDIOC_CMD_STOP, cmd);
 			if (ret == 0) {
-				ctx->status = ENC_STATUS_DRAINING;
+				vsi_v4l2_set_ctx_status(ctx, ENC_STATUS_DRAINING);
 				clear_bit(CTX_FLAG_PRE_DRAINING_BIT, &ctx->flag);
 			}
 		}
 		break;
 	case V4L2_ENC_CMD_START:
+		trace_vsiv4l2_cmd_start(ctx, 0);
+		dev_dbg(ctx->dev->dev, "[%llx] enc start\n", ctx->ctxid);
+		set_bit(CTX_FLAG_PRE_DRAINING_BIT, &ctx->flag);
 		if (ctx->status == ENC_STATUS_STOPPED ||
 			ctx->status == ENC_STATUS_EOS) {
 			ret = vb2_streamon(&ctx->input_que, V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE);
@@ -831,6 +855,28 @@ static int vsi_enc_queue_setup(
 	return ret;
 }
 
+static int vsi_vpu_enc_custom_map_init(struct vsi_v4l2_ctx *ctx, struct vsi_vpu_buf *vpu_buf)
+{
+	u32 num_ctu_row;
+	u32 num_ctu_col;
+
+	num_ctu_col = DIV_ROUND_UP(ctx->roi.width, 8);
+	num_ctu_col = ALIGN(num_ctu_col, 8);
+	num_ctu_row = DIV_ROUND_UP(ctx->roi.height, 8);
+	num_ctu_row = ALIGN(num_ctu_row, 8);
+
+	vpu_buf->custom_qp_map.size = num_ctu_col * num_ctu_row;
+	vpu_buf->custom_qp_map.recorder = ctx->recorder;
+	vpu_buf->custom_qp_map.label = "buf_qp_map";
+	if (vsi_alloc_dma(ctx->dev->dev, &vpu_buf->custom_qp_map) < 0) {
+		v4l2_klog(LOGLVL_ERROR, "alloc custom qp map size %zu failed\n",
+			  vpu_buf->custom_qp_map.size);
+		return -ENOMEM;
+	}
+
+	return 0;
+}
+
 static void vsi_enc_buf_queue(struct vb2_buffer *vb)
 {
 	struct vb2_queue *vq = vb->vb2_queue;
@@ -839,12 +885,25 @@ static void vsi_enc_buf_queue(struct vb2_buffer *vb)
 	int ret;
 
 	v4l2_klog(LOGLVL_FLOW, "%s:%d:%d", __func__, vb->type, vb->index);
+
+	trace_vsiv4l2_buf_queue(ctx, vb->type, vb->index);
+	dev_dbg(ctx->dev->dev, "[%llx] enc %s buf queue %d\n",
+		ctx->ctxid, V4L2_TYPE_IS_OUTPUT(vb->type) ? "output" : "capture", vb->index);
+
 	vsibuf = vb_to_vsibuf(vb);
 	if (!binputqueue(vq->type)) {
 		list_add_tail(&vsibuf->list, &ctx->output_list);
 	} else {
 		list_add_tail(&vsibuf->list, &ctx->input_list);
 		ctx->performance.input_buf_num++;
+		if (ctx->roi_mode == V4L2_MPEG_VIDEO_ROI_MODE_MAP_DELTA_QP) {
+			if (!vsibuf->custom_qp_map.vaddr)
+				vsi_vpu_enc_custom_map_init(ctx, vsibuf);
+			if (vsibuf->custom_qp_map.vaddr)
+				memcpy(vsibuf->custom_qp_map.vaddr,
+				       ctx->custom_qp_map.vaddr,
+				       vsibuf->custom_qp_map.size);
+		}
 	}
 	if (test_bit(CTX_FLAG_CONFIGUPDATE_BIT, &ctx->flag)) {
 		u32 bitrate = ctx->mediacfg.encparams.general.bitPerSecond;
@@ -853,11 +912,6 @@ static void vsi_enc_buf_queue(struct vb2_buffer *vb)
 	}
 
 	ret = vsiv4l2_execcmd(ctx, V4L2_DAEMON_VIDIOC_BUF_RDY, vb);
-}
-
-static int vsi_enc_buf_init(struct vb2_buffer *vb)
-{
-	return 0;
 }
 
 static int vsi_enc_buf_prepare(struct vb2_buffer *vb)
@@ -912,6 +966,11 @@ static void vsi_enc_buf_finish(struct vb2_buffer *vb)
 
 static void vsi_enc_buf_cleanup(struct vb2_buffer *vb)
 {
+	struct vsi_vpu_buf *vpu_buf = vb_to_vsibuf(vb);
+
+	if (V4L2_TYPE_IS_OUTPUT(vb->type))
+		vsi_free_dma(&vpu_buf->custom_qp_map);
+	vsiv4l2_buf_cleanup(vb);
 }
 
 static void vsi_enc_buf_wait_finish(struct vb2_queue *vq)
@@ -928,7 +987,7 @@ static struct vb2_ops vsi_enc_qops = {
 	.queue_setup = vsi_enc_queue_setup,
 	.wait_prepare = vsi_enc_buf_wait_prepare,	/*these two are just mutex protection for done_que*/
 	.wait_finish = vsi_enc_buf_wait_finish,
-	.buf_init = vsi_enc_buf_init,
+	.buf_init = vsiv4l2_buf_init,
 	.buf_prepare = vsi_enc_buf_prepare,
 	.buf_finish = vsi_enc_buf_finish,
 	.buf_cleanup = vsi_enc_buf_cleanup,
@@ -939,6 +998,122 @@ static struct vb2_ops vsi_enc_qops = {
 	//int (*buf_out_validate)(struct vb2_buffer *vb);
 	//void (*buf_request_complete)(struct vb2_buffer *vb);
 };
+
+static void write_qp_to_memory(char qp_delta, u8 *memory, u16 column, u16 row, u16 blockunit,
+			       u16 width, u16 ctb_size, u32 ctb_per_row, u32 ctb_per_column)
+{
+	u32 blks_per_ctb = ctb_size / 8;
+	u32 blks_per_unit = 1 << (3 - blockunit);
+	u32 ctb_row_number    = row * blks_per_unit / blks_per_ctb;
+	u32 ctb_column_number = column * blks_per_unit / blks_per_ctb;
+	u32 ctb_row_stride = ctb_per_row * blks_per_ctb * blks_per_ctb;
+	u32 xoffset = (column * blks_per_unit) % blks_per_ctb;
+	u32 yoffset = (row * blks_per_unit) % blks_per_ctb;
+	u32 stride = blks_per_ctb;
+	u32 columns, rows, r, c;
+
+	rows = columns = blks_per_unit;
+	if (blks_per_ctb < blks_per_unit) {
+		rows = min_t(u32, rows, ctb_per_column * blks_per_ctb - row * blks_per_unit);
+		columns = min_t(u32, columns, ctb_per_row * blks_per_ctb - column * blks_per_unit);
+		rows /= blks_per_ctb;
+		columns *= blks_per_ctb;
+		stride = ctb_row_stride;
+	}
+
+	memory += ctb_row_number * ctb_row_stride +
+		  ctb_column_number * (blks_per_ctb * blks_per_ctb);
+	memory += yoffset * stride + xoffset;
+	for (r = 0; r < rows; r++) {
+		u8 *dst = memory + r * stride;
+
+		for (c = 0; c < columns; c++)
+			*dst++ = qp_delta;
+	}
+}
+
+static void vsi_qp_map_convert(struct vsi_v4l2_ctx *ctx, s32 *map, int count)
+{
+	u16 pic_width = ctx->roi.width;
+	u16 pic_height = ctx->roi.height;
+	u16 ctb_size = ctx->roi.ctb_size;
+	u16 block_unit_type = ctx->roi.block_unit_type;
+	u32 ctb_per_row = DIV_ROUND_UP(pic_width, ctb_size);
+	u32 ctb_per_column = DIV_ROUND_UP(pic_height, ctb_size);
+	u16 block_width;
+	u16 custom_width;
+	u16 custom_height;
+	s8 delta_qp;
+	int i, j;
+
+	custom_width = DIV_ROUND_UP(pic_width, ctx->roi.block.width);
+	custom_height = DIV_ROUND_UP(pic_height, ctx->roi.block.height);
+	block_width = DIV_ROUND_UP(ALIGN(pic_width, ctb_size), ctx->roi.block.width);
+
+	if (count != (custom_width * custom_height)) {
+		v4l2_klog((count > 1 ? LOGLVL_ERROR : LOGLVL_VERBOSE), "custom map mismatch!\n");
+		return;
+	}
+
+	for (i = 0; i < custom_height; i++) {
+		for (j = 0; j < custom_width; j++) {
+			delta_qp = (s8)(*(map + i * custom_width + j));
+			delta_qp = 0 - delta_qp;
+			delta_qp &= 0x3f;
+			delta_qp = (delta_qp << 1) | 0;
+			write_qp_to_memory(delta_qp, (u8 *)ctx->custom_qp_map.vaddr, j, i,
+					   block_unit_type, block_width, ctb_size,
+					   ctb_per_row, ctb_per_column);
+		}
+	}
+}
+
+static int vsi_vpu_enc_set_roi_delta_qp(struct vsi_v4l2_ctx *ctx, s32 *delta_qp, u32 count)
+{
+	struct v4l2_enc_roi_params *proi = &ctx->mediacfg.roiinfo;
+	int i;
+
+	count = min(count, VSI_V4L2_MAX_ROI_REGIONS_H1);
+
+	for (i = 0; i < count; i++)
+		proi->roi_params[i].qp_delta = delta_qp[i];
+
+	set_bit(CTX_FLAG_RECTROIUPDATE, &ctx->flag);
+
+	return 0;
+}
+
+static int vsi_vpu_enc_set_roi_rect(struct vsi_v4l2_ctx *ctx,
+				    struct v4l2_rect *region,
+				    u32 count)
+{
+	struct v4l2_enc_roi_params *proi = &ctx->mediacfg.roiinfo;
+	int i;
+
+	count = min(count, VSI_V4L2_MAX_ROI_REGIONS_H1);
+	proi->num_roi_regions = count;
+
+	v4l2_klog(LOGLVL_CONFIG, "%s:%d", __func__, proi->num_roi_regions);
+
+	for (i = 0; i < count; i++) {
+		proi->roi_params[i].enable = 1;
+		proi->roi_params[i].rect.left = region[i].left;
+		proi->roi_params[i].rect.top = region[i].top;
+		proi->roi_params[i].rect.width = region[i].width;
+		proi->roi_params[i].rect.height = region[i].height;
+	}
+
+	set_bit(CTX_FLAG_RECTROIUPDATE, &ctx->flag);
+
+	return 0;
+}
+
+static int vsi_vpu_enc_set_roi_map(struct vsi_v4l2_ctx *ctx,
+				   s32 *map, u32 count)
+{
+	vsi_qp_map_convert(ctx, map, count);
+	return 0;
+}
 
 static int vsi_v4l2_enc_s_ctrl(struct v4l2_ctrl *ctrl)
 {
@@ -1014,7 +1189,6 @@ static int vsi_v4l2_enc_s_ctrl(struct v4l2_ctrl *ctrl)
 		ctx->mediacfg.multislice_mode = ctrl->val;
 		break;
 	case V4L2_CID_MPEG_VIDEO_MULTI_SLICE_MAX_MB:
-		ctx->mediacfg.encparams.specific.enc_h26x_cmd.sliceSize = ctrl->val;
 		break;
 	case V4L2_CID_MPEG_VIDEO_FRAME_RC_ENABLE:
 		ctx->mediacfg.encparams.specific.enc_h26x_cmd.picRc = ctrl->val;
@@ -1059,16 +1233,34 @@ static int vsi_v4l2_enc_s_ctrl(struct v4l2_ctrl *ctrl)
 			break;
 		}
 		break;
-	case V4L2_CID_ROI:
-		if (ctrl->p_new.p)
-			vsiv4l2_setROI(ctx, ctrl->p_new.p);
-		break;
 	case V4L2_CID_IPCM:
 		if (ctrl->p_new.p)
 			vsiv4l2_setIPCM(ctx, ctrl->p_new.p);
 		break;
 	case V4L2_CID_MPEG_VIDEO_REPEAT_SEQ_HEADER:
 		ctx->mediacfg.encparams.specific.enc_h26x_cmd.idrHdr = ctrl->val;
+		break;
+	case V4L2_CID_MPEG_VIDEO_ROI_MODE:
+		ctx->roi_mode = ctrl->val;
+		set_bit(CTX_FLAG_RECTROIUPDATE, &ctx->flag);
+		break;
+	case V4L2_CID_MPEG_VIDEO_ROI_RECT:
+		vsi_vpu_enc_set_roi_rect(ctx, ctrl->p_new.p, ctrl->new_elems);
+		break;
+	case V4L2_CID_MPEG_VIDEO_ROI_RECT_DELTA_QP:
+		vsi_vpu_enc_set_roi_delta_qp(ctx, ctrl->p_new.p, ctrl->new_elems);
+		break;
+	case V4L2_CID_MPEG_VIDEO_ROI_MAP_DELTA_QP:
+		vsi_vpu_enc_set_roi_map(ctx, ctrl->p_new.p, ctrl->new_elems);
+		break;
+	case V4L2_CID_MPEG_VIDEO_H264_VUI_SAR_ENABLE:
+		fallthrough;
+	case V4L2_CID_MPEG_VIDEO_H264_VUI_SAR_IDC:
+		fallthrough;
+	case V4L2_CID_MPEG_VIDEO_H264_VUI_EXT_SAR_WIDTH:
+		fallthrough;
+	case V4L2_CID_MPEG_VIDEO_H264_VUI_EXT_SAR_HEIGHT:
+		set_bit(CTX_FLAG_SARUPDATE, &ctx->flag);
 		break;
 	default:
 		return 0;
@@ -1090,9 +1282,6 @@ static int vsi_v4l2_enc_g_volatile_ctrl(struct v4l2_ctrl *ctrl)
 		break;
 	case V4L2_CID_MIN_BUFFERS_FOR_OUTPUT:
 		ctrl->val = ctx->mediacfg.minbuf_4output;
-		break;
-	case V4L2_CID_ROI_COUNT:
-		ctrl->val = vsiv4l2_getROIcount();
 		break;
 	case V4L2_CID_IPCM_COUNT:
 		ctrl->val = vsiv4l2_getIPCMcount();
@@ -1145,29 +1334,6 @@ static const struct v4l2_ctrl_ops vsi_encctrl_ops = {
 };
 
 static struct v4l2_ctrl_config vsi_v4l2_encctrl_defs[] = {
-	{
-		.ops = &vsi_encctrl_ops,
-		.id = V4L2_CID_ROI_COUNT,
-		.name = "get max ROI region number",
-		.type = V4L2_CTRL_TYPE_INTEGER,
-		.flags = V4L2_CTRL_FLAG_VOLATILE | V4L2_CTRL_FLAG_READ_ONLY,
-		.min = 0,
-		.max = V4L2_MAX_ROI_REGIONS,
-		.step = 1,
-		.def = 0,
-	},
-	{
-		.ops = &vsi_encctrl_ops,
-		.type_ops = &vsi_enc_type_ops,
-		.id = V4L2_CID_ROI,
-		.name = "vsi priv v4l2 roi params set",
-		.type = VSI_V4L2_CMPTYPE_ROI,
-		.min = 0,
-		.max = V4L2_MAX_ROI_REGIONS,
-		.step = 1,
-		.def = 0,
-		.elem_size = sizeof(struct v4l2_enc_roi_params),
-	},
 	{
 		.ops = &vsi_encctrl_ops,
 		.id = V4L2_CID_IPCM_COUNT,
@@ -1397,7 +1563,7 @@ static struct v4l2_ctrl_config vsi_v4l2_encctrl_defs[] = {
 		.id = V4L2_CID_MPEG_VIDEO_MULTI_SLICE_MAX_MB,
 		.type = V4L2_CTRL_TYPE_INTEGER,
 		.min = 1,
-		.max = 120,		//1920 div 16
+		.max = 8160,		//1920x1080
 		.step = 1,
 		.def = 1,
 	},
@@ -1467,11 +1633,75 @@ static struct v4l2_ctrl_config vsi_v4l2_encctrl_defs[] = {
 	},
 };
 
+static const struct v4l2_rect roi_region_def = {
+	.left = 0,
+	.top = 0,
+	.width = 0,
+	.height = 0,
+};
+
+static const struct v4l2_rect roi_region_min = {
+	.left = 0,
+	.top = 0,
+	.width = 0,
+	.height = 0,
+};
+
+static const struct v4l2_rect roi_region_max = {
+	.left = 0,
+	.top = 0,
+	.width = 1920,
+	.height = 1920,
+};
+
+static const struct v4l2_ctrl_config vsi_vpu_enc_ctrl_roi_rect = {
+	.ops = &vsi_encctrl_ops,
+	.id = V4L2_CID_MPEG_VIDEO_ROI_RECT,
+	.type = V4L2_CTRL_TYPE_RECT,
+	.flags = V4L2_CTRL_FLAG_HAS_WHICH_MIN_MAX,
+	.p_def.p_const = &roi_region_def,
+	.p_min.p_const = &roi_region_min,
+	.p_max.p_const = &roi_region_max,
+	.dims = { VSI_V4L2_MAX_ROI_REGIONS_H1 },
+};
+
+static const struct v4l2_ctrl_config vsi_vpu_enc_ctrl_roi_delta_qp = {
+	.ops = &vsi_encctrl_ops,
+	.id = V4L2_CID_MPEG_VIDEO_ROI_RECT_DELTA_QP,
+	.def = 0,
+	.min = -15,
+	.max = 0,
+	.step = 1,
+	.dims = { VSI_V4L2_MAX_ROI_REGIONS_H1 },
+};
+
+static const struct v4l2_ctrl_config vsi_vpu_enc_ctrl_roi_map = {
+	.ops = &vsi_encctrl_ops,
+	.id = V4L2_CID_MPEG_VIDEO_ROI_MAP_DELTA_QP,
+	.def = 0,
+	.min = -51,
+	.max = 51,
+	.step = 1,
+	.dims = {VSI_MAX_CUSTOM_MAP_UNITS},
+};
+
+static const struct v4l2_area roi_block_def = {
+	.width = 16,
+	.height = 16,
+};
+
+static const struct v4l2_ctrl_config vsi_vpu_enc_ctrl_roi_block_size = {
+	.id = V4L2_CID_MPEG_VIDEO_ROI_BLOCK_SIZE,
+	.type = V4L2_CTRL_TYPE_AREA,
+	.p_def.p_const = &roi_block_def,
+};
+
 static int vsi_setup_enc_ctrls(struct v4l2_ctrl_handler *handler)
 {
 	struct vsi_v4l2_ctx *ctx = container_of(handler, struct vsi_v4l2_ctx, ctrlhdl);
 	int i, ctrl_num = ARRAY_SIZE(vsi_v4l2_encctrl_defs);
 	struct v4l2_ctrl *ctrl = NULL;
+	struct vsi_v4l2_dev_info *dev_info = vsiv4l2_get_hwinfo();
 
 	v4l2_ctrl_handler_init(handler, ctrl_num);
 
@@ -1514,7 +1744,35 @@ static int vsi_setup_enc_ctrls(struct v4l2_ctrl_handler *handler)
 		}
 	}
 
+	v4l2_ctrl_new_std(handler, &vsi_encctrl_ops, V4L2_CID_MPEG_VIDEO_H264_VUI_SAR_ENABLE,
+			  0, 1, 1, 0);
+	v4l2_ctrl_new_std_menu(handler, &vsi_encctrl_ops, V4L2_CID_MPEG_VIDEO_H264_VUI_SAR_IDC,
+			       V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_EXTENDED, 0,
+			       V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_UNSPECIFIED);
+	v4l2_ctrl_new_std(handler, &vsi_encctrl_ops, V4L2_CID_MPEG_VIDEO_H264_VUI_EXT_SAR_WIDTH,
+			  0, 0xFFFF, 1, 0);
+	v4l2_ctrl_new_std(handler, &vsi_encctrl_ops, V4L2_CID_MPEG_VIDEO_H264_VUI_EXT_SAR_HEIGHT,
+			  0, 0xFFFF, 1, 0);
+
 	v4l2_ctrl_new_std(handler, NULL, V4L2_CID_MPEG_VIDEO_AVERAGE_QP, 0, 127, 1, 0);
+
+	v4l2_ctrl_new_std_menu(handler, &vsi_encctrl_ops,
+			       V4L2_CID_MPEG_VIDEO_ROI_MODE,
+			       V4L2_MPEG_VIDEO_ROI_MODE_MAP_DELTA_QP,
+			       ~(BIT(V4L2_MPEG_VIDEO_ROI_MODE_NONE) |
+				 (dev_info->enc_isH1 ? BIT(V4L2_MPEG_VIDEO_ROI_MODE_RECT_DELTA_QP) :
+						       BIT(V4L2_MPEG_VIDEO_ROI_MODE_MAP_DELTA_QP))),
+			       V4L2_MPEG_VIDEO_ROI_MODE_NONE);
+
+	v4l2_ctrl_new_custom(handler, &vsi_vpu_enc_ctrl_roi_block_size, NULL);
+	if (dev_info->enc_isH1) {
+		v4l2_ctrl_new_custom(handler, &vsi_vpu_enc_ctrl_roi_rect, NULL);
+		v4l2_ctrl_new_custom(handler, &vsi_vpu_enc_ctrl_roi_delta_qp, NULL);
+	} else {
+		v4l2_ctrl_new_custom(handler, &vsi_vpu_enc_ctrl_roi_map, NULL);
+	}
+
+	imx_mur_new_v4l2_ctrl(handler, ctx->recorder);
 
 	v4l2_ctrl_handler_setup(handler);
 	return handler->error;
@@ -1549,6 +1807,8 @@ static int v4l2_enc_open(struct file *filp)
 	ctx->flag = CTX_FLAG_ENC;
 	set_bit(CTX_FLAG_CONFIGUPDATE_BIT, &ctx->flag);
 	set_bit(CTX_FLAG_ENC_FLUSHBUF, &ctx->flag);
+	trace_vsiv4l2_create_ctx(ctx, 0);
+	dev_dbg(ctx->dev->dev, "[%llx] create encoder instance\n", ctx->ctxid);
 
 	ctx->frameidx = 0;
 	q = &ctx->input_que;
@@ -1562,6 +1822,7 @@ static int v4l2_enc_open(struct file *filp)
 	q->mem_ops = &vb2_dma_contig_memops;
 	q->memory = VB2_MEMORY_UNKNOWN;
 	q->timestamp_flags = V4L2_BUF_FLAG_TIMESTAMP_COPY;
+	q->allow_cache_hints = 1;
 	INIT_LIST_HEAD(&ctx->input_list);
 	ret = vb2_queue_init(q);
 	/*q->buf_ops = &v4l2_buf_ops is set here*/
@@ -1579,25 +1840,53 @@ static int v4l2_enc_open(struct file *filp)
 	q->mem_ops = &vb2_dma_contig_memops;
 	q->memory = VB2_MEMORY_UNKNOWN;
 	q->timestamp_flags = V4L2_BUF_FLAG_TIMESTAMP_COPY;
+	q->allow_cache_hints = 1;
 	INIT_LIST_HEAD(&ctx->output_list);
 	ret = vb2_queue_init(q);
 	if (ret) {
 		vb2_queue_release(&ctx->input_que);
 		goto err_enc_dec_exit;
 	}
+	ctx->recorder = imx_mur_create_node(dev->recorder, "encoder instance");
+	if (ctx->recorder)
+		ctx->recorder_ctrlsw = imx_mur_create_node(ctx->recorder, "ctrlsw");
 	vsiv4l2_initcfg(ctx);
 	vsi_setup_enc_ctrls(&ctx->ctrlhdl);
 	vfh = (struct v4l2_fh *)filp->private_data;
 	vfh->ctrl_handler = &ctx->ctrlhdl;
 	atomic_set(&ctx->srcframen, 0);
 	atomic_set(&ctx->dstframen, 0);
-	ctx->status = VSI_STATUS_INIT;
+	vsi_v4l2_set_ctx_status(ctx, VSI_STATUS_INIT);
 	ctx->tgid = current->tgid;
 	ctx->pid = current->pid;
 	vsi_v4l2_create_dbgfs_file(ctx);
 
+	ctx->custom_qp_map.size = VSI_MAX_CUSTOM_MAP_UNITS;
+	ctx->custom_qp_map.recorder = ctx->recorder;
+	ctx->custom_qp_map.label = "custom_qp_map";
+	if (vsi_alloc_dma(ctx->dev->dev, &ctx->custom_qp_map) < 0) {
+		v4l2_klog(LOGLVL_ERROR,  "alloc custom qp map size %zu failed\n",
+			  ctx->custom_qp_map.size);
+		goto err_alloc;
+	}
+
+	ctx->zero_qp_map.size = VSI_MAX_CUSTOM_MAP_UNITS;
+	ctx->zero_qp_map.recorder = ctx->recorder;
+	ctx->zero_qp_map.label = "zero_qp_map";
+	if (vsi_alloc_dma(ctx->dev->dev, &ctx->zero_qp_map) < 0) {
+		v4l2_klog(LOGLVL_ERROR,  "alloc custom qp map size %zu failed\n",
+			  ctx->zero_qp_map.size);
+		goto err_alloc;
+	}
+
 	return 0;
 
+err_alloc:
+	vsi_free_dma(&ctx->custom_qp_map);
+	vsi_v4l2_remove_dbgfs_file(ctx);
+	imx_mur_release_v4l2_ctrl(ctx->recorder);
+	v4l2_ctrl_handler_free(&ctx->ctrlhdl);
+	imx_mur_destroy_node(ctx->recorder);
 err_enc_dec_exit:
 	v4l2_fh_del(&ctx->fh);
 	v4l2_fh_exit(&ctx->fh);

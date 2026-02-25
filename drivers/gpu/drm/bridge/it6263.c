@@ -340,6 +340,7 @@ struct it6263 {
 	struct gpio_desc *reset_gpio;
 	bool is_hdmi;
 	bool split_mode;
+	bool de_ssc_enable;
 };
 
 struct it6263_minimode {
@@ -405,7 +406,8 @@ static void it6263_reset(struct it6263 *it6263)
 static void it6263_lvds_reset(struct it6263 *it6263)
 {
 	/* AFE PLL reset */
-	lvds_update_bits(it6263, LVDS_REG_PLL, 0x1, 0x0);
+	lvds_update_bits(it6263, LVDS_REG_PLL,
+			 it6263->de_ssc_enable ? 0x07 : 0x1, 0x0);
 	usleep_range(1000, 2000);
 	lvds_update_bits(it6263, LVDS_REG_PLL, 0x1, 0x1);
 
@@ -416,6 +418,13 @@ static void it6263_lvds_reset(struct it6263 *it6263)
 	lvds_update_bits(it6263, LVDS_REG_SW_RST, SOFT_PCLK_DM_RST, 0x0);
 
 	usleep_range(1000, 2000);
+
+	if (!it6263->de_ssc_enable)
+		return;
+
+	lvds_update_bits(it6263, 0x2c, BIT(6), BIT(6));
+	usleep_range(1000, 2000);
+	lvds_update_bits(it6263, 0x2c, BIT(6), 0);
 }
 
 static void it6263_lvds_set_interface(struct it6263 *it6263)
@@ -449,11 +458,23 @@ static void it6263_lvds_set_afe(struct it6263 *it6263)
 	lvds_update_bits(it6263, LVDS_REG_PLL, 0x07, 0);
 }
 
+static void it6263_lvds_de_ssc_enable(struct it6263 *it6263)
+{
+	if (!it6263->de_ssc_enable)
+		return;
+
+	lvds_update_bits(it6263, LVDS_REG_PLL, 0x07, 0x07);
+	lvds_update_bits(it6263, 0x2c, BIT(6), BIT(6));
+	usleep_range(1000, 2000);
+	lvds_update_bits(it6263, 0x2c, BIT(6), 0);
+}
+
 static void it6263_lvds_config(struct it6263 *it6263)
 {
 	it6263_lvds_reset(it6263);
 	it6263_lvds_set_interface(it6263);
 	it6263_lvds_set_afe(it6263);
+	it6263_lvds_de_ssc_enable(it6263);
 }
 
 static void it6263_hdmi_config(struct it6263 *it6263)
@@ -573,12 +594,13 @@ it6263_read_edid(void *data, u8 *buf, unsigned int block, size_t len)
 	return 0;
 }
 
-static const struct drm_edid *it6263_get_edid(struct it6263 *it6263)
+static const struct drm_edid *
+it6263_get_edid(struct it6263 *it6263, struct drm_connector *connector)
 {
 	const struct drm_edid *drm_edid;
 	const struct edid *edid;
 
-	drm_edid = drm_edid_read_custom(&it6263->connector, it6263_read_edid, it6263);
+	drm_edid = drm_edid_read_custom(connector, it6263_read_edid, it6263);
 	if (!drm_edid) {
 		dev_warn(&it6263->hdmi_i2c->dev, "Failed to read EDID\n");
 		return NULL;
@@ -619,7 +641,7 @@ static int it6263_connector_get_modes(struct drm_connector *connector)
 	int num = 0;
 	int ret;
 
-	drm_edid = it6263_get_edid(it6263);
+	drm_edid = it6263_get_edid(it6263, connector);
 	if (!drm_edid)
 		return 0;
 
@@ -850,7 +872,7 @@ it6263_bridge_edid_read(struct drm_bridge *bridge,
 {
 	struct it6263 *it6263 = bridge_to_it6263(bridge);
 
-	return it6263_get_edid(it6263);
+	return it6263_get_edid(it6263, connector);
 }
 
 static enum drm_mode_status
@@ -1029,6 +1051,8 @@ static int it6263_probe(struct i2c_client *client)
 
 		goto unregister_lvds_i2c;
 	}
+
+	it6263->de_ssc_enable = of_property_read_bool(np, "de-ssc-enable");
 
 	it6263_reset(it6263);
 

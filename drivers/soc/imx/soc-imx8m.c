@@ -45,11 +45,15 @@
 
 struct imx8_soc_data {
 	char *name;
-	int (*soc_revision)(u32 *socrev, u64 *socuid);
+	const char *ocotp_compatible;
+	int (*soc_revision)(struct platform_device *pdev, u32 *socrev);
+	int (*soc_uid)(struct platform_device *pdev, u64 *socuid);
 };
 
-static u64 soc_uid;
-static u64 soc_uid_h;
+struct imx8_soc_drvdata {
+	void __iomem *ocotp_base;
+	struct clk *clk;
+};
 
 #ifdef CONFIG_HAVE_ARM_SMCCC
 static u32 imx8mq_soc_revision_from_atf(void)
@@ -67,30 +71,24 @@ static u32 imx8mq_soc_revision_from_atf(void)
 static inline u32 imx8mq_soc_revision_from_atf(void) { return 0; };
 #endif
 
-static int imx8mq_soc_revision(u32 *socrev, u64 *socuid)
+static int imx8m_soc_uid(struct platform_device *pdev, u64 *socuid)
 {
-	struct device_node *np __free(device_node) =
-		of_find_compatible_node(NULL, NULL, "fsl,imx8mq-ocotp");
-	void __iomem *ocotp_base;
+	struct imx8_soc_drvdata *drvdata = platform_get_drvdata(pdev);
+	void __iomem *ocotp_base = drvdata->ocotp_base;
+
+	*socuid = readl_relaxed(ocotp_base + OCOTP_UID_HIGH);
+	*socuid <<= 32;
+	*socuid |= readl_relaxed(ocotp_base + OCOTP_UID_LOW);
+
+	return 0;
+}
+
+static int imx8mq_soc_revision(struct platform_device *pdev, u32 *socrev)
+{
+	struct imx8_soc_drvdata *drvdata = platform_get_drvdata(pdev);
+	void __iomem *ocotp_base = drvdata->ocotp_base;
 	u32 magic;
 	u32 rev;
-	struct clk *clk;
-	int ret;
-
-	if (!np)
-		return -EINVAL;
-
-	ocotp_base = of_iomap(np, 0);
-	if (!ocotp_base)
-		return -EINVAL;
-
-	clk = of_clk_get_by_name(np, NULL);
-	if (IS_ERR(clk)) {
-		ret = PTR_ERR(clk);
-		goto err_clk;
-	}
-
-	clk_prepare_enable(clk);
 
 	/*
 	 * SOC revision on older imx8mq is not available in fuses so query
@@ -103,67 +101,28 @@ static int imx8mq_soc_revision(u32 *socrev, u64 *socuid)
 			rev = REV_B1;
 	}
 
-	*socuid = readl_relaxed(ocotp_base + OCOTP_UID_HIGH);
-	*socuid <<= 32;
-	*socuid |= readl_relaxed(ocotp_base + OCOTP_UID_LOW);
-
 	*socrev = rev;
 
-	clk_disable_unprepare(clk);
-	clk_put(clk);
-	iounmap(ocotp_base);
+	return 0;
+}
+
+static int imx8mp_soc_uid(struct platform_device *pdev, u64 *socuid)
+{
+	struct imx8_soc_drvdata *drvdata = platform_get_drvdata(pdev);
+	void __iomem *ocotp_base = drvdata->ocotp_base;
+
+	socuid[0] = readl_relaxed(ocotp_base + OCOTP_UID_HIGH + IMX8MP_OCOTP_UID_OFFSET);
+	socuid[0] <<= 32;
+	socuid[0] |= readl_relaxed(ocotp_base + OCOTP_UID_LOW + IMX8MP_OCOTP_UID_OFFSET);
+
+	socuid[1] = readl_relaxed(ocotp_base + IMX8MP_OCOTP_UID_HIGH + 0x10);
+	socuid[1] <<= 32;
+	socuid[1] |= readl_relaxed(ocotp_base + IMX8MP_OCOTP_UID_HIGH);
 
 	return 0;
-
-err_clk:
-	iounmap(ocotp_base);
-	return ret;
 }
 
-static int imx8mm_soc_uid(u64 *socuid)
-{
-	struct device_node *np __free(device_node) =
-		of_find_compatible_node(NULL, NULL, "fsl,imx8mm-ocotp");
-	void __iomem *ocotp_base;
-	struct clk *clk;
-	int ret = 0;
-	u32 offset = of_machine_is_compatible("fsl,imx8mp") ?
-		     IMX8MP_OCOTP_UID_OFFSET : 0;
-
-	if (!np)
-		return -EINVAL;
-
-	ocotp_base = of_iomap(np, 0);
-	if (!ocotp_base)
-		return -EINVAL;
-
-	clk = of_clk_get_by_name(np, NULL);
-	if (IS_ERR(clk)) {
-		ret = PTR_ERR(clk);
-		goto err_clk;
-	}
-
-	clk_prepare_enable(clk);
-
-	*socuid = readl_relaxed(ocotp_base + OCOTP_UID_HIGH + offset);
-	*socuid <<= 32;
-	*socuid |= readl_relaxed(ocotp_base + OCOTP_UID_LOW + offset);
-
-	if (offset) {
-		soc_uid_h = readl_relaxed(ocotp_base + IMX8MP_OCOTP_UID_HIGH + 0x10);
-		soc_uid_h <<= 32;
-		soc_uid_h |= readl_relaxed(ocotp_base + IMX8MP_OCOTP_UID_HIGH);
-	}
-
-	clk_disable_unprepare(clk);
-	clk_put(clk);
-
-err_clk:
-	iounmap(ocotp_base);
-	return ret;
-}
-
-static int imx8mm_soc_revision(u32 *socrev, u64 *socuid)
+static int imx8mm_soc_revision(struct platform_device *pdev, u32 *socrev)
 {
 	struct device_node *np __free(device_node) =
 		of_find_compatible_node(NULL, NULL, "fsl,imx8mm-anatop");
@@ -180,27 +139,71 @@ static int imx8mm_soc_revision(u32 *socrev, u64 *socuid)
 
 	iounmap(anatop_base);
 
-	return imx8mm_soc_uid(socuid);
+	return 0;
+}
+
+static int imx8m_soc_prepare(struct platform_device *pdev, const char *ocotp_compatible)
+{
+	struct device_node *np __free(device_node) =
+		of_find_compatible_node(NULL, NULL, ocotp_compatible);
+	struct imx8_soc_drvdata *drvdata = platform_get_drvdata(pdev);
+	int ret = 0;
+
+	if (!np)
+		return -EINVAL;
+
+	drvdata->ocotp_base = of_iomap(np, 0);
+	if (!drvdata->ocotp_base)
+		return -EINVAL;
+
+	drvdata->clk = of_clk_get_by_name(np, NULL);
+	if (IS_ERR(drvdata->clk)) {
+		ret = PTR_ERR(drvdata->clk);
+		goto err_clk;
+	}
+
+	return clk_prepare_enable(drvdata->clk);
+
+err_clk:
+	iounmap(drvdata->ocotp_base);
+	return ret;
+}
+
+static void imx8m_soc_unprepare(struct platform_device *pdev)
+{
+	struct imx8_soc_drvdata *drvdata = platform_get_drvdata(pdev);
+
+	clk_disable_unprepare(drvdata->clk);
+	clk_put(drvdata->clk);
+	iounmap(drvdata->ocotp_base);
 }
 
 static const struct imx8_soc_data imx8mq_soc_data = {
 	.name = "i.MX8MQ",
+	.ocotp_compatible = "fsl,imx8mq-ocotp",
 	.soc_revision = imx8mq_soc_revision,
+	.soc_uid = imx8m_soc_uid,
 };
 
 static const struct imx8_soc_data imx8mm_soc_data = {
 	.name = "i.MX8MM",
+	.ocotp_compatible = "fsl,imx8mm-ocotp",
 	.soc_revision = imx8mm_soc_revision,
+	.soc_uid = imx8m_soc_uid,
 };
 
 static const struct imx8_soc_data imx8mn_soc_data = {
 	.name = "i.MX8MN",
+	.ocotp_compatible = "fsl,imx8mm-ocotp",
 	.soc_revision = imx8mm_soc_revision,
+	.soc_uid = imx8m_soc_uid,
 };
 
 static const struct imx8_soc_data imx8mp_soc_data = {
 	.name = "i.MX8MP",
+	.ocotp_compatible = "fsl,imx8mm-ocotp",
 	.soc_revision = imx8mm_soc_revision,
+	.soc_uid = imx8mp_soc_uid,
 };
 
 static __maybe_unused const struct of_device_id imx8_soc_match[] = {
@@ -228,9 +231,9 @@ static void imx8mq_noc_init(void)
 		pr_err("Config NOC for VPU fail!\n");
 }
 
-#define imx8_revision(soc_rev) \
-	soc_rev ? \
-	kasprintf(GFP_KERNEL, "%d.%d", (soc_rev >> 4) & 0xf,  soc_rev & 0xf) : \
+#define imx8_revision(dev, soc_rev) \
+	(soc_rev) ? \
+	devm_kasprintf((dev), GFP_KERNEL, "%d.%d", ((soc_rev) >> 4) & 0xf, (soc_rev) & 0xf) : \
 	"unknown"
 
 static void imx8m_unregister_soc(void *data)
@@ -248,16 +251,23 @@ static int imx8m_soc_probe(struct platform_device *pdev)
 	struct soc_device_attribute *soc_dev_attr;
 	struct platform_device *cpufreq_dev;
 	const struct imx8_soc_data *data;
+	struct imx8_soc_drvdata *drvdata;
 	struct device *dev = &pdev->dev;
 	const struct of_device_id *id;
 	struct soc_device *soc_dev;
 	u32 soc_rev = 0;
-	u64 soc_uid = 0;
+	u64 soc_uid[2] = {0, 0};
 	int ret;
 
 	soc_dev_attr = devm_kzalloc(dev, sizeof(*soc_dev_attr), GFP_KERNEL);
 	if (!soc_dev_attr)
 		return -ENOMEM;
+
+	drvdata = devm_kzalloc(dev, sizeof(*drvdata), GFP_KERNEL);
+	if (!drvdata)
+		return -ENOMEM;
+
+	platform_set_drvdata(pdev, drvdata);
 
 	soc_dev_attr->family = "Freescale i.MX";
 
@@ -272,27 +282,39 @@ static int imx8m_soc_probe(struct platform_device *pdev)
 	data = id->data;
 	if (data) {
 		soc_dev_attr->soc_id = data->name;
+		ret = imx8m_soc_prepare(pdev, data->ocotp_compatible);
+		if (ret)
+			return ret;
+
 		if (data->soc_revision) {
-			ret = data->soc_revision(&soc_rev, &soc_uid);
-			if (ret)
+			ret = data->soc_revision(pdev, &soc_rev);
+			if (ret) {
+				imx8m_soc_unprepare(pdev);
 				return ret;
+			}
 		}
+		if (data->soc_uid) {
+			ret = data->soc_uid(pdev, soc_uid);
+			if (ret) {
+				imx8m_soc_unprepare(pdev);
+				return ret;
+			}
+		}
+		imx8m_soc_unprepare(pdev);
 	}
 
-	soc_dev_attr->revision = imx8_revision(soc_rev);
+	soc_dev_attr->revision = imx8_revision(dev, soc_rev);
 	if (!soc_dev_attr->revision)
 		return -ENOMEM;
 
-	if (soc_uid_h) {
-		soc_dev_attr->serial_number = kasprintf(GFP_KERNEL, "%016llX%016llX",
-							soc_uid_h, soc_uid);
-	} else {
-		soc_dev_attr->serial_number = kasprintf(GFP_KERNEL, "%016llX", soc_uid);
-	}
-	if (!soc_dev_attr->serial_number) {
-		ret = -ENOMEM;
-		goto free_rev;
-	}
+	if (soc_uid[1])
+		soc_dev_attr->serial_number = devm_kasprintf(dev, GFP_KERNEL, "%016llX%016llX",
+							     soc_uid[1], soc_uid[0]);
+	else
+		soc_dev_attr->serial_number = devm_kasprintf(dev, GFP_KERNEL, "%016llX",
+							     soc_uid[0]);
+	if (!soc_dev_attr->serial_number)
+		return -ENOMEM;
 
 	soc_dev = soc_device_register(soc_dev_attr);
 	if (IS_ERR(soc_dev))
@@ -318,9 +340,6 @@ static int imx8m_soc_probe(struct platform_device *pdev)
 	if (of_machine_is_compatible("fsl,imx8mq"))
 		imx8mq_noc_init();
 
-free_rev:
-	if (strcmp(soc_dev_attr->revision, "unknown"))
-		kfree(soc_dev_attr->revision);
 	return 0;
 }
 
@@ -355,7 +374,6 @@ static int __init imx8_soc_init(void)
 
 	return 0;
 }
-device_initcall(imx8_soc_init);
 
 #define FSL_SIP_SRC                    0xc2000005
 #define FSL_SIP_SRC_M4_START           0x00
@@ -384,5 +402,6 @@ int check_m4_enabled(void)
 }
 EXPORT_SYMBOL_GPL(check_m4_enabled);
 
+device_initcall(imx8_soc_init);
 MODULE_DESCRIPTION("i.MX8M SoC driver");
-MODULE_LICENSE("GPL");
+MODULE_LICENSE("GPL v2");

@@ -1750,7 +1750,6 @@ static int spi_imx_transfer_one(struct spi_controller *controller,
 	ret = spi_imx_setupxfer(spi, transfer);
 	if (ret < 0)
 		return ret;
-	transfer->effective_speed_hz = spi_imx->spi_bus_clk;
 
 	/* flush rxfifo before transfer */
 	while (spi_imx->devtype_data->rx_available(spi_imx))

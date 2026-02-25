@@ -12,6 +12,7 @@
 #include <linux/mailbox_client.h>
 #include <linux/mailbox_controller.h>
 #include <linux/kfifo.h>
+#include <linux/imx_memory_usage.h>
 
 #define VPU_TIMEOUT_WAKEUP	msecs_to_jiffies(200)
 #define VPU_TIMEOUT		msecs_to_jiffies(1000)
@@ -47,6 +48,8 @@ struct vpu_buffer {
 	u32 length;
 	u32 bytesused;
 	struct device *dev;
+	struct imx_mur_node *recorder;
+	const char *label;
 };
 
 struct vpu_func {
@@ -81,6 +84,8 @@ struct vpu_dev {
 	atomic_t ref_dec;
 
 	struct dentry *debugfs;
+
+	struct imx_mur_node *recorder;
 };
 
 struct vpu_format {
@@ -280,6 +285,8 @@ struct vpu_inst {
 	pid_t pid;
 	pid_t tgid;
 	struct dentry *debugfs;
+
+	struct imx_mur_node *recorder;
 
 	void *priv;
 };

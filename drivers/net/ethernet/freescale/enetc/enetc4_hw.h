@@ -116,6 +116,10 @@
 /* Port broadcast frames dropped VLAN filtering register */
 #define ENETC4_PBFDVFR		0x2d8
 
+/* Port RFS mode register */
+#define ENETC4_PRFSMR		0x310
+#define  PRFSMR_RFSE		BIT(31)
+
 /* Port low power mode register */
 #define ENETC4_PLPMR		0x340
 #define  PLPMR_WME		BIT(0)
@@ -255,6 +259,8 @@
 
 /* Port operational register */
 #define ENETC4_POR		0x4100
+#define  POR_TXDIS		BIT(0)
+#define  POR_RXDIS		BIT(1)
 
 /* Port status register */
 #define ENETC4_PSR		0x4104

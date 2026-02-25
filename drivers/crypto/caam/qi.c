@@ -121,7 +121,7 @@ int caam_qi_enqueue(struct device *qidev, struct caam_drv_req *req)
 
 	do {
 		refcount_inc(&req->drv_ctx->refcnt);
-		ret = qman_enqueue(req->drv_ctx->req_fq, &fd);
+		ret = qman_enqueue(req->drv_ctx->req_fq, &fd, 0);
 		if (likely(!ret))
 			return 0;
 

@@ -23,6 +23,7 @@
 #include <linux/kmod.h>
 #include <linux/mutex.h>
 #include <linux/pci.h>
+#include <linux/gcd.h>
 #include <linux/interrupt.h>
 #include <linux/videodev2.h>
 #include <linux/v4l2-dv-timings.h>
@@ -37,6 +38,7 @@
 #include <media/videobuf2-dma-contig.h>
 #include <media/videobuf2-vmalloc.h>
 #include "vsi-v4l2-priv.h"
+#include "vsi-v4l2-trace.h"
 
 static struct vsi_v4l2_dev_info vsi_v4l2_hwconfig = {0};
 
@@ -1583,6 +1585,50 @@ int vsiv4l2_enc_getalign(u32 srcfmt, u32 dstfmt, int width)
 	return bytesperline;
 }
 
+int vsi_enc_set_roi_info(struct vsi_v4l2_ctx *ctx)
+{
+	struct vsi_v4l2_dev_info *dev_info = vsiv4l2_get_hwinfo();
+	struct vsi_v4l2_mediacfg *pcfg = &ctx->mediacfg;
+	struct vsi_v4l2_roi_info roi;
+
+	memset(&roi, 0, sizeof(roi));
+
+	roi.width = pcfg->encparams.general.width;
+	roi.height = pcfg->encparams.general.height;
+	roi.block_unit_type = 2;
+	roi.block.width = 16;
+	roi.block.height = 16;
+	roi.ctb_size = 16;
+
+	if (pcfg->outfmt_fourcc == V4L2_PIX_FMT_HEVC)
+		roi.ctb_size = 64;
+
+	if (memcmp(&roi, &ctx->roi, sizeof(roi))) {
+		/*reset ROI configuration*/
+		if (dev_info->enc_isH1) {
+			struct v4l2_enc_roi_params *proi = &ctx->mediacfg.roiinfo;
+			int i;
+
+			for (i = 0; i < VSI_V4L2_MAX_ROI_REGIONS_H1; i++) {
+				proi->roi_params[i].enable = 0;
+				proi->roi_params[i].rect.left = 0;
+				proi->roi_params[i].rect.top = 0;
+				proi->roi_params[i].rect.width = 0;
+				proi->roi_params[i].rect.height = 0;
+				proi->roi_params[i].qp_delta = 0;
+			}
+			proi->num_roi_regions = 0;
+			set_bit(CTX_FLAG_RECTROIUPDATE, &ctx->flag);
+		} else {
+			if (ctx->custom_qp_map.vaddr)
+				memset(ctx->custom_qp_map.vaddr, 0, ctx->custom_qp_map.size);
+		}
+	}
+
+	memcpy(&ctx->roi, &roi, sizeof(roi));
+	return 0;
+}
+
 static int vsiv4l2_setfmt_enc(struct vsi_v4l2_ctx *ctx, struct v4l2_format *fmt)
 {
 	struct vsi_v4l2_mediacfg *pcfg = &ctx->mediacfg;
@@ -1635,11 +1681,27 @@ static int vsiv4l2_setfmt_enc(struct vsi_v4l2_ctx *ctx, struct v4l2_format *fmt)
 	pcfg->ycbcr_enc = pixmp->ycbcr_enc;
 	enc_setvui(fmt, &pcfg->encparams);
 
+	vsi_enc_set_roi_info(ctx);
+
 	v4l2_klog(LOGLVL_CONFIG, "%s type:%d, planes:%d, res:%dx%d, bytesperline:%d, sizeimage:%d,%d,%d\n",
 		__func__, fmt->type, pixmp->num_planes, pixmp->width,
 		pixmp->height, pixmp->plane_fmt[0].bytesperline,
 		pixmp->plane_fmt[0].sizeimage, pixmp->plane_fmt[1].sizeimage,
 		pixmp->plane_fmt[2].sizeimage);
+	dev_dbg(ctx->dev->dev,
+		"[%llx] set fmt enc: %c%c%c%c %dx%d, bytesperline = %d, sizeimage = %d,%d,%d\n",
+		ctx->ctxid,
+		pixmp->pixelformat,
+		pixmp->pixelformat >> 8,
+		pixmp->pixelformat >> 16,
+		(pixmp->pixelformat >> 24) & 0x7f,
+		pixmp->width, pixmp->height,
+		pixmp->plane_fmt[0].bytesperline,
+		pixmp->plane_fmt[0].sizeimage,
+		pixmp->plane_fmt[1].sizeimage,
+		pixmp->plane_fmt[2].sizeimage);
+
+	trace_vsiv4l2_set_fmt_enc(pixmp, ctx->ctxid);
 
 	return ret;
 }
@@ -1672,9 +1734,16 @@ void vsi_convertROI(struct vsi_v4l2_ctx *ctx)
 
 	if (vsi_v4l2_hwconfig.encformat == 0)
 		return;
-	num = (vsi_v4l2_hwconfig.enc_isH1 ? VSI_V4L2_MAX_ROI_REGIONS_H1 : VSI_V4L2_MAX_ROI_REGIONS);
+
+	if (!vsi_v4l2_hwconfig.enc_isH1)
+		return;
+
+	num = VSI_V4L2_MAX_ROI_REGIONS_H1;
 	if (proi->num_roi_regions < num)
 		num = proi->num_roi_regions;
+
+	if (ctx->roi_mode != V4L2_MPEG_VIDEO_ROI_MODE_RECT_DELTA_QP)
+		num = 0;
 
 	for (i = 0; i < num; i++) {
 		penccfg->roiAreaEnable[i] = proi->roi_params[i].enable;
@@ -1685,9 +1754,13 @@ void vsi_convertROI(struct vsi_v4l2_ctx *ctx)
 	}
 	/*disable left ones*/
 	for (; i < VSI_V4L2_MAX_ROI_REGIONS; i++) {
-		penccfg->roiAreaEnable[i] = penccfg->roiAreaTop[i] = penccfg->roiAreaLeft[i] =
-			penccfg->roiAreaBottom[i] = penccfg->roiAreaRight[i] = 0;
+		penccfg->roiAreaEnable[i] =
+		penccfg->roiAreaTop[i] =
+		penccfg->roiAreaLeft[i] =
+		penccfg->roiAreaBottom[i] =
+		penccfg->roiAreaRight[i] = 0;
 	}
+
 }
 
 void vsi_convertIPCM(struct vsi_v4l2_ctx *ctx)
@@ -1712,30 +1785,6 @@ void vsi_convertIPCM(struct vsi_v4l2_ctx *ctx)
 		penccfg->ipcmAreaEnable[i] = penccfg->ipcmAreaTop[i] = penccfg->ipcmAreaLeft[i] =
 			penccfg->ipcmAreaBottom[i] = penccfg->ipcmAreaRight[i] = 0;
 	}
-}
-
-int vsiv4l2_setROI(struct vsi_v4l2_ctx *ctx, void *params)
-{
-	int i;
-	struct v4l2_enc_roi_params *proi = (struct v4l2_enc_roi_params *)params;
-
-	ctx->mediacfg.roiinfo = *proi;
-	v4l2_klog(LOGLVL_CONFIG, "%s:%d", __func__, proi->num_roi_regions);
-	for (i = 0; i < proi->num_roi_regions; i++) {
-		v4l2_klog(LOGLVL_CONFIG, "%d:%d:%d:%d:%d:%d", proi->roi_params[i].enable,
-			proi->roi_params[i].qp_delta, proi->roi_params[i].rect.left,
-			proi->roi_params[i].rect.top, proi->roi_params[i].rect.width, proi->roi_params[i].rect.height);
-	}
-	return 0;
-}
-
-int vsiv4l2_getROIcount(void)
-{
-	if (vsi_v4l2_hwconfig.encformat == 0)
-		return 0;
-	if (vsi_v4l2_hwconfig.enc_isH1)
-		return VSI_V4L2_MAX_ROI_REGIONS_H1;
-	return VSI_V4L2_MAX_ROI_REGIONS;
 }
 
 int vsiv4l2_setIPCM(struct vsi_v4l2_ctx *ctx, void *params)
@@ -1849,6 +1898,16 @@ static int vsiv4l2_setfmt_dec(struct vsi_v4l2_ctx *ctx, struct v4l2_format *fmt)
 	v4l2_klog(LOGLVL_CONFIG, "%s type:%d, res:%dx%d, bytesperline:%d, sizeimage:%d\n",
 		__func__, fmt->type, pix->width, pix->height, pix->bytesperline,
 		pix->sizeimage);
+	dev_dbg(ctx->dev->dev,
+		"[%llx] set fmt dec: %c%c%c%c %dx%d, bytesperline = %d, sizeimage = %d\n",
+		ctx->ctxid,
+		pix->pixelformat,
+		pix->pixelformat >> 8,
+		pix->pixelformat >> 16,
+		(pix->pixelformat >> 24) & 0x7f,
+		pix->width, pix->height, pix->bytesperline, pix->sizeimage);
+	trace_vsiv4l2_set_fmt_dec(pix, ctx->ctxid);
+
 	return ret;
 }
 
@@ -2259,6 +2318,33 @@ int vsiv4l2_buffer_config(
 	return 0;
 }
 
+int vsiv4l2_buf_init(struct vb2_buffer *vb)
+{
+	struct vb2_queue *vq = vb->vb2_queue;
+	struct vsi_v4l2_ctx *ctx = fh_to_ctx(vq->drv_priv);
+
+	if (vb->memory != VB2_MEMORY_MMAP)
+		return 0;
+
+	for (int i = 0; i < vb->num_planes; i++)
+		imx_mur_long_new_and_add(ctx->recorder,
+					 vb->planes[i].length,
+					 V4L2_TYPE_IS_OUTPUT(vb->type) ? "output" : "capture");
+	return 0;
+}
+
+void vsiv4l2_buf_cleanup(struct vb2_buffer *vb)
+{
+	struct vb2_queue *vq = vb->vb2_queue;
+	struct vsi_v4l2_ctx *ctx = fh_to_ctx(vq->drv_priv);
+
+	if (vb->memory != VB2_MEMORY_MMAP)
+		return;
+
+	for (int i = 0; i < vb->num_planes; i++)
+		imx_mur_long_sub_and_del(ctx->recorder, vb->planes[i].length);
+}
+
 void vsiv4l2_set_hwinfo(struct vsi_v4l2_dev_info *hwinfo)
 {
 	int i, j;
@@ -2350,4 +2436,131 @@ bool vsi_v4l2_ctrl_is_applicable(struct vsi_v4l2_ctx *ctx, u32 ctrl_id)
 	}
 
 	return false;
+}
+
+void vsi_update_sar(struct vsi_v4l2_ctx *ctx)
+{
+	struct v4l2_daemon_enc_h26x_cmd *cmd = &ctx->mediacfg.encparams.specific.enc_h26x_cmd;
+	struct v4l2_ctrl *ctrl;
+	u32 w, h, divisor;
+
+	cmd->sample_aspect_ratio_width = 0;
+	cmd->sample_aspect_ratio_height = 0;
+
+	ctrl = v4l2_ctrl_find(ctx->fh.ctrl_handler, V4L2_CID_MPEG_VIDEO_H264_VUI_SAR_ENABLE);
+	if (!ctrl || !v4l2_ctrl_g_ctrl(ctrl))
+		return;
+
+	ctrl = v4l2_ctrl_find(ctx->fh.ctrl_handler, V4L2_CID_MPEG_VIDEO_H264_VUI_SAR_IDC);
+	if (!ctrl)
+		return;
+
+	switch (v4l2_ctrl_g_ctrl(ctrl)) {
+	case V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_UNSPECIFIED:
+		return;
+	case V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_1x1:
+		cmd->sample_aspect_ratio_width = 1;
+		cmd->sample_aspect_ratio_height = 1;
+		return;
+	case V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_12x11:
+		cmd->sample_aspect_ratio_width = 12;
+		cmd->sample_aspect_ratio_height = 11;
+		return;
+	case V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_10x11:
+		cmd->sample_aspect_ratio_width = 10;
+		cmd->sample_aspect_ratio_height = 11;
+		return;
+	case V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_16x11:
+		cmd->sample_aspect_ratio_width = 16;
+		cmd->sample_aspect_ratio_height = 11;
+		return;
+	case V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_40x33:
+		cmd->sample_aspect_ratio_width = 40;
+		cmd->sample_aspect_ratio_height = 33;
+		return;
+	case V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_24x11:
+		cmd->sample_aspect_ratio_width = 24;
+		cmd->sample_aspect_ratio_height = 11;
+		return;
+	case V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_20x11:
+		cmd->sample_aspect_ratio_width = 20;
+		cmd->sample_aspect_ratio_height = 11;
+		return;
+	case V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_32x11:
+		cmd->sample_aspect_ratio_width = 32;
+		cmd->sample_aspect_ratio_height = 11;
+		return;
+	case V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_80x33:
+		cmd->sample_aspect_ratio_width = 80;
+		cmd->sample_aspect_ratio_height = 33;
+		return;
+	case V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_18x11:
+		cmd->sample_aspect_ratio_width = 18;
+		cmd->sample_aspect_ratio_height = 11;
+		return;
+	case V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_15x11:
+		cmd->sample_aspect_ratio_width = 15;
+		cmd->sample_aspect_ratio_height = 11;
+		return;
+	case V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_64x33:
+		cmd->sample_aspect_ratio_width = 64;
+		cmd->sample_aspect_ratio_height = 33;
+		return;
+	case V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_160x99:
+		cmd->sample_aspect_ratio_width = 160;
+		cmd->sample_aspect_ratio_height = 99;
+		return;
+	case V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_4x3:
+		cmd->sample_aspect_ratio_width = 4;
+		cmd->sample_aspect_ratio_height = 3;
+		return;
+	case V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_3x2:
+		cmd->sample_aspect_ratio_width = 3;
+		cmd->sample_aspect_ratio_height = 2;
+		return;
+	case V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_2x1:
+		cmd->sample_aspect_ratio_width = 2;
+		cmd->sample_aspect_ratio_height = 1;
+		return;
+	default:
+		break;
+	}
+
+	ctrl = v4l2_ctrl_find(ctx->fh.ctrl_handler, V4L2_CID_MPEG_VIDEO_H264_VUI_EXT_SAR_WIDTH);
+	if (!ctrl)
+		return;
+	w = v4l2_ctrl_g_ctrl(ctrl);
+
+	ctrl = v4l2_ctrl_find(ctx->fh.ctrl_handler, V4L2_CID_MPEG_VIDEO_H264_VUI_EXT_SAR_HEIGHT);
+	if (!ctrl)
+		return;
+	h = v4l2_ctrl_g_ctrl(ctrl);
+	if (!w || !h)
+		return;
+
+	divisor = gcd(w, h);
+	cmd->sample_aspect_ratio_width = w / divisor;
+	cmd->sample_aspect_ratio_height = h / divisor;
+}
+
+void vsi_update_slice_size(struct vsi_v4l2_ctx *ctx)
+{
+	u32 width = ctx->mediacfg.encparams.general.width;
+	u32 height = ctx->mediacfg.encparams.general.height;
+	u32 mbs_per_row = DIV_ROUND_UP(width, 16);
+	u32 mbs_per_col = DIV_ROUND_UP(height, 16);
+	u32 mbs_in_slice;
+	u32 slice_size;
+	struct v4l2_ctrl *ctrl;
+
+	if (ctx->mediacfg.multislice_mode != V4L2_MPEG_VIDEO_MULTI_SLICE_MODE_MAX_MB)
+		return;
+
+	ctrl = v4l2_ctrl_find(ctx->fh.ctrl_handler, V4L2_CID_MPEG_VIDEO_MULTI_SLICE_MAX_MB);
+	if (!ctrl)
+		return;
+
+	mbs_in_slice = v4l2_ctrl_g_ctrl(ctrl);
+	slice_size = clamp(mbs_in_slice / mbs_per_row, 1, mbs_per_col);
+	ctx->mediacfg.encparams.specific.enc_h26x_cmd.sliceSize = slice_size;
 }

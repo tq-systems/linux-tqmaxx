@@ -577,7 +577,6 @@ static void imx8mp_clocks_apply_constraints(const struct imx8mp_clock_constraint
 		clk_hw_set_rate_range(hws[constr->clkid], 0, constr->maxrate);
 }
 
-
 static int imx8mp_clocks_probe(struct platform_device *pdev)
 {
 	struct device *dev = &pdev->dev;

@@ -83,7 +83,6 @@
 		regulator-max-microvolt = <3300000>;
 		gpio = <&gpio2 6 GPIO_ACTIVE_HIGH>;
 		enable-active-high;
-		regulator-always-on;
 	};
 
 	reg_usb_vbus: regulator-vbus {
@@ -795,6 +794,7 @@
 	reset-gpio = <&gpio2 7 GPIO_ACTIVE_LOW>;
 	host-wake-gpio = <&gpio5 21 GPIO_ACTIVE_LOW>;
 	vpcie-supply = <&reg_pcie0>;
+	supports-clkreq;
 	status = "okay";
 };
 
