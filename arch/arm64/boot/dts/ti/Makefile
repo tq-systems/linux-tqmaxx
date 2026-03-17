@@ -243,6 +243,17 @@ dtb-$(CONFIG_ARCH_K3) += k3-j722s-evm-v3link-fusion.dtbo
 dtb-$(CONFIG_ARCH_K3) += k3-j722s-evm-dsi-rpi-7inch-panel.dtbo
 dtb-$(CONFIG_ARCH_K3) += k3-j722s-evm-microtips-mf101hie-panel.dtbo
 
+k3-am67a-tqma67xx-mba67xx-dsi-rpi-7inch-panel-dtbs := \
+	k3-am67a-tqma67xx-mba67xx.dtb k3-am67a-tqma67xx-mba67xx-dsi-rpi-7inch-panel.dtbo
+k3-am67a-tqma67xx-mba67xx-lvds-tm070jdhg30-dtbs := \
+	k3-am67a-tqma67xx-mba67xx.dtb k3-am67a-tqma67xx-mba67xx-lvds-tm070jdhg30.dtbo
+k3-am67a-tqma67xx-mba67xx-lvds-vesa-fhd-dtbs := \
+	k3-am67a-tqma67xx-mba67xx.dtb k3-am67a-tqma67xx-mba67xx-lvds-vesa-fhd.dtbo
+
+dtb-$(CONFIG_ARCH_K3) += k3-am67a-tqma67xx-mba67xx-dsi-rpi-7inch-panel.dtb
+dtb-$(CONFIG_ARCH_K3) += k3-am67a-tqma67xx-mba67xx-lvds-tm070jdhg30.dtb
+dtb-$(CONFIG_ARCH_K3) += k3-am67a-tqma67xx-mba67xx-lvds-vesa-fhd.dtb
+
 # Boards with J784s4 SoC
 dtb-$(CONFIG_ARCH_K3) += k3-am69-sk.dtb
 dtb-$(CONFIG_ARCH_K3) += k3-am69-sk-fpdlink-fusion-auxport.dtbo
