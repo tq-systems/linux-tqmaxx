@@ -8,7 +8,9 @@
 #include <linux/bitfield.h>
 #include <linux/delay.h>
 #include <linux/dev_printk.h>
+#include <linux/i2c.h>
 #include <linux/module.h>
+#include <linux/property.h>
 #include <linux/regmap.h>
 #include <linux/types.h>
 
@@ -191,6 +193,7 @@ struct regmap *devm_cci_regmap_init_i2c(struct i2c_client *client,
 		.val_bits = 8,
 		.reg_format_endian = REGMAP_ENDIAN_BIG,
 		.disable_locking = true,
+		.use_single_read = device_property_read_bool(&client->dev, "use-single-read"),
 	};
 
 	return devm_regmap_init_i2c(client, &config);
