@@ -547,7 +547,6 @@
 	/* X16 M.2 KEY E */
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpuart5>;
-	uart-has-rtscts;
 	status = "okay";
 };
 
@@ -555,7 +554,6 @@
 	/* X5 */
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpuart7>;
-	uart-has-rtscts;
 	status = "okay";
 };
 
@@ -564,7 +562,6 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpuart8>;
 	linux,rs485-enabled-at-boot-time;
-	uart-has-rtscts;
 	status = "okay";
 };
 
