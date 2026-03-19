@@ -60,6 +60,7 @@
 };
 
 &oldi1 {
+	ti,companion-oldi = <&oldi0>;
 	ti,secondary-oldi;
 	status = "okay";
 };
