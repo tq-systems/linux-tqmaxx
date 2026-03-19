@@ -214,6 +214,7 @@ static const struct k3_rproc_dev_data c66_data = {
 	.num_mems = ARRAY_SIZE(c66_mems),
 	.boot_align_addr = SZ_1K,
 	.uses_lreset = true,
+	.fw_suspend_handshake = false,
 };
 
 static const struct k3_rproc_dev_data c71_data = {
@@ -221,6 +222,7 @@ static const struct k3_rproc_dev_data c71_data = {
 	.num_mems = ARRAY_SIZE(c71_mems),
 	.boot_align_addr = SZ_2M,
 	.uses_lreset = false,
+	.fw_suspend_handshake = false,
 };
 
 static const struct k3_rproc_dev_data c7xv_data = {
@@ -228,6 +230,7 @@ static const struct k3_rproc_dev_data c7xv_data = {
 	.num_mems = ARRAY_SIZE(c7xv_mems),
 	.boot_align_addr = SZ_2M,
 	.uses_lreset = true,
+	.fw_suspend_handshake = true,
 };
 
 static const struct k3_rproc_dev_data j722s_c7xv_data = {
@@ -235,6 +238,7 @@ static const struct k3_rproc_dev_data j722s_c7xv_data = {
 	.num_mems = ARRAY_SIZE(c7xv_mems),
 	.boot_align_addr = SZ_2M,
 	.uses_lreset = false,
+	.fw_suspend_handshake = false,
 };
 
 static const struct of_device_id k3_dsp_of_match[] = {

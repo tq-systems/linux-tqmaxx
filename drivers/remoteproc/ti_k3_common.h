@@ -49,12 +49,14 @@ struct k3_rproc_mem_data {
  * @num_mems: number of memory regions in @mems
  * @boot_align_addr: boot vector address alignment granularity
  * @uses_lreset: flag to denote the need for local reset management
+ * @fw_suspend_handshake: flag to denote if firmware supports suspend handshake
  */
 struct k3_rproc_dev_data {
 	const struct k3_rproc_mem_data *mems;
 	u32 num_mems;
 	u32 boot_align_addr;
 	bool uses_lreset;
+	bool fw_suspend_handshake;
 };
 
 /**

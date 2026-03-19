@@ -147,6 +147,7 @@ static const struct k3_rproc_dev_data am64_m4_data = {
 	.num_mems = ARRAY_SIZE(am64_m4_mems),
 	.boot_align_addr = SZ_1K,
 	.uses_lreset = true,
+	.fw_suspend_handshake = true,
 };
 
 static const struct of_device_id k3_m4_of_match[] = {

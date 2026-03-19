@@ -113,6 +113,126 @@
 			status = "disabled";
 		};
 	};
+
+	watchdog4: watchdog@2240000 {
+		compatible = "ti,j7-rti-wdt";
+		reg = <0x00 0x2240000 0x00 0x100>;
+		clocks = <&k3_clks 352 0>;
+		power-domains = <&k3_pds 352 TI_SCI_PD_EXCLUSIVE>;
+		assigned-clocks = <&k3_clks 352 0>;
+		assigned-clock-parents = <&k3_clks 352 4>;
+	};
+
+	watchdog5: watchdog@2250000 {
+		compatible = "ti,j7-rti-wdt";
+		reg = <0x00 0x2250000 0x00 0x100>;
+		clocks = <&k3_clks 353 0>;
+		power-domains = <&k3_pds 353 TI_SCI_PD_EXCLUSIVE>;
+		assigned-clocks = <&k3_clks 353 0>;
+		assigned-clock-parents = <&k3_clks 353 4>;
+	};
+
+	watchdog6: watchdog@2260000 {
+		compatible = "ti,j7-rti-wdt";
+		reg = <0x00 0x2260000 0x00 0x100>;
+		clocks = <&k3_clks 354 0>;
+		power-domains = <&k3_pds 354 TI_SCI_PD_EXCLUSIVE>;
+		assigned-clocks = <&k3_clks 354 0>;
+		assigned-clock-parents = <&k3_clks 354 4>;
+	};
+
+	watchdog7: watchdog@2270000 {
+		compatible = "ti,j7-rti-wdt";
+		reg = <0x00 0x2270000 0x00 0x100>;
+		clocks = <&k3_clks 355 0>;
+		power-domains = <&k3_pds 355 TI_SCI_PD_EXCLUSIVE>;
+		assigned-clocks = <&k3_clks 355 0>;
+		assigned-clock-parents = <&k3_clks 355 4>;
+	};
+
+	memorycontroller0: memory-controller@2980000 {
+		compatible = "ti,j7-ddrss";
+		reg = <0x0 0x02980000 0x0 0x200>;
+		reg-names = "ss_cfg";
+		ranges = <0x00 0x00 0x00 0x02990000 0x00 0x00004000>;
+		interrupts = <GIC_SPI 216 IRQ_TYPE_LEVEL_HIGH>;
+		power-domains = <&k3_pds 191 TI_SCI_PD_SHARED>,
+				<&k3_pds 46 TI_SCI_PD_SHARED>;
+		clocks = <&k3_clks 191 1>;
+		#address-cells = <2>;
+		#size-cells = <2>;
+
+		ddr0: ddr@0 {
+			compatible = "cdns,j7-ddr";
+			reg = <0x00 0x0000 0x00 0x72c>,
+				  <0x00 0x2000 0x00 0x4b0>,
+				  <0x00 0x4000 0x00 0x163c>;
+			reg-names = "ctl_cfg", "ctl_cfg_pi", "ctl_cfg_phy";
+		};
+	};
+
+	memorycontroller1: memory-controller@29a0000 {
+		compatible = "ti,j7-ddrss";
+		reg = <0x0 0x029a0000 0x0 0x200>;
+		reg-names = "ss_cfg";
+		ranges = <0x00 0x00 0x00 0x029b0000 0x00 0x00004000>;
+		interrupts = <GIC_SPI 220 IRQ_TYPE_LEVEL_HIGH>;
+		power-domains = <&k3_pds 192 TI_SCI_PD_SHARED>,
+				<&k3_pds 47 TI_SCI_PD_SHARED>;
+		clocks = <&k3_clks 192 1>;
+		#address-cells = <2>;
+		#size-cells = <2>;
+
+		ddr1: ddr@0 {
+			compatible = "cdns,j7-ddr";
+			reg = <0x00 0x0000 0x00 0x72c>,
+				  <0x00 0x2000 0x00 0x4b0>,
+				  <0x00 0x4000 0x00 0x163c>;
+			reg-names = "ctl_cfg", "ctl_cfg_pi", "ctl_cfg_phy";
+		};
+	};
+
+	memorycontroller2: memory-controller@29c0000 {
+		compatible = "ti,j7-ddrss";
+		reg = <0x0 0x029c0000 0x0 0x200>;
+		reg-names = "ss_cfg";
+		ranges = <0x00 0x00 0x00 0x029d0000 0x00 0x00004000>;
+		interrupts = <GIC_SPI 244 IRQ_TYPE_LEVEL_HIGH>;
+		power-domains = <&k3_pds 193 TI_SCI_PD_SHARED>,
+				<&k3_pds 48 TI_SCI_PD_SHARED>;
+		clocks = <&k3_clks 193 1>;
+		#address-cells = <2>;
+		#size-cells = <2>;
+
+		ddr2: ddr@0 {
+			compatible = "cdns,j7-ddr";
+			reg = <0x00 0x0000 0x00 0x72c>,
+				  <0x00 0x2000 0x00 0x4b0>,
+				  <0x00 0x4000 0x00 0x163c>;
+			reg-names = "ctl_cfg", "ctl_cfg_pi", "ctl_cfg_phy";
+		};
+	};
+
+	memorycontroller3: memory-controller@29e0000 {
+		compatible = "ti,j7-ddrss";
+		reg = <0x0 0x029e0000 0x0 0x200>;
+		reg-names = "ss_cfg";
+		ranges = <0x00 0x00 0x00 0x029f0000 0x00 0x00004000>;
+		interrupts = <GIC_SPI 534 IRQ_TYPE_LEVEL_HIGH>;
+		power-domains = <&k3_pds 194 TI_SCI_PD_SHARED>,
+				<&k3_pds 49 TI_SCI_PD_SHARED>;
+		clocks = <&k3_clks 194 1>;
+		#address-cells = <2>;
+		#size-cells = <2>;
+
+		ddr3: ddr@0 {
+			compatible = "cdns,j7-ddr";
+			reg = <0x00 0x0000 0x00 0x72c>,
+				  <0x00 0x2000 0x00 0x4b0>,
+				  <0x00 0x4000 0x00 0x163c>;
+			reg-names = "ctl_cfg", "ctl_cfg_pi", "ctl_cfg_phy";
+		};
+	};
 };
 
 &scm_conf {
