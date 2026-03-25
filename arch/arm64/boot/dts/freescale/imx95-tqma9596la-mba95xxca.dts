@@ -308,11 +308,9 @@
 		typec_con: connector {
 			compatible = "usb-c-connector";
 			label = "X9";
-			power-role = "dual";
+			power-role = "source";
 			data-role = "dual";
-			try-power-role = "sink";
-			typec-power-opmode = "default";
-			pd-disable;
+			source-pdos = <PDO_FIXED(5000, 500, PDO_FIXED_USB_COMM)>;
 			self-powered;
 
 			port {
