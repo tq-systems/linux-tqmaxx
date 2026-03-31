@@ -16,20 +16,6 @@
 		reg = <0x0 0x40000000 0 0x80000000>;
 	};
 
-	reg_usdhc2_vqmmc: regulator-usdhc2-vqmmc {
-		compatible = "regulator-gpio";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_reg_usdhc2_vqmmc>;
-		regulator-name = "V_SD2";
-		regulator-min-microvolt = <1800000>;
-		regulator-max-microvolt = <3300000>;
-		gpios = <&gpio1 4 GPIO_ACTIVE_HIGH>;
-		states = <1800000 0x1>,
-			 <3300000 0x0>;
-		vin-supply = <&ldo5_reg>;
-		status = "disabled";
-	};
-
 	reg_5v_in: regulator-5v-in {
 		compatible = "regulator-fixed";
 		regulator-name = "V_5V_IN";
