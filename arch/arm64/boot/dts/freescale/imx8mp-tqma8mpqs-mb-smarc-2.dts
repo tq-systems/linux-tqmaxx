@@ -348,9 +348,13 @@
 	status = "okay";
 };
 
-&reg_sdvmmc {
+&reg_usdhc2_vmmc {
 	startup-delay-us = <100>;
 	off-on-delay-us = <200000>;
+	status = "okay";
+};
+
+&reg_usdhc2_vqmmc {
 	status = "okay";
 };
 
@@ -395,7 +399,7 @@
 &usdhc2 {
 	cd-gpios = <&gpio2 12 GPIO_ACTIVE_LOW>;
 	wp-gpios = <&gpio2 20 GPIO_ACTIVE_HIGH>;
-	vmmc-supply = <&reg_sdvmmc>;
+	vmmc-supply = <&reg_usdhc2_vmmc>;
 	no-mmc;
 	no-sdio;
 	status = "okay";
