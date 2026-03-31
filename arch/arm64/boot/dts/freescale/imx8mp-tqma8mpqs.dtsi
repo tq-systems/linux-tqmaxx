@@ -279,13 +279,6 @@
 		input;
 		line-name = "PEWAKE#";
 	};
-
-	rtc-int-hog {
-		gpio-hog;
-		gpios = <27 0>;
-		input;
-		line-name = "RTC_INT#";
-	};
 };
 
 &gpio3 {
@@ -313,7 +306,7 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_gpio4>, <&pinctrl_sdp>, <&pinctrl_espi_rst>;
 
-	gpio-line-names = "", "GPIO8", "", "",
+	gpio-line-names = "RTC_INT#", "GPIO8", "", "",
 			  "GPIO9", "ESPI_RST#", "", "",
 			  "", "", "", "",
 			  "", "", "GBE0_SDP_DIR", "",
@@ -321,6 +314,13 @@
 			  "", "", "", "",
 			  "", "GPIO0", "GPIO1", "",
 			  "GPIO2", "GPIO6", "", "";
+
+	rtc-int-hog {
+		gpio-hog;
+		gpios = <0 0>;
+		input;
+		line-name = "RTC_INT#";
+	};
 
 	espi-reset-hog {
 		gpio-hog;
@@ -379,8 +379,8 @@
 		quartz-load-femtofarads = <7000>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_pcf85063>;
-		interrupt-parent = <&gpio2>;
-		interrupts = <27 IRQ_TYPE_EDGE_FALLING>;
+		interrupt-parent = <&gpio4>;
+		interrupts = <0 IRQ_TYPE_EDGE_FALLING>;
 	};
 
 	eeprom1: eeprom@54 {
