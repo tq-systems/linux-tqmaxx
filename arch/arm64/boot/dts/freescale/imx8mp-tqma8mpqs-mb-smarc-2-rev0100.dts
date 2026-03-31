@@ -1,0 +1,25 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright (c) 2026 TQ-Systems GmbH <linux@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Markus Niebel
+ */
+
+#include "imx8mp-tqma8mpqs-mb-smarc-2.dts"
+
+/ {
+	model = "TQ-Systems i.MX8MPlus TQMa8MPxS (Prototype) on MB-SMARC-2";
+};
+
+&pinctrl_uart2 {
+	fsl,pins = <MX8MP_IOMUXC_UART2_TXD__UART2_DCE_TX	0x140>,
+		   <MX8MP_IOMUXC_UART2_RXD__UART2_DCE_RX	0x140>,
+		   <MX8MP_IOMUXC_SD1_DATA4__GPIO2_IO06		0x140>,
+		   <MX8MP_IOMUXC_SD1_DATA5__GPIO2_IO07		0x140>;
+};
+
+&uart2 {
+	/delete-property/ uart-has-rtscts;
+	rts-gpios = <&gpio2 6 GPIO_ACTIVE_LOW>;
+	cts-gpios = <&gpio2 7 GPIO_ACTIVE_LOW>;
+};
