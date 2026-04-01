@@ -678,8 +678,7 @@
 	pinctrl-0 = <&pinctrl_uart2>;
 	assigned-clocks = <&clk IMX8MP_CLK_UART2>;
 	assigned-clock-parents = <&clk IMX8MP_SYS_PLL1_80M>;
-	rts-gpios = <&gpio2 6 GPIO_ACTIVE_LOW>;
-	cts-gpios = <&gpio2 7 GPIO_ACTIVE_LOW>;
+	uart-has-rtscts;
 };
 
 &uart3 {
@@ -1028,8 +1027,8 @@
 	pinctrl_uart2: uart2grp {
 		fsl,pins = <MX8MP_IOMUXC_UART2_TXD__UART2_DCE_TX	0x140>,
 			   <MX8MP_IOMUXC_UART2_RXD__UART2_DCE_RX	0x140>,
-			   <MX8MP_IOMUXC_SD1_DATA4__GPIO2_IO06		0x140>,
-			   <MX8MP_IOMUXC_SD1_DATA5__GPIO2_IO07		0x140>;
+			   <MX8MP_IOMUXC_SD1_DATA4__UART2_DCE_RTS	0x140>,
+			   <MX8MP_IOMUXC_SD1_DATA5__UART2_DCE_CTS	0x140>;
 	};
 
 	pinctrl_uart3: uart3grp {
