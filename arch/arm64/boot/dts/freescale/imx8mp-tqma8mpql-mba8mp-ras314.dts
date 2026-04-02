@@ -151,6 +151,7 @@
 	sound {
 		compatible = "fsl,imx-audio-tlv320aic32x4";
 		model = "tq-mba8mp-ras314";
+		audio-asrc = <&easrc>;
 		audio-cpu = <&sai5>;
 		audio-codec = <&tlv320aic3x04>;
 		audio-routing =
