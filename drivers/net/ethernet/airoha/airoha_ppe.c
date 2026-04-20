@@ -201,7 +201,9 @@ static int airoha_ppe_get_wdma_info(struct net_device *dev, const u8 *addr,
 	if (!dev)
 		return -ENODEV;
 
+	rcu_read_lock();
 	err = dev_fill_forward_path(dev, addr, &stack);
+	rcu_read_unlock();
 	if (err)
 		return err;
 
@@ -1466,13 +1468,16 @@ void airoha_ppe_deinit(struct airoha_eth *eth)
 {
 	struct airoha_npu *npu;
 
-	rcu_read_lock();
-	npu = rcu_dereference(eth->npu);
+	mutex_lock(&flow_offload_mutex);
+
+	npu = rcu_replace_pointer(eth->npu, NULL,
+				  lockdep_is_held(&flow_offload_mutex));
 	if (npu) {
 		npu->ops.ppe_deinit(npu);
 		airoha_npu_put(npu);
 	}
-	rcu_read_unlock();
+
+	mutex_unlock(&flow_offload_mutex);
 
 	rhashtable_destroy(&eth->ppe->l2_flows);
 	rhashtable_destroy(&eth->flow_table);

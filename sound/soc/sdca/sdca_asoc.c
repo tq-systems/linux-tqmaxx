@@ -16,6 +16,7 @@
 #include <linux/minmax.h>
 #include <linux/module.h>
 #include <linux/overflow.h>
+#include <linux/pm_runtime.h>
 #include <linux/regmap.h>
 #include <linux/soundwire/sdw_registers.h>
 #include <linux/string_helpers.h>
@@ -795,7 +796,6 @@ static int control_limit_kctl(struct device *dev,
 	struct sdca_control_range *range;
 	int min, max, step;
 	unsigned int *tlv;
-	int shift;
 
 	if (control->type != SDCA_CTL_DATATYPE_Q7P8DB)
 		return 0;
@@ -814,42 +814,69 @@ static int control_limit_kctl(struct device *dev,
 	min = sign_extend32(min, control->nbits - 1);
 	max = sign_extend32(max, control->nbits - 1);
 
-	/*
-	 * FIXME: Only support power of 2 step sizes as this can be supported
-	 * by a simple shift.
-	 */
-	if (hweight32(step) != 1) {
-		dev_err(dev, "%s: %s: currently unsupported step size\n",
-			entity->label, control->label);
-		return -EINVAL;
-	}
-
-	/*
-	 * The SDCA volumes are in steps of 1/256th of a dB, a step down of
-	 * 64 (shift of 6) gives 1/4dB. 1/4dB is the smallest unit that is also
-	 * representable in the ALSA TLVs which are in 1/100ths of a dB.
-	 */
-	shift = max(ffs(step) - 1, 6);
-
 	tlv = devm_kcalloc(dev, 4, sizeof(*tlv), GFP_KERNEL);
 	if (!tlv)
 		return -ENOMEM;
 
-	tlv[0] = SNDRV_CTL_TLVT_DB_SCALE;
+	tlv[0] = SNDRV_CTL_TLVT_DB_MINMAX;
 	tlv[1] = 2 * sizeof(*tlv);
 	tlv[2] = (min * 100) >> 8;
-	tlv[3] = ((1 << shift) * 100) >> 8;
+	tlv[3] = (max * 100) >> 8;
 
-	mc->min = min >> shift;
-	mc->max = max >> shift;
-	mc->shift = shift;
-	mc->rshift = shift;
-	mc->sign_bit = 15 - shift;
+	step = (step * 100) >> 8;
+
+	mc->min = ((int)tlv[2] / step);
+	mc->max = ((int)tlv[3] / step);
+	mc->shift = step;
+	mc->sign_bit = 15;
+	mc->sdca_q78 = 1;
 
 	kctl->tlv.p = tlv;
 	kctl->access |= SNDRV_CTL_ELEM_ACCESS_TLV_READ;
 
 	return 0;
+}
+
+static int volatile_get_volsw(struct snd_kcontrol *kcontrol,
+			      struct snd_ctl_elem_value *ucontrol)
+{
+	struct snd_soc_component *component = snd_kcontrol_chip(kcontrol);
+	struct device *dev = component->dev;
+	int ret;
+
+	ret = pm_runtime_resume_and_get(dev);
+	if (ret < 0) {
+		dev_err(dev, "failed to resume reading %s: %d\n",
+			kcontrol->id.name, ret);
+		return ret;
+	}
+
+	ret = snd_soc_get_volsw(kcontrol, ucontrol);
+
+	pm_runtime_put(dev);
+
+	return ret;
+}
+
+static int volatile_put_volsw(struct snd_kcontrol *kcontrol,
+			      struct snd_ctl_elem_value *ucontrol)
+{
+	struct snd_soc_component *component = snd_kcontrol_chip(kcontrol);
+	struct device *dev = component->dev;
+	int ret;
+
+	ret = pm_runtime_resume_and_get(dev);
+	if (ret < 0) {
+		dev_err(dev, "failed to resume writing %s: %d\n",
+			kcontrol->id.name, ret);
+		return ret;
+	}
+
+	ret = snd_soc_put_volsw(kcontrol, ucontrol);
+
+	pm_runtime_put(dev);
+
+	return ret;
 }
 
 static int populate_control(struct device *dev,
@@ -906,8 +933,13 @@ static int populate_control(struct device *dev,
 	(*kctl)->private_value = (unsigned long)mc;
 	(*kctl)->iface = SNDRV_CTL_ELEM_IFACE_MIXER;
 	(*kctl)->info = snd_soc_info_volsw;
-	(*kctl)->get = snd_soc_get_volsw;
-	(*kctl)->put = snd_soc_put_volsw;
+	if (control->is_volatile) {
+		(*kctl)->get = volatile_get_volsw;
+		(*kctl)->put = volatile_put_volsw;
+	} else {
+		(*kctl)->get = snd_soc_get_volsw;
+		(*kctl)->put = snd_soc_put_volsw;
+	}
 
 	if (readonly_control(control))
 		(*kctl)->access = SNDRV_CTL_ELEM_ACCESS_READ;
@@ -1535,7 +1567,7 @@ static int set_usage(struct device *dev, struct regmap *regmap,
 		unsigned int rate = sdca_range(range, SDCA_USAGE_SAMPLE_RATE, i);
 		unsigned int width = sdca_range(range, SDCA_USAGE_SAMPLE_WIDTH, i);
 
-		if ((!rate || rate == target_rate) && width == target_width) {
+		if ((!rate || rate == target_rate) && (!width || width == target_width)) {
 			unsigned int usage = sdca_range(range, SDCA_USAGE_NUMBER, i);
 			unsigned int reg = SDW_SDCA_CTL(function->desc->adr,
 							entity->id, sel, 0);
