@@ -209,6 +209,11 @@
 	status = "okay";
 };
 
+&vpuctrl {
+	boot = <&vpu_boot>;
+	sram = <&sram1>;
+};
+
 &wdog3 {
 	status = "okay";
 };

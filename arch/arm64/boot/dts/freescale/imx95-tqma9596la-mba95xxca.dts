@@ -200,6 +200,21 @@
 			alloc-ranges = <0 0x80000000 0 0x80000000>;
 			linux,cma-default;
 		};
+
+		vpu_boot: vpu-boot@a0000000 {
+			reg = <0 0xa0000000 0 0x100000>;
+			no-map;
+		};
+
+		mali_protected: mali_protected {
+			reg = <0 0xa0100000 0 0x1000000>;
+			no-map;
+		};
+	};
+
+	mali_pma: protected-memory-allocator {
+		compatible = "arm,protected-memory-allocator";
+		memory-region = <&mali_protected>;
 	};
 
 	sfp_xfi: sfp-xfi {
@@ -543,6 +558,10 @@
 	status = "okay";
 };
 
+&neoisp0 {
+	status = "okay";
+};
+
 &netc_blk_ctrl {
 	status = "okay";
 };
@@ -772,6 +791,7 @@
 	pinctrl-2 = <&pinctrl_usdhc2_200mhz>;
 	vmmc-supply = <&reg_sdvmmc>;
 	cd-gpios = <&gpio3 0 GPIO_ACTIVE_LOW>;
+	fsl,cd-gpio-wakeup-disable;
 	no-mmc;
 	no-sdio;
 	disable-wp;
