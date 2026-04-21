@@ -276,6 +276,10 @@
 	status = "okay";
 };
 
+&netc_timer {
+	status = "okay";
+};
+
 /* X44 mPCIe */
 &pcie0 {
 	status = "okay";

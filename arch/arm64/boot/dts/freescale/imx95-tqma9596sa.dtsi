@@ -118,10 +118,6 @@
 	phy-mode = "rgmii-id";
 };
 
-&netc_timer {
-	status = "okay";
-};
-
 &flexcan1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_flexcan1>;
