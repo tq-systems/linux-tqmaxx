@@ -885,10 +885,8 @@ static int enetc4_pf_init(struct enetc_pf *pf)
 
 	/* Initialize the MAC address for PF and VFs */
 	err = enetc_setup_mac_addresses(dev->of_node, pf);
-	if (err) {
-		dev_err(dev, "Failed to set MAC addresses\n");
-		return err;
-	}
+	if (err)
+		return dev_err_probe(dev, err, "Failed to set MAC addresses\n");
 
 	err = enetc4_init_ntmp_user(pf->si);
 	if (err) {
