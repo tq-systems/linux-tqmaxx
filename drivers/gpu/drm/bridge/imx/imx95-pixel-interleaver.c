@@ -319,8 +319,9 @@ static int imx95_pinter_probe(struct platform_device *pdev)
 		if (!ch->next_bridge) {
 			of_node_put(remote_port);
 			ret = -EPROBE_DEFER;
-			dev_dbg(dev, "channel%u failed to find next bridge: %d\n",
-				i, ret);
+			dev_err_probe(dev, ret,
+				      "channel%u failed to find next bridge\n",
+				      i);
 			goto free_child;
 		}
 
