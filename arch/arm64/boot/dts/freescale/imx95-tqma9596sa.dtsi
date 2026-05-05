@@ -44,6 +44,11 @@
 			reg = <0 0xa0000000 0 0x100000>;
 			no-map;
 		};
+
+		mali_protected: mali_protected {
+			reg = <0 0xa0100000 0 0x1000000>;
+			no-map;
+		};
 	};
 
 	clk_dp: clk-dp {
@@ -56,6 +61,11 @@
 		compatible = "fixed-clock";
 		#clock-cells = <0>;
 		clock-frequency = <25000000>;
+	};
+
+	mali_pma: protected-memory-allocator {
+		compatible = "arm,protected-memory-allocator";
+		memory-region = <&mali_protected>;
 	};
 
 	reg_1v8: regulator-1v8 {
@@ -389,6 +399,10 @@
 	};
 };
 
+&neoisp0 {
+	status = "okay";
+};
+
 &netc_blk_ctrl {
 	status = "okay";
 };
@@ -431,6 +445,10 @@
 		ti,dp83867-rxctrl-strap-quirk;
 		ti,clk-output-sel = <DP83867_CLK_O_SEL_OFF>;
 	};
+};
+
+&netc_timer {
+	status = "okay";
 };
 
 &pcie0 {
