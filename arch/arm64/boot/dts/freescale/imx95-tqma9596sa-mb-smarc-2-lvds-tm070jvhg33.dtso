@@ -14,6 +14,10 @@
 	status = "okay";
 };
 
+&display_pixel_link {
+	status = "okay";
+};
+
 &dpu {
 	status = "okay";
 };
@@ -38,6 +42,14 @@
 &panel_lvds0 {
 	compatible = "tianma,tm070jvhg33";
 	status = "okay";
+};
+
+&pixel_interleaver {
+	status = "okay";
+
+	channel@0 {
+		status = "okay";
+	};
 };
 
 &tpm3 {

@@ -98,9 +98,6 @@
 	};
 };
 
-&display_pixel_link {
-	status = "okay";
-};
 
 &displaymix_irqsteer {
 	status = "okay";
@@ -473,14 +470,6 @@
 		 <&pcieclk 0>;
 	clock-names = "pcie", "pcie_bus", "pcie_phy", "pcie_aux", "ref";
 	reset-gpios = <&expander2 10 GPIO_ACTIVE_LOW>;
-};
-
-&pixel_interleaver {
-	status = "okay";
-
-	channel@0 {
-		status = "okay";
-	};
 };
 
 &sai3 {
