@@ -313,6 +313,12 @@
 	pinctrl-0 = <&pinctrl_ecspi2>;
 	cs-gpios = <&gpio5 13 GPIO_ACTIVE_LOW>;
 	status = "okay";
+
+	spidev0_0: spidev0@0 {
+		compatible = "tq,testdev";
+		reg = <0>;
+		spi-max-frequency = <5000000>;
+	};
 };
 
 &ecspi3 {
