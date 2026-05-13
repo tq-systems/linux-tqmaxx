@@ -562,6 +562,8 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpspi4>;
 	cs-gpios = <&gpio5 14 GPIO_ACTIVE_LOW>, <&gpio5 13 GPIO_ACTIVE_LOW>;
+	/* per datasheet, without SCK loopback via pad (LPSPI_CFGR1[SAMPLE]) */
+	spi-max-frequency = <30000000>;
 	status = "okay";
 
 	spidev0: spi@0 {
