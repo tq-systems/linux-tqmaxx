@@ -98,7 +98,6 @@
 	};
 };
 
-
 &displaymix_irqsteer {
 	status = "okay";
 };
