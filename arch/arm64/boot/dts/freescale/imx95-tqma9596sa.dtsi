@@ -359,6 +359,8 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpspi3>;
 	cs-gpios = <&gpio2 8 GPIO_ACTIVE_LOW>, <&gpio2 7 GPIO_ACTIVE_LOW>;
+	/* per datasheet, without SCK loopback via pad (LPSPI_CFGR1[SAMPLE]) */
+	spi-max-frequency = <30000000>;
 };
 
 /* SER0 */
