@@ -268,20 +268,6 @@
 		/* 20 */ "", "", "", "",
 		/* 24 */ "", "", "", "",
 		/* 28 */ "", "", "", "";
-
-	expander-irq-hog {
-		gpio-hog;
-		gpios = <12 GPIO_ACTIVE_LOW>;
-		input;
-		line-name = "PEX_INT#";
-	};
-
-	rtc-irq-hog {
-		gpio-hog;
-		gpios = <14 GPIO_ACTIVE_LOW>;
-		input;
-		line-name = "RTC_EVENT#";
-	};
 };
 
 &gpio2 {
@@ -309,20 +295,6 @@
 		/* 20 */ "", "", "", "",
 		/* 24 */ "", "", "ENET1_INT#", "ENET2_INT#",
 		/* 28 */ "", "", "", "";
-
-	ethphy-eqos-irq-hog {
-		gpio-hog;
-		gpios = <26 GPIO_ACTIVE_LOW>;
-		input;
-		line-name = "ENET1_INT#";
-	};
-
-	ethphy-fec-irq-hog {
-		gpio-hog;
-		gpios = <27 GPIO_ACTIVE_LOW>;
-		input;
-		line-name = "ENET2_INT#";
-	};
 };
 
 &gpio4 {
@@ -335,13 +307,6 @@
 		/* 20 */ "", "", "", "",
 		/* 24 */ "", "", "", "",
 		/* 28 */ "", "DP_INT", "", "";
-
-	dp-int-hog {
-		gpio-hog;
-		gpios = <29 GPIO_ACTIVE_LOW>;
-		input;
-		line-name = "DP_INT";
-	};
 };
 
 &ldb {
