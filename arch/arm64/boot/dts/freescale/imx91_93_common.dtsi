@@ -1144,7 +1144,7 @@
 
 					port@1 {
 						reg = <1>;
-						endpoint {
+						dpi_to_panel: endpoint {
 						};
 					};
 				};
