@@ -36,10 +36,10 @@
 		i2c2 = &lpi2c3;
 		mmc0 = &usdhc1;
 		mmc1 = &usdhc2;
-		serial0 = &lpuart1;
-		serial1 = &lpuart2;
 		rtc0 = &pcf85063;
 		rtc1 = &bbnsm_rtc;
+		serial0 = &lpuart1;
+		serial1 = &lpuart2;
 	};
 
 	backlight: backlight {
