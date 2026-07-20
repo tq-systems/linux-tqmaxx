@@ -1008,9 +1008,6 @@ static void disp_mix_gasket_config(struct csi_state *state)
 		break;
 
 	case MEDIA_BUS_FMT_Y10_1X10:
-		fmt_val = GASKET_0_CTRL_DATA_TYPE_RAW10;
-		break;
-	case MEDIA_BUS_FMT_Y10_1X10:
 	case MEDIA_BUS_FMT_SBGGR10_1X10:
 	case MEDIA_BUS_FMT_SGBRG10_1X10:
 	case MEDIA_BUS_FMT_SGRBG10_1X10:
