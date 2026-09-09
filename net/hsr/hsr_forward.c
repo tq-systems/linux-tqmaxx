@@ -18,19 +18,6 @@
 
 struct hsr_node;
 
-static void hsr_parse_req_master(struct hsr_frame_info *frame,
-				 unsigned int *port,
-				 bool *header)
-{
-	*port = HSR_PT_NONE;
-	*header = false;
-
-	if (!frame->skb_std)
-		return;
-
-	hsr_skb_get_header_port(frame->skb_std, header, port);
-}
-
 static inline int is_hsr_l2ptp(struct sk_buff *skb)
 {
 	struct hsr_ethhdr *hsr_ethhdr;
@@ -377,19 +364,21 @@ struct sk_buff *hsr_create_tagged_frame(struct hsr_frame_info *frame,
 		/* set the lane id properly */
 		hsr_set_path_id(frame, hsr_ethhdr, port);
 		return skb_clone(frame->skb_hsr, GFP_ATOMIC);
-	} else if (port->dev->features & NETIF_F_HW_HSR_TAG_INS) {
-		skb = skb_clone(frame->skb_std, GFP_ATOMIC);
-		if (hsr_skb_has_port(skb))
-			skb_set_owner_w(skb, frame->skb_std->sk);
-		return skb;
 	}
 
-	/* Create the new skb with enough headroom to fit the HSR tag */
-	skb = __pskb_copy(frame->skb_std,
-			  skb_headroom(frame->skb_std) + HSR_HLEN, GFP_ATOMIC);
+	skb = skb_clone(frame->skb_std, GFP_ATOMIC);
 	if (!skb)
 		return NULL;
-	skb_reset_mac_header(skb);
+
+	if (frame->req_tx_port != HSR_PT_NONE)
+		skb_set_owner_w(skb, frame->skb_std->sk);
+
+	if (port->dev->features & NETIF_F_HW_HSR_TAG_INS)
+		return skb;
+
+	/* Ensure the cloned skb has enough headroom to fit the HSR tag */
+	if (skb_cow_head(skb, HSR_HLEN))
+		goto err;
 
 	if (skb->ip_summed == CHECKSUM_PARTIAL)
 		skb->csum_start += HSR_HLEN;
@@ -398,19 +387,16 @@ struct sk_buff *hsr_create_tagged_frame(struct hsr_frame_info *frame,
 	if (frame->is_vlan)
 		movelen += VLAN_HLEN;
 
+	/* The entire header area needs to be linear */
+	if (!pskb_may_pull(skb, HSR_HLEN + movelen))
+		goto err;
+
 	src = skb_mac_header(skb);
 	dst = skb_push(skb, HSR_HLEN);
 	memmove(dst, src, movelen);
+	skb_set_network_header(skb, ETH_HLEN + HSR_HLEN);
 	skb_reset_mac_header(skb);
-
-	if (hsr_skb_has_port(skb)) {
-		/* Packets are bound to a port and the sender may expect time
-		 * information.
-		 */
-		skb_shinfo(skb)->tx_flags = skb_shinfo(frame->skb_std)->tx_flags;
-		skb_shinfo(skb)->tskey = skb_shinfo(frame->skb_std)->tskey;
-		skb_set_owner_w(skb, frame->skb_std->sk);
-	}
+	skb_reset_mac_len(skb);
 
 	/* skb_put_padto free skb on error and hsr_fill_tag returns NULL in
 	 * that case
@@ -442,6 +428,9 @@ struct sk_buff *hsr_create_tagged_frame(struct hsr_frame_info *frame,
 	}
 
 	return skb;
+err:
+	kfree(skb);
+	return NULL;
 }
 
 struct sk_buff *prp_create_tagged_frame(struct hsr_frame_info *frame,
@@ -460,23 +449,12 @@ struct sk_buff *prp_create_tagged_frame(struct hsr_frame_info *frame,
 		}
 		return skb_clone(frame->skb_prp, GFP_ATOMIC);
 	} else if (port->dev->features & NETIF_F_HW_HSR_TAG_INS) {
-		skb = skb_clone(frame->skb_std, GFP_ATOMIC);
-		if (hsr_skb_has_port(skb))
-			skb_set_owner_w(skb, frame->skb_std->sk);
-		return skb;
+		return skb_clone(frame->skb_std, GFP_ATOMIC);
 	}
 
 	skb = skb_copy_expand(frame->skb_std, skb_headroom(frame->skb_std),
 			      skb_tailroom(frame->skb_std) + HSR_HLEN,
 			      GFP_ATOMIC);
-	if (hsr_skb_has_port(skb)) {
-		/* Packets are bound to a port and the sender may expect time
-		 * information.
-		 */
-		skb_shinfo(skb)->tx_flags = skb_shinfo(frame->skb_std)->tx_flags;
-		skb_shinfo(skb)->tskey = skb_shinfo(frame->skb_std)->tskey;
-		skb_set_owner_w(skb, frame->skb_std->sk);
-	}
 	return prp_fill_rct(skb, frame, port);
 }
 
@@ -660,17 +638,13 @@ hsr_directed_tx_ports(struct hsr_frame_info *frame)
 static void hsr_forward_do(struct hsr_frame_info *frame)
 {
 	unsigned int dir_ports = 0;
-	unsigned int req_tx_port;
-	bool req_tx_keep_header;
 	struct hsr_port *port;
 	bool sent = false;
 
-	hsr_parse_req_master(frame, &req_tx_port, &req_tx_keep_header);
-
 	hsr_for_each_port(frame->port_rcv->hsr, port) {
 		struct hsr_priv *hsr = port->hsr;
-		unsigned int skb_rx_port = 0;
 		struct sk_buff *skb = NULL;
+
 		/* Don't send frame back the way it came */
 		if (port == frame->port_rcv)
 			continue;
@@ -689,32 +663,13 @@ static void hsr_forward_do(struct hsr_frame_info *frame)
 		if ((port->dev->features & NETIF_F_HW_HSR_DUP) && sent)
 			continue;
 
-		/* RX PTP packets have the received port recorded */
-		if (frame->skb_hsr)
-			skb = frame->skb_hsr;
-		else if (frame->skb_prp)
-			skb = frame->skb_prp;
-
-		skb_rx_port = hsr_skb_has_port(skb);
-		if (skb_rx_port) {
-			/* No PTP forwarding */
-			if (port->type != HSR_PT_MASTER)
-				continue;
-
-			skb = skb_clone(skb, GFP_ATOMIC);
-			/* Inject the PTP packet into the master interface
-			 * with HSR headers.
-			 */
-			goto inject_into_stack;
-		}
-
 		/* PTP TX packets have an outgoing port specified */
-		if (req_tx_port != HSR_PT_NONE && req_tx_port != port->type)
+		if (frame->req_tx_port != HSR_PT_NONE && frame->req_tx_port != port->type)
 			continue;
 		/* PTP TX packets may already have a HSR header which needs to
 		 * be preserved
 		 */
-		if (req_tx_keep_header) {
+		if (frame->has_foreign_header && frame->skb_std) {
 			skb = skb_clone(frame->skb_std, GFP_ATOMIC);
 			if (skb)
 				skb_set_owner_w(skb, frame->skb_std->sk);
@@ -857,16 +812,7 @@ int prp_fill_frame_info(__be16 proto, struct sk_buff *skb,
 			struct hsr_frame_info *frame)
 {
 	/* Supervision frame */
-	struct prp_rct *rct;
-
-	if (frame->has_foreign_header) {
-		struct hsr_port *port = frame->port_rcv;
-
-		frame->skb_std = skb;
-		WARN_ON_ONCE(port->type != HSR_PT_MASTER);
-		return 0;
-	}
-	rct = skb_get_PRP_rct(skb);
+	struct prp_rct *rct = skb_get_PRP_rct(skb);
 
 	if (rct &&
 	    prp_check_lsdu_size(skb, rct, frame->is_supervision)) {
@@ -882,7 +828,8 @@ int prp_fill_frame_info(__be16 proto, struct sk_buff *skb,
 }
 
 static int fill_frame_info(struct hsr_frame_info *frame,
-			   struct sk_buff *skb, struct hsr_port *port)
+			   struct sk_buff *skb, struct hsr_port *port,
+			   enum hsr_port_type tx_port, bool has_hsr_header)
 {
 	struct hsr_priv *hsr = port->hsr;
 	struct hsr_vlan_ethhdr *vlan_hdr;
@@ -915,9 +862,8 @@ static int fill_frame_info(struct hsr_frame_info *frame,
 	/* For Offloaded case, there is no need for node list since
 	 * firmware/hardware implements LRE function.
 	 */
-	if (hsr_skb_has_header(skb))
-		frame->has_foreign_header = true;
-
+	frame->req_tx_port = tx_port;
+	frame->has_foreign_header = has_hsr_header;
 	if (!hsr->fwd_offloaded && !frame->has_foreign_header) {
 		frame->node_src = hsr_get_node(port, n_db, skb,
 					       frame->is_supervision,
@@ -956,12 +902,13 @@ static int fill_frame_info(struct hsr_frame_info *frame,
 }
 
 /* Must be called holding rcu read lock (because of the port parameter) */
-void hsr_forward_skb(struct sk_buff *skb, struct hsr_port *port)
+void hsr_forward_skb(struct sk_buff *skb, struct hsr_port *port,
+		     enum hsr_port_type tx_port, bool has_hsr_header)
 {
 	struct hsr_frame_info frame;
 
 	rcu_read_lock();
-	if (fill_frame_info(&frame, skb, port) < 0)
+	if (fill_frame_info(&frame, skb, port, tx_port, has_hsr_header) < 0)
 		goto out_drop;
 	/* No need to register frame when rx offload is supported */
 	if (!port->hsr->fwd_offloaded && !frame.has_foreign_header)

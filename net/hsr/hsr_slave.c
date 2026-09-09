@@ -63,9 +63,8 @@ static rx_handler_result_t hsr_handle_frame(struct sk_buff **pskb)
 	skb_reset_mac_header(skb);
 	if ((!hsr->prot_version && protocol == htons(ETH_P_PRP)) ||
 	    protocol == htons(ETH_P_HSR)) {
-		if (!pskb_may_pull(skb, ETH_HLEN + HSR_HLEN)) {
+		if (!pskb_may_pull(skb, ETH_HLEN + HSR_HLEN))
 			goto finish_free_consume;
-		}
 
 		skb_set_network_header(skb, ETH_HLEN + HSR_HLEN);
 	}
@@ -76,34 +75,29 @@ static rx_handler_result_t hsr_handle_frame(struct sk_buff **pskb)
 	 */
 	if (port->type == HSR_PT_INTERLINK) {
 		spin_lock_bh(&hsr->seqnr_lock);
-		hsr_forward_skb(skb, port);
+		hsr_forward_skb(skb, port, HSR_PT_NONE, false);
 		spin_unlock_bh(&hsr->seqnr_lock);
 	} else {
 		struct hsr_ethhdr *hsr_ethhdr;
 
-		/* PTP packets are not supposed to be forwarded via HSR/ PRP
-		 * as-is. The latency introduced by forwarding renders
-		 * the time information useless.
-		 * Instead attach the port information on which it was
-		 * received, forward both copies to userland and let it deal
-		 * with it.
+		/* PTP packets are not supposed to be forwarded via HSR as-is.
+		 * The latency introduced by forwarding renders the time
+		 * information useless. Userland needs to capture the packet on
+		 * the original interface instead of hsr.
 		 */
 		if ((!hsr->prot_version && protocol == htons(ETH_P_PRP)) ||
 		    protocol == htons(ETH_P_HSR)) {
 			/* HSR */
 			hsr_ethhdr = (struct hsr_ethhdr *)skb_mac_header(skb);
-			if (hsr_ethhdr->hsr_tag.encap_proto == htons(ETH_P_1588)) {
-				if (!hsr_skb_add_header_port(skb, false, port->type))
-					goto finish_free_consume;
-			}
+			if (hsr_ethhdr->hsr_tag.encap_proto == htons(ETH_P_1588))
+				goto finish_free_consume;
 		} else {
-			if (protocol == htons(ETH_P_1588)) {
-				if (!hsr_skb_add_header_port(skb, false, port->type))
-					goto finish_free_consume;
-			}
+			/* PRP */
+			if (protocol == htons(ETH_P_1588))
+				goto finish_free_consume;
 		}
 
-		hsr_forward_skb(skb, port);
+		hsr_forward_skb(skb, port, HSR_PT_NONE, false);
 	}
 
 	return RX_HANDLER_CONSUMED;

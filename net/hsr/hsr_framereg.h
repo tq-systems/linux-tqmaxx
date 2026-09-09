@@ -29,6 +29,7 @@ struct hsr_frame_info {
 	bool is_from_san;
 	bool is_l2ptp;
 	bool has_foreign_header;
+	enum hsr_port_type req_tx_port;
 };
 
 void hsr_del_self_node(struct hsr_priv *hsr);

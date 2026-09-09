@@ -12,6 +12,8 @@
 
 #include <drm/drm_crtc.h>
 
+#include "tidss_drv.h"
+
 #define to_tidss_crtc(c) container_of((c), struct tidss_crtc, crtc)
 
 struct tidss_device;
@@ -24,6 +26,11 @@ struct tidss_crtc {
 	struct drm_pending_vblank_event *event;
 
 	struct completion framedone_completion;
+
+	bool self_refresh_pending_enable[TIDSS_MAX_PLANES];
+
+	/* Skip vp teardown/re-init on atomic_disable */
+	bool suppress_disable;
 };
 
 #define to_tidss_crtc_state(x) container_of(x, struct tidss_crtc_state, base)
@@ -31,6 +38,8 @@ struct tidss_crtc {
 struct tidss_crtc_state {
 	/* Must be first. */
 	struct drm_crtc_state base;
+
+	bool always_on_display;
 
 	bool plane_pos_changed;
 

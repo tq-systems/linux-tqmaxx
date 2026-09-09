@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-only or MIT
 /*
- * Device Tree file for the AM62L3 Badge
+ * https://www.beagleboard.org/boards/beaglebadge
  *
- * Copyright (C) 2025 Texas Instruments Incorporated - https://www.ti.com/
+ * Copyright (C) 2026 Texas Instruments Incorporated - https://www.ti.com/
  */
 
 /dts-v1/;
@@ -10,28 +10,25 @@
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/input/input.h>
 #include <dt-bindings/leds/common.h>
-#include <dt-bindings/net/ti-dp83867.h>
 #include "k3-am62l3.dtsi"
 #include "k3-pinctrl.h"
 
 / {
-	compatible = "beagle,am62l3-badge", "ti,am62l3";
-	model = "Texas Instruments AM62L3 Badge";
+	compatible = "beagle,am62l3-beaglebadge", "ti,am62l3";
+	model = "BeagleBoard.org BeagleBadge";
 
 	chosen {
-		stdout-path = &uart0;
+		stdout-path = "serial0:115200n8";
 	};
 
 	aliases {
-		gpio0 = &gpio0;
 		i2c0 = &i2c0;
 		i2c1 = &i2c1;
-		mmc0 = &sdhci0;
+		i2c2 = &i2c2;
+		i2c4 = &wkup_i2c0;
 		mmc1 = &sdhci1;
-		mmc2 = &sdhci2;
-		serial3 = &uart1;
-		usb0 = &usb0;
-		usb1 = &usb1;
+		serial0 = &uart0;
+		serial1 = &uart1;
 	};
 
 	memory@80000000 {
@@ -39,6 +36,22 @@
 		reg = <0x00000000 0x80000000 0x00000000 0x10000000>;
 		device_type = "memory";
 		bootph-all;
+	};
+
+	thermal-zones {
+		wkup0-thermal {
+			polling-delay-passive = <250>;	/* milliSeconds */
+			polling-delay = <500>;		/* milliSeconds */
+			thermal-sensors = <&vtm0 0>;
+
+			trips {
+				crit0 {
+					temperature = <125000>;
+					hysteresis = <2000>;
+					type = "critical";
+				};
+			};
+		};
 	};
 
 	/* RTC GPIO 0 - Connected to joystick */
@@ -77,8 +90,6 @@
 	gpio_keys: gpio-keys {
 		compatible = "gpio-keys";
 		autorepeat;
-		pinctrl-names = "default";
-		pinctrl-0 = <&main_usr_button_default_pins>;
 
 		button-select {
 			label = "SELECT";
@@ -119,25 +130,23 @@
 
 	multicolor-led {
 		compatible = "pwm-leds-multicolor";
-		pinctrl-names = "default";
-		pinctrl-0 = <&rgb_led_default_pins>;
 
 		multi-led {
 			color = <LED_COLOR_ID_RGB>;
 			max-brightness = <255>;
 
 			led-red {
-				pwms = <&ecap2 0 255 0>;
+				pwms = <&ecap2 0 10000000 0>;
 				color = <LED_COLOR_ID_RED>;
 			};
 
 			led-green {
-				pwms = <&ecap1 0 255 0>;
+				pwms = <&ecap1 0 10000000 0>;
 				color = <LED_COLOR_ID_GREEN>;
 			};
 
 			led-blue {
-				pwms = <&epwm1 1 255 0>;
+				pwms = <&epwm1 1 10000000 0>;
 				color = <LED_COLOR_ID_BLUE>;
 			};
 		};
@@ -169,8 +178,6 @@
 
 	pwm-beeper {
 		compatible = "pwm-beeper";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pwm_beeper_default_pins>;
 		pwms = <&epwm0 1 1000000 0>;
 		amp-supply = <&sensor_3v3>;
 	};
@@ -204,7 +211,7 @@
 		regulator-name = "VDD_3V3";
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
-		vin-supply = <&vsys_out>;
+		vin-supply = <&vcc_3v3_main>;
 		regulator-always-on;
 		regulator-boot-on;
 		bootph-all;
@@ -219,9 +226,9 @@
 		vin-supply = <&vdd_3v3>;
 		regulator-boot-on;
 		enable-active-high;
-		gpio = <&gpio0 16 GPIO_ACTIVE_HIGH>;
+		gpios = <&gpio0 16 GPIO_ACTIVE_HIGH>;
 		pinctrl-names = "default";
-		pinctrl-0 = <&vdd_3v3_sd_ena_default_pins>;
+		pinctrl-0 = <&vdd_3v3_sd_ena_pins_default>;
 		bootph-all;
 	};
 
@@ -233,11 +240,10 @@
 		regulator-max-microvolt = <3300000>;
 		vin-supply = <&vdd_3v3>;
 		regulator-boot-on;
-		regulator-always-on;
 		enable-active-high;
-		gpio = <&wkup_gpio0 1 GPIO_ACTIVE_HIGH>;
+		gpios = <&wkup_gpio0 1 GPIO_ACTIVE_HIGH>;
 		pinctrl-names = "default";
-		pinctrl-0 = <&sensor_3v3_ena_default_pins>;
+		pinctrl-0 = <&sensor_3v3_ena_pins_default>;
 		bootph-all;
 	};
 
@@ -254,7 +260,7 @@
 };
 
 &pmx0 {
-	main_uart0_default_pins: main-uart0-default-pins {
+	uart0_pins_default: uart0-default-pins {
 		pinctrl-single,pins = <
 			AM62LX_IOPAD(0x01b8, PIN_OUTPUT, 0) /* (C13) UART0_TXD */
 			AM62LX_IOPAD(0x01b4, PIN_INPUT, 0) /* (D13) UART0_RXD */
@@ -262,77 +268,75 @@
 		bootph-all;
 	};
 
-	main_uart0_wakeup_pins: main-uart0-wakeup-pins {
+	uart0_pins_wakeup: uart0-wakeup-pins {
 		pinctrl-single,pins = <
 			AM62LX_IOPAD(0x01b8, PIN_OUTPUT, 0) /* (C13) UART0_TXD */
 			AM62LX_IOPAD(0x01b4, PIN_INPUT | PIN_WKUP_EN, 0) /* (D13) UART0_RXD */
 		>;
+		bootph-all;
 	};
 
-	main_uart1_default_pins: main-uart1-default-pins {
+	uart1_pins_default: uart1-default-pins {
 		pinctrl-single,pins = <
-			AM62LX_IOPAD(0x019c, PIN_OUTPUT, 2) /* (A12) UART1_TXD */
-			AM62LX_IOPAD(0x0198, PIN_INPUT, 2) /* (C11) UART1_RXD */
-			AM62LX_IOPAD(0x0180, PIN_INPUT, 2) /* (A8) UART1_CTS */
-			AM62LX_IOPAD(0x0184, PIN_OUTPUT, 2) /* (B10) UART1_RTS */
+			AM62LX_IOPAD(0x019c, PIN_OUTPUT, 2) /* (A12) MCASP0_ACLKR.UART1_TXD */
+			AM62LX_IOPAD(0x0198, PIN_INPUT, 2) /* (C11) MCASP0_AFSR.UART1_RXD */
+			AM62LX_IOPAD(0x0180, PIN_INPUT, 2) /* (A8) MCASP0_AXR3.UART1_CTSn */
+			AM62LX_IOPAD(0x0184, PIN_OUTPUT, 2) /* (B10) MCASP0_AXR2.UART1_RTSn */
 		>;
+		bootph-all;
 	};
 
-	main_usr_button_default_pins: main-usr-button-default-pins {
+	usr_button_pins_default: usr-button-default-pins {
 		pinctrl-single,pins = <
-			AM62LX_IOPAD(0x00a4, PIN_INPUT, 7) /* (H18) GPMC0_AD11.GPIO0_26 | SELECT */
-			AM62LX_IOPAD(0x01e4, PIN_INPUT, 7) /* (D16) EXT_REFCLK1.GPIO0_104 | BACK*/
-			AM62LX_IOPAD(0x00c0, PIN_INPUT, 7) /* (N19) GPMC0_ADVn_ALE.GPIO0_32 | UP */
-			AM62LX_IOPAD(0x00e8, PIN_INPUT, 7) /* (L19) GPMC0_CSn1.GPIO0_42 | DOWN */
-			AM62LX_IOPAD(0x00b8, PIN_INPUT, 7) /* (L21) GPMC0_CLK.GPIO0_31 | LEFT */
-			AM62LX_IOPAD(0x01c0, PIN_INPUT, 7) /* (B13) UART0_RTSn.GPIO0_95 | RIGHT */
+			AM62LX_IOPAD(0x00a4, PIN_INPUT, 7) /* (H18) GPMC0_AD11.GPIO0_26 */
+			AM62LX_IOPAD(0x01e4, PIN_INPUT, 7) /* (D16) EXT_REFCLK1.GPIO0_104 */
+			AM62LX_IOPAD(0x00c0, PIN_INPUT, 7) /* (N19) GPMC0_ADVn_ALE.GPIO0_32 */
+			AM62LX_IOPAD(0x00e8, PIN_INPUT, 7) /* (L19) GPMC0_CSn1.GPIO0_42 */
+			AM62LX_IOPAD(0x00b8, PIN_INPUT, 7) /* (L21) GPMC0_CLK.GPIO0_31 */
+			AM62LX_IOPAD(0x01c0, PIN_INPUT, 7) /* (B13) UART0_RTSn.GPIO0_95 */
 		>;
+		bootph-all;
 	};
 
-	main_i2c0_default_pins: main-i2c0-default-pins {
+	i2c0_pins_default: i2c0-default-pins {
 		pinctrl-single,pins = <
 			AM62LX_IOPAD(0x01cc, PIN_INPUT_PULLUP, 0) /* (B7) I2C0_SCL */
 			AM62LX_IOPAD(0x01d0, PIN_INPUT_PULLUP, 0) /* (A7) I2C0_SDA */
 		>;
+		bootph-all;
 	};
 
-	main_i2c1_default_pins: main-i2c1-default-pins {
+	i2c1_pins_default: i2c1-default-pins {
 		pinctrl-single,pins = <
 			AM62LX_IOPAD(0x01d4, PIN_INPUT_PULLUP, 0) /* (D7) I2C1_SCL */
 			AM62LX_IOPAD(0x01d8, PIN_INPUT_PULLUP, 0) /* (A6) I2C1_SDA */
 		>;
+		bootph-all;
 	};
 
-	vdd_3v3_sd_ena_default_pins: vdd-3v3-sd-ena-default-pins {
+	i2c2_qwiic_pins_default: i2c2-qwiic-default-pins {
+		pinctrl-single,pins = <
+			AM62LX_IOPAD(0x01dc, PIN_INPUT_PULLUP, 0) /* (B8) I2C2_SCL */
+			AM62LX_IOPAD(0x01e0, PIN_INPUT_PULLUP, 0) /* (D8) I2C2_SDA */
+		>;
+		bootph-all;
+	};
+
+	vdd_3v3_sd_ena_pins_default: vdd-3v3-sd-ena-default-pins {
 		pinctrl-single,pins = <
 			AM62LX_IOPAD(0x07c, PIN_OUTPUT, 7) /* (L23) GPMC0_AD1.GPIO0_16 */
 		>;
 		bootph-all;
 	};
 
-	sensor_3v3_ena_default_pins: sensor-3v3-ena-default-pins {
+	sensor_3v3_ena_pins_default: sensor-3v3-ena-default-pins {
 		pinctrl-single,pins = <
 			AM62LX_IOPAD(0x004, PIN_OUTPUT, 7) /* (AA23) WKUP_UART0_TXD.WKUP_GPIO0_1 */
-		>;
-	};
-
-	main_mmc0_default_pins: main-mmc0-default-pins {
-		pinctrl-single,pins = <
-			AM62LX_IOPAD(0x0214, PIN_INPUT, 0) /* (D2) MMC0_CMD */
-			AM62LX_IOPAD(0x020c, PIN_OUTPUT, 0) /* (B2) MMC0_CLK */
-			AM62LX_IOPAD(0x0208, PIN_INPUT, 0) /* (D3) MMC0_DAT0 */
-			AM62LX_IOPAD(0x0204, PIN_INPUT_PULLUP, 0) /* (D4) MMC0_DAT1 */
-			AM62LX_IOPAD(0x0200, PIN_INPUT_PULLUP, 0) /* (C1) MMC0_DAT2 */
-			AM62LX_IOPAD(0x01fc, PIN_INPUT_PULLUP, 0) /* (C2) MMC0_DAT3 */
-			AM62LX_IOPAD(0x01f8, PIN_INPUT_PULLUP, 0) /* (C4) MMC0_DAT4 */
-			AM62LX_IOPAD(0x01f4, PIN_INPUT_PULLUP, 0) /* (B3) MMC0_DAT5 */
-			AM62LX_IOPAD(0x01f0, PIN_INPUT_PULLUP, 0) /* (A3) MMC0_DAT6 */
-			AM62LX_IOPAD(0x01ec, PIN_INPUT_PULLUP, 0) /* (B4) MMC0_DAT7 */
 		>;
 		bootph-all;
 	};
 
-	main_mmc1_default_pins: main-mmc1-default-pins {
+	mmc1_pins_default: mmc1-default-pins {
 		pinctrl-single,pins = <
 			AM62LX_IOPAD(0x0230, PIN_INPUT, 0) /* (Y3) MMC1_CMD */
 			AM62LX_IOPAD(0x0228, PIN_OUTPUT, 0) /* (Y2) MMC1_CLK */
@@ -340,12 +344,12 @@
 			AM62LX_IOPAD(0x0220, PIN_INPUT, 0) /* (Y4) MMC1_DAT1 */
 			AM62LX_IOPAD(0x021c, PIN_INPUT, 0) /* (AA2) MMC1_DAT2 */
 			AM62LX_IOPAD(0x0218, PIN_INPUT, 0) /* (AB2) MMC1_DAT3 */
-			AM62LX_IOPAD(0x0234, PIN_INPUT, 0) /* (B6) MMC1_SDCD */
+			AM62LX_IOPAD(0x0234, PIN_INPUT, 7) /* (B6) MMC1_SDCD.GPIO0_122 */
 		>;
 		bootph-all;
 	};
 
-	main_mmc2_pins_default: main-mmc2-default-pins {
+	mmc2_pins_default: mmc2-default-pins {
 		pinctrl-single,pins = <
 			AM62LX_IOPAD(0x010c, PIN_INPUT, 0) /* (U23) MMC2_CMD */
 			AM62LX_IOPAD(0x0104, PIN_OUTPUT, 0) /* (R23) MMC2_CLK */
@@ -357,47 +361,61 @@
 		>;
 	};
 
-	wlan_en_pins_default: wlan-en-pins-default {
+	wlan_en_pins_default: wlan-en-default-pins {
 		pinctrl-single,pins = <
 			AM62LX_IOPAD(0x0110, PIN_OUTPUT, 7) /* (T20) MMC2_SDCD.GPIO0_51 */
 		>;
 	};
 
-	main_wlirq_pins_default: main-wlirq-pins-default {
+	wlirq_pins_default: wlirq-default-pins {
 		pinctrl-single,pins = <
 			AM62LX_IOPAD(0x0114, PIN_INPUT, 7) /* (T21) MMC2_SDWP.GPIO0_52 */
 		>;
 	};
 
-	main_usb1_default_pins: main-usb1-default-pins {
+	usb1_pins_default: usb1-default-pins {
 		pinctrl-single,pins = <
-			AM62LX_IOPAD(0x0248, PIN_INPUT | PIN_DS_PULLUD_ENABLE | PIN_DS_PULL_UP, 0) /* (A5) USB1_DRVVBUS */
+			AM62LX_IOPAD(0x0248, PIN_INPUT | PIN_DS_PULLUD_ENABLE |
+				PIN_DS_PULL_UP, 0) /* (A5) USB1_DRVVBUS */
 		>;
+		bootph-all;
 	};
 
-	pwm_beeper_default_pins: pwm-beeper-default-pins {
+	pwm_beeper_pins_default: pwm-beeper-default-pins {
 		pinctrl-single,pins = <
 			AM62LX_IOPAD(0x00b0, PIN_OUTPUT, 4) /* (F22) GPMC0_AD14.EHRPWM0_B */
 		>;
 	};
 
-	pmic_irq_default_pins: pmic-irq-default-pins {
+	pmic_irq_pins_default: pmic-irq-default-pins {
 		pinctrl-single,pins = <
 			AM62LX_IOPAD(0x01e8, PIN_INPUT, 0) /* (C8) EXTINTn */
 		>;
+		bootph-all;
 	};
 
-	wkup_i2c0_default_pins: wkup-i2c0-default-pins {
+	wkup_i2c0_pins_default: wkup-i2c0-default-pins {
 		pinctrl-single,pins = <
 			AM62LX_IOPAD(0x0010, PIN_INPUT_PULLUP, 0) /* (AB22) WKUP_I2C0_SCL */
 			AM62LX_IOPAD(0x0014, PIN_INPUT_PULLUP, 0) /* (AA22) WKUP_I2C0_SDA */
 		>;
+		bootph-all;
 	};
 
-	rgb_led_default_pins: rgb-led-default-pins {
+	rgb_led_ecap2_pins_default: rgb-led-ecap2-default-pins {
 		pinctrl-single,pins = <
 			AM62LX_IOPAD(0x0190, PIN_OUTPUT, 2) /* (A11) MCASP0_ACLKX.ECAP2_IN_APWM_OUT */
+		>;
+	};
+
+	rgb_led_ecap1_pins_default: rgb-led-ecap1-default-pins {
+		pinctrl-single,pins = <
 			AM62LX_IOPAD(0x0188, PIN_OUTPUT, 2) /* (A9) MCASP0_AXR1.ECAP1_IN_APWM_OUT */
+		>;
+	};
+
+	rgb_led_epwm1_pins_default: rgb-led-epwm1-default-pins {
+		pinctrl-single,pins = <
 			AM62LX_IOPAD(0x018c, PIN_OUTPUT, 5) /* (B9) MCASP0_AXR0.EHRPWM1_B */
 		>;
 	};
@@ -421,16 +439,17 @@
 		>;
 	};
 
-	main_spi1_pins_default: main-spi1-default-pins {
+	spi1_pins_default: spi1-default-pins {
 		pinctrl-single,pins = <
 			AM62LX_IOPAD(0x008c, PIN_OUTPUT, 4) /* (H22) GPMC0_AD5.SPI1_CLK */
 			AM62LX_IOPAD(0x0088, PIN_OUTPUT, 4) /* (K23) GPMC0_AD4.SPI1_CS0 */
 			AM62LX_IOPAD(0x0080, PIN_INPUT, 4) /* (K22) GPMC0_AD2.SPI1_D0 */
 			AM62LX_IOPAD(0x0084, PIN_OUTPUT, 4) /* (J23) GPMC0_AD3.SPI1_D1 */
 		>;
+		bootph-all;
 	};
 
-	main_spi3_pins_default: main-spi3-default-pins {
+	spi3_pins_default: spi3-default-pins {
 		pinctrl-single,pins = <
 			AM62LX_IOPAD(0x00d0, PIN_OUTPUT, 5) /* (P22) GPMC0_BE1n.SPI3_CLK */
 			AM62LX_IOPAD(0x00cc, PIN_OUTPUT, 5) /* (P23) GPMC0_BE0n_CLE.SPI3_CS0 */
@@ -441,53 +460,77 @@
 
 	mcp23s18_reset_pins_default: mcp23s18-reset-default-pins {
 		pinctrl-single,pins = <
-			AM62LX_IOPAD(0x00a0, PIN_OUTPUT, 4) /* (H21) GPMC0_AD10.GPIO0_25 */
+			AM62LX_IOPAD(0x00a0, PIN_OUTPUT, 7) /* (H21) GPMC0_AD10.GPIO0_25 */
+		>;
+	};
+
+	epwm2_pins_default: epwm2-default-pins {
+		pinctrl-single,pins = <
+			AM62LX_IOPAD(0x00c4, PIN_OUTPUT, 4) /* (N20) GPMC0_OEn_REn.EHRPWM2_A */
 		>;
 	};
 
 	lora_control_pins_default: lora-control-default-pins {
 		pinctrl-single,pins = <
-			AM62LX_IOPAD(0x00c8, PIN_OUTPUT, 7) /* (M19) GPMC0_WEn.GPIO0_34 | RESET */
-			AM62LX_IOPAD(0x00e4, PIN_OUTPUT, 7) /* (L20) GPMC0_CSn0.GPIO0_41 | RF SW */
-			AM62LX_IOPAD(0x01a4, PIN_INPUT, 7) /* (D11) SPI0_CS1.GPIO0_88 | BUSY */
-			AM62LX_IOPAD(0x01bc, PIN_INPUT, 7) /* (B14) UART0_CTSn.GPIO0_94 | DIO (IRQ) */
+			AM62LX_IOPAD(0x00c8, PIN_OUTPUT, 7) /* (M19) GPMC0_WEn.GPIO0_34 */
+			AM62LX_IOPAD(0x00e4, PIN_OUTPUT, 7) /* (L20) GPMC0_CSn0.GPIO0_41 */
+			AM62LX_IOPAD(0x01a4, PIN_INPUT, 7) /* (D11) SPI0_CS1.GPIO0_88 */
+			AM62LX_IOPAD(0x01bc, PIN_INPUT, 7) /* (B14) UART0_CTSn.GPIO0_94 */
 		>;
+		bootph-all;
+	};
+
+	gpio0_pins_default: gpio0-default-pins {
+		pinctrl-single,pins = <
+			AM62LX_IOPAD(0x0078, PIN_OUTPUT, 7) /* (L22) GPMC0_AD0.GPIO0_15 */
+			AM62LX_IOPAD(0x00e0, PIN_INPUT, 7) /* (M21) GPMC0_DIR.GPIO0_40 */
+			AM62LX_IOPAD(0x00ec, PIN_OUTPUT, 7) /* (M23) GPMC0_CSn2.GPIO0_43 */
+			AM62LX_IOPAD(0x00f0, PIN_INPUT, 7) /* (M22) GPMC0_CSn3.GPIO0_44 */
+			AM62LX_IOPAD(0x0194, PIN_OUTPUT, 7) /* (B11) MCASP0_AFSX.GPIO0_84 */
+		>;
+		bootph-all;
 	};
 };
 
 &uart0 {
-	pinctrl-0 = <&main_uart0_default_pins>;
-	pinctrl-1 = <&main_uart0_wakeup_pins>;
-	pinctrl-names = "default", "wakeup";
 	wakeup-source;
-	status = "okay";
+	pinctrl-0 = <&uart0_pins_default>;
+	pinctrl-1 = <&uart0_pins_wakeup>;
+	pinctrl-names = "default", "wakeup";
 	bootph-all;
+	status = "okay";
 };
 
 &uart1 {
-	status = "okay";
 	pinctrl-names = "default";
-	pinctrl-0 = <&main_uart1_default_pins>;
+	pinctrl-0 = <&uart1_pins_default>;
 	bootph-all;
+	status = "okay";
 
 	bluetooth {
 		compatible = "ti,cc33xx-bt";
-		cc33xx-supply = <&wlan_en>;
 		max-speed = <115200>;
+		cc33xx-supply = <&wlan_en>;
 	};
 };
 
 &i2c0 {
-	status = "okay";
-	pinctrl-names = "default";
-	pinctrl-0 = <&main_i2c0_default_pins>;
 	clock-frequency = <400000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&i2c0_pins_default>;
 	bootph-all;
+	status = "okay";
+
+	/* T&H Sensor */
+	th-sensor@44 {
+		compatible = "sensirion,sht4x";
+		reg = <0x44>;
+	};
 
 	/* EEPROM */
 	eeprom@50 {
 		/* FT24C32A-ELRT */
-		compatible = "atmel,24c512";
+		compatible = "atmel,24c32";
 		reg = <0x50>;
 	};
 
@@ -504,25 +547,29 @@
 		vdd-supply = <&vcc_3v3_main>;
 		vddio-supply = <&vcc_3v3_main>;
 	};
-
-	/* T&H Sensor */
-	th-sensor@44 {
-		compatible = "sensirion,sht4x";
-		reg = <0x44>;
-	};
 };
 
 &i2c1 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&main_i2c1_default_pins>;
 	clock-frequency = <400000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&i2c1_pins_default>;
 	bootph-all;
+	status = "okay";
+};
+
+&i2c2 {
+	clock-frequency = <400000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&i2c2_qwiic_pins_default>;
+	bootph-all;
+	status = "okay";
 };
 
 &wkup_i2c0 {
 	clock-frequency = <400000>;
 	pinctrl-names = "default";
-	pinctrl-0 = <&wkup_i2c0_default_pins>;
+	pinctrl-0 = <&wkup_i2c0_pins_default>;
+	bootph-all;
 	status = "okay";
 
 	tps65214: pmic@30 {
@@ -530,15 +577,15 @@
 		reg = <0x30>;
 		interrupt-parent = <&gic500>;
 		interrupts = <GIC_SPI 224 IRQ_TYPE_LEVEL_HIGH>;
-		pinctrl-names = "default";
-		pinctrl-0 = <&pmic_irq_default_pins>;
-		ti,power-button;
-
 		buck1-supply = <&vcc_3v3_main>;
 		buck2-supply = <&vcc_3v3_main>;
 		buck3-supply = <&vcc_3v3_main>;
 		ldo1-supply = <&vcc_3v3_main>;
 		ldo2-supply = <&vcc_3v3_main>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pmic_irq_pins_default>;
+		ti,power-button;
+		bootph-all;
 
 		regulators {
 			buck1_reg: buck1 {
@@ -585,74 +632,64 @@
 };
 
 &gpio0 {
+	gpio-line-names = "","","","","","","","","","",	/* 0-9 */
+			 "","","","","","BOOST_5V_ENA","VDD_3V3_SD_ENA","","","",	/* 10-19 */
+			 "","","","","","MCP23S18_RESET","BTN_SELECT","","","",	/* 20-29 */
+			 "","BTN_LEFT","BTN_UP","","LORA_RESET","","","","","",	/* 30-39 */
+			 "GAUGE_BATLOW","LORA_RFSW","BTN_DOWN","USB_RST","MBUS_INT","","","","","",	/* 40-49 */
+			 "","WLAN_EN","","","","","","","","",	/* 50-59 */
+			 "","","","","","","","","","",	/* 60-69 */
+			 "","","","","","","","","","",	/* 70-79 */
+			 "","","","","MBUS_RST","","","","LORA_BUSY","",	/* 80-89 */
+			 "","","","","LORA_DIO","BTN_RIGHT","","","","",	/* 90-99 */
+			 "","","","","BTN_BACK","","","","","",	/* 100-109 */
+			 "","","","","","","","","","",	/* 110-119 */
+			 "","","SD_CD","","","";	/* 120-125 */
 	pinctrl-names = "default";
-	pinctrl-0 = <&lora_control_pins_default>;
-	status = "okay";
+	pinctrl-0 = <&gpio0_pins_default>, <&usr_button_pins_default>, <&lora_control_pins_default>;
 	bootph-all;
-	gpio-line-names ="","","","","","","","","","", //GPIO0_0->9
-			 "","","","","","","vdd_3v3_sd_ena","","","", //GPIO0_10->19
-			 "","","","","","mcp23s18_reset","button_select","","","", //GPIO0_20->29
-			 "","button_left","button_up","","lora_reset","","","","","", //GPIO0_30->39
-			 "","lora_rfsw","button_down","","","","","","","", //GPIO0_40->49
-			 "","wlan_ena","","","","","","","","", //GPIO0_50->59
-			 "","","","","","","","","","", //GPIO0_60->69
-			 "","","","","","","","","","", //GPIO0_70->79
-			 "","","","","","","","","lora_busy","", //GPIO0_80->89
-			 "","","","","lora_dio","button_right","","","","", //GPIO0_90->99
-			 "","","","","button_back","","","","",""; //GPIO0_100->109
-};
-
-&gpio2 {
 	status = "okay";
-	bootph-all;
 };
 
 &wkup_gpio0 {
-	status = "okay";
-
-	gpio-line-names ="","sensor_3v3_ena","","","","","",""; //GPIO0_0->7
-};
-
-&sdhci0 {
-	/* eMMC */
-	non-removable;
-	pinctrl-names = "default";
-	pinctrl-0 = <&main_mmc0_default_pins>;
-	status = "okay";
+	gpio-line-names = "","SENSOR_3V3_ENA","","","","","","";	/* 0-7 */
 	bootph-all;
+	status = "okay";
 };
 
 &sdhci1 {
 	/* SD/MMC */
 	vmmc-supply = <&vdd_3v3_sd>;
-	pinctrl-names = "default";
-	pinctrl-0 = <&main_mmc1_default_pins>;
 	disable-wp;
-	status = "okay";
+	cd-gpios = <&gpio0 122 GPIO_ACTIVE_LOW>;
+	cd-debounce-delay-ms = <100>;
+	ti,fails-without-test-cd;
+	pinctrl-names = "default";
+	pinctrl-0 = <&mmc1_pins_default>;
 	bootph-all;
+	status = "okay";
 };
 
 &sdhci2 {
-	vmmc-supply = <&wlan_en>;
-	pinctrl-names = "default";
-	pinctrl-0 = <&main_mmc2_pins_default>;
-	bus-width = <4>;
-	non-removable;
-	ti,fails-without-test-cd;
-	cap-power-off-card;
-	keep-power-in-suspend;
-	ti,driver-strength-ohm = <50>;
 	#address-cells = <1>;
 	#size-cells = <0>;
+	vmmc-supply = <&wlan_en>;
+	bus-width = <4>;
+	non-removable;
+	cap-power-off-card;
+	keep-power-in-suspend;
+	pinctrl-names = "default";
+	pinctrl-0 = <&mmc2_pins_default>;
+	ti,driver-strength-ohm = <50>;
 	status = "okay";
 
 	wlcore: wlcore@2 {
 		compatible = "ti,cc3300";
 		reg = <2>;
-		pinctrl-names = "default";
-		pinctrl-0 = <&main_wlirq_pins_default>;
 		interrupt-parent = <&gpio0>;
 		interrupts = <52 IRQ_TYPE_EDGE_RISING>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&wlirq_pins_default>;
 	};
 };
 
@@ -669,22 +706,32 @@
 };
 
 &epwm0 {
-	/* For PWM Beeper */
+	pinctrl-names = "default";
+	pinctrl-0 = <&pwm_beeper_pins_default>;
 	status = "okay";
 };
 
 &epwm1 {
-	/* For RGB LED */
+	pinctrl-names = "default";
+	pinctrl-0 = <&rgb_led_epwm1_pins_default>;
+	status = "okay";
+};
+
+&epwm2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&epwm2_pins_default>;
 	status = "okay";
 };
 
 &ecap1 {
-	/* For RGB LED */
+	pinctrl-names = "default";
+	pinctrl-0 = <&rgb_led_ecap1_pins_default>;
 	status = "okay";
 };
 
 &ecap2 {
-	/* For RGB LED */
+	pinctrl-names = "default";
+	pinctrl-0 = <&rgb_led_ecap2_pins_default>;
 	status = "okay";
 };
 
@@ -696,29 +743,30 @@
 &usb0 {
 	usb-role-switch;
 	bootph-all;
+	status = "okay";
 };
 
 &usbss1 {
 	ti,vbus-divider;
-	status = "okay";
 	bootph-all;
+	status = "okay";
 };
 
 &usb1 {
 	dr_mode = "host";
 	pinctrl-names = "default";
-	pinctrl-0 = <&main_usb1_default_pins>;
+	pinctrl-0 = <&usb1_pins_default>;
 	bootph-all;
+	status = "okay";
 };
 
 &ospi0 {
-	bootph-all;
-	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&ospi0_pins_default>;
+	bootph-all;
+	status = "okay";
 
 	ospi0_nor: flash@0 {
-		bootph-all;
 		compatible = "jedec,spi-nor";
 		reg = <0x0>;
 		spi-tx-bus-width = <8>;
@@ -730,12 +778,13 @@
 		cdns,tslch-ns = <60>;
 		cdns,read-delay = <4>;
 		cdns,phy-mode;
+		bootph-all;
 
 		partitions {
-			bootph-all;
 			compatible = "fixed-partitions";
 			#address-cells = <1>;
 			#size-cells = <1>;
+			bootph-all;
 
 			partition@0 {
 				label = "ospi.tiboot3";
@@ -779,25 +828,25 @@
 
 &spi1 {
 	pinctrl-names = "default";
-	pinctrl-0 = <&main_spi1_pins_default>;
+	pinctrl-0 = <&spi1_pins_default>;
 	status = "okay";
 
 	mcp23s18: gpio@0 {
 		compatible = "microchip,mcp23s18";
-		pinctrl-names = "default";
-		pinctrl-0 = <&mcp23s18_reset_pins_default>;
 		reg = <0>;
 		spi-max-frequency = <10000000>;
 		gpio-controller;
 		#gpio-cells = <2>;
-		microchip,spi-present-mask = <0x01>;
 		reset-gpios = <&gpio0 25 GPIO_ACTIVE_LOW>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&mcp23s18_reset_pins_default>;
+		microchip,spi-present-mask = /bits/ 8 <0x01>;
 	};
 };
 
 &spi3 {
 	pinctrl-names = "default";
-	pinctrl-0 = <&main_spi3_pins_default>;
+	pinctrl-0 = <&spi3_pins_default>;
 	status = "okay";
 
 	sx1262_lora: lora@0 {
