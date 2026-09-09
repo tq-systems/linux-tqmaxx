@@ -1698,6 +1698,7 @@ void ata_scsi_requeue_deferred_qc(struct ata_port *ap)
 
 	scmd = qc->scsicmd;
 	ap->deferred_qc = NULL;
+	cancel_work(&ap->deferred_qc_work);
 	ata_qc_free(qc);
 	scmd->result = (DID_SOFT_ERROR << 16);
 	scsi_done(scmd);
@@ -3093,6 +3094,9 @@ ata_scsi_find_dev(struct ata_port *ap, const struct scsi_device *scsidev)
 {
 	struct ata_device *dev = __ata_scsi_find_dev(ap, scsidev);
 
+	if (!ata_adapter_is_online(ap))
+		return NULL;
+
 	if (unlikely(!dev || !ata_dev_enabled(dev)))
 		return NULL;
 
@@ -3595,7 +3599,7 @@ static unsigned int ata_scsiop_maint_in(struct ata_device *dev,
 
 	if (cdb[2] != 1 && cdb[2] != 3) {
 		ata_dev_warn(dev, "invalid command format %d\n", cdb[2]);
-		ata_scsi_set_invalid_field(dev, cmd, 1, 0xff);
+		ata_scsi_set_invalid_field(dev, cmd, 2, 0xff);
 		return 0;
 	}
 
