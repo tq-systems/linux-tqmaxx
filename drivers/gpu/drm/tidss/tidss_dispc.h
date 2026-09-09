@@ -57,6 +57,7 @@ struct dispc_vid_info {
 
 struct dispc_errata {
 	bool i2000; /* DSS Does Not Support YUV Pixel Data Formats */
+	bool i2097; /* OVR Layer Disable May Cause Sync Lost */
 };
 
 enum dispc_vp_bus_type {
@@ -92,6 +93,8 @@ struct dispc_features {
 	u32 num_vids;
 	struct dispc_vid_info vid_info[TIDSS_MAX_PLANES];
 	u32 vid_order[TIDSS_MAX_PLANES];
+	/* The DSS has VP_CONTROL.DPIENABLE bit */
+	bool has_vp_control_dpienable;
 
 	/*
 	 * Size of the DMA FIFO buffer available for self-refresh mode in bytes.
@@ -140,7 +143,8 @@ void dispc_vp_disable_clk(struct dispc_device *dispc, u32 hw_videoport);
 int dispc_vp_set_clk_rate(struct dispc_device *dispc, u32 hw_videoport,
 			  unsigned long rate);
 void dispc_vp_setup(struct dispc_device *dispc, u32 hw_videoport,
-		    const struct drm_crtc_state *state, bool newmodeset);
+		    const struct drm_crtc_state *state, bool newmodeset,
+		    bool dpi_output);
 
 int dispc_runtime_suspend(struct dispc_device *dispc);
 int dispc_runtime_resume(struct dispc_device *dispc);
